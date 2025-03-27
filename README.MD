@@ -3,8 +3,8 @@
 Forum Thread
 ![Discord](https://img.shields.io/discord/1337164726802579597?label=Discord)
 ![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?style=flat)
-Modrinth
-Github Releases
+![Modrinth Version](https://img.shields.io/modrinth/v/c4u7nzUZ?style=flat)
+![GitHub Release](https://img.shields.io/github/v/release/mkram17/Bazaar-Utils?style=flat&color=green)
 
 ## Features
 
