@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.Events.ChatHandler;
 import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.Utils.Commands;
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
+import com.github.mkram17.bazaarutils.Utils.ItemUpdater;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
@@ -22,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
+    public static ItemUpdater updater = new ItemUpdater();
 
     @Override
     public void onInitializeClient() {
@@ -40,7 +42,7 @@ public class BazaarUtils implements ClientModInitializer {
         ChatHandler.subscribe();
         gui.registerScreenEvent();
         eventBus.subscribe(gui);
-
+        eventBus.subscribe(updater);
     }
 
     private void registerCommands() {

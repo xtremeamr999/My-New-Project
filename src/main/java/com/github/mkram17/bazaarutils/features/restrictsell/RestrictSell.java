@@ -17,6 +17,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO make sure this works with sacks
 //TODO maybe color chest if it is locked
 //TODO use custom size for safety clicks left
 public class RestrictSell {

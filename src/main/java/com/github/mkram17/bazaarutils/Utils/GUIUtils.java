@@ -38,10 +38,15 @@ public class GUIUtils {
         if(containerName == null) return false;
         return containerName.contains("Instant Buy");
     }
+    public boolean inBuyOrders(){
+        if(containerName == null) return false;
+        return containerName.contains("Co-op Bazaar Orders");
+    }
+
     public boolean inBazaar(){
 //        return false;
         if(containerName == null) return false;
-        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar");
+        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar") || inBuyOrders();
     }
     private GenericContainerScreen chestScreen;
     @Getter

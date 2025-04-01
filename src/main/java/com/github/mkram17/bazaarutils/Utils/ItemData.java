@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 
 //TODO figure out how to handle rounding with price
+//TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
 public class ItemData {
     public static ItemData getItem(int index){

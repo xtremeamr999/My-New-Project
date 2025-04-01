@@ -71,11 +71,11 @@ public class Util {
     }
 
 
-    public static void addWatchedItem(String itemName, Double price, boolean isSellOrder, int volume) {
+    public static void addWatchedItem(String itemName, Double fullPrice, boolean isSellOrder, int volume) {
         itemName = itemName.toLowerCase();
         if (BazaarData.findProductId(itemName) != null) {
             ItemData.priceTypes type = isSellOrder ? ItemData.priceTypes.INSTABUY : ItemData.priceTypes.INSTASELL;
-            ItemData itemToAdd = new ItemData(itemName, price, type, volume);
+            ItemData itemToAdd = new ItemData(itemName, fullPrice, type, volume);
             BUConfig.get().watchedItems.add(itemToAdd);
             notifyAll("Added item: § " + itemToAdd.getGeneralInfo(), notificationTypes.ITEMDATA);
         } else {

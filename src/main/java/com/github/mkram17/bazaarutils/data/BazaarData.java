@@ -1,13 +1,14 @@
 package com.github.mkram17.bazaarutils.data;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Utils.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.google.gson.*;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +18,8 @@ public class BazaarData {
 
     private static String jsonString;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final String productNameFile = "C:\\mc modding\\Bazaar-Utils-1.21.4\\src\\main\\resources\\Bazaar Resources.json";
-    private static final String dataFile = "C:\\mc modding\\Bazaar-Utils-1.21.4\\src\\main\\resources\\Bazaar Json.json";
+    private static final String PRODUCT_NAME_RESOURCE = "bazaar_resources.json";
+//    private static final String dataFile = "bazaar_json.json";
     static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
 
 
@@ -38,7 +39,7 @@ public class BazaarData {
                         throwable.printStackTrace();
                     } else {
                         jsonString = getAsPrettyJsonObject(reply);
-                        writeJsonToFile(jsonString);
+//                        writeJsonToFile(jsonString);
 
                         if (!BUConfig.get().watchedItems.isEmpty()) {
                             ItemData.update();
@@ -48,14 +49,34 @@ public class BazaarData {
         }, 1, 1, TimeUnit.SECONDS);
     }
 
-    private static void writeJsonToFile(String jsonString) {
-        try (FileWriter writer = new FileWriter(dataFile)) {
-            writer.write(jsonString);
+    public static JsonObject loadResourceJson(String resourcePath) {
+        try (InputStream inputStream = BazaarUtils.class.getClassLoader().getResourceAsStream("assets/bazaarutils/" + resourcePath)) {
+            if (inputStream == null) {
+                Util.notifyAll("Could not find resource: " + resourcePath, Util.notificationTypes.ERROR);
+                return new JsonObject();
+            }
+
+            InputStreamReader reader = new InputStreamReader(inputStream);
+            return JsonParser.parseReader(reader).getAsJsonObject();
         } catch (IOException e) {
-            Util.notifyAll("Error writing JSON data to file: " + e.getMessage(), Util.notificationTypes.BAZAARDATA);
+            Util.notifyAll("Error reading resource: " + e.getMessage(), Util.notificationTypes.ERROR);
             e.printStackTrace();
+            return new JsonObject();
         }
     }
+
+//    public static File getDataFile() {
+//        return FabricLoader.getInstance().getConfigDir().resolve("bazaarutils_data.json").toFile();
+//    }
+
+//    private static void writeJsonToFile(String jsonString) {
+//        try (FileWriter writer = new FileWriter(getDataFile())) {
+//            writer.write(jsonString);
+//        } catch (IOException e) {
+//            Util.notifyAll("Error writing JSON data to file: " + e.getMessage(), Util.notificationTypes.BAZAARDATA);
+//            e.printStackTrace();
+//        }
+//    }
 
     //(product id, what you are looking for in quick status-- either buyPrice or sellPrice)
     public static Double findItemPrice(String productId, ItemData.priceTypes priceType) {
@@ -85,12 +106,12 @@ public class BazaarData {
     }
 
     //returns null if it cant find anything, gets product id from natural name
-    public static String findProductId(String name){
+    public static String findProductId(String name) {
         JsonObject resources;
         JsonObject bazaarConversions;
 
-        try (FileReader reader = new FileReader(productNameFile)){
-            resources = gson.fromJson(reader, JsonObject.class);
+        try {
+            resources = loadResourceJson(PRODUCT_NAME_RESOURCE);
             bazaarConversions = resources.getAsJsonObject("bazaarConversions");
 
             for (String key : bazaarConversions.keySet()) {
@@ -98,11 +119,12 @@ public class BazaarData {
                     return key;
                 }
             }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            Util.notifyAll("Error finding product ID: " + e.getMessage(), Util.notificationTypes.ERROR);
+            e.printStackTrace();
         }
-        Util.notifyAll("Couldnt find product id", Util.notificationTypes.BAZAARDATA);
+
+        Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);
         return null;
     }
 

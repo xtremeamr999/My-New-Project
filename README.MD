@@ -14,6 +14,9 @@ Forum Thread
 - Outdated Item Notifications (tells you in chat when an order has been undercut, click message to open bazaar if you have a cookie)
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
 
+### Links
+#### Discord https://discord.gg/xDKjvm5hQd Modrinth https://modrinth.com/mod/bazaar-utils
+
 ## Using Bazaar Utils
 
 REMEMBER -- if your bazaar flipper account upgrade is not level two, change your bazaar tax with /bazaarutils tax or the mod wont work right
