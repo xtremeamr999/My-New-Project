@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.mixin;
+package com.github.mkram17.bazaarutils.mixin.DevOnly;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;

@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 //TODO change the message number instead of sending more
+//TODO message looks ugly -- see ticket #2
 public class OutdatedItems {
     @Getter @Setter
     private boolean autoOpenEnabled;

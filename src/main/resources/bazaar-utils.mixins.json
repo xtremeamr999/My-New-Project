@@ -9,8 +9,8 @@
 		"DrawContentMixin",
 		"MixinSignOpen",
 		"MixinSimpleInventory",
-		"YggdrasilMinecraftSessionServiceMixin",
-		"YggdrasilServicesKeyInfoMixin"
+      "DevOnly.YggdrasilMinecraftSessionServiceMixin",
+      "DevOnly.YggdrasilServicesKeyInfoMixin"
 
 	],
 	"injectors": {
