@@ -1,6 +1,5 @@
 # Bazaar Utils
 
-Forum Thread
 ![Discord](https://img.shields.io/discord/1337164726802579597?label=Discord)
 ![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?style=flat)
 ![Modrinth Version](https://img.shields.io/modrinth/v/c4u7nzUZ?style=flat)
