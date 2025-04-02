@@ -51,7 +51,7 @@ public class ChatHandler {
                     price /= (1 - BUConfig.get().bzTax);
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedItem(itemName, price, !(messageType == messageTypes.BUYORDER), volume);
-                Util.notifyAll(itemName + " was added with a price of " + price, Util.notificationTypes.ITEMDATA);
+                Util.notifyAll(itemName + " was added with a total price of " + price, Util.notificationTypes.ITEMDATA);
             }
 
             if (messageType == messageTypes.FILLED) {
@@ -80,14 +80,23 @@ public class ChatHandler {
 
     public static void handleCancelled(ArrayList<Text> siblings) {
         double totalPrice;
-        String priceString = siblings.get(4).getString();
-        totalPrice = Double.parseDouble(priceString.substring(0, priceString.indexOf(" coins")).replace(",", ""));
-        ItemData item = ItemData.findItemTotalPrice(totalPrice);
-        if(item != null){
-            item.remove();
-        } else{
-            Util.notifyAll("Error finding cancelled item.", Util.notificationTypes.ERROR);
-
+        ItemData item;
+        try {
+            String infoString = siblings.get(4).getString();
+            if(infoString.contains("coins")) {
+                totalPrice = Double.parseDouble(infoString.substring(0, infoString.indexOf(" coins")).replace(",", ""));
+                item = ItemData.findItemTotalPrice(totalPrice);
+            } else {
+                String name = siblings.get(6).getString().trim();
+                item = ItemData.findItem(name, null, 3, null);
+            }
+            if (item != null) {
+                item.remove();
+            } else {
+                Util.notifyAll("Error finding cancelled item.", Util.notificationTypes.ERROR);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

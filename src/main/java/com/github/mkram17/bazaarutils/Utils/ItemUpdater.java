@@ -31,7 +31,8 @@ public class ItemUpdater {
             String name = "";
             boolean isSellOrder;
             double fullPrice;
-            int volume;
+            int volumeFilled;
+            int totalVolume;
             List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
             if(customName.contains("BUY")){
                 name = customName.substring(4);
@@ -40,12 +41,26 @@ public class ItemUpdater {
                 name = customName.substring(5);
                 isSellOrder = true;
             }
+            var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
+            volumeFilled = Integer.valueOf(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
+            totalVolume = Integer.valueOf(volumeFilledString.substring(volumeFilledString.indexOf("/")+1, volumeFilledString.lastIndexOf(" ")));
+            fullPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"))*totalVolume;
 
-            volume = Integer.valueOf(changedComponents.get(13).getString().substring(0, changedComponents.get(13).getString().indexOf(" ")));
-//            Util.addWatchedItem();
+            ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
+//            updateWithItem(tempItem);
         }
     }
 
+    private static void updateWithItem(ItemData foundItem){
+        ItemData match = ItemData.findItem(foundItem.getName(), foundItem.getPrice(), foundItem.getVolume(), foundItem.getPriceType());
+        if(match == null)
+            return;
+        if(match.getPrice() != foundItem.getPrice()){
+            Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPrice() + " to " + foundItem.getPrice());
+            match.setPrice(foundItem.getPrice());
+        }
+
+    }
     private static ArrayList<ItemStack> findOrders(List<ItemStack> orderStacks){
             ArrayList<ItemStack> items = new ArrayList<>();
             int lastBlackPaneIndex = -1, firstAfterIndex = -1;

@@ -1,14 +1,18 @@
 package com.github.mkram17.bazaarutils.data;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Utils.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.google.gson.*;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +22,7 @@ public class BazaarData {
 
     private static String jsonString;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final String PRODUCT_NAME_RESOURCE = "bazaar_resources.json";
+    private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
 //    private static final String dataFile = "bazaar_json.json";
     static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
 
@@ -50,16 +54,23 @@ public class BazaarData {
     }
 
     public static JsonObject loadResourceJson(String resourcePath) {
-        try (InputStream inputStream = BazaarUtils.class.getClassLoader().getResourceAsStream("assets/bazaarutils/" + resourcePath)) {
-            if (inputStream == null) {
+        ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+        Identifier resourceId = Identifier.of("bazaar-utils", resourcePath);
+
+        try {
+            Optional<Resource> optionalResource = resourceManager.getResource(resourceId);
+            if (optionalResource.isPresent()) {
+                Resource resource = optionalResource.get();
+                try (InputStream inputStream = resource.getInputStream();
+                     InputStreamReader reader = new InputStreamReader(inputStream)) {
+                    return JsonParser.parseReader(reader).getAsJsonObject();
+                }
+            } else {
                 Util.notifyAll("Could not find resource: " + resourcePath, Util.notificationTypes.ERROR);
                 return new JsonObject();
             }
-
-            InputStreamReader reader = new InputStreamReader(inputStream);
-            return JsonParser.parseReader(reader).getAsJsonObject();
         } catch (IOException e) {
-            Util.notifyAll("Error reading resource: " + e.getMessage(), Util.notificationTypes.ERROR);
+            Util.notifyAll("Error reading resource: " + resourcePath, Util.notificationTypes.ERROR);
             e.printStackTrace();
             return new JsonObject();
         }

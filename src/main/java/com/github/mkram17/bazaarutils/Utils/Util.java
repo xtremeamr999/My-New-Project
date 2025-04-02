@@ -16,6 +16,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class Util {
     public enum notificationTypes {
@@ -42,7 +43,7 @@ public class Util {
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
 
-        if (notiType.isEnabled() || BUConfig.get().developer.allMessages) {
+        if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
             if (MinecraftClient.getInstance().player != null) {
                 MinecraftClient.getInstance().player.sendMessage(Text.literal("[" + simpleCallingName + "] " + messageStr), false);
             }
@@ -79,7 +80,7 @@ public class Util {
             BUConfig.get().watchedItems.add(itemToAdd);
             notifyAll("Added item: § " + itemToAdd.getGeneralInfo(), notificationTypes.ITEMDATA);
         } else {
-            notifyAll("Could not add item: § " + itemName + " §a (is it spelled correctly?)", notificationTypes.ERROR);
+            notifyAll("Could not add item: § " + itemName + "  (is it spelled correctly?)", notificationTypes.ERROR);
         }
         ItemData.update();
     }
@@ -92,6 +93,23 @@ public class Util {
     public static String getCallingClassName() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         return stackTrace[3].getClassName().substring(stackTrace[3].getClassName().lastIndexOf(".") + 1);
+    }
+
+    public static int findComponentIndex(List<Text> components, String lookingFor){
+        int num = 0;
+        for(Text component : components){
+            if(component.getString().contains(lookingFor))
+                return num;
+            num++;
+        }
+            return -1;
+    }
+    public static String findComponentWith(List<Text> components, String lookingFor){
+        for(Text component : components){
+            if(component.getString().contains(lookingFor))
+                return component.getString();
+        }
+            return null;
     }
 
     public static void copyToClipboard(String clip) {
@@ -138,7 +156,39 @@ public class Util {
         }
         return input.substring(0, index);
     }
+    public static String extractTextAfterWord(String text, String word) {
+        if (text == null || word == null || text.isEmpty() || word.isEmpty()) {
+            return "";
+        }
 
+        int wordIndex = text.indexOf(word);
+        if (wordIndex == -1) {
+            return ""; // Word not found
+        }
+
+        // Start looking after the word
+        int startIndex = wordIndex + word.length();
+        if (startIndex >= text.length()) {
+            return ""; // Word is at the end of the text
+        }
+
+        // Skip spaces after the word
+        while (startIndex < text.length() && Character.isWhitespace(text.charAt(startIndex))) {
+            startIndex++;
+        }
+
+        if (startIndex >= text.length()) {
+            return ""; // No non-space characters after the word
+        }
+
+        // Find the next space after non-space content
+        int endIndex = startIndex;
+        while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
+            endIndex++;
+        }
+
+        return removeFormatting(text.substring(startIndex, endIndex));
+    }
     public static double removeTrailingZeroes(double value) {
         return Double.parseDouble(String.valueOf(value).replaceAll("\\.0$", "").replaceAll("(\\.\\d*?)0+$", "$1"));
     }
