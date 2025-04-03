@@ -82,9 +82,18 @@ public class Util {
         } else {
             notifyAll("Could not add item: § " + itemName + "  (is it spelled correctly?)", notificationTypes.ERROR);
         }
+        BUConfig.HANDLER.save();
         ItemData.update();
     }
 
+    public static void addWatchedItem(ItemData item){
+        if(item == null)
+            return;
+        BUConfig.get().watchedItems.add(item);
+        notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
+        BUConfig.HANDLER.save();
+        ItemData.update();
+    }
     public static void startExecutors() {
         BazaarData.scheduleBazaar();
         ItemData.scheduleNotifyOutdated();
@@ -120,7 +129,16 @@ public class Util {
     public static String removeFormatting(String str) {
         return str.replaceAll("§.", "").replace(",", "").trim();
     }
+    public static int parseNumber(String input) {
+        input = input.toUpperCase();
+        double value = Double.parseDouble(input.replaceAll("[^0-9.]", ""));
 
+        if (input.endsWith("K")) return (int) (value * 1_000);
+        if (input.endsWith("M")) return (int) (value * 1_000_000);
+        if (input.endsWith("B")) return (int) (value * 1_000_000_000);
+
+        return (int) value;
+    }
     public static <T> void writeFile(T content) {
         try {
             Files.write(Paths.get("bazaar_data.json"), content.toString().getBytes());

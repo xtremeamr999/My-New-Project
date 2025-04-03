@@ -1,5 +1,5 @@
 # gradle
-**/DevOnly/
+#**/DevOnly/
 .gradle/
 build/
 out/

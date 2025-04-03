@@ -122,13 +122,12 @@ public class ChatHandler {
                     item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTASELL);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
-                volumeClaimed = Integer.parseInt(siblings.get(5).getString().replace(",", ""));
+//                volumeClaimed = Integer.parseInt(siblings.get(5).getString().replace(",", ""));
                 itemName = siblings.get(7).getString().trim();
-                String priceString = siblings.get(7).getString();
-                price = Double.parseDouble(priceString.substring(0, priceString.indexOf(" coins")).replace(",", ""))/volumeClaimed;
-                item = ItemData.findItem(itemName, price, volumeClaimed, ItemData.priceTypes.INSTABUY);
+                String priceString = siblings.get(9).getString();
+                price = Double.parseDouble(priceString.trim().replace(",", ""));
+                item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTABUY);
             }
-
 
 
             if (item == null) {
@@ -143,8 +142,8 @@ public class ChatHandler {
                 Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
             }
         } catch (Exception ex) {
-            Util.notifyAll("Error in order text: " + siblings, Util.notificationTypes.ERROR);
             ex.printStackTrace();
+            Util.notifyAll("Error in order claim text: " + siblings, Util.notificationTypes.ERROR);
         }
     }
 

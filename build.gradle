@@ -72,6 +72,9 @@ dependencies {
 	modImplementation("curse.maven:modernkeybinding-695433:6016136")
 	include("curse.maven:modernkeybinding-695433:6016136")
 
+	//mixin constraints
+	include(implementation("com.moulberry:mixinconstraints:1.0.8"))
+
 }
 fabricApi {
 	configureDataGeneration {

@@ -146,7 +146,7 @@ public class ItemData {
     }
 
     //untested
-    //run by ex: getVariables((item) -> item.getPrice()) or (chatgpt) ItemData.getVariables(ItemData::getPrice);
+    //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> ArrayList<T> getVariables(Function<ItemData, T> variable){
         ArrayList<T> variables = new ArrayList<>();
         for(ItemData item : BUConfig.get().watchedItems){
@@ -200,7 +200,7 @@ public class ItemData {
     public static void notifyOutdated(){
         if(notifyOutdatedSeconds % BUConfig.get().outdatedItems.getOutdatedTiming() == 0 && BUConfig.get().outdatedItems.isNotifyOutdated()) {
             for (ItemData item : outdated) {
-                Util.notifyAll(item.getGeneralInfo() + " is outdated.");
+                Util.notifyAll(item.getName() + " is outdated.");
             }
         }
         notifyOutdatedSeconds++;

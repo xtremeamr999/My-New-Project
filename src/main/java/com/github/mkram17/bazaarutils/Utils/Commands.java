@@ -189,6 +189,13 @@ public class Commands {
                                     )
                             )
                     );
+            bazaarutils.then(ClientCommandManager.literal("list")
+                            .executes(context -> {
+                                        Util.notifyAll(ItemData.getVariables(ItemData::getName));
+                                        return 1;
+                                    }
+                            )
+                    );
         }
 //
         CommandNode<FabricClientCommandSource> bazaarutilsNode = dispatcher.register(bazaarutils);
