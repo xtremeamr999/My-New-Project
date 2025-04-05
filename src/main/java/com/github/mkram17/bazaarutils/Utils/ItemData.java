@@ -7,13 +7,13 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import meteordevelopment.orbit.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 
@@ -116,13 +116,6 @@ public class ItemData {
         findOutdated();
     }
 
-    public static void scheduleNotifyOutdated(){
-        //if its a decimal, it will schedule decimal for every second as ex: .3 = every 3 seconds
-        if(BUConfig.get().outdatedItems.isNotifyOutdated()) {
-            timeExecutor.scheduleAtFixedRate(ItemData::notifyOutdated, 0, 1, TimeUnit.SECONDS);
-        }
-    }
-
     private static void updateMarketPrices(){
         for(ItemData item: BUConfig.get().watchedItems) {
             double oldPrice = item.marketPrice;
@@ -145,7 +138,6 @@ public class ItemData {
         return Math.abs(getPrice() - price) <= maximumRounding;
     }
 
-    //untested
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> ArrayList<T> getVariables(Function<ItemData, T> variable){
         ArrayList<T> variables = new ArrayList<>();
@@ -196,13 +188,12 @@ public class ItemData {
         return itemList.getFirst();
     }
 
-    //maybe replace with using ItemOutdatedEvent?
-    public static void notifyOutdated(){
-        if(notifyOutdatedSeconds % BUConfig.get().outdatedItems.getOutdatedTiming() == 0 && BUConfig.get().outdatedItems.isNotifyOutdated()) {
-            for (ItemData item : outdated) {
-                Util.notifyAll(item.getName() + " is outdated.");
-            }
-        }
+    @EventHandler
+    public static void notifyOutdated(OutdatedItemEvent e) {
+        if (!BUConfig.get().outdatedItems.isNotifyOutdated())
+            return;
+        Util.notifyAll(e.getItem().getName() + " is outdated.");
+
         notifyOutdatedSeconds++;
     }
 

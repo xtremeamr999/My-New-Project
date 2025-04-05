@@ -71,7 +71,6 @@ public class Util {
                 ), false);
     }
 
-
     public static void addWatchedItem(String itemName, Double fullPrice, boolean isSellOrder, int volume) {
         itemName = itemName.toLowerCase();
         if (BazaarData.findProductId(itemName) != null) {
@@ -96,7 +95,6 @@ public class Util {
     }
     public static void startExecutors() {
         BazaarData.scheduleBazaar();
-        ItemData.scheduleNotifyOutdated();
     }
 
     public static String getCallingClassName() {
