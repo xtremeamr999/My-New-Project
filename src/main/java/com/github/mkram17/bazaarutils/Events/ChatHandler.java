@@ -49,6 +49,7 @@ public class ChatHandler {
                 price = Util.getPrettyNumber(Double.parseDouble(siblings.get(7).getString().substring(0, siblings.get(7).getString().indexOf(" coin")).replace(",", "")));
                 if (messageType == messageTypes.SELLORDER)
                     price /= (1 - BUConfig.get().bzTax);
+                price = (double) Math.round(price * 10) / 10;
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedItem(itemName, price, !(messageType == messageTypes.BUYORDER), volume);
                 Util.notifyAll(itemName + " was added with a total price of " + price, Util.notificationTypes.ITEMDATA);
@@ -59,9 +60,9 @@ public class ChatHandler {
                 volume = Integer.parseInt(messageText.substring(messageText.indexOf("for") + 4, messageText.indexOf("x")).replace(",", ""));
                 itemName = messageText.substring(messageText.indexOf("x") + 2, messageText.indexOf("was") - 1);
                 if(messageText.contains("Sell Offer"))
-                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTABUY);
+                    item = ItemData.findItemFromChat(itemName, null, volume, ItemData.priceTypes.INSTABUY);
                 else
-                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItemFromChat(itemName, null, volume, ItemData.priceTypes.INSTASELL);
                 if(item == null)
                     Util.notifyAll("Could not find item to fill with info vol: "+ volume + " name: " + itemName, Util.notificationTypes.ERROR);
                 else {
@@ -88,7 +89,7 @@ public class ChatHandler {
                 item = ItemData.findItemTotalPrice(totalPrice);
             } else {
                 String name = siblings.get(6).getString().trim();
-                item = ItemData.findItem(name, null, 3, null);
+                item = ItemData.findItemFromChat(name, null, 3, null);
             }
             if (item != null) {
                 item.remove();
@@ -117,24 +118,24 @@ public class ChatHandler {
                 String priceString = siblings.get(7).getString();
                 price = Double.parseDouble(priceString.substring(0, priceString.indexOf(" coins")).replace(",", ""))/volumeClaimed;
                 if(ItemData.getVariables(ItemData::getVolume).contains(volumeClaimed))
-                    item = ItemData.findItem(itemName, price, volumeClaimed, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItemFromChat(itemName, price, volumeClaimed, ItemData.priceTypes.INSTASELL);
                 else
-                    item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItemFromChat(itemName, price, null, ItemData.priceTypes.INSTASELL);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
 //                volumeClaimed = Integer.parseInt(siblings.get(5).getString().replace(",", ""));
                 itemName = siblings.get(7).getString().trim();
                 String priceString = siblings.get(9).getString();
                 price = Double.parseDouble(priceString.trim().replace(",", ""));
-                item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTABUY);
+                item = ItemData.findItemFromChat(itemName, price, null, ItemData.priceTypes.INSTABUY);
             }
 
-
+//TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
             if (item == null) {
                 Util.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ITEMDATA);
                 return;
             }
-            if (item.getVolume() == volumeClaimed) {
+            if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
                 Util.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
                 ItemData.removeItem(item);
             } else {

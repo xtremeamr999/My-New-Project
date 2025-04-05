@@ -23,13 +23,11 @@ public class OutdatedItems {
     private boolean autoOpenEnabled;
     @Getter @Setter
     private boolean notifyOutdated;
-    @Getter @Setter
-    private int outdatedTiming;
 
-    public OutdatedItems(boolean autoOpenEnabled, boolean notifyOutdated, int outdatedTiming) {
+
+    public OutdatedItems(boolean autoOpenEnabled, boolean notifyOutdated) {
         this.autoOpenEnabled = autoOpenEnabled;
         this.notifyOutdated = notifyOutdated;
-        this.outdatedTiming = outdatedTiming;
     }
 
     @EventHandler

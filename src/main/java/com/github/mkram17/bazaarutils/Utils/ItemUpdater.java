@@ -66,36 +66,14 @@ public class ItemUpdater {
 
     private static void removeOldItems(List<ItemData> foundItems){
         for(ItemData item : BUConfig.get().watchedItems){
-            if(findItem(item, foundItems) != null)
+            if(ItemData.findItem(item, foundItems) != null)
                 continue;
             item.remove();
             Util.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
         }
+        BUConfig.HANDLER.save();
     }
-    private static ItemData findItem(ItemData matchingItem, List<ItemData> list) {
-        String name = matchingItem.getName();
-        double price = matchingItem.getPrice();
-        int volume = matchingItem.getVolume();
-        ItemData.priceTypes priceType = matchingItem.getPriceType();
-                ArrayList<ItemData> itemList = new ArrayList<>();
-        for(ItemData item : list){
-            if(item.isSimilarPrice(price) &&
-                    item.getVolume() == volume + item.getAmountClaimed() &&
-                    name.equalsIgnoreCase(item.getName()) &&
-                    priceType == item.getPriceType()){
-                itemList.add(item);
-            }
-        }
-        if (itemList.isEmpty()) {
-            return null;
-        }
-        if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
-                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
-        }
-        return itemList.getFirst();
-    }
+
     private static ItemData updateWithItem(ItemData foundItem){
         ItemData match = ItemData.findItem(foundItem.getName(), foundItem.getPrice(), foundItem.getVolume(), foundItem.getPriceType());
         if(match == null) {
@@ -107,6 +85,7 @@ public class ItemUpdater {
             Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPrice() + " to " + foundItem.getPrice(), Util.notificationTypes.ITEMDATA);
             match.setPrice(foundItem.getPrice());
         }
+        BUConfig.HANDLER.save();
         return null;
     }
 
@@ -137,6 +116,10 @@ public class ItemUpdater {
                 if(!orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE))
                     items.add(orderScreenStacks.get(i));
             }
+
+            //if there are no items last index+1 will be arrow, so in that case it should return empty list
+            if(orderScreenStacks.get(lastBlackPaneIndex+1).isOf(Items.ARROW))
+                return new ArrayList<>();
 
             return items;
     }

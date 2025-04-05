@@ -7,7 +7,6 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import meteordevelopment.orbit.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -168,6 +167,52 @@ public class ItemData {
         }
         return itemList.getFirst();
     }
+    public static ItemData findItem(ItemData matchingItem, List<ItemData> list) {
+        String name = matchingItem.getName();
+        double price = matchingItem.getPrice();
+        int volume = matchingItem.getVolume();
+        ItemData.priceTypes priceType = matchingItem.getPriceType();
+        ArrayList<ItemData> itemList = new ArrayList<>();
+        for(ItemData item : list){
+            if(item.isSimilarPrice(price) &&
+                    item.getVolume() == volume + item.getAmountClaimed() &&
+                    name.equalsIgnoreCase(item.getName()) &&
+                    priceType == item.getPriceType()){
+                itemList.add(item);
+            }
+        }
+        if (itemList.isEmpty()) {
+            return null;
+        }
+        if (itemList.size() > 1) {
+            itemList.forEach(duplicate -> {
+                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
+            });
+        }
+        return itemList.getFirst();
+    }
+
+    public static ItemData findItemFromChat(String name, Double price, Integer volumeLeft, priceTypes priceType) {
+        ArrayList<ItemData> itemList = new ArrayList<>();
+        for(ItemData item : BUConfig.get().watchedItems){
+            if((price == null || Math.abs(item.getPrice() - price) < 1) &&
+                    (volumeLeft == null || item.getVolume() == volumeLeft + item.getAmountClaimed()) &&
+                    (name == null || name.equalsIgnoreCase(item.getName())) &&
+                    (priceType == null || priceType == item.getPriceType())){
+                itemList.add(item);
+            }
+        }
+        if (itemList.isEmpty()) {
+            Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volumeLeft + "]", Util.notificationTypes.ITEMDATA);
+            return null;
+        }
+        if (itemList.size() > 1) {
+            itemList.forEach(duplicate -> {
+                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
+            });
+        }
+        return itemList.getFirst();
+    }
     public static ItemData findItemTotalPrice(double totalPrice) {
         ArrayList<ItemData> itemList = new ArrayList<>();
         for(ItemData item : BUConfig.get().watchedItems){
@@ -188,22 +233,13 @@ public class ItemData {
         return itemList.getFirst();
     }
 
-    @EventHandler
-    public static void notifyOutdated(OutdatedItemEvent e) {
-        if (!BUConfig.get().outdatedItems.isNotifyOutdated())
-            return;
-        Util.notifyAll(e.getItem().getName() + " is outdated.");
-
-        notifyOutdatedSeconds++;
-    }
-
     private static void findOutdated(){
         List<ItemData> oldOutdated = new ArrayList<>(outdated);
         outdated.clear();
-        for(ItemData item: BUConfig.get().watchedItems){
+        for(ItemData item : BUConfig.get().watchedItems){
             if(item.isOutdated()) {
                 outdated.add(item);
-                if(!oldOutdated.contains(item))
+                if(ItemData.findItem(item, outdated) == null)
                     BazaarUtils.eventBus.post(new OutdatedItemEvent(item));
             }
         }
