@@ -43,7 +43,7 @@ public class FlipHelper extends CustomItemButton {
 
             inCancelOrderScreen = false;
             ItemStack cancelItem = e.getItemStacks().get(11);
-            if(cancelItem.getCustomName().getString().contains("Cancel"))
+            if(!cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"))
                 inCancelOrderScreen = true;
 
             flipPrice = item.getFlipPrice();
@@ -53,11 +53,12 @@ public class FlipHelper extends CustomItemButton {
     public void handleFlip() {
         if(item != null && flipPrice != 0 && BazaarUtils.gui.wasLastChestFlip()) {
             GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)));
-            GUIUtils.closeHandledScreen();
+            GUIUtils.closeSign();
             item.flipItem(flipPrice);
         }
     }
 
+    //not an event, just uses data from the event
     public ItemData getFlipItem(ChestLoadedEvent e){
 
         for (ItemStack itemStack : e.getItemStacks()) {
@@ -101,7 +102,7 @@ public class FlipHelper extends CustomItemButton {
                 Util.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);
                 return true;
             }else {
-                Util.notifyAll("found match, but isnt filled", Util.notificationTypes.ERROR);
+                Util.notifyAll("found match, but isnt filled", Util.notificationTypes.GUI);
                 return true;
             }
         }

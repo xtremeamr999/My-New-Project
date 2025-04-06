@@ -84,16 +84,23 @@ public class GUIUtils {
         itemStacks = e.getItemStacks();
     }
 
-    public static void closeHandledScreen(){
+    public static void closeHandledScreen() {
         try {
             Util.notifyAll("Closing gui", Util.notificationTypes.GUI);
-//            Thread.sleep(300);
             MinecraftClient client = MinecraftClient.getInstance();
-            if (client != null && client.player != null) {
-                MinecraftClient.getInstance().player.closeHandledScreen();
-            } else {
-                Util.notifyAll("Error closing gui: something was null", Util.notificationTypes.ERROR);
+            if (client == null) {
+                Util.notifyAll("Client is null", Util.notificationTypes.ERROR);
+                return;
             }
+
+            client.execute(() -> {
+                var player = client.player;
+                if (player != null) {
+                    player.closeHandledScreen();
+                } else {
+                    Util.notifyAll("Player is null", Util.notificationTypes.ERROR);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
             Util.notifyAll("Error closing gui", Util.notificationTypes.ERROR);
@@ -103,9 +110,9 @@ public class GUIUtils {
     public static void closeSign(){
         try {
             Util.notifyAll("Closing sign", Util.notificationTypes.GUI);
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client != null && client.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
-                signEditScreen.close();
+            MinecraftClient mcclient = MinecraftClient.getInstance();
+            if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
+                mcclient.execute(signEditScreen::close);
 //                signEditScreen.removed();
 //                client.setScreen(null);
             } else {

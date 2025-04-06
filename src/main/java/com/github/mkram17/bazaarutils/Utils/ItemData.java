@@ -175,7 +175,7 @@ public class ItemData {
         ArrayList<ItemData> itemList = new ArrayList<>();
         for(ItemData item : list){
             if(item.isSimilarPrice(price) &&
-                    item.getVolume() == volume + item.getAmountClaimed() &&
+                    item.getVolume() == volume &&
                     name.equalsIgnoreCase(item.getName()) &&
                     priceType == item.getPriceType()){
                 itemList.add(item);
@@ -192,11 +192,12 @@ public class ItemData {
         return itemList.getFirst();
     }
 
+    //TODO fix volume finding -- probably a better way to do this
     public static ItemData findItemFromChat(String name, Double price, Integer volumeLeft, priceTypes priceType) {
         ArrayList<ItemData> itemList = new ArrayList<>();
         for(ItemData item : BUConfig.get().watchedItems){
             if((price == null || Math.abs(item.getPrice() - price) < 1) &&
-                    (volumeLeft == null || item.getVolume() == volumeLeft + item.getAmountClaimed()) &&
+                    (volumeLeft == null || item.getVolume() == volumeLeft + item.getAmountClaimed() || item.getVolume() == volumeLeft) &&
                     (name == null || name.equalsIgnoreCase(item.getName())) &&
                     (priceType == null || priceType == item.getPriceType())){
                 itemList.add(item);
@@ -239,7 +240,7 @@ public class ItemData {
         for(ItemData item : BUConfig.get().watchedItems){
             if(item.isOutdated()) {
                 outdated.add(item);
-                if(ItemData.findItem(item, outdated) == null)
+                if(ItemData.findItem(item, oldOutdated) == null)
                     BazaarUtils.eventBus.post(new OutdatedItemEvent(item));
             }
         }
@@ -271,9 +272,12 @@ public class ItemData {
 
     public static void removeItem(ItemData item){
         BUConfig.get().watchedItems.remove(item);
+        BUConfig.HANDLER.save();
     }
     public void remove(){
-        BUConfig.get().watchedItems.remove(this);
+        if(!BUConfig.get().watchedItems.remove(this))
+            Util.notifyAll("Error removing " + name + " from watched items. Item couldnt be found.");
+        BUConfig.HANDLER.save();
     }
     public static void clearItems(){
         for(ItemData item: BUConfig.get().watchedItems)

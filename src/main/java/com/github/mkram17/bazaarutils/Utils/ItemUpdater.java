@@ -26,6 +26,7 @@ public class ItemUpdater {
         updateWatchedItems(orderStacks);
     }
 
+    //TODO low priority -- update amount claimed as well
     private static void updateWatchedItems(ArrayList<ItemStack> orderStacks){
         List<ItemData> foundItems = new ArrayList<>();
         for(ItemStack stack : orderStacks){
@@ -34,7 +35,7 @@ public class ItemUpdater {
             boolean isSellOrder;
             double unitPrice;
             double fullPrice;
-            int volumeFilled;
+            int volumeFilled = -1;
             int totalVolume;
             List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
             if(customName.contains("BUY")){
@@ -57,6 +58,11 @@ public class ItemUpdater {
 
             ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
 
+            if(volumeFilled != -1)
+                tempItem.setAmountFilled(volumeFilled);
+            if(volumeFilled == totalVolume)
+                tempItem.setStatus(ItemData.statuses.FILLED);
+
             //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found
             foundItems.add(tempItem);
             Util.addWatchedItem(updateWithItem(tempItem));
@@ -75,7 +81,7 @@ public class ItemUpdater {
     }
 
     private static ItemData updateWithItem(ItemData foundItem){
-        ItemData match = ItemData.findItem(foundItem.getName(), foundItem.getPrice(), foundItem.getVolume(), foundItem.getPriceType());
+        ItemData match = ItemData.findItem(foundItem, BUConfig.get().watchedItems);
         if(match == null) {
             Util.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
             return foundItem;
@@ -84,6 +90,14 @@ public class ItemUpdater {
         if(match.getPrice() != foundItem.getPrice()){
             Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPrice() + " to " + foundItem.getPrice(), Util.notificationTypes.ITEMDATA);
             match.setPrice(foundItem.getPrice());
+        }
+        if(match.getStatus() != foundItem.getStatus()){
+            Util.notifyAll("Updating status of " + match.getName() + " from " + match.getStatus() + " to " + foundItem.getStatus(), Util.notificationTypes.ITEMDATA);
+            match.setStatus(foundItem.getStatus());
+        }
+        if(match.getAmountFilled() != foundItem.getAmountFilled()){
+            Util.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
+            match.setAmountFilled(foundItem.getAmountFilled());
         }
         BUConfig.HANDLER.save();
         return null;
