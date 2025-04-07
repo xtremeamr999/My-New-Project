@@ -123,6 +123,7 @@ public class ChatHandler {
                     item = ItemData.findItemFromChat(itemName, price, null, ItemData.priceTypes.INSTASELL);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
+                //TODO figure out when there is a volume included in message
 //                volumeClaimed = Integer.parseInt(siblings.get(5).getString().replace(",", ""));
                 itemName = siblings.get(7).getString().trim();
                 String priceString = siblings.get(9).getString();
@@ -138,7 +139,7 @@ public class ChatHandler {
             if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
                 Util.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
                 ItemData.removeItem(item);
-            } else {
+            } else if(volumeClaimed != null){
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
                 Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
             }
