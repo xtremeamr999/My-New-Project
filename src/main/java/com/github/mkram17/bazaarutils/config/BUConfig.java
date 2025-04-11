@@ -4,10 +4,10 @@ import com.github.mkram17.bazaarutils.Utils.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelper;
-import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelperSettings;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrderSettings;
+import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelper;
+import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelperSettings;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.google.gson.GsonBuilder;
@@ -47,9 +47,7 @@ public class BUConfig {
     @SerialEntry
     public double bzTax = 0.01125;
     @SerialEntry
-    public ArrayList<CustomOrder> customOrders = new ArrayList<>(List.of(
-            new CustomOrder(new CustomOrderSettings(true, 71680, 17, CustomOrder.COLORMAP.get(0)))
-    ));
+    public ArrayList<CustomOrder> customOrders = new ArrayList<>();
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
@@ -87,7 +85,9 @@ public class BUConfig {
                     .build()
             );
 
-
+            if (customOrders.isEmpty()) {
+                customOrders.add(new CustomOrder(new CustomOrderSettings(true, 71680, 17, CustomOrder.COLORMAP.get(0))));
+            }
             OptionGroup.Builder customOrdersGroupBuilder = OptionGroup.createBuilder()
                     .name(Text.literal("Custom Buy Amounts"))
                     .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));

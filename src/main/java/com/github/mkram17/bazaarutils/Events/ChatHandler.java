@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO seems like there are still some places where it doesnt round. ex 10.8723333 not 10.9
 public class ChatHandler {
     private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED, CANCELLED}
 
@@ -46,13 +47,19 @@ public class ChatHandler {
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(siblings.get(5).getString());
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
-                price = Util.getPrettyNumber(Double.parseDouble(siblings.get(7).getString().substring(0, siblings.get(7).getString().indexOf(" coin")).replace(",", "")));
-                if (messageType == messageTypes.SELLORDER)
+                String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
+                totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+                price = Double.parseDouble(totalPriceString)/volume;
+                ItemData itemToAdd;
+                if (messageType == messageTypes.SELLORDER) {
                     price /= (1 - BUConfig.get().bzTax);
-                price = (double) Math.round(price * 10) / 10;
+                    itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTABUY, volume);
+                } else
+                    itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTASELL, volume);
+
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
-                Util.addWatchedItem(itemName, price, !(messageType == messageTypes.BUYORDER), volume);
-                Util.notifyAll(itemName + " was added with a total price of " + price, Util.notificationTypes.ITEMDATA);
+                Util.addWatchedItem(itemToAdd);
+                Util.notifyAll(itemName + " was added with a price of " + itemToAdd.getPrice(), Util.notificationTypes.ITEMDATA);
             }
 
             if (messageType == messageTypes.FILLED) {

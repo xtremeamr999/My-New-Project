@@ -27,7 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//TODO fix some bugs with disabling and enabling each order not working
+//TODO fix some bugs with disabling and enabling each order not working -- might just be max buy order
+//TODO fix bug where after flip help button it will still show in orders screen
 @NoArgsConstructor
 public class CustomOrder extends CustomItemButton {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.GREEN_STAINED_GLASS_PANE));

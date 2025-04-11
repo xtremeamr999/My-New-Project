@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 //TODO change the message number instead of sending more
-//TODO message looks ugly -- see ticket #2
 public class OutdatedItems {
     @Getter @Setter
     private boolean autoOpenEnabled;
@@ -33,7 +32,7 @@ public class OutdatedItems {
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated)
-            Util.notifyChatCommand("Your order for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated.", "bz");
+            Util.notifyChatCommand("Your order for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
         if(BazaarUtils.gui.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{

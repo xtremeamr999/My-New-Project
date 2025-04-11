@@ -97,6 +97,7 @@ public class ItemData {
         this.productId = BazaarData.findProductId(name);
         this.volume = volume;
         this.price = fullPrice/volume;
+        price = (double) Math.round(price * 100) / 100;
         this.status = statuses.SET;
         this.maximumRounding = getMaxRouding(fullPrice, volume);
     }

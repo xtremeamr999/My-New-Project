@@ -12,12 +12,12 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO not working properly in prod env with mods
 public class ItemUpdater {
     private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
     private static List<ItemStack> orderScreen;
     @EventHandler
     public static void onGUI(ChestLoadedEvent e){
-        //TODO make in orders screen method
         if(!BazaarUtils.gui.inBuyOrders())
             return;
 
@@ -49,10 +49,12 @@ public class ItemUpdater {
             if(Util.findComponentWith(changedComponents, "Filled") != null) {
                 var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
                 volumeFilled = Integer.valueOf(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
+                //might be able to find actual volume here as well instead of approximating it
                 totalVolume = Integer.valueOf(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
             } else {
                 fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
-                totalVolume = (int) Math.round(fullPrice/unitPrice);
+                //havent tested fully, so might not work if number ever uses k/m or if it's not always the index 1 of the siblings
+                totalVolume = Integer.parseInt(changedComponents.get(2).getSiblings().get(1).getString());
             }
             fullPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"))*totalVolume;
 
@@ -71,12 +73,19 @@ public class ItemUpdater {
     }
 
     private static void removeOldItems(List<ItemData> foundItems){
+        List<ItemData> itemsToRemove = new ArrayList<>();
+
         for(ItemData item : BUConfig.get().watchedItems){
-            if(ItemData.findItem(item, foundItems) != null)
-                continue;
+            if(ItemData.findItem(item, foundItems) == null) {
+                itemsToRemove.add(item);
+            }
+        }
+
+        for(ItemData item : itemsToRemove) {
             item.remove();
             Util.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
         }
+
         BUConfig.HANDLER.save();
     }
 

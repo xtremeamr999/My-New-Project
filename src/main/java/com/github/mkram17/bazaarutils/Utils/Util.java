@@ -102,6 +102,7 @@ public class Util {
         return stackTrace[3].getClassName().substring(stackTrace[3].getClassName().lastIndexOf(".") + 1);
     }
 
+    //finds the first index that contains lookingFor, so there could be another later which would cause problems
     public static int findComponentIndex(List<Text> components, String lookingFor){
         int num = 0;
         for(Text component : components){

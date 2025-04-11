@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+//TODO not working properly in prod env with mods
 public class FlipHelper extends CustomItemButton {
     public double flipPrice;
     private double orderPrice = -1;
