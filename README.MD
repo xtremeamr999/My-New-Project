@@ -44,5 +44,4 @@ Other commands:
 
 - Option to disable pick up stash messages/control frequency of them
 - Option to change how often you are notified about outdated orders
-- Automatically add items from before mod was downloaded
 

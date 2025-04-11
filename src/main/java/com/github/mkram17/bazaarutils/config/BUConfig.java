@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.Utils.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashHelper;
+import com.github.mkram17.bazaarutils.features.StashMessages;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrderSettings;
 import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelper;
@@ -59,6 +60,8 @@ public class BUConfig {
     public RestrictSell restrictSell = new RestrictSell(true, 3, new ArrayList<>(List.of(new RestrictSellControl(RestrictSell.restrictBy.PRICE, 1000000))));
     @SerialEntry
     public Developer developer = new Developer();
+    @SerialEntry
+    public StashMessages stashMessages = new StashMessages(false);
 
     public static void openGUI() {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -81,6 +84,7 @@ public class BUConfig {
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
                     .option(stashHelper.createOption())
+                    .option(stashMessages.createOption())
                     .group(restrictSellGroupBuilder.build())
                     .build()
             );

@@ -15,6 +15,17 @@ public class ChatHandler {
 
     public static void subscribe() {
         registerBazaarChat();
+        registerStashRemover();
+    }
+
+    //TODO there is a small blank message when stash messages are removed, try to fix this -- medium priority
+    public static void registerStashRemover(){
+        //five? separate messages
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            if(BUConfig.get().stashMessages.shouldRemoveMessages())
+                return !message.getString().contains("materials stashed away") && !message.getString().contains("material stashed") && !message.getString().contains("to pick them up") && !message.getString().equals(" ") && !message.getString().equals("  ");
+            return true;
+        });
     }
 
     public static void registerBazaarChat() {
@@ -24,7 +35,8 @@ public class ChatHandler {
                 if (message.getSiblings().get(1).getString().contains("escrow")
                         || message.getSiblings().get(1).getString().contains("Submitting")
                         || message.getSiblings().get(1).getString().contains("Executing")
-                        || message.getSiblings().get(1).getString().contains("Claiming")) return;
+                        || message.getSiblings().get(1).getString().contains("Claiming"))
+                    return;
             }
 
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
