@@ -1,11 +1,11 @@
 # Bazaar Utils
 
-![Discord](https://img.shields.io/discord/1337164726802579597?label=Discord)
-![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?style=flat)
-![Modrinth Version](https://img.shields.io/modrinth/v/c4u7nzUZ?style=flat)
-![GitHub Release](https://img.shields.io/github/v/release/mkram17/Bazaar-Utils?style=flat&color=green)
+[![Discord](https://img.shields.io/discord/1337164726802579597?style=flat&label=discord&color=red)](https://discord.gg/xDKjvm5hQd)
+![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?color=red)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/c4u7nzUZ?label=modrinth%20downloads&color=red)](https://modrinth.com/mod/bazaar-utils)
+[![GitHub Release](https://img.shields.io/github/v/release/mkram17/Bazaar-Utils?style=flat&logoColor=green&color=red)](https://github.com/mkram17/Bazaar-Utils/releases)
 
-## Features
+## 🔍Features
 
 - Custom Orders (buttons in buy order and insta buy menu so you can have options for different buy amounts)
 - Insta Sell Rules (make rules to lock insta sell button until clicked 3x)
@@ -14,35 +14,33 @@
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
 - Disable Stash Messages (Option to disable reminders in chat to pick up your stash)
 
-### Links
-#### Discord https://discord.gg/xDKjvm5hQd Modrinth https://modrinth.com/mod/bazaar-utils
-
-## Using Bazaar Utils
+## ❓Using Bazaar Utils
 
 REMEMBER -- if your bazaar flipper account upgrade is not level two, change your bazaar tax with /bazaarutils tax or the mod wont work right
 ##### To open the mod config use `/bazaarutils` or `/bu`.
-Other commands:
+🧾Other commands:
 - customorder add {order amount} {slot number} _(top left slot is slot #1, to the right is #2, etc etc)_
 - customorder remove {order number} _(the order it is shown in config)_
 - rule add {based on volume, price or item name} {amount over which will be restricted}
 - rule remove {rule number}
 - developer _(to enable developer settings, you probably wont use this)_
 
-## Dependencies
+## 🧩Dependencies
 
-### Must Have in Mods Folder
+### 🔗Must Have in Mods Folder
 
 - Fabric API (you probably already have this https://modrinth.com/mod/fabric-api/versions?g=1.21.4)
 - Mod Menu (https://modrinth.com/mod/modmenu/versions?g=1.21.4&l=fabric)
 - Yet Another Config Library (https://modrinth.com/mod/yacl/versions?g=1.21.4&l=fabric )
 
-### Included in Mod Already
+### 📦Included in Mod Already
 
 - Orbit Event System (helps in mod development)
 - Modern Keybinding (enables you to add keybinds with modifiers ALT, CTRL, SHIFT)
 
-### Future Features
+### 🛠️Future Features
 
+- Bookmark items you order often to quickly get back to them
 - Option to disable pick up stash messages/control frequency of them
 - Option to change how often you are notified about outdated orders
 
