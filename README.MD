@@ -12,6 +12,7 @@
 - Flip Helper (makes button in flip gui to flip for market price instead of having to find and type it into sign)
 - Outdated Item Notifications (tells you in chat when an order has been undercut, click message to open bazaar if you have a cookie)
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
+- Disable Stash Messages (Option to disable reminders in chat to pick up your stash)
 
 ### Links
 #### Discord https://discord.gg/xDKjvm5hQd Modrinth https://modrinth.com/mod/bazaar-utils
