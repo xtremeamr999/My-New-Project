@@ -1,7 +1,8 @@
-package com.github.mkram17.bazaarutils.Utils;
+package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import lombok.Getter;

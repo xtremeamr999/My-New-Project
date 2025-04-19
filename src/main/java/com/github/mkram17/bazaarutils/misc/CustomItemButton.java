@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.Utils;
+package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;

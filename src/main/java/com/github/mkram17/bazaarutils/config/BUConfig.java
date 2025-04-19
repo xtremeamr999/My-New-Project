@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.Utils.ItemData;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashHelper;
@@ -41,6 +41,8 @@ public class BUConfig {
     }
 
 
+    @SerialEntry
+    public boolean firstLoad = true;
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(new FlipHelperSettings(true, 17, Items.CHERRY_SIGN));
     @SerialEntry

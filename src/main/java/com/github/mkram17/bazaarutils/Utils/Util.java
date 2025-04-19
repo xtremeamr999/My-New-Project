@@ -2,6 +2,8 @@ package com.github.mkram17.bazaarutils.Utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.misc.ItemData;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.ClickEvent;
@@ -16,6 +18,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Util {
@@ -25,9 +29,13 @@ public class Util {
             return BUConfig.get().developer.isDeveloperVariableEnabled(this);
         }
     }
+    private static final LinkedList<ScheduledTask> tasks = new LinkedList<>();
     public static final String HELPMESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
-            "/bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  " +
-            "For more help go to https://discord.gg/xDKjvm5hQd";
+            "/bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
+    public static final Text DISCORDLINK = Text.literal("Discord server")
+            .styled(style -> style
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!"))));
 
     public static<T> void notifyAll(T message) {
         String callingName = getCallingClassName();
@@ -93,8 +101,39 @@ public class Util {
         BUConfig.HANDLER.save();
         ItemData.update();
     }
+
+    private static void subscribeTicks(){
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            List<ScheduledTask> snapshot = new ArrayList<>(tasks);
+            for (ScheduledTask task : snapshot) {
+                task.ticksLeft--;
+                if (task.ticksLeft <= 0) {
+                    task.action.run();
+                    tasks.remove(task);
+                }
+            }
+        });
+    }
+
+
+    //this one runs asynch and other one runs on main thread (i think)
+    public static void tickExecuteLater(int ticks, Runnable action) {
+        tasks.add(new ScheduledTask(ticks, action));
+    }
+
+    private static class ScheduledTask {
+        int ticksLeft;
+        Runnable action;
+
+        ScheduledTask(int ticks, Runnable action) {
+            this.ticksLeft = ticks;
+            this.action = action;
+        }
+    }
+
     public static void startExecutors() {
         BazaarData.scheduleBazaar();
+        subscribeTicks();
     }
 
     public static String getCallingClassName() {

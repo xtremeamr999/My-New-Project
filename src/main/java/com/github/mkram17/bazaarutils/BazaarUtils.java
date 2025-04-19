@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.Utils.ItemUpdater;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.mojang.serialization.Codec;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
@@ -40,6 +41,7 @@ public class BazaarUtils implements ClientModInitializer {
 
         ChestLoadedEvent.subscribe();
         ChatHandler.subscribe();
+        JoinMessages.subscribe();
         gui.registerScreenEvent();
         eventBus.subscribe(gui);
         eventBus.subscribe(updater);

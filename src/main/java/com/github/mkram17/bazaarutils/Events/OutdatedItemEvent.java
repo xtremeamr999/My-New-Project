@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.Events;
 
-import com.github.mkram17.bazaarutils.Utils.ItemData;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 

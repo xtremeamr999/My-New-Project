@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.data;
 
-import com.github.mkram17.bazaarutils.Utils.ItemData;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.google.gson.*;
