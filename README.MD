@@ -1,14 +1,14 @@
 # Bazaar Utils
 
 [![Discord](https://img.shields.io/discord/1337164726802579597?style=flat&label=discord&color=red)](https://discord.gg/xDKjvm5hQd)
-![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?color=red)
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/c4u7nzUZ?label=modrinth%20downloads&color=red)](https://modrinth.com/mod/bazaar-utils)
 [![GitHub Release](https://img.shields.io/github/v/release/mkram17/Bazaar-Utils?style=flat&logoColor=green&color=red)](https://github.com/mkram17/Bazaar-Utils/releases)
+![GitHub License](https://img.shields.io/github/license/mkram17/Bazaar-Utils?color=red)
 
 ## 🔍Features
 
 - Custom Orders (buttons in buy order and insta buy menu so you can have options for different buy amounts)
-- Insta Sell Rules (make rules to lock insta sell button until clicked 3x)
+- Insta Sell Rules (stops accidental insta selling by locking button until clicked 3x, depending on restrictions you make about price, volume, or name of items)
 - Flip Helper (makes button in flip gui to flip for market price instead of having to find and type it into sign)
 - Outdated Item Notifications (tells you in chat when an order has been undercut, click message to open bazaar if you have a cookie)
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
