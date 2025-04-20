@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.Utils;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
+import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,6 +49,13 @@ public class GUIUtils {
         if(containerName == null) return false;
         return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar") || inBuyOrders();
     }
+
+    public boolean inAnyItemScreen(){
+        if(containerName == null || containerName.contains("Bazaar")) return false;
+        return containerName.contains("➜")
+                || inBuyOrderScreen()
+                || inInstaBuy();
+    }
     private GenericContainerScreen chestScreen;
     @Getter
     private String containerName;
@@ -58,6 +66,10 @@ public class GUIUtils {
     public boolean inFlipGui;
     @Getter @Setter
     private static Inventory lowerChestInventory;
+    @Getter @Setter
+    private Bookmark currentBookmark;
+    @Getter @Setter
+    private String previousScreenName;
 
     public enum guiTypes {CHEST, SIGN}
     public void register(){
@@ -72,6 +84,10 @@ public class GUIUtils {
                 Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
             }
         });
+
+        ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
+            BazaarUtils.gui.previousScreenName = BazaarUtils.gui.containerName;
+        });
     }
     @EventHandler(priority = EventPriority.HIGH)
     private void loadSign(SignOpenEvent e){
@@ -82,6 +98,10 @@ public class GUIUtils {
     private void onChestLoaded(ChestLoadedEvent e){
         guiType = guiType.CHEST;
         itemStacks = e.getItemStacks();
+        currentBookmark = null;
+
+        if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen())
+            currentBookmark = new Bookmark(Bookmark.findName());
     }
 
     public static void closeHandledScreen() {

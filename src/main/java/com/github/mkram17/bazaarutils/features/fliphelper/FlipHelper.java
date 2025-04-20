@@ -6,13 +6,11 @@ import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
-import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -110,7 +108,7 @@ public class FlipHelper extends CustomItemButton {
         return false;
     }
 
-    @Override @EventHandler
+    @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
         if (!BazaarUtils.gui.inFlipGui || !settings.isEnabled() || event.slot.getIndex() != settings.getSlotNumber())
             return;
@@ -125,8 +123,8 @@ public class FlipHelper extends CustomItemButton {
         shouldAddToSign = false;
     }
 
-    @Override @EventHandler
-    public void onGUI(ReplaceItemEvent event) {
+    @EventHandler
+    public void replaceItemEvent(ReplaceItemEvent event) {
         if(!BazaarUtils.gui.inFlipGui || !(event.getSlotId() == settings.getSlotNumber()) || !settings.isEnabled() || inCancelOrderScreen) return;
 
         ItemStack itemStack = new ItemStack(settings.getReplaceItem(), 1);
@@ -140,16 +138,8 @@ public class FlipHelper extends CustomItemButton {
         event.setReplacement(itemStack);
     }
 
-    @Override
     public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Flip Helper"))
-                .description(OptionDescription.of(Text.literal("Button in flip order menu to undercut market prices for items.")))
-                .binding(true,
-                        () -> settings.isEnabled(),
-                        (newVal) -> settings.setEnabled(newVal))
-                .controller(BUConfig::createBooleanController)
-                .build();
+        return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> settings.isEnabled(), newVal -> settings.setEnabled(newVal));
     }
 
 }

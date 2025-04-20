@@ -4,13 +4,12 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,9 +50,8 @@ public class CustomOrder extends CustomItemButton {
         BazaarUtils.eventBus.subscribe(this);
     }
 
-    @Override
     @EventHandler
-    public void onGUI(ReplaceItemEvent event) {
+    public void replaceItemEvent(ReplaceItemEvent event) {
         if (!(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy()) || !settings.isEnabled())
             return;
 
@@ -67,7 +65,6 @@ public class CustomOrder extends CustomItemButton {
         event.setReplacement(itemStack);
     }
 
-    @Override
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
         if (!(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy()) || !settings.isEnabled())
@@ -93,16 +90,13 @@ public class CustomOrder extends CustomItemButton {
         buySignClicked = true;
     }
 
-    @Override
     public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal(settings.getOrderAmount() == 71680 ? "Buy Max Button" : "Buy " + settings.getOrderAmount() + " Button"))
-                .binding(true,
-                        () -> settings.isEnabled(),
-                        (newVal) -> settings.setEnabled(newVal))
-                .description(OptionDescription.of(Text.literal("Buy order button for " + settings.getOrderAmount() + " of an item.")))
-                .controller(BUConfig::createBooleanController)
-                .build();
+        return super.createOption(
+                settings.getOrderAmount() == 71680 ? "Buy Max Button" : "Buy " + settings.getOrderAmount() + " Button",
+                "Buy order button for " + settings.getOrderAmount() + " of an item.",
+                () -> settings.isEnabled(),
+                newVal -> settings.setEnabled(newVal)
+        );
     }
     public static void buildOptions(OptionGroup.Builder builder){
         List<CustomOrder> customOrders = BUConfig.get().customOrders;

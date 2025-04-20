@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
+import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
@@ -64,6 +65,9 @@ public class BUConfig {
     public Developer developer = new Developer();
     @SerialEntry
     public StashMessages stashMessages = new StashMessages(false);
+    @SerialEntry
+    public ArrayList<Bookmark> bookmarks = new ArrayList<>();
+
 
     public static void openGUI() {
         MinecraftClient client = MinecraftClient.getInstance();
