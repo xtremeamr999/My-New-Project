@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
+import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -15,7 +16,8 @@ import java.util.function.Supplier;
 public class CustomItemButton {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
     protected int slotNumber;
-    protected ItemStack replacementItem;
+    @Getter
+    protected transient ItemStack replacementItem;
 
     protected void checkGui(ChestLoadedEvent event) {
 

@@ -26,6 +26,18 @@ public abstract class MixinHandledScreen {
 	private void onHandleMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
 		if (slot == null) return;
 
+		//for insta sell rules
+		RestrictSell sell = BUConfig.get().restrictSell;
+		if (sell.isSlotLocked(slotId)) {
+			if (sell.getSafetyClicks() < 3) {
+				sell.addSafetyClick();
+				Util.notifyAll(sell.getMessage());
+				ci.cancel();
+			} else {
+				sell.resetSafetyClicks();
+			}
+		}
+
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
 		BazaarUtils.eventBus.post(event);
@@ -57,19 +69,6 @@ public abstract class MixinHandledScreen {
 		if (keyBinding.matchesKey(keyCode, scanCode) && iKeyBinding.getKeyModifier().isActive(iKeyBinding.getKeyConflictContext())) {
 			iKeyBinding.press();
 			keyBinding.setPressed(true);
-		}
-	}
-	@Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
-	public void onMouseClickedSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-		RestrictSell sell = BUConfig.get().restrictSell;
-		if (!sell.isSlotLocked(slotId))
-			return;
-		if (sell.getSafetyClicks() < 3) {
-			sell.addSafetyClick();
-			Util.notifyAll(sell.getMessage());
-			ci.cancel();
-		} else {
-			sell.resetSafetyClicks();
 		}
 	}
 }

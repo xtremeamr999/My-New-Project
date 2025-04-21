@@ -139,6 +139,14 @@ public class FlipHelper extends CustomItemButton {
     }
 
     public Option<Boolean> createOption() {
+//        return Option.<Boolean>createBuilder()
+//                .name(Text.literal("Flip Helper"))
+//                .description(OptionDescription.of(Text.literal("Button in flip order menu to undercut market prices for items.")))
+//                .binding(true,
+//                        () -> settings.isEnabled(),
+//                        (newVal) -> settings.setEnabled(newVal))
+//                .controller(BUConfig::createBooleanController)
+//                .build();
         return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> settings.isEnabled(), newVal -> settings.setEnabled(newVal));
     }
 

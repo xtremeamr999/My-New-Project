@@ -91,6 +91,14 @@ public class CustomOrder extends CustomItemButton {
     }
 
     public Option<Boolean> createOption() {
+//        return Option.<Boolean>createBuilder()
+//                .name(Text.literal(settings.getOrderAmount() == 71680 ? "Buy Max Button" : "Buy " + settings.getOrderAmount() + " Button"))
+//                .binding(true,
+//                        () -> settings.isEnabled(),
+//                        (newVal) -> settings.setEnabled(newVal))
+//                .description(OptionDescription.of(Text.literal("Buy order button for " + settings.getOrderAmount() + " of an item.")))
+//                .controller(BUConfig::createBooleanController)
+//                .build();
         return super.createOption(
                 settings.getOrderAmount() == 71680 ? "Buy Max Button" : "Buy " + settings.getOrderAmount() + " Button",
                 "Buy order button for " + settings.getOrderAmount() + " of an item.",

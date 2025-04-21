@@ -10,10 +10,12 @@ import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
+//TODO search for item matching name and then use that ItemStack for bookmark -- can also use that for full name if it's cut off
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
@@ -22,13 +24,15 @@ public class Bookmark extends CustomItemButton {
     @EventHandler
     protected void checkGui(ChestLoadedEvent event) {
         inCorrectGui = BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen();
+        changeVisuals(BUConfig.get().bookmarks.contains(this));
     }
 
-    public Bookmark(String name) {
+    public Bookmark(String name, Item replacementItem) {
         this.name = name;
         this.slotNumber = 0;
-        changeVisuals(BUConfig.get().bookmarks.contains(this));
-        replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
+        this.replacementItem = replacementItem.getDefaultStack();
+        changeVisuals(false);
+        this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         inCorrectGui = true;
 
         BazaarUtils.eventBus.subscribe(this);
@@ -42,6 +46,7 @@ public class Bookmark extends CustomItemButton {
         event.setReplacement(replacementItem);
     }
 
+    //TODO fix every object's events still being active once they are made even when not on screen
     @EventHandler
     private void onClick(SlotClickEvent event){
         if(!inCorrectGui || !super.shouldUseSlot(event))
@@ -49,6 +54,7 @@ public class Bookmark extends CustomItemButton {
         switchBookmarked();
 
     }
+
     private void switchBookmarked(){
         if(BUConfig.get().bookmarks.contains(this)) {
             changeVisuals(false);
@@ -64,10 +70,12 @@ public class Bookmark extends CustomItemButton {
         if(bookmarked) {
             replacementItem = new ItemStack(Items.GREEN_STAINED_GLASS_PANE, 1);
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Remove " + name + " Bookmark"));
+            replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "⃠ ");
         }
         else {
             replacementItem = new ItemStack(Items.RED_STAINED_GLASS_PANE, 1);
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Bookmark " + name));
+            replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         }
     }
 

@@ -1,8 +1,7 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.StashMessages;
@@ -12,6 +11,7 @@ import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelper;
 import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelperSettings;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -66,7 +66,7 @@ public class BUConfig {
     @SerialEntry
     public StashMessages stashMessages = new StashMessages(false);
     @SerialEntry
-    public ArrayList<Bookmark> bookmarks = new ArrayList<>();
+    public ArrayList<Bookmark> bookmarks = new ArrayList<>(List.of(new Bookmark("Diamond", Items.DIAMOND)));
 
 
     public static void openGUI() {

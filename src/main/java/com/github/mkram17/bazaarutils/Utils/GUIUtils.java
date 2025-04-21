@@ -18,6 +18,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
@@ -101,7 +102,7 @@ public class GUIUtils {
         currentBookmark = null;
 
         if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen())
-            currentBookmark = new Bookmark(Bookmark.findName());
+            currentBookmark = new Bookmark(Bookmark.findName(), Items.BARRIER);
     }
 
     public static void closeHandledScreen() {
