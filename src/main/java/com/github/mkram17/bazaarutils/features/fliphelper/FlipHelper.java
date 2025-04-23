@@ -51,8 +51,7 @@ public class FlipHelper extends CustomItemButton {
 
     public void handleFlip() {
         if(item != null && flipPrice != 0 && BazaarUtils.gui.wasLastChestFlip()) {
-            GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)));
-            GUIUtils.closeSign();
+            GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
             item.flipItem(flipPrice);
         }
     }

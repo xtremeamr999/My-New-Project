@@ -66,7 +66,7 @@ public class BUConfig {
     @SerialEntry
     public StashMessages stashMessages = new StashMessages(false);
     @SerialEntry
-    public ArrayList<Bookmark> bookmarks = new ArrayList<>(List.of(new Bookmark("Diamond", Items.DIAMOND)));
+    public ArrayList<Bookmark> bookmarks = new ArrayList<>();
 
 
     public static void openGUI() {

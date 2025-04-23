@@ -5,7 +5,6 @@ import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
-import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -79,8 +78,7 @@ public class CustomOrder extends CustomItemButton {
     @EventHandler
     private void onSignOpened(SignOpenEvent event) {
         if (!buySignClicked) return;
-        GUIUtils.setSignText(Integer.toString(settings.getOrderAmount()));
-        Util.executeLater(GUIUtils::closeSign, 30);
+        GUIUtils.setSignText(Integer.toString(settings.getOrderAmount()), true);
         buySignClicked = false;
     }
 

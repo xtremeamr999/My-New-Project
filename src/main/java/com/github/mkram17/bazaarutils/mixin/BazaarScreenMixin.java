@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -42,7 +43,7 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
     }
 
     @Inject(method = "init", at = @At("TAIL"))
-    private void bazaarutils$addConfiguredButtons(CallbackInfo ci) { // Renamed method
+    private void bazaarutils$addConfiguredButtons(CallbackInfo ci) {
         String screenTitle = this.title.getString();
         boolean isTargetScreen = screenTitle.startsWith("Bazaar");
 
@@ -65,10 +66,10 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
 
             int buttonsAdded = 0;
             for (int i = 0; i < bookmarks.size(); i++) {
-                ItemStack configuredItem = bookmarks.get(i).getReplacementItem();
+                ItemStack configuredItem = bookmarks.get(i).getBookmarkedItem();
 
                 final int buttonIndex = i;
-                final ItemStack itemForButton = configuredItem;
+                final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
 
                 ItemSlotButtonWidget button = new ItemSlotButtonWidget(
@@ -78,8 +79,10 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
                         SLOT_BUTTON_TEXTURES,
                         (btn) -> {
                             Util.notifyAll("Clicked configured button #" + (buttonIndex + 1) + ": " + bookmark.getName(), Util.notificationTypes.GUI);
+                            bookmark.onLeftClick();
                         },
-                        itemForButton
+                        itemForButton,
+                        Text.of(bookmark.getName())
                 );
 
                 this.addDrawableChild(button);

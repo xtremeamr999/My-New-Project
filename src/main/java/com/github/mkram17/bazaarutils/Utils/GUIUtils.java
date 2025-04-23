@@ -101,8 +101,14 @@ public class GUIUtils {
         itemStacks = e.getItemStacks();
         currentBookmark = null;
 
-        if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen())
-            currentBookmark = new Bookmark(Bookmark.findName(), Items.BARRIER);
+        if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen()){
+            String name = Bookmark.findName();
+            if(Bookmark.isBookmarked(name)){
+                currentBookmark = Bookmark.findMatchingBookmark(name);
+                BazaarUtils.eventBus.subscribe(currentBookmark);
+            } else
+                currentBookmark = new Bookmark(Bookmark.findName(), Items.BARRIER.getDefaultStack());
+        }
     }
 
     public static void closeHandledScreen() {
@@ -134,8 +140,6 @@ public class GUIUtils {
             MinecraftClient mcclient = MinecraftClient.getInstance();
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);
-//                signEditScreen.removed();
-//                client.setScreen(null);
             } else {
                 Util.notifyAll("Error closing sign: client was null or not in a sign", Util.notificationTypes.ERROR);
             }
@@ -147,26 +151,60 @@ public class GUIUtils {
 
 
 
-    public static void setSignText(String text) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.currentScreen instanceof SignEditScreen screen) {
-            AccessorSignEditScreen signScreen = (AccessorSignEditScreen) screen;
-            String[] lines = text.split("\n", 4);
+    public static void setSignText(String text, boolean closeAfter) {
+        final int MAX_ATTEMPTS = 5;
+        final long DELAY_MS = 250;
 
-            // Save original row to restore later
-            int originalRow = signScreen.getCurrentRow();
+        CompletableFuture.runAsync(() -> {
+            for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client != null && client.currentScreen instanceof SignEditScreen) {
+                    final SignEditScreen screen = (SignEditScreen) client.currentScreen;
+                    client.execute(() -> {
+                        try {
+                            AccessorSignEditScreen signScreen = (AccessorSignEditScreen) screen;
+                            String[] lines = text.split("\n", 4);
+                            int originalRow = signScreen.getCurrentRow();
 
-            // Update all 4 lines
-            for (int i = 0; i < 4; i++) {
-                String line = i < lines.length ? lines[i] : "";
-                signScreen.setCurrentRow(i); // Set the target row
-                signScreen.callSetCurrentRowMessage(line); // Update the line
+                            for (int i = 0; i < 4; i++) {
+                                String line = i < lines.length ? lines[i] : "";
+                                signScreen.setCurrentRow(i);
+                                signScreen.callSetCurrentRowMessage(line);
+                            }
+                            signScreen.setCurrentRow(originalRow);
+                        } catch (Exception e) {
+                            Util.notifyAll("Error executing sign text update: " + e.getMessage(), Util.notificationTypes.ERROR);
+                            e.printStackTrace();
+                        }
+                    });
+                    if (closeAfter)
+                        closeSign();
+                    return;
+                } else {
+                    if (attempt < MAX_ATTEMPTS - 1) {
+                        try {
+                            Thread.sleep(DELAY_MS);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            MinecraftClient finalClient = MinecraftClient.getInstance();
+                            if (finalClient != null) {
+                                finalClient.execute(() -> Util.notifyAll("Sign text setting interrupted", Util.notificationTypes.ERROR));
+                            }
+                            return;
+                        }
+                    }
+                }
             }
 
-            // Restore original row
-            signScreen.setCurrentRow(originalRow);
-        }
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client != null) {
+                client.execute(() -> Util.notifyAll("Error setting sign text: client was null or not in a sign after " + MAX_ATTEMPTS + " attempts", Util.notificationTypes.ERROR));
+            } else {
+                System.err.println("Error setting sign text: Failed after " + MAX_ATTEMPTS + " attempts, client was null.");
+            }
+        });
     }
+
     @EventHandler(priority = EventPriority.HIGH)
     private void onLoad(ChestLoadedEvent e){
         lowerChestInventory = e.getLowerChestInventory();

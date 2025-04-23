@@ -61,7 +61,7 @@ public class ChestLoadedEvent implements ICancellable {
         return stacks;
     }
 
-    private static void checkIfGuiLoaded(GenericContainerScreen screen) {
+    static void checkIfGuiLoaded(GenericContainerScreen screen) {
         while (true) {
             try {
                 Thread.sleep(20);

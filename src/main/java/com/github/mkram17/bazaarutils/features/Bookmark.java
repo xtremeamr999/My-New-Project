@@ -4,34 +4,38 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.Utils.GUIUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 
 //TODO search for item matching name and then use that ItemStack for bookmark -- can also use that for full name if it's cut off
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
+    @Getter @Setter
+    public ItemStack bookmarkedItem;
     protected boolean inCorrectGui = false;
+    private final int SIGN_SLOT_NUMBER = 45;
 
     @EventHandler
     protected void checkGui(ChestLoadedEvent event) {
-        inCorrectGui = BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen();
-        changeVisuals(BUConfig.get().bookmarks.contains(this));
+            BazaarUtils.eventBus.unsubscribe(this);
     }
 
-    public Bookmark(String name, Item replacementItem) {
+    public Bookmark(String name, ItemStack bookmarkedItem) {
         this.name = name;
         this.slotNumber = 0;
-        this.replacementItem = replacementItem.getDefaultStack();
-        changeVisuals(false);
+        this.bookmarkedItem = bookmarkedItem;
+        changeVisuals(isBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         inCorrectGui = true;
 
@@ -52,18 +56,23 @@ public class Bookmark extends CustomItemButton {
         if(!inCorrectGui || !super.shouldUseSlot(event))
             return;
         switchBookmarked();
+        bookmarkedItem = findItem(name, event);
+    }
 
+    public void onLeftClick(){
+        GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
+        GUIUtils.setSignText(name, true);
     }
 
     private void switchBookmarked(){
-        if(BUConfig.get().bookmarks.contains(this)) {
+        if(isBookmarked(name)) {
             changeVisuals(false);
             BUConfig.get().bookmarks.remove(this);
         }else {
             changeVisuals(true);
             BUConfig.get().bookmarks.add(this);
         }
-//        BUConfig.HANDLER.save();
+        BUConfig.HANDLER.save();
     }
 
     private void changeVisuals(boolean bookmarked){
@@ -90,6 +99,31 @@ public class Bookmark extends CustomItemButton {
         if(BazaarUtils.gui.inAnyItemScreen())
             return containerName.substring(containerName.indexOf("➜")+2);
         return "?";
+    }
+
+    private static ItemStack findItem(String name, SlotClickEvent event){
+        ScreenHandler handler = event.handledScreen.getScreenHandler();
+
+        for(Slot slot : handler.slots){
+            ItemStack itemStack = slot.getStack();
+
+            if (!itemStack.isEmpty() && itemStack.getName().getString().startsWith(name)) {
+                return itemStack;
+            }
+        }
+        return null;
+    }
+
+    public static boolean isBookmarked(String name){
+        return findMatchingBookmark(name) != null;
+    }
+
+    public static Bookmark findMatchingBookmark(String name){
+        for(Bookmark bookmark : BUConfig.get().bookmarks) {
+            if(bookmark.getName().equalsIgnoreCase(name))
+                return bookmark;
+        }
+        return null;
     }
 
 }
