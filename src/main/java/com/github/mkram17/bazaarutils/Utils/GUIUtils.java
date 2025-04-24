@@ -102,12 +102,12 @@ public class GUIUtils {
         currentBookmark = null;
 
         if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen()){
-            String name = Bookmark.findName();
+            String name = Bookmark.findName(e);
             if(Bookmark.isBookmarked(name)){
                 currentBookmark = Bookmark.findMatchingBookmark(name);
                 BazaarUtils.eventBus.subscribe(currentBookmark);
             } else
-                currentBookmark = new Bookmark(Bookmark.findName(), Items.BARRIER.getDefaultStack());
+                currentBookmark = new Bookmark(name, Items.BARRIER.getDefaultStack());
         }
     }
 

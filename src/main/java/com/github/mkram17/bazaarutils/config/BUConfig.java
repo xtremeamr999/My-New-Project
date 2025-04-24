@@ -12,7 +12,7 @@ import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelperSettings;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
-import com.google.gson.GsonBuilder;
+import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
@@ -21,6 +21,7 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
@@ -33,7 +34,9 @@ public class BUConfig {
     public static final ConfigClassHandler<BUConfig> HANDLER = ConfigClassHandler.createBuilder(BUConfig.class)
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("bazaarutils.json"))
-                    .appendGsonBuilder(GsonBuilder::setPrettyPrinting) // not needed, pretty print by default
+                    .appendGsonBuilder(gsonBuilder -> gsonBuilder
+                            .setPrettyPrinting()
+                            .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())) // not needed, pretty print by default
                     .build())
             .build();
 

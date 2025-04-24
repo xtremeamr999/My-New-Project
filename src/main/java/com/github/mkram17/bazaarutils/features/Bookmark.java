@@ -24,7 +24,7 @@ public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public ItemStack bookmarkedItem;
     protected boolean inCorrectGui = false;
-    private final int SIGN_SLOT_NUMBER = 45;
+    private static final int SIGN_SLOT_NUMBER = 45;
 
     @EventHandler
     protected void checkGui(ChestLoadedEvent event) {
@@ -44,10 +44,17 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
-        if(!inCorrectGui || !super.shouldReplaceItem(event))
-            return;
+        try {
+            if (!inCorrectGui || !super.shouldReplaceItem(event))
+                return;
 
-        event.setReplacement(replacementItem);
+            if (replacementItem == null)
+                changeVisuals(isBookmarked(name));
+
+            event.setReplacement(replacementItem);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //TODO fix every object's events still being active once they are made even when not on screen
@@ -57,11 +64,17 @@ public class Bookmark extends CustomItemButton {
             return;
         switchBookmarked();
         bookmarkedItem = findItem(name, event);
+        BUConfig.HANDLER.save();
     }
 
     public void onLeftClick(){
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.setSignText(name, true);
+    }
+
+    public void onShiftClick(){
+        BUConfig.get().bookmarks.remove(this);
+        BUConfig.HANDLER.save();
     }
 
     private void switchBookmarked(){
@@ -88,7 +101,21 @@ public class Bookmark extends CustomItemButton {
         }
     }
 
-    public static String findName(){
+    public static String findName(ChestLoadedEvent e){
+        String containerName = BazaarUtils.gui.getContainerName();
+        String name = findNameFromContainer();
+        if(containerName.length() > 30){
+            for(ItemStack stack : e.getItemStacks()){
+                if(stack == null) continue;
+                if (!stack.isEmpty() && stack.getName().getString().startsWith(name)) {
+                    return stack.getCustomName().getString();
+                }
+            }
+        }
+        return name;
+    }
+
+    private static String findNameFromContainer(){
         String containerName = BazaarUtils.gui.getContainerName();
         if(BazaarUtils.gui.inInstaBuy())
             return containerName.substring(0, containerName.indexOf("➜")-1);
@@ -101,13 +128,22 @@ public class Bookmark extends CustomItemButton {
         return "?";
     }
 
+
     private static ItemStack findItem(String name, SlotClickEvent event){
         ScreenHandler handler = event.handledScreen.getScreenHandler();
 
         for(Slot slot : handler.slots){
             ItemStack itemStack = slot.getStack();
+            if(itemStack == null) continue;
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().startsWith(name)) {
+                return itemStack;
+            }
+        }
+        for(Slot slot : handler.slots){
+            ItemStack itemStack = slot.getStack();
+
+            if (!itemStack.isEmpty() && itemStack.getName().getString().contains(name)) {
                 return itemStack;
             }
         }

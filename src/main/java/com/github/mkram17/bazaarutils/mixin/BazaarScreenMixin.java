@@ -78,8 +78,14 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
                         buttonSize, buttonSize,
                         SLOT_BUTTON_TEXTURES,
                         (btn) -> {
-                            Util.notifyAll("Clicked configured button #" + (buttonIndex + 1) + ": " + bookmark.getName(), Util.notificationTypes.GUI);
-                            bookmark.onLeftClick();
+                            if (Screen.hasShiftDown()) {
+                                Util.notifyAll("Shift-Clicked configured button #" + (buttonIndex + 1) + ": " + bookmark.getName(), Util.notificationTypes.GUI);
+                                bookmark.onShiftClick();
+                            } else {
+                                Util.notifyAll("Removed " + bookmark.getName() + " bookmark. Open Bazaar again to display changes.");
+                                bookmark.onLeftClick();
+                            }
+
                         },
                         itemForButton,
                         Text.of(bookmark.getName())
@@ -91,9 +97,9 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
                 currentButtonY += buttonSize + spacing;
             }
 
-            if (buttonsAdded > 0) {
-                Util.notifyAll("Added " + buttonsAdded + " configured button(s) to screen: " + screenTitle, Util.notificationTypes.GUI);
-            }
+//            if (buttonsAdded > 0) {
+//                Util.notifyAll("Added " + buttonsAdded + " configured button(s) to screen: " + screenTitle, Util.notificationTypes.GUI);
+//            }
         }
     }
 
