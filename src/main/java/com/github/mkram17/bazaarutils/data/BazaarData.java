@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.google.gson.*;
+import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -20,14 +21,14 @@ import java.util.concurrent.TimeUnit;
 
 public class BazaarData {
 
-    private static String jsonString;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
 //    private static final String dataFile = "bazaar_json.json";
     static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
+    private static SkyBlockBazaarReply bazaarReply = null;
 
 
-    public static<T> String getAsPrettyJsonObject(T object){
+    public static<T> String getAsPrettyJsonObject(String object){
         return gson.toJson(object);
     }
     public static JsonObject getAsJsonObjectFromString(String str){
@@ -39,10 +40,14 @@ public class BazaarData {
         bzExecutor.scheduleAtFixedRate(() -> {
                 APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
                     if (throwable != null) {
-                        Util.notifyAll("Exception thrown trying to get bazaar data");
+                        Util.notifyAll("Exception thrown trying to get bazaar data", Util.notificationTypes.ERROR);
                         throwable.printStackTrace();
                     } else {
-                        jsonString = getAsPrettyJsonObject(reply);
+                        if(reply == null){
+                            Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
+                            return;
+                        }
+                        bazaarReply = reply;
 //                        writeJsonToFile(jsonString);
 
                         if (!BUConfig.get().watchedItems.isEmpty()) {
@@ -93,16 +98,26 @@ public class BazaarData {
     public static Double findItemPrice(String productId, ItemData.priceTypes priceType) {
         double sellPrice = -1;
         double buyPrice = -1;
+        if (bazaarReply == null){
+            Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
+            return -1.0;
+        }
         try {
-            JsonObject products = getAsJsonObjectFromString(jsonString).get("products").getAsJsonObject();
-            JsonObject item = products.get(productId).getAsJsonObject();
-            JsonArray buy_summary = item.get("buy_summary").getAsJsonArray();
-            JsonArray sell_summary = item.get("sell_summary").getAsJsonArray();
-            //sell summary is buy orders, and buy summary is sell orders
-            sellPrice =  sell_summary.get(0).getAsJsonObject().get("pricePerUnit").getAsDouble();
-            buyPrice = buy_summary.get(0).getAsJsonObject().get("pricePerUnit").getAsDouble();
+            var product = bazaarReply.getProduct(productId);
+            var buy_summary = product.getBuySummary();
+            var sell_summary = product.getSellSummary();
+            sellPrice = sell_summary.get(0).getPricePerUnit();
+            buyPrice = buy_summary.get(0).getPricePerUnit();
+            Util.notifyAll("Price found: " + sellPrice, Util.notificationTypes.BAZAARDATA);
+            Util.notifyAll("Price found: " +buyPrice, Util.notificationTypes.BAZAARDATA);
+            if(priceType == ItemData.priceTypes.INSTASELL)
+                return sellPrice;
+            else if(priceType == ItemData.priceTypes.INSTABUY)
+                return buyPrice;
         } catch (Exception e) {
-            Util.notifyAll("There was an error fetching Json objects (probably caused by incorrect product ID [" + productId + "]): ", Util.notificationTypes.BAZAARDATA);
+            Util.notifyAll("There was an error fetching Json objects (probably caused by incorrect product ID [" + productId + "])", Util.notificationTypes.ERROR);
+            Util.notifyAll(e.getMessage(), Util.notificationTypes.ERROR);
+            Util.notifyAll(e.getCause(), Util.notificationTypes.ERROR);
             e.printStackTrace();
         }
 

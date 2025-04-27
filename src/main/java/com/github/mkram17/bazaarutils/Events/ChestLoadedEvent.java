@@ -32,7 +32,7 @@ public class ChestLoadedEvent implements ICancellable {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (screen instanceof GenericContainerScreen genericContainerScreen) {
                 CompletableFuture.runAsync(() -> checkIfGuiLoaded(genericContainerScreen)).thenRun(() -> {
-                    Util.notifyAll("Chest loaded event went off!", Util.notificationTypes.GUI);
+//                    Util.notifyAll("Chest loaded event went off!", Util.notificationTypes.GUI);
 
                     ChestLoadedEvent event = new ChestLoadedEvent();
                     ScreenHandler handler = genericContainerScreen.getScreenHandler();

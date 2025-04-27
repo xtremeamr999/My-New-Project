@@ -148,25 +148,35 @@ public class ItemData {
         return variables;
     }
 
-    public static ItemData findItem(String name, Double price, Integer volumeLeft, priceTypes priceType) {
+    public static ItemData findItem(String name, Double price, Integer volume, priceTypes priceType) {
         ArrayList<ItemData> itemList = new ArrayList<>();
         for(ItemData item : BUConfig.get().watchedItems){
             if((price == null || item.isSimilarPrice(price)) &&
-                    (volumeLeft == null || item.getVolume() == volumeLeft + item.getAmountClaimed()) &&
+                    (volume == null || Math.abs(item.getVolume() - volume) <= (0.05 * volume)) &&
                     (name == null || name.equalsIgnoreCase(item.getName())) &&
                     (priceType == null || priceType == item.getPriceType())){
                 itemList.add(item);
             }
         }
+
         if (itemList.isEmpty()) {
-            Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volumeLeft + "]", Util.notificationTypes.ITEMDATA);
+            Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);
             return null;
         }
         if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
+            ItemData bestMatch = itemList.getFirst();
+            for (ItemData duplicate : itemList) {
                 Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
+                if (volume == null) {
+                    continue;
+                }
+                if (Math.abs(duplicate.getVolume() - volume) < Math.abs(bestMatch.getVolume() - volume)) {
+                    bestMatch = duplicate;
+                }
+            }
+            return bestMatch;
         }
+
         return itemList.getFirst();
     }
     public static ItemData findItem(ItemData matchingItem, List<ItemData> list) {

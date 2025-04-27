@@ -50,10 +50,17 @@ public class Util {
         String callingName = getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
+        Text messageText = Text.literal("[" + simpleCallingName + "] " + messageStr);
+        if(notiType == notificationTypes.ERROR){
+            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> style
+                    .withColor(Formatting.RED)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support"))));
+        }
 
         if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
             if (MinecraftClient.getInstance().player != null) {
-                MinecraftClient.getInstance().player.sendMessage(Text.literal("[" + simpleCallingName + "] " + messageStr), false);
+                MinecraftClient.getInstance().player.sendMessage(messageText, false);
             }
             LogManager.getLogger(callingName).info("[AutoBz] Message [" + message + "]");
         }

@@ -124,7 +124,8 @@ public class FlipHelper extends CustomItemButton {
 
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!BazaarUtils.gui.inFlipGui || !(event.getSlotId() == settings.getSlotNumber()) || !settings.isEnabled() || inCancelOrderScreen) return;
+        if(!(event.getSlotId() == settings.getSlotNumber())) return;
+        if(!BazaarUtils.gui.inFlipGui || !settings.isEnabled() || inCancelOrderScreen) return;
 
         ItemStack itemStack = new ItemStack(settings.getReplaceItem(), 1);
         if(item == null) {
@@ -138,14 +139,6 @@ public class FlipHelper extends CustomItemButton {
     }
 
     public Option<Boolean> createOption() {
-//        return Option.<Boolean>createBuilder()
-//                .name(Text.literal("Flip Helper"))
-//                .description(OptionDescription.of(Text.literal("Button in flip order menu to undercut market prices for items.")))
-//                .binding(true,
-//                        () -> settings.isEnabled(),
-//                        (newVal) -> settings.setEnabled(newVal))
-//                .controller(BUConfig::createBooleanController)
-//                .build();
         return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> settings.isEnabled(), newVal -> settings.setEnabled(newVal));
     }
 

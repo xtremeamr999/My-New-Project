@@ -55,7 +55,9 @@ dependencies {
 	include "meteordevelopment:orbit:0.2.4"
 //	modImplementation "com.ptsmods:devlogin:3.5"
 
-	implementation ("net.hypixel:hypixel-api-transport-apache:4.4")
+	modImplementation("net.hypixel:hypixel-api-transport-apache:4.4")
+	include("net.hypixel:hypixel-api-transport-apache:4.4")
+	include("net.hypixel:hypixel-api-core:4.4")
 
 	modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
 

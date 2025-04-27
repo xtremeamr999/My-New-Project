@@ -59,6 +59,7 @@ public class Commands {
         bazaarutils.then(ClientCommandManager.literal("developer")
                         .executes((context) ->{
                             BUConfig.get().developerMode = !BUConfig.get().developerMode;
+                            HANDLER.save();
                             Util.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
                             return 1;
                         })

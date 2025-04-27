@@ -49,9 +49,8 @@ public class ItemUpdater {
             unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"));
             if(Util.findComponentWith(changedComponents, "Filled") != null) {
                 var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
-                volumeFilled = Integer.valueOf(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
-                //might be able to find actual volume here as well instead of approximating it
-                totalVolume = Integer.valueOf(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
+                volumeFilled = Integer.valueOf(Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/"))));
+                totalVolume = Integer.valueOf(Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" "))));
             } else {
                 fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
                 //havent tested fully, so might not work if number ever uses k/m or if it's not always the index 1 of the siblings

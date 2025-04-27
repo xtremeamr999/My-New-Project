@@ -82,7 +82,7 @@ public class GUIUtils {
             lowerChestInventory= null;
             if (screen instanceof GenericContainerScreen genericContainerScreen) {
                 containerName = Util.removeFormatting(genericContainerScreen.getTitle().getString());
-                Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
+//                Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
             }
         });
 
@@ -211,7 +211,7 @@ public class GUIUtils {
         updateFlipGui();
     }
 
-    private boolean inFlipGui() {
+    public boolean inFlipGui() {
         if (containerName == null || lowerChestInventory == null) {
             return false;
         }
@@ -232,10 +232,9 @@ public class GUIUtils {
             inFlipGui = true;
             Util.notifyAll("In flip gui", Util.notificationTypes.GUI);
         }
-        else if(guiType == guiTypes.CHEST) {
+        else
             inFlipGui = false;
-//            Util.notifyAll("Flip gui removed", Util.notificationTypes.GUI);
-        }
+
     }
     public static void clickSlot(int slotIndex, int button) {
         MinecraftClient client = MinecraftClient.getInstance();
