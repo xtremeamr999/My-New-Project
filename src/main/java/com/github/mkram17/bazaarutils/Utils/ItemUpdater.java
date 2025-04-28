@@ -27,7 +27,6 @@ public class ItemUpdater {
         updateWatchedItems(orderStacks);
     }
 
-    //TODO low priority -- update amount claimed as well
     private static void updateWatchedItems(ArrayList<ItemStack> orderStacks){
         List<ItemData> foundItems = new ArrayList<>();
         for(ItemStack stack : orderStacks){
@@ -38,6 +37,8 @@ public class ItemUpdater {
             double fullPrice;
             int volumeFilled = -1;
             int totalVolume;
+            int amountUnclaimed = 0;
+            int amountClaimed = -1;
             List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
             if(customName.contains("BUY")){
                 name = customName.substring(4);
@@ -49,14 +50,23 @@ public class ItemUpdater {
             unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"));
             if(Util.findComponentWith(changedComponents, "Filled") != null) {
                 var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
-                volumeFilled = Integer.valueOf(Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/"))));
-                totalVolume = Integer.valueOf(Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" "))));
+                volumeFilled = Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
+                totalVolume = Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
             } else {
                 fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
                 //havent tested fully, so might not work if number ever uses k/m or if it's not always the index 1 of the siblings
                 totalVolume = Integer.parseInt(changedComponents.get(2).getSiblings().get(1).getString());
             }
             fullPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"))*totalVolume;
+            if(volumeFilled != -1) {
+                if (Util.findComponentWith(changedComponents, "to claim!") != null) {
+                    var amountUnclaimedString = Util.findComponentWith(changedComponents, "to claim!");
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(" ")));
+                    amountClaimed = volumeFilled - amountUnclaimed;
+                } else {
+                    amountClaimed = volumeFilled;
+                }
+            }
 
             ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
 
@@ -64,6 +74,8 @@ public class ItemUpdater {
                 tempItem.setAmountFilled(volumeFilled);
             if(volumeFilled == totalVolume)
                 tempItem.setStatus(ItemData.statuses.FILLED);
+            if(amountClaimed != -1)
+                tempItem.setAmountClaimed(amountClaimed);
 
             //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found
             foundItems.add(tempItem);
@@ -107,6 +119,10 @@ public class ItemUpdater {
         if(match.getAmountFilled() != foundItem.getAmountFilled()){
             Util.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
             match.setAmountFilled(foundItem.getAmountFilled());
+        }
+        if(match.getAmountClaimed() != foundItem.getAmountClaimed()){
+            Util.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
+            match.setAmountClaimed(foundItem.getAmountClaimed());
         }
         BUConfig.HANDLER.save();
         return null;

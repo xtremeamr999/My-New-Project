@@ -11,35 +11,65 @@ import java.util.List;
 
 //TODO seems like there are still some places where it doesnt round. ex 10.8723333 not 10.9
 public class ChatHandler {
-    private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED, CANCELLED}
+    private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
+    private static ArrayList<String> previousMessages = new ArrayList<>();
+    private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "  "};
 
     public static void subscribe() {
         registerBazaarChat();
         registerStashRemover();
     }
 
-    //TODO there is a small blank message when stash messages are removed, try to fix this -- medium priority
-    public static void registerStashRemover(){
-        //five? separate messages
+    public static void registerStashRemover() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if(BUConfig.get().stashMessages.shouldRemoveMessages())
-                return !message.getString().contains("materials stashed away") && !message.getString().contains("material stashed") && !message.getString().contains("to pick them up") && !message.getString().equals(" ") && !message.getString().equals("  ");
-            return true;
+            if (!BUConfig.get().stashMessages.shouldRemoveMessages()) return true;
+
+            String currentMessageString = message.getString();
+            boolean shouldRemove = currentMessageString.equalsIgnoreCase(removeList[0]);
+            int indexOfMessage = indexOfMessage(currentMessageString);
+
+            for(int index = indexOfMessage; index>=1; index--){
+                if(index > previousMessages.size()) {
+                    previousMessages.clear();
+                    break;
+                }
+                if(previousMessages.get(index-1).contains(removeList[index-1])) {
+                    shouldRemove = true;
+                } else {
+                    shouldRemove = false;
+                }
+            }
+
+            previousMessages.add(currentMessageString);
+            if(!shouldRemove)
+                previousMessages.clear();
+            return !shouldRemove;
         });
+
+    }
+
+    private static int indexOfMessage(String message){
+        for (int k = 1; k < removeList.length-1; k++) {
+            String flag = removeList[k];
+            if (message.contains(flag))
+                return k;
+        }
+        if(message.contains(removeList[removeList.length-1])) return removeList.length-1;
+        return -1;
     }
 
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+            ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
             if (!(message.getString().contains("[Bazaar]"))) return;
-            if (!message.getSiblings().isEmpty()) {
-                if (message.getSiblings().get(1).getString().contains("escrow")
-                        || message.getSiblings().get(1).getString().contains("Submitting")
-                        || message.getSiblings().get(1).getString().contains("Executing")
-                        || message.getSiblings().get(1).getString().contains("Claiming"))
+            if (!siblings.isEmpty()) {
+                if (siblings.get(1).getString().contains("escrow")
+                        || siblings.get(1).getString().contains("Submitting")
+                        || siblings.get(1).getString().contains("Executing")
+                        || siblings.get(1).getString().contains("Claiming") || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")))
                     return;
             }
 
-            ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
 
             String itemName;
             int volume;
@@ -54,7 +84,7 @@ public class ChatHandler {
             if (siblings.size() >= 3 && siblings.get(2).getString().contains("Sell Offer Setup!"))
                 messageType = messageTypes.SELLORDER;
             if(siblings.size() >= 3 && siblings.get(2).getString().contains("Claimed")) messageType = messageTypes.CLAIMED;
-            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
+//            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
 
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(siblings.get(5).getString());
@@ -92,32 +122,8 @@ public class ChatHandler {
 
             if (messageType == messageTypes.CLAIMED) {
                 handleClaimed(siblings);
-            }if (messageType == messageTypes.CANCELLED) {
-                handleCancelled(siblings);
             }
         });
-    }
-
-    public static void handleCancelled(ArrayList<Text> siblings) {
-        double totalPrice;
-        ItemData item;
-        try {
-            String infoString = siblings.get(4).getString();
-            if(infoString.contains("coins")) {
-                totalPrice = Double.parseDouble(infoString.substring(0, infoString.indexOf(" coins")).replace(",", ""));
-                item = ItemData.findItemTotalPrice(totalPrice);
-            } else {
-                String name = siblings.get(6).getString().trim();
-                item = ItemData.findItemFromChat(name, null, 3, null);
-            }
-            if (item != null) {
-                item.remove();
-            } else {
-                Util.notifyAll("Error finding cancelled item.", Util.notificationTypes.ERROR);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static void handleClaimed(ArrayList<Text> siblings) {
