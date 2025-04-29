@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
+import com.github.mkram17.bazaarutils.misc.ModCompatabilityHelper;
 import com.mojang.serialization.Codec;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
@@ -25,6 +26,7 @@ public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
     public static ItemUpdater updater = new ItemUpdater();
+    public static ModCompatabilityHelper compatabilityHelper = new ModCompatabilityHelper();
 
     @Override
     public void onInitializeClient() {
@@ -33,6 +35,7 @@ public class BazaarUtils implements ClientModInitializer {
         registerDeserializedEvents();
         registerCommands();
         Util.startExecutors();
+        compatabilityHelper.initializePatches();
     }
 
     private void registerEvents() {

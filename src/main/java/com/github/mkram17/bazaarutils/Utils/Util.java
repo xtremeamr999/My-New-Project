@@ -42,6 +42,7 @@ public class Util {
         String messageStr = message.toString();
         messageStr = messageStr.toLowerCase().contains("exception") ? "§c" + messageStr : "§a" + messageStr;
 
+        if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(Text.literal("[BazaarUtils] " + messageStr), false);
         LogManager.getLogger(callingName).info("[AutoBz] Message [" + message + "]");
     }

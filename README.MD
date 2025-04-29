@@ -13,6 +13,7 @@
 - Outdated Item Notifications (tells you in chat when an order has been undercut, click message to open bazaar if you have a cookie)
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
 - Disable Stash Messages (Option to disable reminders in chat to pick up your stash)
+- Bookmarks (easily and quickly access bookmarked items from the main Bazaar menu)
 
 ## ❓Using Bazaar Utils
 
@@ -40,7 +41,6 @@ REMEMBER -- if your bazaar flipper account upgrade is not level two, change your
 
 ### 🛠️Future Features
 
-- Bookmark items you order often to quickly get back to them
-- Option to disable pick up stash messages/control frequency of them
+- Option to control frequency of pick up stash messages
 - Option to change how often you are notified about outdated orders
-
+- Sounds for when order becomes outdated
