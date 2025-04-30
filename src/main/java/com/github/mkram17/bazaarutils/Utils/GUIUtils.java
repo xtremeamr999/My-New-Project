@@ -262,11 +262,4 @@ public class GUIUtils {
         });
     }
 
-    public static void sendCommand(String command){
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player != null) {
-            client.player.networkHandler.sendChatCommand(command);
-        }
-    }
-
 }

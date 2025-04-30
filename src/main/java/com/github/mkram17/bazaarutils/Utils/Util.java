@@ -23,6 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Util {
+    public static void sendCommand(String command){
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player != null) {
+            client.player.networkHandler.sendChatCommand(command);
+        }
+    }
+
     public enum notificationTypes {
         ERROR, GUI, FEATURE, BAZAARDATA, COMMAND, ITEMDATA;
         public boolean isEnabled() {
@@ -44,7 +51,7 @@ public class Util {
 
         if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(Text.literal("[BazaarUtils] " + messageStr), false);
-        LogManager.getLogger(callingName).info("[AutoBz] Message [" + message + "]");
+        LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
     }
 
     public static<T> void notifyAll(T message, notificationTypes notiType) {
@@ -63,7 +70,7 @@ public class Util {
             if (MinecraftClient.getInstance().player != null) {
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
             }
-            LogManager.getLogger(callingName).info("[AutoBz] Message [" + message + "]");
+            LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
         }
     }
 

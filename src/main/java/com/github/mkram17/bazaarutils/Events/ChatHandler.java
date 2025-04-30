@@ -9,7 +9,6 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO seems like there are still some places where it doesnt round. ex 10.8723333 not 10.9
 public class ChatHandler {
     private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
     private static ArrayList<String> previousMessages = new ArrayList<>();

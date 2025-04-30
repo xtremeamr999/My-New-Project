@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
+import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import lombok.Getter;
@@ -17,7 +18,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 
-//TODO search for item matching name and then use that ItemStack for bookmark -- can also use that for full name if it's cut off
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
@@ -57,7 +57,6 @@ public class Bookmark extends CustomItemButton {
         }
     }
 
-    //TODO fix every object's events still being active once they are made even when not on screen
     @EventHandler
     private void onClick(SlotClickEvent event){
         if(!inCorrectGui || !super.shouldUseSlot(event))
@@ -69,8 +68,20 @@ public class Bookmark extends CustomItemButton {
 
     public void onLeftClick(){
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
-        GUIUtils.setSignText(name, true);
+        if(BazaarUtils.compatabilityHelper.isSkyblockerDetected()) {
+            Util.notifyAll("Attempting to use Skyblocker search for " + name + " in Bazaar.", Util.notificationTypes.GUI);
+            if (!BazaarUtils.compatabilityHelper.skyblockerSearchBazaar(name))
+                alternateOnLeftClick();
+        } else
+            GUIUtils.setSignText(name, true);
     }
+
+    //requires cookie?
+    public void alternateOnLeftClick(){
+        GUIUtils.closeHandledScreen();
+        Util.sendCommand("bz " + name);
+    }
+
 
     public void onShiftClick(){
         BUConfig.get().bookmarks.remove(this);

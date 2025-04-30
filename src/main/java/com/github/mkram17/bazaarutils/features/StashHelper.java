@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.Utils.GUIUtils;
+import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import committee.nova.mkb.api.IKeyBinding;
 import committee.nova.mkb.keybinding.KeyConflictContext;
@@ -16,7 +17,6 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-//TODO add option to block materials stashed away message from hypixel
 public class StashHelper {
     @Getter @Setter
     private boolean enabled;
@@ -54,7 +54,7 @@ public class StashHelper {
                 return;
             if(ticksBetweenPresses>15) {
                 GUIUtils.closeHandledScreen();
-                GUIUtils.sendCommand("pickupstash");
+                Util.sendCommand("pickupstash");
 
                  ticksBetweenPresses = 0;
             }

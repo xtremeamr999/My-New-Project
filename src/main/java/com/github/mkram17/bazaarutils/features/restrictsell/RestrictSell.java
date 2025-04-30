@@ -19,7 +19,6 @@ import java.util.List;
 
 //TODO make sure this works with sacks
 //TODO maybe color chest if it is locked
-//TODO use custom size for safety clicks left
 public class RestrictSell {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter

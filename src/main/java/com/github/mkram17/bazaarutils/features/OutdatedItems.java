@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.Events.OutdatedItemEvent;
-import com.github.mkram17.bazaarutils.Utils.GUIUtils;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
@@ -48,7 +47,7 @@ public class OutdatedItems {
                 }
             }
 
-            GUIUtils.sendCommand("bz");
+            Util.sendCommand("bz");
         });
     }
     public Collection<Option<Boolean>> createOptions() {
