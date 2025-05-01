@@ -60,7 +60,7 @@ public class ItemUpdater {
             if(volumeFilled != -1) {
                 if (Util.findComponentWith(changedComponents, "to claim!") != null) {
                     var amountUnclaimedString = Util.findComponentWith(changedComponents, "to claim!");
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(" ")));
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf("items")-1));
                     amountClaimed = volumeFilled - amountUnclaimed;
                 } else {
                     amountClaimed = volumeFilled;
