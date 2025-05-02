@@ -35,7 +35,7 @@ public class BazaarUtils implements ClientModInitializer {
         registerDeserializedEvents();
         registerCommands();
         Util.startExecutors();
-        compatabilityHelper.initializePatches();
+        ModCompatibilityHelper.initializePatches();
     }
 
     private void registerEvents() {

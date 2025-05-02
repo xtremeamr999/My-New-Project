@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.Utils.GUIUtils;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -67,13 +68,10 @@ public class Bookmark extends CustomItemButton {
     }
 
     public void onLeftClick(){
+        ModCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
-        if(BazaarUtils.compatabilityHelper.isSkyblockerDetected()) {
-            Util.notifyAll("Attempting to use Skyblocker search for " + name + " in Bazaar.", Util.notificationTypes.GUI);
-            if (!BazaarUtils.compatabilityHelper.skyblockerSearchBazaar(name))
-                alternateOnLeftClick();
-        } else
-            GUIUtils.setSignText(name, true);
+        GUIUtils.setSignText(name, true);
+        Util.tickExecuteLater(4, ModCompatibilityHelper::tryEnableSkyblockerBazaarOverlay);
     }
 
     //requires cookie?

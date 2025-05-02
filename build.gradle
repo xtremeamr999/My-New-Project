@@ -30,6 +30,7 @@ repositories {
 		name = "Terraformers (for gui)"
 		url = "https://maven.terraformersmc.com/"
 	}
+
 	exclusiveContent {
 		forRepository {
 			maven {
@@ -76,6 +77,9 @@ dependencies {
 
 	//mixin constraints
 	include(implementation("com.moulberry:mixinconstraints:1.0.8"))
+
+	//Skyblocker for compatibility
+	compileOnly files('libs/skyblocker-1.23.0-beta.3+mc1.21.4.jar')
 
 }
 fabricApi {

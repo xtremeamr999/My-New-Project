@@ -3,14 +3,13 @@ package com.github.mkram17.bazaarutils.misc;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.Utils.Util.notificationTypes;
 import com.google.gson.*;
-import lombok.Getter;
+import de.hysky.skyblocker.config.SkyblockerConfig;
+import de.hysky.skyblocker.config.SkyblockerConfigManager;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,15 +24,14 @@ public class ModCompatibilityHelper {
 
     private static final Gson GSON_WRITER = new GsonBuilder().setPrettyPrinting().create();
 
-    public void initializePatches(){
+    public static void initializePatches(){
         if (FabricLoader.getInstance().isModLoaded(REI_MOD_ID)) {
             Util.notifyAll("Bazaar Utils: REI detected. Attempting to modify REI config.");
             modifyReiConfigWithGson();
         }
-        tryInitializeSkyblockerIntegration();
     }
 
-    private void modifyReiConfigWithGson() {
+    private static void modifyReiConfigWithGson() {
         Path configDir = FabricLoader.getInstance().getConfigDir();
         Path reiConfigFile = configDir.resolve(REI_CONFIG_FILENAME);
 
@@ -93,62 +91,61 @@ public class ModCompatibilityHelper {
         }
     }
 
-
-    @Getter
-    private boolean skyblockerDetected = false;
-    private Class<?> searchOverManagerClass = null;
-    private Method updateSearchMethod = null;
-    private Method pushSearchMethod = null;
-    private Field isAuctionField = null;
-    private Field isCommandField = null;
-
-    public void tryInitializeSkyblockerIntegration() {
-        if (FabricLoader.getInstance().isModLoaded(SKYBLOCKER_MOD_ID)) { 
+    //true == success, false == failure
+    public static boolean tryDisableSkyblockerBazaarOverlay() {
+        if (FabricLoader.getInstance().isModLoaded(SKYBLOCKER_MOD_ID)) {
             try {
-                searchOverManagerClass = Class.forName("de.hysky.skyblocker.skyblock.searchoverlay.SearchOverManager");
+                SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
+                boolean currentValue = skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar;
+                System.out.println("[Bazaar Utils] Skyblocker Bazaar Overlay current state: " + currentValue);
 
-                isAuctionField = searchOverManagerClass.getDeclaredField("isAuction");
-                isAuctionField.setAccessible(true);
+                if (currentValue) {
+                    skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar = false;
+                    System.out.println("[Bazaar Utils] Attempting to disable Skyblocker Bazaar Overlay...");
 
-                isCommandField = searchOverManagerClass.getDeclaredField("isCommand");
-                isCommandField.setAccessible(true);
-
-                updateSearchMethod = searchOverManagerClass.getDeclaredMethod("updateSearch", String.class);
-                updateSearchMethod.setAccessible(true);
-
-                pushSearchMethod = searchOverManagerClass.getDeclaredMethod("pushSearch");
-                pushSearchMethod.setAccessible(true);
-
-                skyblockerDetected = true;
-                System.out.println("Bazaar Utils: Skyblocker detected! Enabling integration.");
-
-            } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | SecurityException e) {
-                System.err.println("Bazaar Utils: Skyblocker detected, but failed to integrate (likely version mismatch or internal changes).");
-                e.printStackTrace();
-                skyblockerDetected = false;
-            }
-        } else {
-            System.out.println("Bazaar Utils: Skyblocker not found. Using fallback search.");
-            skyblockerDetected = false;
-        }
-    }
-
-    public boolean skyblockerSearchBazaar(String itemName) {
-        if (skyblockerDetected && searchOverManagerClass != null) {
-            try {
-                isAuctionField.setBoolean(null, false);
-                isCommandField.setBoolean(null, true);
-                updateSearchMethod.invoke(null, itemName);
-                pushSearchMethod.invoke(null);
-                return true;
-
-            } catch (Exception e) {
-                System.err.println("Bazaar Utils: Error calling Skyblocker via reflection. Falling back.");
+                    SkyblockerConfigManager.save();
+                    Util.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                    return true;
+                } else {
+                    System.out.println("[Bazaar Utils] Skyblocker Bazaar Overlay already disabled.");
+                    return true;
+                }
+            } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
+                System.err.println("[Bazaar Utils] Failed to access or modify Skyblocker config setting.");
                 e.printStackTrace();
                 return false;
             }
+        } else {
+            System.out.println("[Bazaar Utils] Skyblocker not loaded, cannot change its config.");
+            return false;
         }
-        return false;
+    }
+
+    public static boolean tryEnableSkyblockerBazaarOverlay() {
+        if (FabricLoader.getInstance().isModLoaded(SKYBLOCKER_MOD_ID)) {
+            try {
+                SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
+                if (!skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar) {
+                    System.out.println("[Bazaar Utils] Attempting to enable Skyblocker Bazaar Overlay...");
+                    skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar = true;
+                    SkyblockerConfigManager.save();
+
+                    Util.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                    return true;
+                } else {
+                    System.out.println("[Bazaar Utils] Skyblocker Bazaar Overlay already enabled.");
+                    return true;
+                }
+
+            } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
+                System.err.println("[Bazaar Utils] Failed to access or modify Skyblocker config setting (enable attempt).");
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            System.out.println("[Bazaar Utils] Skyblocker not loaded, cannot enable its config setting.");
+            return false;
+        }
     }
     
 }

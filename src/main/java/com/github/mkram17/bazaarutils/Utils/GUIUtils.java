@@ -153,7 +153,7 @@ public class GUIUtils {
 
     public static void setSignText(String text, boolean closeAfter) {
         final int MAX_ATTEMPTS = 5;
-        final long DELAY_MS = 250;
+        final long DELAY_MS = 200;
 
         CompletableFuture.runAsync(() -> {
             for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
