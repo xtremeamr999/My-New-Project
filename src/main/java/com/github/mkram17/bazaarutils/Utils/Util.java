@@ -16,6 +16,8 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -40,9 +42,20 @@ public class Util {
     public static final String HELPMESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
             "/bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
     public static final Text DISCORDLINK = Text.literal("Discord server")
-            .styled(style -> style
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!"))));
+            .styled(style -> {
+                //? if > 1.21.4{
+                        try {
+                            return style
+                                            .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    //?} else {
+//                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
+//                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!"))));
+    //?}
 
     public static<T> void notifyAll(T message) {
         String callingName = getCallingClassName();
@@ -60,10 +73,21 @@ public class Util {
         String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
         Text messageText = Text.literal("[" + simpleCallingName + "] " + messageStr);
         if(notiType == notificationTypes.ERROR){
-            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> style
-                    .withColor(Formatting.RED)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support"))));
+            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
+                //? if > 1.21.4 {
+                try {
+                    return style
+                            .withColor(Formatting.RED)
+                            .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord for support")));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            //? } else {
+//                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
+//                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support"))));
+            //? }
         }
 
         if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
@@ -89,8 +113,13 @@ public class Util {
                 .styled(style -> style
                         .withBold(true)
                         .withColor(Formatting.GOLD)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
+                        //? if > 1.21.4 {
+                        .withClickEvent(new ClickEvent.RunCommand("/" + command))
+                        .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
+                        //? } else {
+//                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
+//                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
+                        //? }
                 ), false);
     }
 
