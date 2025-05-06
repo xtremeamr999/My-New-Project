@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.config;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
-import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.StashMessages;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrderSettings;
@@ -58,8 +57,6 @@ public class BUConfig {
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
-    public StashHelper stashHelper = new StashHelper(true);
-    @SerialEntry
     public OutdatedItems outdatedItems = new OutdatedItems(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
@@ -92,7 +89,6 @@ public class BUConfig {
                     .name(Text.literal("General"))
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
-                    .option(stashHelper.createOption())
                     .option(stashMessages.createOption())
                     .group(restrictSellGroupBuilder.build())
                     .build()

@@ -7,26 +7,31 @@ import com.github.mkram17.bazaarutils.Utils.GUIUtils;
 import com.github.mkram17.bazaarutils.Utils.ItemUpdater;
 import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.mojang.serialization.Codec;
+import de.siphalor.amecs.api.AmecsKeyBinding;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
     public static ItemUpdater updater = new ItemUpdater();
     public static ModCompatibilityHelper compatabilityHelper = new ModCompatibilityHelper();
+    public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
 
     @Override
     public void onInitializeClient() {
@@ -34,6 +39,7 @@ public class BazaarUtils implements ClientModInitializer {
         BUConfig.HANDLER.load();
         registerDeserializedEvents();
         registerCommands();
+        registerKeybinds();
         Util.startExecutors();
         ModCompatibilityHelper.initializePatches();
     }
@@ -55,6 +61,13 @@ public class BazaarUtils implements ClientModInitializer {
             Commands.register(dispatcher);
         });
     }
+
+    private void registerKeybinds(){
+        keybinds.add(new StashHelper());
+        for(AmecsKeyBinding keybind : keybinds) {
+            KeyBindingHelper.registerKeyBinding(keybind);
+        }
+    }
     //must be run after config load
     private void registerDeserializedEvents(){
         for(CustomOrder order : BUConfig.get().customOrders) {
@@ -63,7 +76,6 @@ public class BazaarUtils implements ClientModInitializer {
         eventBus.subscribe(BUConfig.get().flipHelper);
         eventBus.subscribe(BUConfig.get().restrictSell);
         eventBus.subscribe(BUConfig.get().outdatedItems);
-        BUConfig.get().stashHelper.registerKeybind();
         BUConfig.get().restrictSell.registerScreenEvent();
     }
 

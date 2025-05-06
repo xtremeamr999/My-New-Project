@@ -88,11 +88,11 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modImplementation("meteordevelopment:orbit:0.2.4")
-    include("meteordevelopment:orbit:0.2.4")
+//    include("meteordevelopment:orbit:0.2.4")
 
     modImplementation("net.hypixel:hypixel-api-transport-apache:4.4")
-    include("net.hypixel:hypixel-api-transport-apache:4.4")
-    include("net.hypixel:hypixel-api-core:4.4")
+//    include("net.hypixel:hypixel-api-transport-apache:4.4")
+//    include("net.hypixel:hypixel-api-core:4.4")
 
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
 
@@ -106,20 +106,20 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.36")
 
     // Modern Keybinding
-    modImplementation("curse.maven:modernkeybinding-695433:6016136")
-    include("curse.maven:modernkeybinding-695433:6016136")
+//    modImplementation("curse.maven:modernkeybinding-695433:6016136")
+//    include("curse.maven:modernkeybinding-695433:6016136")
+
+    //Amecs Reborn
+    modImplementation("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${deps["core.mcVersion"]}")
 
     // Mixin Constraints
-    // The implementation(...) around include suggests 'include' might be a function call returning a dependency object
-    // If 'include' is a standard function provided by Fabric Loom or another plugin, it might work as is:
-    // implementation(include("com.moulberry:mixinconstraints:1.0.8"))
-    // Assuming standard dependency declaration for now:
     modImplementation("com.moulberry:mixinconstraints:1.0.8")
-    include("com.moulberry:mixinconstraints:1.0.8")
+//    include("com.moulberry:mixinconstraints:1.0.8")
 
 
     // Skyblocker for compatibility
-    modCompileOnly("curse.maven:skyblocker-936169:6329846")
+//    modCompileOnly("maven.modrinth:y6DuFGwJ:v${property("skyblocker_version")}+${deps["core.mcVersion"]}")
+    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
 
 }
 tasks {

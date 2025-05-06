@@ -23,4 +23,4 @@ stonecutter {
 //    }
 }
 
-rootProject.name = "Bazaar Utils"
+rootProject.name = "Bazaar-Utils-Modern"

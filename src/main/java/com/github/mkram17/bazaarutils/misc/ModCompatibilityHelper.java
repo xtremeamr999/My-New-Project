@@ -100,10 +100,10 @@ public class ModCompatibilityHelper {
                 System.out.println("[Bazaar Utils] Skyblocker Bazaar Overlay current state: " + currentValue);
 
                 if (currentValue) {
-                    skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar = false;
+                    //TODO test to make sure this works instead of .save()
+                    SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = false);
                     System.out.println("[Bazaar Utils] Attempting to disable Skyblocker Bazaar Overlay...");
 
-                    SkyblockerConfigManager.save();
                     Util.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
                     return true;
                 } else {
@@ -127,8 +127,8 @@ public class ModCompatibilityHelper {
                 SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
                 if (!skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar) {
                     System.out.println("[Bazaar Utils] Attempting to enable Skyblocker Bazaar Overlay...");
-                    skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar = true;
-                    SkyblockerConfigManager.save();
+                    SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = true);
+
 
                     Util.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
                     return true;
