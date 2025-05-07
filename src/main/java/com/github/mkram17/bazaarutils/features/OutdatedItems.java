@@ -31,7 +31,7 @@ public class OutdatedItems {
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated)
-            Util.notifyChatCommand("Your order for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
+            Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
         if(BazaarUtils.gui.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{

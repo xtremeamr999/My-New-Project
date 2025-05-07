@@ -55,6 +55,12 @@ public class ItemData {
             INSTASELL.opposite = INSTABUY;
             INSTABUY.opposite = INSTASELL;
         }
+        public String getString(){
+            return switch (this) {
+                case INSTASELL -> "buy order";
+                case INSTABUY -> "sell order";
+            };
+        }
     }
     public enum statuses{SET,FILLED}
 
@@ -100,10 +106,10 @@ public class ItemData {
         this.price = fullPrice/volume;
         price = (double) Math.round(price * 100) / 100;
         this.status = statuses.SET;
-        this.maximumRounding = getMaxRouding(fullPrice, volume);
+        this.maximumRounding = getMaxRounding(fullPrice, volume);
     }
 
-    private static double getMaxRouding(double fullPrice, int volume){
+    private static double getMaxRounding(double fullPrice, int volume){
         if(fullPrice < 10000)
             return 0;
         else{
@@ -288,7 +294,7 @@ public class ItemData {
     }
     public void remove(){
         if(!BUConfig.get().watchedItems.remove(this))
-            Util.notifyAll("Error removing " + name + " from watched items. Item couldnt be found.");
+            Util.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
     }
     public static void clearItems(){

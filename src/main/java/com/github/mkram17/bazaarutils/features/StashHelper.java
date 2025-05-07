@@ -7,6 +7,7 @@ import de.siphalor.amecs.api.KeyModifiers;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
+//TODO make using amecs optional
 public class StashHelper extends AmecsKeyBinding {
     private transient int ticksBetweenPresses;
 
@@ -17,12 +18,12 @@ public class StashHelper extends AmecsKeyBinding {
 
     @Override
     public void onPressed(){
-        if(ticksBetweenPresses>15) {
+//        if(ticksBetweenPresses>15) {
             GUIUtils.closeHandledScreen();
             Util.sendCommand("pickupstash");
 
 //            ticksBetweenPresses = 0;
-        }
+//        }
     }
 
 //    public void registerKeybind() {

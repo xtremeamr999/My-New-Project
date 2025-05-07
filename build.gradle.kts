@@ -8,7 +8,7 @@ plugins {
 //	id 'org.jetbrains.kotlin.jvm' version '2.0.0'
 }
 group = property("maven_group")!!
-version = property("mod_version")!!
+version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
 
 base { archivesName.set(property("mod.id").toString()) }
 repositories {
@@ -87,12 +87,12 @@ dependencies {
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
-    modImplementation("meteordevelopment:orbit:0.2.4")
-//    include("meteordevelopment:orbit:0.2.4")
+    implementation("meteordevelopment:orbit:0.2.4")
+    include("meteordevelopment:orbit:0.2.4")
 
     modImplementation("net.hypixel:hypixel-api-transport-apache:4.4")
-//    include("net.hypixel:hypixel-api-transport-apache:4.4")
-//    include("net.hypixel:hypixel-api-core:4.4")
+    include("net.hypixel:hypixel-api-transport-apache:4.4")
+    include("net.hypixel:hypixel-api-core:4.4")
 
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
 
@@ -113,8 +113,7 @@ dependencies {
     modImplementation("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${deps["core.mcVersion"]}")
 
     // Mixin Constraints
-    modImplementation("com.moulberry:mixinconstraints:1.0.8")
-//    include("com.moulberry:mixinconstraints:1.0.8")
+    include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
 
 
     // Skyblocker for compatibility
@@ -135,7 +134,9 @@ tasks {
     }
 
     jar {
-        from("LICENSE")
+        from("LICENSE"){
+            rename { "${it}_${archiveBaseName.get()}" }
+        }
     }
 
     publishing {

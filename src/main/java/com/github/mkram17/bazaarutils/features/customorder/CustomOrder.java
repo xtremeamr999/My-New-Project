@@ -27,7 +27,7 @@ import java.util.Map;
 
 @NoArgsConstructor
 public class CustomOrder extends CustomItemButton {
-    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.GREEN_STAINED_GLASS_PANE, 4, Items.BLACK_STAINED_GLASS_PANE));
+    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.BLACK_STAINED_GLASS_PANE));
     private boolean buySignClicked = false;
     @Getter @Setter
     private CustomOrderSettings settings;

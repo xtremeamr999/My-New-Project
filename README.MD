@@ -30,15 +30,14 @@ REMEMBER -- if your bazaar flipper account upgrade is not level two, change your
 
 ### 🔗Must Have in Mods Folder
 
-- Fabric API (you probably already have this https://modrinth.com/mod/fabric-api/versions?g=1.21.4)
-- Mod Menu (https://modrinth.com/mod/modmenu/versions?g=1.21.4&l=fabric)
-- Yet Another Config Library (https://modrinth.com/mod/yacl/versions?g=1.21.4&l=fabric )
+- Fabric API (you probably already have this https://modrinth.com/mod/fabric-api)
+- Mod Menu (https://modrinth.com/mod/modmenu)
+- Yet Another Config Library (https://modrinth.com/mod/yacl)
+- Amecs Reborn (https://modrinth.com/mod/amecs-reborn)
 
 ### 📦Included in Mod Already
 
 - Orbit Event System (helps in mod development)
-- Modern Keybinding (enables you to add keybinds with modifiers ALT, CTRL, SHIFT)
-
 ### 🛠️Future Features
 
 - Option to control frequency of pick up stash messages

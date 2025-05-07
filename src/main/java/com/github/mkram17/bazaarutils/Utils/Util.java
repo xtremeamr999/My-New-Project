@@ -16,6 +16,8 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class Util {
     public static final Text DISCORDLINK = Text.literal("Discord server")
             .styled(style -> {
                         //? if > 1.21.4 {
-                        /*try {
+                        try {
                             return style
                                             .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
                             .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
@@ -50,12 +52,12 @@ public class Util {
                             throw new RuntimeException(e);
                         }
                     });
-                    *///?} else {
-                        return style
+                    //?} else {
+                        /*return style
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!")));
                     });
-        //?}
+        *///?}
 
     public static<T> void notifyAll(T message) {
         String callingName = getCallingClassName();
@@ -75,7 +77,7 @@ public class Util {
         if(notiType == notificationTypes.ERROR){
             messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
                         //? if > 1.21.4 {
-                /*try {
+                try {
                     return style
                             .withColor(Formatting.RED)
                             .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
@@ -84,12 +86,12 @@ public class Util {
                     throw new RuntimeException(e);
                 }
             });
-            *///?} else {
-                        return style
+            //?} else {
+                        /*return style
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support")));
                     });
-            //?}
+            *///?}
         }
 
         if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
@@ -116,12 +118,12 @@ public class Util {
                         .withBold(true)
                         .withColor(Formatting.GOLD)
                         //? if > 1.21.4 {
-                        /*.withClickEvent(new ClickEvent.RunCommand("/" + command))
+                        .withClickEvent(new ClickEvent.RunCommand("/" + command))
                         .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
-                        *///?} else {
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
+                        //?} else {
+                                /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
-                        //?}
+                        *///?}
                 ), false);
     }
 
