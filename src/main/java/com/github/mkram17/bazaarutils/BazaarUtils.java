@@ -30,7 +30,6 @@ public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
     public static ItemUpdater updater = new ItemUpdater();
-    public static ModCompatibilityHelper compatabilityHelper = new ModCompatibilityHelper();
     public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
 
     @Override
@@ -63,7 +62,10 @@ public class BazaarUtils implements ClientModInitializer {
     }
 
     private void registerKeybinds(){
-        keybinds.add(new StashHelper());
+        StashHelper stashHelper = new StashHelper();
+        stashHelper.registerTickCounter();
+        keybinds.add(stashHelper);
+
         for(AmecsKeyBinding keybind : keybinds) {
             KeyBindingHelper.registerKeyBinding(keybind);
         }

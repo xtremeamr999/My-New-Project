@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 
 //TODO make inBazaar() work all the time
 public class GUIUtils {
+    private static boolean closedScreen = false;
     public boolean wasLastChestFlip(){
         return inFlipGui;
     }
@@ -111,6 +112,7 @@ public class GUIUtils {
         }
     }
 
+    //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why
     public static void closeHandledScreen() {
         try {
             Util.notifyAll("Closing gui", Util.notificationTypes.GUI);
@@ -122,12 +124,15 @@ public class GUIUtils {
 
             client.execute(() -> {
                 var player = client.player;
-                if (player != null) {
+                if (player != null && !closedScreen) {
+                    closedScreen = true;
                     player.closeHandledScreen();
-                } else {
-                    Util.notifyAll("Player is null", Util.notificationTypes.ERROR);
                 }
+//                else {
+//                    Util.notifyAll("Player is null", Util.notificationTypes.ERROR);
+//                }
             });
+            closedScreen = false;
         } catch (Exception e) {
             e.printStackTrace();
             Util.notifyAll("Error closing gui", Util.notificationTypes.ERROR);
