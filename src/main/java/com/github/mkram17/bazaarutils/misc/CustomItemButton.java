@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.misc;
 
-import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;

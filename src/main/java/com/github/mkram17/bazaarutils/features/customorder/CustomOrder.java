@@ -1,10 +1,10 @@
 package com.github.mkram17.bazaarutils.features.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
-import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.Utils.GUIUtils;
+import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
+import com.github.mkram17.bazaarutils.events.SignOpenEvent;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import dev.isxander.yacl3.api.ConfigCategory;

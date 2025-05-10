@@ -1,10 +1,10 @@
 // src/main/java/com/github/mkram17/bazaarutils/mixin/client/BazaarScreenMixin.java
 package com.github.mkram17.bazaarutils.mixin;
 
-import com.github.mkram17.bazaarutils.Utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -76,13 +76,13 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
                         buttonX,
                         currentButtonY,
                         buttonSize, buttonSize,
-                        SLOT_BUTTON_TEXTURES,
+                        Bookmark.SLOT_BUTTON_TEXTURES,
                         (btn) -> {
                             if (Screen.hasShiftDown()) {
                                 Util.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
-                                bookmark.onShiftClick();
+                                bookmark.onWidgetShiftClick();
                             } else {
-                                bookmark.onLeftClick();
+                                bookmark.onWidgetLeftClick();
                             }
 
                         },

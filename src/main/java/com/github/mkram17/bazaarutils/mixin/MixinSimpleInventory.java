@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.mixin;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
+import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;

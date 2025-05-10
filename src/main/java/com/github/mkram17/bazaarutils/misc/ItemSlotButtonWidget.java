@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.misc;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.tooltip.Tooltip; // Import Tooltip
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.ItemStack;

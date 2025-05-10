@@ -1,7 +1,7 @@
-package com.github.mkram17.bazaarutils.Events;
+package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.ItemData;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;

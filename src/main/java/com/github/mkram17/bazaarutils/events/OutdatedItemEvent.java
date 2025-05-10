@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.Events;
+package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import lombok.Getter;

@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.OutdatedItemEvent;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;

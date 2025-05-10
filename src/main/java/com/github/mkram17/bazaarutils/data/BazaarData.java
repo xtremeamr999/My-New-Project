@@ -1,7 +1,8 @@
 package com.github.mkram17.bazaarutils.data;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.ItemData;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.google.gson.*;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
@@ -60,7 +61,7 @@ public class BazaarData {
 
     public static JsonObject loadResourceJson(String resourcePath) {
         ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier resourceId = Identifier.of("bazaar-utils", resourcePath);
+        Identifier resourceId = Identifier.of(BazaarUtils.MODID, resourcePath);
 
         try {
             Optional<Resource> optionalResource = resourceManager.getResource(resourceId);
@@ -104,6 +105,10 @@ public class BazaarData {
         }
         try {
             var product = bazaarReply.getProduct(productId);
+            if(product == null){
+                Util.notifyAll("Could not find item using product ID: " + productId, Util.notificationTypes.ERROR);
+                return -1.0;
+            }
             var buy_summary = product.getBuySummary();
             var sell_summary = product.getSellSummary();
             sellPrice = sell_summary.get(0).getPricePerUnit();
@@ -146,7 +151,7 @@ public class BazaarData {
                 }
             }
         } catch (Exception e) {
-            Util.notifyAll("Error finding product ID: " + e.getMessage(), Util.notificationTypes.ERROR);
+            Util.notifyAll("Error while finding product ID: " + e.getMessage(), Util.notificationTypes.ERROR);
             e.printStackTrace();
         }
 

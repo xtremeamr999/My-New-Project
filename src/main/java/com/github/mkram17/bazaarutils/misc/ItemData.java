@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.OutdatedItemEvent;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import lombok.Getter;
@@ -107,6 +107,10 @@ public class ItemData {
         price = (double) Math.round(price * 100) / 100;
         this.status = statuses.SET;
         this.maximumRounding = getMaxRounding(fullPrice, volume);
+
+        if(productId == null){
+            Util.notifyAll("Could not find product id for item: " + name, Util.notificationTypes.ITEMDATA);
+        }
     }
 
     private static double getMaxRounding(double fullPrice, int volume){

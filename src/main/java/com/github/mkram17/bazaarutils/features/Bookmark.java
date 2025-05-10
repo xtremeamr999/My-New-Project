@@ -1,24 +1,27 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.Utils.GUIUtils;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
+//TODO when itemStack cant be found, do not show bookmark option
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
@@ -26,6 +29,12 @@ public class Bookmark extends CustomItemButton {
     public ItemStack bookmarkedItem;
     protected boolean inCorrectGui = false;
     private static final int SIGN_SLOT_NUMBER = 45;
+    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_base");
+    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_hover");
+//    private static final Identifier CLICK = Identifier.tryParse("bazaarutils", "widget/widget_click");
+    public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
+            BASE,
+            HOVER);
 
     @EventHandler
     protected void checkGui(ChestLoadedEvent event) {
@@ -59,7 +68,7 @@ public class Bookmark extends CustomItemButton {
     }
 
     @EventHandler
-    private void onClick(SlotClickEvent event){
+    private void onBookmarkClick(SlotClickEvent event){
         if(!inCorrectGui || !super.shouldUseSlot(event))
             return;
         switchBookmarked();
@@ -67,7 +76,7 @@ public class Bookmark extends CustomItemButton {
         BUConfig.HANDLER.save();
     }
 
-    public void onLeftClick(){
+    public void onWidgetLeftClick(){
         ModCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.setSignText(name, true);
@@ -75,13 +84,13 @@ public class Bookmark extends CustomItemButton {
     }
 
     //requires cookie?
-    public void alternateOnLeftClick(){
+    public void alternateOnWidgetLeftClick(){
         GUIUtils.closeHandledScreen();
         Util.sendCommand("bz " + name);
     }
 
 
-    public void onShiftClick(){
+    public void onWidgetShiftClick(){
         BUConfig.get().bookmarks.remove(this);
         BUConfig.HANDLER.save();
     }

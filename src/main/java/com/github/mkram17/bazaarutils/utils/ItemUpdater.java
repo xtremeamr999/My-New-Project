@@ -1,7 +1,7 @@
-package com.github.mkram17.bazaarutils.Utils;
+package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import meteordevelopment.orbit.EventHandler;

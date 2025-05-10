@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.misc;
 
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.*;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;

@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features.restrictsell;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ReplaceItemEvent;
+import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -17,7 +17,6 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO make sure this works with sacks
 //TODO maybe color chest if it is locked
 public class RestrictSell {
     public enum restrictBy{PRICE, VOLUME, NAME}

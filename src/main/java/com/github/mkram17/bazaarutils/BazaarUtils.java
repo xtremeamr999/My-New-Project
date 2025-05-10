@@ -1,11 +1,11 @@
 package com.github.mkram17.bazaarutils;
 
-import com.github.mkram17.bazaarutils.Events.ChatHandler;
-import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.Utils.Commands;
-import com.github.mkram17.bazaarutils.Utils.GUIUtils;
-import com.github.mkram17.bazaarutils.Utils.ItemUpdater;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.events.ChatHandler;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.utils.Commands;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ItemUpdater;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
@@ -31,6 +31,7 @@ public class BazaarUtils implements ClientModInitializer {
     public static GUIUtils gui = new GUIUtils();
     public static ItemUpdater updater = new ItemUpdater();
     public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
+    public static final String MODID = "bazaarutils";
 
     @Override
     public void onInitializeClient() {
@@ -83,7 +84,7 @@ public class BazaarUtils implements ClientModInitializer {
 
     public static final ComponentType<String> CUSTOM_SIZE_COMPONENT = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
-            Identifier.of("bazaarutils", "custom_size"),
+            Identifier.of(BazaarUtils.MODID, "custom_size"),
             ComponentType.<String>builder().codec(Codec.STRING).build()
     );
 }

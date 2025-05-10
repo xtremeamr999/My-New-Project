@@ -13,7 +13,7 @@
 		"Discord": "https://discord.gg/xDKjvm5hQd"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/bazaar-utils/icon.png",
+	"icon": "assets/bazaarutils/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
@@ -24,7 +24,7 @@
 		]
 	},
 	"mixins": [
-		"bazaar-utils.mixins.json"
+		"bazaarutils.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.9",

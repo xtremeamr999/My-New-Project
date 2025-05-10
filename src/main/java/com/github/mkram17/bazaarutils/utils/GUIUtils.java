@@ -1,8 +1,8 @@
-package com.github.mkram17.bazaarutils.Utils;
+package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.Events.SignOpenEvent;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import lombok.Getter;
@@ -13,12 +13,14 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
@@ -39,7 +41,7 @@ public class GUIUtils {
     }
     public boolean inInstaBuy(){
         if(containerName == null) return false;
-        return containerName.contains("Instant Buy");
+        return containerName.contains("➜ Insta");
     }
     public boolean inBuyOrders(){
         if(containerName == null) return false;
@@ -117,25 +119,38 @@ public class GUIUtils {
         try {
             Util.notifyAll("Closing gui", Util.notificationTypes.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
+            if(!(client.currentScreen instanceof HandledScreen<?>))
+                return;
             if (client == null) {
                 Util.notifyAll("Client is null", Util.notificationTypes.ERROR);
                 return;
             }
 
             client.execute(() -> {
-                var player = client.player;
-                if (player != null && !closedScreen) {
-                    closedScreen = true;
-                    player.closeHandledScreen();
-                }
-//                else {
-//                    Util.notifyAll("Player is null", Util.notificationTypes.ERROR);
-//                }
+                ClientPlayerEntity player = client.player;
+                customCloseHandledScreen();
             });
-            closedScreen = false;
         } catch (Exception e) {
             e.printStackTrace();
             Util.notifyAll("Error closing gui", Util.notificationTypes.ERROR);
+        }
+    }
+
+    private static void customCloseHandledScreen() {
+        try {
+            MinecraftClient client = MinecraftClient.getInstance();
+            ClientPlayerEntity player = client.player;
+            if (player == null) {
+                Util.notifyAll("Player is null, cannot close screen", Util.notificationTypes.ERROR);
+                return;
+            }
+            player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(player.currentScreenHandler.syncId));
+            client.setScreen(null);
+            player.currentScreenHandler = player.playerScreenHandler;
+
+        } catch (Exception e) {
+            Util.notifyAll("Error encountered while closing screen with custom method", Util.notificationTypes.ERROR);
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashMessages;
@@ -76,7 +76,7 @@ public class BUConfig {
 
     public Screen createGUI(Screen parent) {
         return YetAnotherConfigLib.create(HANDLER, (defaults, config, builder) -> {
-            builder.title(Text.literal("Bazaar Utils"));
+            builder.title(Text.literal("Bazaar utils"));
             OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
                     .name(Text.literal("Sell rules"))
                     .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));

@@ -1,7 +1,7 @@
-package com.github.mkram17.bazaarutils.Events;
+package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;

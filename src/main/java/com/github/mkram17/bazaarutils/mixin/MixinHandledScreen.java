@@ -2,11 +2,11 @@
 package com.github.mkram17.bazaarutils.mixin;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.Events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.Utils.Util;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import de.siphalor.amecs.api.AmecsKeyBinding;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -63,10 +63,11 @@ public abstract class MixinHandledScreen {
 
 	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
 	public void onkeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-		AmecsKeyBinding keyBinding = BazaarUtils.keybinds.getFirst();
+		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();
 		if (!keyBinding.isPressed() && keyBinding.getDefaultKey().getCode() == keyCode && keyBinding.getDefaultModifiers().getAlt()) {
 			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
-			keyBinding.setPressed(true);
+			if(keyBinding.getTicksBetweenPresses() > 10)
+				keyBinding.setPressed(true);
 			cir.setReturnValue(true);
 		}
 	}

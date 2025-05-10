@@ -1,8 +1,9 @@
-package com.github.mkram17.bazaarutils.Utils;
+package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.misc.ItemData;
+import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@UtilityClass
 public class Util {
     public static void sendCommand(String command){
         MinecraftClient client = MinecraftClient.getInstance();
@@ -66,7 +68,7 @@ public class Util {
 
         if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(Text.literal("[BazaarUtils] " + messageStr), false);
-        LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
+        LogManager.getLogger(callingName).info("[Bazaar utils] Message [" + message + "]");
     }
 
     public static<T> void notifyAll(T message, notificationTypes notiType) {
@@ -75,7 +77,7 @@ public class Util {
         String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
         Text messageText = Text.literal("[" + simpleCallingName + "] " + messageStr);
         if(notiType == notificationTypes.ERROR){
-            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
+            messageText = Text.literal("[Bazaar utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
                         //? if > 1.21.4 {
                 try {
                     return style
@@ -98,7 +100,7 @@ public class Util {
             if (MinecraftClient.getInstance().player != null) {
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
             }
-            LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
+            LogManager.getLogger(callingName).info("[Bazaar utils] Message [" + message + "]");
         }
     }
 
@@ -144,6 +146,7 @@ public class Util {
     public static void addWatchedItem(ItemData item){
         if(item == null)
             return;
+        assert item.getProductID() != null;
         BUConfig.get().watchedItems.add(item);
         notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
         BUConfig.HANDLER.save();
