@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
@@ -30,8 +31,10 @@ public class OutdatedItems {
 
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
-        if(notifyOutdated)
+        if(notifyOutdated) {
             Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
+            SoundUtil.notifyMultipleTimes(3);
+        }
         if(BazaarUtils.gui.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{

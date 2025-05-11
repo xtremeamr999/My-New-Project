@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -69,6 +70,7 @@ public class CustomOrder extends CustomItemButton {
 
         if (event.slot.getIndex() != settings.getSlotNumber())
             return;
+        SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
 
         openSign();
     }

@@ -76,7 +76,7 @@ public abstract class BazaarScreenMixin<T extends ScreenHandler> extends Screen 
                         buttonX,
                         currentButtonY,
                         buttonSize, buttonSize,
-                        Bookmark.SLOT_BUTTON_TEXTURES,
+                        SLOT_BUTTON_TEXTURES,
                         (btn) -> {
                             if (Screen.hasShiftDown()) {
                                 Util.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");

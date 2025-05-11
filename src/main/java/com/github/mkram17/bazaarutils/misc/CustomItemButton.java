@@ -9,6 +9,9 @@ import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
@@ -19,6 +22,8 @@ public class CustomItemButton {
     protected int slotNumber;
     @Getter @Setter
     protected transient ItemStack replacementItem;
+    protected static final RegistryEntry<SoundEvent> BUTTON_SOUND = SoundEvents.UI_BUTTON_CLICK;
+    protected static final float BUTTON_VOLUME = .2f;
 
     protected void checkGui(ChestLoadedEvent event) {
 

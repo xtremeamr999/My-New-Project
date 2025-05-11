@@ -1,14 +1,15 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
+import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -31,7 +32,6 @@ public class Bookmark extends CustomItemButton {
     private static final int SIGN_SLOT_NUMBER = 45;
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_base");
     private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_hover");
-//    private static final Identifier CLICK = Identifier.tryParse("bazaarutils", "widget/widget_click");
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
             HOVER);
@@ -71,12 +71,14 @@ public class Bookmark extends CustomItemButton {
     private void onBookmarkClick(SlotClickEvent event){
         if(!inCorrectGui || !super.shouldUseSlot(event))
             return;
+        SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         switchBookmarked();
         bookmarkedItem = findItem(name, event);
         BUConfig.HANDLER.save();
     }
 
     public void onWidgetLeftClick(){
+        SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         ModCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.setSignText(name, true);

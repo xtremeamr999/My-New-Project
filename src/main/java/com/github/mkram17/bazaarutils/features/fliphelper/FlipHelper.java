@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.ItemData;
@@ -110,6 +111,7 @@ public class FlipHelper extends CustomItemButton {
     public void onSlotClicked(SlotClickEvent event) {
         if (!BazaarUtils.gui.inFlipGui || !settings.isEnabled() || event.slot.getIndex() != settings.getSlotNumber())
             return;
+        SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         GUIUtils.clickSlot(15,0);
         if (item != null)
             shouldAddToSign = true;
