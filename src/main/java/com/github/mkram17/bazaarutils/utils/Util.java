@@ -68,7 +68,7 @@ public class Util {
 
         if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(Text.literal("[BazaarUtils] " + messageStr), false);
-        LogManager.getLogger(callingName).info("[Bazaar utils] Message [" + message + "]");
+        LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
     }
 
     public static<T> void notifyAll(T message, notificationTypes notiType) {
@@ -77,7 +77,7 @@ public class Util {
         String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
         Text messageText = Text.literal("[" + simpleCallingName + "] " + messageStr);
         if(notiType == notificationTypes.ERROR){
-            messageText = Text.literal("[Bazaar utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
+            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
                         //? if > 1.21.4 {
                 try {
                     return style
@@ -100,7 +100,7 @@ public class Util {
             if (MinecraftClient.getInstance().player != null) {
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
             }
-            LogManager.getLogger(callingName).info("[Bazaar utils] Message [" + message + "]");
+            LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
         }
     }
 

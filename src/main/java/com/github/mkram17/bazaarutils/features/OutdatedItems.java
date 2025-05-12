@@ -22,18 +22,22 @@ public class OutdatedItems {
     private boolean autoOpenEnabled;
     @Getter @Setter
     private boolean notifyOutdated;
+    @Getter @Setter
+    private boolean notificationSound;
 
 
     public OutdatedItems(boolean autoOpenEnabled, boolean notifyOutdated) {
         this.autoOpenEnabled = autoOpenEnabled;
         this.notifyOutdated = notifyOutdated;
+        this.notificationSound = true;
     }
 
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated) {
             Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
-            SoundUtil.notifyMultipleTimes(3);
+            if(notificationSound)
+                SoundUtil.notifyMultipleTimes(3);
         }
         if(BazaarUtils.gui.inBazaar() || !autoOpenEnabled)
             return;
@@ -69,6 +73,14 @@ public class OutdatedItems {
                 .binding(true,
                         this::isNotifyOutdated,
                         this::setNotifyOutdated)
+                .controller(BUConfig::createBooleanController)
+                .build());
+        options.add(Option.<Boolean>createBuilder()
+                .name(Text.literal("Sound for Outdated Orders"))
+                .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order becomes outdated.")))
+                .binding(true,
+                        this::isNotificationSound,
+                        this::setNotificationSound)
                 .controller(BUConfig::createBooleanController)
                 .build());
         return options;

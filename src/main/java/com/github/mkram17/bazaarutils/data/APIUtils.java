@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.data;
 
+import com.github.mkram17.bazaarutils.utils.Util;
 import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.apache.ApacheHttpClient;
 import net.hypixel.api.reply.AbstractReply;
@@ -9,19 +10,21 @@ import java.util.function.BiConsumer;
 
 public class APIUtils {
 
-    private static String getApiKey() {
+    public static String getApiKey() {
         String apiKey = System.getenv("HYPIXEL_API_KEY");
         if (apiKey != null) {
             return apiKey;
         }
-
-        return System.getProperty("apiKey", "64bd424e-ccb0-42ed-8b66-6e42a135afb4"); // arbitrary key, replace with your own to test or use the property
+        Util.notifyAll("No API key found!", Util.notificationTypes.BAZAARDATA);
+        return System.getProperty("apiKey", "");
     }
 
     public static final HypixelAPI API;
+    public static final UUID uuid;
 
     static {
-        API = new HypixelAPI(new ApacheHttpClient(UUID.fromString(getApiKey())));
+        uuid = UUID.fromString(getApiKey());
+        API = new HypixelAPI(new ApacheHttpClient(uuid));
     }
 
     public static <T extends AbstractReply> BiConsumer<T, Throwable> getTestConsumer() {

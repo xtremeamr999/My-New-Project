@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+//TODO more efficient timing of api requests
 public class BazaarData {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -27,6 +27,10 @@ public class BazaarData {
 //    private static final String dataFile = "bazaar_json.json";
     static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
     private static SkyBlockBazaarReply bazaarReply = null;
+    private static int bazaarDataPeriod = 1;
+    private static int exceptionCount = 0;
+    private static int bazaarCalls = 0;
+    private static boolean skipNextCall = false;
 
 
     public static<T> String getAsPrettyJsonObject(String object){
@@ -36,13 +40,30 @@ public class BazaarData {
         return JsonParser.parseString(str).getAsJsonObject();
     }
 
-    //called in init
     public static void scheduleBazaar(){
+
         bzExecutor.scheduleAtFixedRate(() -> {
-                APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
+            if(skipNextCall) {
+                skipNextCall = false;
+                return;
+            }
+
+            APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
+                    bazaarCalls++;
+                    if(bazaarCalls % 10 == 0)
+                        skipNextCall = true;
+
                     if (throwable != null) {
+                        skipNextCall = true;
+                        exceptionCount++;
                         Util.notifyAll("Exception thrown trying to get bazaar data", Util.notificationTypes.ERROR);
+                        System.out.println(throwable.getMessage());
+                        System.out.println("[Bazaar Utils] Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
+                        System.out.println("[Bazaar Utils] Status: " + APIUtils.API.getStatus(APIUtils.uuid));
                         throwable.printStackTrace();
+                        if(exceptionCount % 5 == 0){
+                            bazaarDataPeriod++;
+                        }
                     } else {
                         if(reply == null){
                             Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
@@ -56,7 +77,7 @@ public class BazaarData {
                         }
                     }
                 });
-        }, 1, 1, TimeUnit.SECONDS);
+        }, 1, bazaarDataPeriod, TimeUnit.SECONDS);
     }
 
     public static JsonObject loadResourceJson(String resourcePath) {
