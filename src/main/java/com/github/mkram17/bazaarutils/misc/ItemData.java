@@ -158,7 +158,8 @@ public class ItemData {
         return variables;
     }
 
-    public static ItemData findItem(String name, Double price, Integer volume, priceTypes priceType) {
+    //TODO refactor of match finding -- it can definitely be improved
+    private static ArrayList<ItemData> findExactMatches(String name, Double price, Integer volume, priceTypes priceType){
         ArrayList<ItemData> itemList = new ArrayList<>();
         for(ItemData item : BUConfig.get().watchedItems){
             if((price == null || item.isSimilarPrice(price)) &&
@@ -168,6 +169,25 @@ public class ItemData {
                 itemList.add(item);
             }
         }
+        return itemList;
+    }
+    private static ArrayList<ItemData> findLooseVolumeMatches(String name, Double price, Integer volume, priceTypes priceType){
+        ArrayList<ItemData> itemList = new ArrayList<>();
+        for(ItemData item : BUConfig.get().watchedItems){
+            if((price == null || item.isSimilarPrice(price)) &&
+                    (volume == null || Math.abs(item.getVolume() - volume) <= (0.05 * volume) || Math.abs(item.getVolume()-item.getAmountClaimed() - volume) <= (0.05 * volume)) &&
+                    (name == null || name.equalsIgnoreCase(item.getName())) &&
+                    (priceType == null || priceType == item.getPriceType())){
+                itemList.add(item);
+            }
+        }
+        return itemList;
+    }
+
+    public static ItemData findItem(String name, Double price, Integer volume, priceTypes priceType) {
+        ArrayList<ItemData> itemList = findExactMatches(name, price, volume, priceType);
+        if(itemList.isEmpty())
+            itemList = findLooseVolumeMatches(name, price, volume, priceType);
 
         if (itemList.isEmpty()) {
             Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);

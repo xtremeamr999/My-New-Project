@@ -1,12 +1,13 @@
 package com.github.mkram17.bazaarutils.misc;
 
-import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
+import com.github.mkram17.bazaarutils.utils.Util;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class JoinMessages {
+public class JoinMessages implements BUTransientListener {
     private static final Text welcomeMessage = Text.literal("[Bazaar utils] ")
             .formatted(Formatting.WHITE)
             .append(Text.literal("Thanks for installing! Use /buconfig to configure the mod.")
@@ -19,7 +20,8 @@ public class JoinMessages {
                     .append(Text.literal("!")
                             .formatted(Formatting.GREEN)));
 
-    public static void subscribe(){
+    @Override
+    public void subscribe(){
         registerWelcomeMessageSender();
     }
     private static void registerWelcomeMessageSender() {

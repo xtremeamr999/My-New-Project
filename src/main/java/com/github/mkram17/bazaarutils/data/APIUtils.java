@@ -16,7 +16,8 @@ public class APIUtils {
             return apiKey;
         }
         Util.notifyAll("No API key found!", Util.notificationTypes.BAZAARDATA);
-        return System.getProperty("apiKey", "");
+        //fake api key, but wont be used so it doesnt matter
+        return "11111111-2222-3333-4444-555555555555";
     }
 
     public static final HypixelAPI API;

@@ -2,10 +2,7 @@ package com.github.mkram17.bazaarutils.features.fliphelper;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.events.SignOpenEvent;
-import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -21,7 +18,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class FlipHelper extends CustomItemButton {
+import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+
+//TODO switch to finding market price without finding the ItemData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
+public class FlipHelper extends CustomItemButton implements BUSerializedListener {
     public double flipPrice;
     private double orderPrice = -1;
     private int orderVolumeFilled = -1;
@@ -143,5 +143,9 @@ public class FlipHelper extends CustomItemButton {
         return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> settings.isEnabled(), newVal -> settings.setEnabled(newVal));
     }
 
+    @Override
+    public void registerEvents() {
+        eventBus.subscribe(this);
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.ItemData;
@@ -13,7 +14,9 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemUpdater {
+import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+
+public class ItemUpdater implements BUTransientListener {
     private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
     private static List<ItemStack> orderScreen;
     @EventHandler
@@ -119,7 +122,7 @@ public class ItemUpdater {
             Util.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
             match.setAmountFilled(foundItem.getAmountFilled());
         }
-        if(match.getAmountClaimed() != foundItem.getAmountClaimed()){
+        if(match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0){
             Util.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
             match.setAmountClaimed(foundItem.getAmountClaimed());
         }
@@ -160,5 +163,10 @@ public class ItemUpdater {
                 return new ArrayList<>();
 
             return items;
+    }
+
+    @Override
+    public void subscribe() {
+        eventBus.subscribe(this);
     }
 }

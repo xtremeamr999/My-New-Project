@@ -9,52 +9,12 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatHandler {
+public class ChatHandler implements BUTransientListener{
     private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
-    private static ArrayList<String> previousMessages = new ArrayList<>();
-    private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "  "};
 
-    public static void subscribe() {
+    @Override
+    public void subscribe() {
         registerBazaarChat();
-        registerStashRemover();
-    }
-
-    public static void registerStashRemover() {
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if (!BUConfig.get().stashMessages.shouldRemoveMessages()) return true;
-
-            String currentMessageString = message.getString();
-            boolean shouldRemove = currentMessageString.equalsIgnoreCase(removeList[0]);
-            int indexOfMessage = indexOfMessage(currentMessageString);
-
-            for(int index = indexOfMessage; index>=1; index--){
-                if(index > previousMessages.size()) {
-                    previousMessages.clear();
-                    break;
-                }
-                if(previousMessages.get(index-1).contains(removeList[index-1])) {
-                    shouldRemove = true;
-                } else {
-                    shouldRemove = false;
-                }
-            }
-
-            previousMessages.add(currentMessageString);
-            if(!shouldRemove)
-                previousMessages.clear();
-            return !shouldRemove;
-        });
-
-    }
-
-    private static int indexOfMessage(String message){
-        for (int k = 1; k < removeList.length-1; k++) {
-            String flag = removeList[k];
-            if (message.contains(flag))
-                return k;
-        }
-        if(message.contains(removeList[removeList.length-1])) return removeList.length-1;
-        return -1;
     }
 
     public static void registerBazaarChat() {
@@ -68,7 +28,6 @@ public class ChatHandler {
                         || siblings.get(1).getString().contains("Claiming") || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")))
                     return;
             }
-
 
             String itemName;
             int volume;

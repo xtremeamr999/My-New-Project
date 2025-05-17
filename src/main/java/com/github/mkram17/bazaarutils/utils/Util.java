@@ -2,8 +2,8 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
-import lombok.experimental.UtilityClass;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -25,13 +25,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@UtilityClass
-public class Util {
+public class Util implements BUTransientListener {
     public static void sendCommand(String command){
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
             client.player.networkHandler.sendChatCommand(command);
         }
+    }
+
+    @Override
+    public void subscribe() {
+        subscribeTicks();
     }
 
     public enum notificationTypes {
@@ -153,7 +157,7 @@ public class Util {
         ItemData.update();
     }
 
-    private static void subscribeTicks(){
+    public static void subscribeTicks(){
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             List<ScheduledTask> snapshot = new ArrayList<>(tasks);
             for (ScheduledTask task : snapshot) {
@@ -182,10 +186,6 @@ public class Util {
         }
     }
 
-    public static void startExecutors() {
-        BazaarData.scheduleBazaar();
-        subscribeTicks();
-    }
 
     public static String getCallingClassName() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();

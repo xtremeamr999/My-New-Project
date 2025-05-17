@@ -1,16 +1,12 @@
 package com.github.mkram17.bazaarutils;
 
-import com.github.mkram17.bazaarutils.events.ChatHandler;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BUSerializedListener;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
+import com.github.mkram17.bazaarutils.features.StashHelper;
+import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Commands;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.ItemUpdater;
-import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.misc.JoinMessages;
-import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.mojang.serialization.Codec;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import meteordevelopment.orbit.EventBus;
@@ -25,35 +21,32 @@ import net.minecraft.util.Identifier;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
-    public static ItemUpdater updater = new ItemUpdater();
+    public static StashHelper stashHelper;
     public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
+    public static final String VERSION = new Properties().getProperty("mod_version");
 
     @Override
     public void onInitializeClient() {
         registerEvents();
         BUConfig.HANDLER.load();
-        registerDeserializedEvents();
+        serializedSubscribeEvents();
         registerCommands();
         registerKeybinds();
-        Util.startExecutors();
+
         ModCompatibilityHelper.initializePatches();
     }
 
     private void registerEvents() {
         eventBus.registerLambdaFactory("com.github.mkram17.bazaarutils", (lookupInMethod, klass) ->
                 (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
-
-        ChestLoadedEvent.subscribe();
-        ChatHandler.subscribe();
-        JoinMessages.subscribe();
-        gui.registerScreenEvent();
-        eventBus.subscribe(gui);
-        eventBus.subscribe(updater);
+        transientSubscribeEvents();
     }
 
     private void registerCommands() {
@@ -61,25 +54,31 @@ public class BazaarUtils implements ClientModInitializer {
             Commands.register(dispatcher);
         });
     }
+    private void transientSubscribeEvents(){
+        BUTransientListener.addTransientEvents();
+        List<BUTransientListener> serializedListeners = BUTransientListener.getTransientEvents();
+
+        for(BUTransientListener listener : serializedListeners) {
+            listener.subscribe();
+        }
+    }
+    //must be run after config load
+    private void serializedSubscribeEvents(){
+        List<BUSerializedListener> serializedListeners = BUConfig.get().getSerializedEvents();
+
+        for(BUSerializedListener listener : serializedListeners) {
+            listener.registerEvents();
+        }
+    }
 
     private void registerKeybinds(){
-        StashHelper stashHelper = new StashHelper();
+        stashHelper = new StashHelper();
         stashHelper.registerTickCounter();
         keybinds.add(stashHelper);
 
         for(AmecsKeyBinding keybind : keybinds) {
             KeyBindingHelper.registerKeyBinding(keybind);
         }
-    }
-    //must be run after config load
-    private void registerDeserializedEvents(){
-        for(CustomOrder order : BUConfig.get().customOrders) {
-            eventBus.subscribe(order);
-        }
-        eventBus.subscribe(BUConfig.get().flipHelper);
-        eventBus.subscribe(BUConfig.get().restrictSell);
-        eventBus.subscribe(BUConfig.get().outdatedItems);
-        BUConfig.get().restrictSell.registerScreenEvent();
     }
 
     public static final ComponentType<String> CUSTOM_SIZE_COMPONENT = Registry.register(

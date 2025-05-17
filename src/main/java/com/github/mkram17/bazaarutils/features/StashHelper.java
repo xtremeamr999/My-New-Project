@@ -34,14 +34,19 @@ public class StashHelper extends AmecsKeyBinding {
             ticksBetweenPresses++;
         });
     }
-//    public Option<Boolean> createOption() {
-//        return Option.<Boolean>createBuilder()
-//                .name(Text.literal("Stash Helper"))
-//                .description(OptionDescription.of(Text.literal("Alt + V to close bazaar (if it's open) and then pick up stash")))
-//                .binding(true,
-//                        this::isEnabled,
-//                        this::setEnabled)
-//                .controller(BUConfig::createBooleanController)
-//                .build();
-//    }
+
+    public String getUsage(){
+        return getModifierString(getDefaultModifiers().getValue()) +"+" + getDefaultKey().getLocalizedText().getString();
+    }
+
+    private static String getModifierString(boolean[] modifiers) {
+        String modifierString = "";
+        if(modifiers[0])
+            modifierString += "ALT";
+        if(modifiers[1])
+            modifierString += "CTRL";
+        if(modifiers[2])
+            modifierString += "SHIFT";
+        return modifierString;
+    }
 }

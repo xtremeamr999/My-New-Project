@@ -17,14 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class ChestLoadedEvent implements ICancellable {
+public class ChestLoadedEvent implements ICancellable, BUTransientListener {
     @Getter
     private Inventory lowerChestInventory;
     @Getter
     private List<ItemStack> itemStacks = new ArrayList<>();
     @Getter
     private String containerName;
-    public static void subscribe(){
+
+    @Override
+    public void subscribe(){
         registerScreenEvent();
     }
 

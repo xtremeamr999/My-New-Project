@@ -1,10 +1,14 @@
 package com.github.mkram17.bazaarutils.data;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.Resource;
@@ -20,7 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
-public class BazaarData {
+public class BazaarData implements BUTransientListener {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
@@ -32,7 +36,10 @@ public class BazaarData {
     private static int bazaarCalls = 0;
     private static boolean skipNextCall = false;
 
-
+    @Override
+    public void subscribe(){
+        scheduleBazaar();
+    }
     public static<T> String getAsPrettyJsonObject(String object){
         return gson.toJson(object);
     }
@@ -43,6 +50,8 @@ public class BazaarData {
     public static void scheduleBazaar(){
 
         bzExecutor.scheduleAtFixedRate(() -> {
+            if(!(bazaarCalls % bazaarDataPeriod == 0))
+                return;
             if(skipNextCall) {
                 skipNextCall = false;
                 return;
@@ -50,7 +59,7 @@ public class BazaarData {
 
             APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
                     bazaarCalls++;
-                    if(bazaarCalls % 10 == 0)
+                    if(bazaarCalls % 10 == 0 || bazaarCalls < 5)
                         skipNextCall = true;
 
                     if (throwable != null) {
@@ -77,7 +86,7 @@ public class BazaarData {
                         }
                     }
                 });
-        }, 1, bazaarDataPeriod, TimeUnit.SECONDS);
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
     public static JsonObject loadResourceJson(String resourcePath) {

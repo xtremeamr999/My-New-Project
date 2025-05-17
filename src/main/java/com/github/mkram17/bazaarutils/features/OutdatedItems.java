@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.events.BUSerializedListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -16,8 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+
 //TODO change the message number instead of sending more
-public class OutdatedItems {
+public class OutdatedItems implements BUSerializedListener {
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter
@@ -84,5 +87,10 @@ public class OutdatedItems {
                 .controller(BUConfig::createBooleanController)
                 .build());
         return options;
+    }
+
+    @Override
+    public void registerEvents() {
+        eventBus.subscribe(this);
     }
 }

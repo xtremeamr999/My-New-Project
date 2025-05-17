@@ -1,12 +1,13 @@
 package com.github.mkram17.bazaarutils.features.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BUSerializedListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
@@ -26,8 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+
+//TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 @NoArgsConstructor
-public class CustomOrder extends CustomItemButton {
+public class CustomOrder extends CustomItemButton implements BUSerializedListener {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.BLACK_STAINED_GLASS_PANE));
     private boolean buySignClicked = false;
     @Getter @Setter
@@ -45,7 +49,7 @@ public class CustomOrder extends CustomItemButton {
 
     public CustomOrder(CustomOrderSettings settings){
         this.settings = settings;
-        BazaarUtils.eventBus.subscribe(this);
+        eventBus.subscribe(this);
     }
 
     @EventHandler
@@ -112,5 +116,10 @@ public class CustomOrder extends CustomItemButton {
         for (CustomOrder order : customOrders) {
             builder.option(order.createOption());
         }
+    }
+
+    @Override
+    public void registerEvents() {
+        eventBus.subscribe(this);
     }
 }

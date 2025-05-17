@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.events.BUSerializedListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.OutdatedItems;
 import com.github.mkram17.bazaarutils.features.StashMessages;
@@ -12,6 +12,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
+import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
@@ -24,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -132,6 +134,30 @@ public class BUConfig {
         return BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true);
     }
 
+    public List<BUSerializedListener> getSerializedEvents() {
+        List<BUSerializedListener> events = new ArrayList<>();
+
+        for (Field field : this.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(this);
+
+                if (value instanceof BUSerializedListener) {
+                    events.add((BUSerializedListener) value);
+                }
+                else if (value instanceof Collection) {
+                    for (Object item : (Collection<?>) value) {
+                        if (item instanceof BUSerializedListener) {
+                            events.add((BUSerializedListener) item);
+                        }
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                Util.notifyAll("Error accessing field: " + field.getName() + " - " + e.getMessage(), Util.notificationTypes.ERROR);
+            }
+        }
+        return events;
+    }
 
     public static class Developer {
         public boolean allMessages = false;

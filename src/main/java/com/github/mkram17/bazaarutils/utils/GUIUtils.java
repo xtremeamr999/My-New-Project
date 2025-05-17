@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.events.BUTransientListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
@@ -28,8 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+
 //TODO make inBazaar() work all the time
-public class GUIUtils {
+public class GUIUtils implements BUTransientListener {
     private static boolean closedScreen = false;
     public boolean wasLastChestFlip(){
         return inFlipGui;
@@ -75,10 +78,14 @@ public class GUIUtils {
     @Getter @Setter
     private String previousScreenName;
 
-    public enum guiTypes {CHEST, SIGN}
-    public void register(){
-
+    @Override
+    public void subscribe() {
+        eventBus.subscribe(this);
+        registerScreenEvent();
     }
+
+    public enum guiTypes {CHEST, SIGN}
+
     public void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             BazaarUtils.gui = this;
@@ -108,7 +115,7 @@ public class GUIUtils {
             String name = Bookmark.findName(e);
             if(Bookmark.isBookmarked(name)){
                 currentBookmark = Bookmark.findMatchingBookmark(name);
-                BazaarUtils.eventBus.subscribe(currentBookmark);
+                eventBus.subscribe(currentBookmark);
             } else
                 currentBookmark = new Bookmark(name, Items.BARRIER.getDefaultStack());
         }
