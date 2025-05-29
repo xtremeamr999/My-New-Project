@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatHandler implements BUTransientListener{
+public class ChatHandler implements BUListener{
     private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
 
     @Override
@@ -67,9 +67,9 @@ public class ChatHandler implements BUTransientListener{
                 volume = Integer.parseInt(messageText.substring(messageText.indexOf("for") + 4, messageText.indexOf("x")).replace(",", ""));
                 itemName = messageText.substring(messageText.indexOf("x") + 2, messageText.indexOf("was") - 1);
                 if(messageText.contains("Sell Offer"))
-                    item = ItemData.findItemFromChat(itemName, null, volume, ItemData.priceTypes.INSTABUY);
+                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTABUY);
                 else
-                    item = ItemData.findItemFromChat(itemName, null, volume, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTASELL);
                 if(item == null)
                     Util.notifyAll("Could not find item to fill with info vol: "+ volume + " name: " + itemName, Util.notificationTypes.ERROR);
                 else {
@@ -101,9 +101,9 @@ public class ChatHandler implements BUTransientListener{
                 String priceString = siblings.get(7).getString();
                 price = Double.parseDouble(priceString.substring(0, priceString.indexOf(" coins")).replace(",", ""))/volumeClaimed;
                 if(ItemData.getVariables(ItemData::getVolume).contains(volumeClaimed))
-                    item = ItemData.findItemFromChat(itemName, price, volumeClaimed, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItem(itemName, price, volumeClaimed, ItemData.priceTypes.INSTASELL);
                 else
-                    item = ItemData.findItemFromChat(itemName, price, null, ItemData.priceTypes.INSTASELL);
+                    item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTASELL);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
                 //TODO figure out when there is a volume included in message
@@ -111,7 +111,7 @@ public class ChatHandler implements BUTransientListener{
                 itemName = siblings.get(7).getString().trim();
                 String priceString = siblings.get(9).getString();
                 price = Double.parseDouble(priceString.trim().replace(",", ""));
-                item = ItemData.findItemFromChat(itemName, price, null, ItemData.priceTypes.INSTABUY);
+                item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTABUY);
             }
 
 //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding

@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features.restrictsell;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.BUSerializedListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
@@ -21,7 +21,7 @@ import java.util.List;
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO maybe color chest if it is locked
-public class RestrictSell implements BUSerializedListener {
+public class RestrictSell implements BUListener {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
@@ -185,7 +185,7 @@ public class RestrictSell implements BUSerializedListener {
         }
     }
     @Override
-    public void registerEvents() {
+    public void subscribe() {
         registerScreenEvent();
         eventBus.subscribe(this);
     }

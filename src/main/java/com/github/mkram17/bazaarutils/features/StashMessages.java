@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.BUSerializedListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -12,8 +12,9 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class StashMessages implements BUSerializedListener {
+public class StashMessages implements BUListener {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
@@ -21,13 +22,13 @@ public class StashMessages implements BUSerializedListener {
     private boolean removeMessages;
     @Setter @Getter
     private boolean stashPreviouslyClaimed = false;
-    private ArrayList<String> previousMessages = new ArrayList<>();
+    private transient ArrayList<String> previousMessages = new ArrayList<>(Collections.singleton(""));
     private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "  "};
 
     public StashMessages(boolean removeMessages){
         this.removeMessages = removeMessages;
     }
-    public void registerEvents(){
+    public void subscribe(){
         registerStashRemover();
         registerStashClaimDetector();
     }
@@ -37,7 +38,7 @@ public class StashMessages implements BUSerializedListener {
                 stashPreviouslyClaimed = true;
                 BUConfig.HANDLER.save();
                 Util.tickExecuteLater(2, () ->{
-                    Util.notifyAll("To help claiming your stash, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
+                    Util.notifyAll("To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
                     });
             }
         });

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class ChestLoadedEvent implements ICancellable, BUTransientListener {
+public class ChestLoadedEvent implements ICancellable, BUListener {
     @Getter
     private Inventory lowerChestInventory;
     @Getter

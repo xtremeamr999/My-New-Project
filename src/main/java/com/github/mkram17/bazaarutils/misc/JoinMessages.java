@@ -1,13 +1,13 @@
 package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.BUTransientListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class JoinMessages implements BUTransientListener {
+public class JoinMessages implements BUListener {
     private static final Text welcomeMessage = Text.literal("[Bazaar utils] ")
             .formatted(Formatting.WHITE)
             .append(Text.literal("Thanks for installing! Use /buconfig to configure the mod.")
@@ -30,10 +30,12 @@ public class JoinMessages implements BUTransientListener {
                 if (BUConfig.get().firstLoad) {
                     Util.tickExecuteLater(40, () -> {
                         client.player.sendMessage(welcomeMessage, false);
-                        Util.tickExecuteLater(40, () -> {
+                        Util.tickExecuteLater(60, () -> {
                             Util.notifyAll(Util.HELPMESSAGE);
 
-                        client.player.sendMessage(discordMessage, false);
+                            Util.tickExecuteLater(40, () -> {
+                                client.player.sendMessage(discordMessage, false);
+                            });
 
                         });
                     });

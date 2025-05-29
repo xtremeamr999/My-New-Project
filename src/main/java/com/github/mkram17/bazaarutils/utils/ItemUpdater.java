@@ -1,9 +1,9 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.BUTransientListener;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
-public class ItemUpdater implements BUTransientListener {
+public class ItemUpdater implements BUListener {
     private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
     private static List<ItemStack> orderScreen;
     @EventHandler

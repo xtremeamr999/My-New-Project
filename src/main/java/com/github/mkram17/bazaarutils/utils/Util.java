@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.events.BUTransientListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Util implements BUTransientListener {
+public class Util implements BUListener {
     public static void sendCommand(String command){
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -52,14 +52,16 @@ public class Util implements BUTransientListener {
                         //? if > 1.21.4 {
                         try {
                             return style
-                                            .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
+                                    .withBold(true)
+                                    .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
+                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);
                         }
                     });
                     //?} else {
                         /*return style
+                                .withBold(true)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!")));
                     });

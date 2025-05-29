@@ -1,13 +1,7 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.events.BUSerializedListener;
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.features.OutdatedItems;
-import com.github.mkram17.bazaarutils.features.StashMessages;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrderSettings;
-import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelper;
-import com.github.mkram17.bazaarutils.features.fliphelper.FlipHelperSettings;
+import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
@@ -47,9 +41,11 @@ public class BUConfig {
 
 
     @SerialEntry
+    public String MODVERSION = "";
+    @SerialEntry
     public boolean firstLoad = true;
     @SerialEntry
-    public FlipHelper flipHelper = new FlipHelper(new FlipHelperSettings(true, 17, Items.CHERRY_SIGN));
+    public FlipHelper flipHelper = new FlipHelper(true, 17, Items.CHERRY_SIGN);
     @SerialEntry
     public ArrayList<ItemData> watchedItems = new ArrayList<>();
     @SerialEntry
@@ -97,7 +93,7 @@ public class BUConfig {
             );
 
             if (customOrders.isEmpty()) {
-                customOrders.add(new CustomOrder(new CustomOrderSettings(true, 71680, 17, CustomOrder.COLORMAP.get(0))));
+                customOrders.add(new CustomOrder(true, 71680, 17, CustomOrder.COLORMAP.get(0)));
             }
             OptionGroup.Builder customOrdersGroupBuilder = OptionGroup.createBuilder()
                     .name(Text.literal("Custom Buy Amounts"))
@@ -134,21 +130,21 @@ public class BUConfig {
         return BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true);
     }
 
-    public List<BUSerializedListener> getSerializedEvents() {
-        List<BUSerializedListener> events = new ArrayList<>();
+    public List<BUListener> getSerializedEvents() {
+        List<BUListener> events = new ArrayList<>();
 
         for (Field field : this.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 Object value = field.get(this);
 
-                if (value instanceof BUSerializedListener) {
-                    events.add((BUSerializedListener) value);
+                if (value instanceof BUListener) {
+                    events.add((BUListener) value);
                 }
                 else if (value instanceof Collection) {
                     for (Object item : (Collection<?>) value) {
-                        if (item instanceof BUSerializedListener) {
-                            events.add((BUSerializedListener) item);
+                        if (item instanceof BUListener) {
+                            events.add((BUListener) item);
                         }
                     }
                 }

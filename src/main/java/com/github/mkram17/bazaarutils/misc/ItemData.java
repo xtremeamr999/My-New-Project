@@ -233,48 +233,25 @@ public class ItemData {
         }
         return itemList.getFirst();
     }
-
-    //TODO fix volume finding -- probably a better way to do this
-    public static ItemData findItemFromChat(String name, Double price, Integer volumeLeft, priceTypes priceType) {
-        ArrayList<ItemData> itemList = new ArrayList<>();
-        for(ItemData item : BUConfig.get().watchedItems){
-            if((price == null || Math.abs(item.getPrice() - price) < 1) &&
-                    (volumeLeft == null || item.getVolume() == volumeLeft + item.getAmountClaimed() || item.getVolume() == volumeLeft) &&
-                    (name == null || name.equalsIgnoreCase(item.getName())) &&
-                    (priceType == null || priceType == item.getPriceType())){
-                itemList.add(item);
-            }
-        }
-        if (itemList.isEmpty()) {
-            Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volumeLeft + "]", Util.notificationTypes.ITEMDATA);
-            return null;
-        }
-        if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
-                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
-        }
-        return itemList.getFirst();
-    }
-    public static ItemData findItemTotalPrice(double totalPrice) {
-        ArrayList<ItemData> itemList = new ArrayList<>();
-        for(ItemData item : BUConfig.get().watchedItems){
-            if(totalPrice == item.fullPrice){
-                itemList.add(item);
-            }
-        }
-        if (itemList.isEmpty()) {
-            Util.notifyAll("Could not find item with total price: " + totalPrice, Util.notificationTypes.ITEMDATA);
-            return null;
-        }
-        if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
-                Util.notifyAll("Duplicate totalprice item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
-            return null;
-        }
-        return itemList.getFirst();
-    }
+//    public static ItemData findItemTotalPrice(double totalPrice) {
+//        ArrayList<ItemData> itemList = new ArrayList<>();
+//        for(ItemData item : BUConfig.get().watchedItems){
+//            if(totalPrice == item.fullPrice){
+//                itemList.add(item);
+//            }
+//        }
+//        if (itemList.isEmpty()) {
+//            Util.notifyAll("Could not find item with total price: " + totalPrice, Util.notificationTypes.ITEMDATA);
+//            return null;
+//        }
+//        if (itemList.size() > 1) {
+//            itemList.forEach(duplicate -> {
+//                Util.notifyAll("Duplicate totalprice item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
+//            });
+//            return null;
+//        }
+//        return itemList.getFirst();
+//    }
 
     private static void findOutdated(){
         List<ItemData> oldOutdated = new ArrayList<>(outdated);

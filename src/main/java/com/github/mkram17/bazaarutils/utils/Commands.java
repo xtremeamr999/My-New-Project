@@ -1,8 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrderSettings;
+import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
@@ -82,15 +81,15 @@ public class Commands {
                                                 context.getSource().sendError(Text.literal("Slot number must be 1-36"));
                                                 return 0;
                                             }
-                                            CustomOrder orderToAdd = new CustomOrder(new CustomOrderSettings(
+                                            CustomOrder orderToAdd = new CustomOrder(
                                                     true,
                                                     orderAmount,
                                                     slotNumber - 1,
                                                     CustomOrder.getNextColoredPane()
-                                            ));
+                                            );
 
                                             BUConfig.get().customOrders.add(orderToAdd);
-                                            Util.notifyAll("Added order for " + orderToAdd.getSettings().getOrderAmount() + " in slot number " + slotNumber);
+                                            Util.notifyAll("Added order for " + orderToAdd.getOrderAmount() + " in slot number " + slotNumber);
                                             HANDLER.save();
                                             return 1;
                                         })
@@ -108,8 +107,8 @@ public class Commands {
                                                 return 0;
                                             }
                                             CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum-1);
-                                            if(customOrder.getSettings().getOrderAmount() != 71680) {
-                                                Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum-1).getSettings().getOrderAmount());
+                                            if(customOrder.getOrderAmount() != 71680) {
+                                                Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum-1).getOrderAmount());
                                                 BUConfig.get().customOrders.remove(orderNum);
                                             } else{
                                                 Util.notifyAll("Cannot remove Max Buy Order.");

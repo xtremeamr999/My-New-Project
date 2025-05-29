@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.fliphelper;
+package com.github.mkram17.bazaarutils.features;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
@@ -14,6 +14,7 @@ import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -21,7 +22,7 @@ import net.minecraft.util.Formatting;
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO switch to finding market price without finding the ItemData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
-public class FlipHelper extends CustomItemButton implements BUSerializedListener {
+public class FlipHelper extends CustomItemButton implements BUListener {
     public double flipPrice;
     private double orderPrice = -1;
     private int orderVolumeFilled = -1;
@@ -29,15 +30,18 @@ public class FlipHelper extends CustomItemButton implements BUSerializedListener
     private boolean shouldAddToSign = false;
     private boolean inCancelOrderScreen = false;
     @Getter @Setter
-    private FlipHelperSettings settings;
+    private boolean enabled;
+    @Getter
+    private Item replaceItem;
 
-    public FlipHelper(FlipHelperSettings settings) {
-        this.settings = settings;
+    public FlipHelper(boolean enabled, int slotNumber, Item item) {
+        this.enabled = enabled;
+        this.slotNumber = slotNumber;
+        this.replaceItem = item;
     }
-
     @EventHandler
     public void guiChestOpenedEvent(ChestLoadedEvent e) {
-        if(settings.isEnabled() && BazaarUtils.gui.inFlipGui) {
+        if(isEnabled() && BazaarUtils.gui.inFlipGui) {
             item = getFlipItem(e);
 
             inCancelOrderScreen = false;
@@ -109,7 +113,7 @@ public class FlipHelper extends CustomItemButton implements BUSerializedListener
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!BazaarUtils.gui.inFlipGui || !settings.isEnabled() || event.slot.getIndex() != settings.getSlotNumber())
+        if (!BazaarUtils.gui.inFlipGui || !isEnabled() || event.slot.getIndex() != slotNumber)
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         GUIUtils.clickSlot(15,0);
@@ -125,10 +129,10 @@ public class FlipHelper extends CustomItemButton implements BUSerializedListener
 
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!(event.getSlotId() == settings.getSlotNumber())) return;
-        if(!BazaarUtils.gui.inFlipGui || !settings.isEnabled() || inCancelOrderScreen) return;
+        if(!(event.getSlotId() == slotNumber)) return;
+        if(!BazaarUtils.gui.inFlipGui || !isEnabled() || inCancelOrderScreen) return;
 
-        ItemStack itemStack = new ItemStack(settings.getReplaceItem(), 1);
+        ItemStack itemStack = new ItemStack(getReplaceItem(), 1);
         if(item == null) {
             itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Could not find order").formatted(Formatting.DARK_PURPLE));
             itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "???");
@@ -140,11 +144,11 @@ public class FlipHelper extends CustomItemButton implements BUSerializedListener
     }
 
     public Option<Boolean> createOption() {
-        return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> settings.isEnabled(), newVal -> settings.setEnabled(newVal));
+        return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> isEnabled(), newVal -> setEnabled(newVal));
     }
 
     @Override
-    public void registerEvents() {
+    public void subscribe() {
         eventBus.subscribe(this);
     }
 }

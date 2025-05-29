@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.BUTransientListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO make inBazaar() work all the time
-public class GUIUtils implements BUTransientListener {
+public class GUIUtils implements BUListener {
     private static boolean closedScreen = false;
     public boolean wasLastChestFlip(){
         return inFlipGui;

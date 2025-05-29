@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.BUSerializedListener;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO change the message number instead of sending more
-public class OutdatedItems implements BUSerializedListener {
+public class OutdatedItems implements BUListener {
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter
@@ -90,7 +90,7 @@ public class OutdatedItems implements BUSerializedListener {
     }
 
     @Override
-    public void registerEvents() {
+    public void subscribe() {
         eventBus.subscribe(this);
     }
 }

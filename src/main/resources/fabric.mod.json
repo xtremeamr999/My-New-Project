@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "bazaarutils",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Bazaar Utils",
 	"description": "A mod for Hypixel Skyblock that adds useful features for the bazaar for Minecraft 1.21 AND 1.8.9.",
 	"authors": [
@@ -28,7 +28,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.9",
-		"minecraft": "~1.21.4",
+		"minecraft": "~1.21.4-1.21.5",
 		"java": ">=21",
 		"fabric-api": "*"
 	}

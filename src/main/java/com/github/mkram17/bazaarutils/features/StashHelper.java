@@ -25,7 +25,6 @@ public class StashHelper extends AmecsKeyBinding {
             ticksBetweenPresses = 0;
             GUIUtils.closeHandledScreen();
             Util.sendCommand("pickupstash");
-
         }
     }
 
