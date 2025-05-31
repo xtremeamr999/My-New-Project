@@ -8,12 +8,14 @@ import com.github.mkram17.bazaarutils.utils.Commands;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.mojang.serialization.Codec;
 import de.siphalor.amecs.api.AmecsKeyBinding;
+import lombok.Getter;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
@@ -31,6 +33,8 @@ public class BazaarUtils implements ClientModInitializer {
     public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
     public static boolean updatedMajorVersion = false;
+    @Getter
+    private static String updateNotes;
 
     //TODO combine both groups of listeners into one and just subscribe after handler load
     @Override
@@ -80,6 +84,12 @@ public class BazaarUtils implements ClientModInitializer {
     private void getModProperties(){
         FabricLoader.getInstance().getModContainer(MODID).ifPresent(modContainer -> {
             ModMetadata metadata = modContainer.getMetadata();
+
+            CustomValue updateNotesValue = metadata.getCustomValue("latestMajorUpdateNotes");
+            if (updateNotesValue != null)
+                updateNotes = updateNotesValue.getAsString();
+
+
             var oldVersion = BUConfig.get().MODVERSION;
             var currentVersion = metadata.getVersion().getFriendlyString();
             var oldVersionMajor = oldVersion.substring(oldVersion.indexOf(".")+1);

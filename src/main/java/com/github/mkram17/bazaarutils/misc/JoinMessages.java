@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.misc;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -19,6 +20,10 @@ public class JoinMessages implements BUListener {
                     .append(Util.DISCORDLINK)
                     .append(Text.literal("!")
                             .formatted(Formatting.GREEN)));
+    private static final Text updateMessage = Text.literal("[Bazaar Utils] ")
+            .formatted(Formatting.WHITE)
+            .append(Text.literal(BazaarUtils.getUpdateNotes())
+                    .formatted(Formatting.DARK_GREEN));
 
     @Override
     public void subscribe(){
@@ -27,7 +32,8 @@ public class JoinMessages implements BUListener {
     private static void registerWelcomeMessageSender() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (client.player != null) {
-                if (BUConfig.get().firstLoad) {
+                var isFirstLoad = BUConfig.get().firstLoad;
+                if (isFirstLoad) {
                     Util.tickExecuteLater(40, () -> {
                         client.player.sendMessage(welcomeMessage, false);
                         Util.tickExecuteLater(60, () -> {
@@ -41,6 +47,12 @@ public class JoinMessages implements BUListener {
                     });
                     BUConfig.get().firstLoad = false;
                     BUConfig.HANDLER.save();
+                }
+
+                if(BazaarUtils.updatedMajorVersion && !isFirstLoad){
+                    Util.tickExecuteLater(40, () -> client.player.sendMessage(updateMessage, false));
+                    Util.tickExecuteLater(41, () -> client.player.sendMessage(Util.CHANGELOG, false));
+                    BazaarUtils.updatedMajorVersion = false;
                 }
             }
         });

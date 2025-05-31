@@ -51,6 +51,9 @@ public class StashMessages implements BUListener {
             boolean shouldRemove = currentMessageString.equalsIgnoreCase(removeList[0]);
             int indexOfMessage = indexOfMessage(currentMessageString);
 
+            if(previousMessages == null)
+                previousMessages = new ArrayList<>(Collections.singleton(""));
+
             for(int index = indexOfMessage; index>=1; index--){
                 if(index > previousMessages.size()) {
                     previousMessages.clear();

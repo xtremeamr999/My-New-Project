@@ -66,22 +66,54 @@ public class Util implements BUListener {
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!")));
                     });
         *///?}
+        public static final Text CHANGELOG = Text.literal("Click To See Changelog")
+            .styled(style -> {
+                        //? if > 1.21.4 {
+                        try {
+                            return style
+                                    .withBold(true)
+                                    .withClickEvent(new ClickEvent.OpenUrl(new URI("https://modrinth.com/mod/bazaar-utils/changelog")))
+                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to see the changelog")))
+                                    .withFormatting(Formatting.GREEN);
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    //?} else {
+                        /*return style
+                                .withBold(true)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/bazaar-utils/changelog"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to see the changelog")))
+                                .withFormatting(Formatting.GREEN);
+                    });
+        *///?}
 
-    public static<T> void notifyAll(T message) {
+    public static void notifyAll(String message) {
         String callingName = getCallingClassName();
-        String messageStr = message.toString();
-        messageStr = messageStr.toLowerCase().contains("exception") ? "§c" + messageStr : "§a" + messageStr;
+
+        var messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.WHITE);
+
+        if(message.toLowerCase().contains("exception"))
+            messageText.append(Text.literal(message).formatted(Formatting.RED));
+        else
+            messageText.append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
         if (MinecraftClient.getInstance().player != null)
-            MinecraftClient.getInstance().player.sendMessage(Text.literal("[BazaarUtils] " + messageStr), false);
+            MinecraftClient.getInstance().player.sendMessage(messageText, false);
         LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
     }
 
-    public static<T> void notifyAll(T message, notificationTypes notiType) {
+    public static void notifyAll(String message, notificationTypes notiType) {
         String callingName = getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
-        String messageStr = notiType == notificationTypes.ERROR ? "§c" + message : "§a" + message;
-        Text messageText = Text.literal("[" + simpleCallingName + "] " + messageStr);
+        var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.WHITE);
+
+        if(notiType == notificationTypes.ERROR)
+            messageText.append(Text.literal(message).formatted(Formatting.RED));
+        else
+            messageText.append(Text.literal(message).formatted(Formatting.DARK_GREEN));
+
+
         if(notiType == notificationTypes.ERROR){
             messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
                         //? if > 1.21.4 {
@@ -103,9 +135,9 @@ public class Util implements BUListener {
         }
 
         if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
-            if (MinecraftClient.getInstance().player != null) {
+            if (MinecraftClient.getInstance().player != null)
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
-            }
+
             LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
         }
     }

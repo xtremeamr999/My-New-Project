@@ -192,7 +192,7 @@ public class Commands {
                     );
             bazaarutils.then(ClientCommandManager.literal("list")
                             .executes(context -> {
-                                        Util.notifyAll(ItemData.getVariables(ItemData::getName));
+                                        Util.notifyAll(ItemData.getVariables(ItemData::getName).toString());
                                         return 1;
                                     }
                             )

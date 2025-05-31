@@ -152,7 +152,7 @@ public class BazaarData implements BUListener {
         } catch (Exception e) {
             Util.notifyAll("There was an error fetching Json objects (probably caused by incorrect product ID [" + productId + "])", Util.notificationTypes.ERROR);
             Util.notifyAll(e.getMessage(), Util.notificationTypes.ERROR);
-            Util.notifyAll(e.getCause(), Util.notificationTypes.ERROR);
+            Util.notifyAll(e.getCause().getMessage(), Util.notificationTypes.ERROR);
             e.printStackTrace();
         }
 
