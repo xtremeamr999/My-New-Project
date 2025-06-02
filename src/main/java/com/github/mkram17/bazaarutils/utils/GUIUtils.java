@@ -52,11 +52,13 @@ public class GUIUtils implements BUListener {
     }
 
     public boolean inBazaar(){
+        updateContainerName();
 //        return false;
         if(containerName == null) return false;
-        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar") || inBuyOrders();
+        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar") || inBuyOrders() || containerName.contains("➜");
     }
 
+    //only for specific items
     public boolean inAnyItemScreen(){
         if(containerName == null || containerName.contains("Bazaar")) return false;
         return containerName.contains("➜")
@@ -85,6 +87,13 @@ public class GUIUtils implements BUListener {
     }
 
     public enum guiTypes {CHEST, SIGN}
+    private void updateContainerName(){
+        var screen = MinecraftClient.getInstance().currentScreen;
+        if (screen instanceof GenericContainerScreen genericContainerScreen) {
+            containerName = Util.removeFormatting(genericContainerScreen.getTitle().getString());
+//                Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
+        }
+    }
 
     public void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
