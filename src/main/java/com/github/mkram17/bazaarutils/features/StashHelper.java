@@ -48,4 +48,6 @@ public class StashHelper extends AmecsKeyBinding {
             modifierString += "SHIFT";
         return modifierString;
     }
+
+
 }

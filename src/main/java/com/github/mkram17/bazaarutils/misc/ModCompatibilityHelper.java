@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.utils.Util.notificationTypes;
 import com.google.gson.*;
 import de.hysky.skyblocker.config.SkyblockerConfig;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
+import lombok.Getter;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -21,6 +22,9 @@ public class ModCompatibilityHelper {
     private static final String REI_CONFIG_SECTION = "appearance";
     private static final String REI_CONFIG_FIELD = "horizontalEntriesBoundariesColumns";
     private static final int HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE = 16;
+    public static final String AMECS_MODID = "amecs-reborn";
+    @Getter
+    private static boolean amecsReborn = false;
 
     private static final Gson GSON_WRITER = new GsonBuilder().setPrettyPrinting().create();
 
@@ -29,6 +33,8 @@ public class ModCompatibilityHelper {
             Util.notifyAll("Bazaar utils: REI detected. Attempting to modify REI config.");
             modifyReiConfigWithGson();
         }
+        if(FabricLoader.getInstance().isModLoaded(AMECS_MODID))
+            amecsReborn = true;
     }
 
     private static void modifyReiConfigWithGson() {

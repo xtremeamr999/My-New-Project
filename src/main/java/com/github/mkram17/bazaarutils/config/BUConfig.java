@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
+import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -14,12 +15,15 @@ import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,14 +87,17 @@ public class BUConfig {
             }
             restrictSell.buildOptions(restrictSellGroupBuilder);
 
-            builder.category(ConfigCategory.createBuilder()
-                    .name(Text.literal("General"))
+            ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder();
+            generalBuilder.name(Text.literal("General"))
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
-                    .option(stashMessages.createOption())
-                    .group(restrictSellGroupBuilder.build())
-                    .build()
-            );
+                    .option(stashMessages.createOption());
+            if(!ModCompatibilityHelper.isAmecsReborn())
+                generalBuilder.option(createAmecsDownloadButton());
+
+            generalBuilder.group(restrictSellGroupBuilder.build());
+
+            builder.category(generalBuilder.build());
 
             if (customOrders.isEmpty()) {
                 customOrders.add(new CustomOrder(true, 71680, 17, CustomOrder.COLORMAP.get(0)));
@@ -153,8 +160,28 @@ public class BUConfig {
             }
         }
         return events;
-    }
 
+
+    }
+    private static ButtonOption createAmecsDownloadButton() {
+        return ButtonOption.createBuilder()
+                .name(Text.of("Download Amecs Reborn"))
+                .description(OptionDescription.of(Text.of("Amecs Reborn is needed for the Stash Helper feature. Download here.")))
+                .text(Text.of("(for Stash Helper)")) // optional
+                .action((yaclScreen, buttonOption) -> {
+                    MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
+                        if (confirmed) {
+                            try {
+                                net.minecraft.util.Util.getOperatingSystem().open(new URI("https://modrinth.com/mod/amecs-reborn"));
+                            } catch (URISyntaxException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        MinecraftClient.getInstance().setScreen(null);
+                    }, "https://modrinth.com/mod/amecs-reborn", true));
+                })
+                .build();
+    }
     public static class Developer {
         public boolean allMessages = false;
         public boolean errorMessages = false;

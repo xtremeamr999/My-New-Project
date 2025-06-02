@@ -110,7 +110,7 @@ dependencies {
 //    include("curse.maven:modernkeybinding-695433:6016136")
 
     //Amecs Reborn
-    modImplementation("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${deps["core.mcVersion"]}")
+    modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${deps["core.mcVersion"]}")
 
     // Mixin Constraints
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)

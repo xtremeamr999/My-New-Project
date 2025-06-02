@@ -32,6 +32,10 @@
 		"java": ">=21",
 		"fabric-api": "*"
 	},
+	"suggests": {
+		"amecsreborn": ">=2.02",
+		"modmenu": "13.0.1"
+	},
 	"custom": {
 		"latestMajorUpdateNotes": "v0.2 Update: New feature! Bookmarks - Make bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page. To remove them, shift click on it from the main page or go to the item's page and click the remove button."
 	}

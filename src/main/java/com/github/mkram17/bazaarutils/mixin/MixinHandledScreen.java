@@ -2,11 +2,13 @@
 package com.github.mkram17.bazaarutils.mixin;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
+import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.utils.Util;
+import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -61,6 +63,7 @@ public abstract class MixinHandledScreen {
 		}
 	}
 
+	@IfModLoaded(ModCompatibilityHelper.AMECS_MODID)
 	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
 	public void onkeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
 		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();

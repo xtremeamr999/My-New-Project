@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -30,16 +31,19 @@ public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
     public static GUIUtils gui = new GUIUtils();
     public static StashHelper stashHelper;
-    public static ArrayList<AmecsKeyBinding> keybinds = new ArrayList<>();
+    public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
     public static boolean updatedMajorVersion = false;
     @Getter
     private static String updateNotes;
 
+
     //TODO combine both groups of listeners into one and just subscribe after handler load
     @Override
     public void onInitializeClient() {
         BUConfig.HANDLER.load();
+
+        ModCompatibilityHelper.initializePatches();
 
         getModProperties();
         registerEventBus();
@@ -47,7 +51,6 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
 
-        ModCompatibilityHelper.initializePatches();
     }
 
     private void registerEventBus() {
@@ -72,12 +75,15 @@ public class BazaarUtils implements ClientModInitializer {
     }
 
     private void registerKeybinds(){
+        if(!ModCompatibilityHelper.isAmecsReborn())
+            return;
         stashHelper = new StashHelper();
         stashHelper.registerTickCounter();
         keybinds.add(stashHelper);
 
-        for(AmecsKeyBinding keybind : keybinds) {
-            KeyBindingHelper.registerKeyBinding(keybind);
+        for(KeyBinding keybind : keybinds) {
+            if(keybind instanceof AmecsKeyBinding)
+                KeyBindingHelper.registerKeyBinding(keybind);
         }
     }
 

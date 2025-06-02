@@ -38,7 +38,7 @@ public class StashMessages implements BUListener {
                 stashPreviouslyClaimed = true;
                 BUConfig.HANDLER.save();
                 Util.tickExecuteLater(2, () ->{
-                    Util.notifyAll("To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
+                    Util.notifyAll("TIP - To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
                     });
             }
         });
