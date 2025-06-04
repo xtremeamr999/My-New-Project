@@ -75,10 +75,12 @@ class ModDependencies {
 //val env = Env()
 val deps = ModDependencies()
 //val modProperties = ModProperties()
+val mcVersion = deps.get("core.mcVersion").toString()
+
 dependencies {
     // To change the versions see the gradle.properties file
-    minecraft("com.mojang:minecraft:${deps["core.mcVersion"]}")
-    mappings("net.fabricmc:yarn:${deps["core.mcVersion"]}+build.${deps["yarn_build"]}:v2")
+    minecraft("com.mojang:minecraft:${mcVersion}")
+    mappings("net.fabricmc:yarn:${mcVersion}+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabricLoaderVersion"]}")
 //    modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
 
@@ -96,7 +98,7 @@ dependencies {
 
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
 
-    modImplementation("com.terraformersmc:modmenu:${property("modmenu_version")}")
+    modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
 
     // Project Lombok
     compileOnly("org.projectlombok:lombok:1.18.36")
@@ -110,7 +112,7 @@ dependencies {
 //    include("curse.maven:modernkeybinding-695433:6016136")
 
     //Amecs Reborn
-    modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${deps["core.mcVersion"]}")
+    modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${mcVersion}")
 
     // Mixin Constraints
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
@@ -126,10 +128,15 @@ tasks {
     processResources {
         inputs.property("version", project.version)
         inputs.property("minecraft", stonecutter.current.version)
+        inputs.property("mcVersion", mcVersion)
 
         filesMatching("fabric.mod.json") {
-            expand(getProperties())
-            expand(mutableMapOf("version" to project.version))
+            val expansionProps = project.properties.toMutableMap()
+
+            expansionProps["mcVersion"] = mcVersion
+            expansionProps["version"] = project.version
+
+            expand(expansionProps)
         }
     }
 

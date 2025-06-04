@@ -95,9 +95,9 @@ public class BazaarUtils implements ClientModInitializer {
             if (updateNotesValue != null)
                 updateNotes = updateNotesValue.getAsString();
 
-
             var oldVersion = BUConfig.get().MODVERSION;
             var currentVersion = metadata.getVersion().getFriendlyString();
+
             var oldVersionMajor = oldVersion.substring(oldVersion.indexOf(".")+1);
             var currentVersionMajor = currentVersion.substring(currentVersion.indexOf(".")+1);
 
@@ -113,5 +113,10 @@ public class BazaarUtils implements ClientModInitializer {
             Registries.DATA_COMPONENT_TYPE,
             Identifier.of(BazaarUtils.MODID, "custom_size"),
             ComponentType.<String>builder().codec(Codec.STRING).build()
+    );
+    public static final ComponentType<Boolean> CUSTOM_SHOWPRICECHART_COMPONENT = Registry.register(
+            Registries.DATA_COMPONENT_TYPE,
+            Identifier.of(BazaarUtils.MODID, "has_price_chart"),
+            ComponentType.<Boolean>builder().codec(Codec.BOOL).build()
     );
 }

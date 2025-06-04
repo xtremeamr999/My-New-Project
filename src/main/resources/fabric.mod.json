@@ -8,7 +8,7 @@
 		"mkram17"
 	],
 	"contact": {
-		"sources": "https://github.com/mkram17/Bazaar-Utils/tree/1.21.4",
+		"sources": "https://github.com/mkram17/Bazaar-Utils/tree/modern",
 		"Modrinth": "https://modrinth.com/project/bazaar-utils",
 		"Discord": "https://discord.gg/xDKjvm5hQd"
 	},
@@ -28,7 +28,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.9",
-		"minecraft": "~1.21.4-1.21.5",
+		"minecraft": "${mcVersion}",
 		"java": ">=21",
 		"fabric-api": "*"
 	},
@@ -37,6 +37,6 @@
 		"modmenu": "13.0.1"
 	},
 	"custom": {
-		"latestMajorUpdateNotes": "v0.2 Update: New feature! Bookmarks - Make bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page. To remove them, shift click on it from the main page or go to the item's page and click the remove button."
+		"latestMajorUpdateNotes": "${major_update_notes}"
 	}
 }

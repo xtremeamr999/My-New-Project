@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -21,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -142,14 +141,6 @@ public class Util implements BUListener {
         }
     }
 
-    public static<T> void executeLater(Runnable runnable, int milliDelay){
-        try {
-            Thread.sleep(milliDelay);
-            MinecraftClient.getInstance().execute(runnable);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static void notifyChatCommand(String message, String command){
         assert MinecraftClient.getInstance().player != null;
@@ -167,20 +158,6 @@ public class Util implements BUListener {
                 ), false);
     }
 
-    public static void addWatchedItem(String itemName, Double fullPrice, boolean isSellOrder, int volume) {
-        itemName = itemName.toLowerCase();
-        if (BazaarData.findProductId(itemName) != null) {
-            ItemData.priceTypes type = isSellOrder ? ItemData.priceTypes.INSTABUY : ItemData.priceTypes.INSTASELL;
-            ItemData itemToAdd = new ItemData(itemName, fullPrice, type, volume);
-            BUConfig.get().watchedItems.add(itemToAdd);
-            notifyAll("Added item: § " + itemToAdd.getGeneralInfo(), notificationTypes.ITEMDATA);
-        } else {
-            notifyAll("Could not add item: § " + itemName + "  (is it spelled correctly?)", notificationTypes.ERROR);
-        }
-        BUConfig.HANDLER.save();
-        ItemData.update();
-    }
-
     public static void addWatchedItem(ItemData item){
         if(item == null)
             return;
@@ -193,12 +170,13 @@ public class Util implements BUListener {
 
     public static void subscribeTicks(){
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            List<ScheduledTask> snapshot = new ArrayList<>(tasks);
-            for (ScheduledTask task : snapshot) {
+            Iterator<ScheduledTask> iterator = tasks.iterator();
+            while (iterator.hasNext()) {
+                ScheduledTask task = iterator.next();
                 task.ticksLeft--;
                 if (task.ticksLeft <= 0) {
                     task.action.run();
-                    tasks.remove(task);
+                    iterator.remove();
                 }
             }
         });

@@ -69,6 +69,8 @@ public class BUConfig {
     public StashMessages stashMessages = new StashMessages(false);
     @SerialEntry
     public ArrayList<Bookmark> bookmarks = new ArrayList<>();
+    @SerialEntry
+    public PriceCharts priceCharts = new PriceCharts();
 
 
     public static void openGUI() {
@@ -91,7 +93,8 @@ public class BUConfig {
             generalBuilder.name(Text.literal("General"))
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
-                    .option(stashMessages.createOption());
+                    .option(stashMessages.createOption())
+                    .option(priceCharts.createOption());
             if(!ModCompatibilityHelper.isAmecsReborn())
                 generalBuilder.option(createAmecsDownloadButton());
 

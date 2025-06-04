@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.features.PriceCharts;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.github.mkram17.bazaarutils.utils.ItemUpdater;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -23,7 +22,6 @@ public interface BUListener {
         transientEvents.add(new ItemUpdater());
         transientEvents.add(new BazaarData());
         transientEvents.add(new Util());
-        transientEvents.add(new PriceCharts());
     }
 
     //dont use lombok here, it fucks shit up
