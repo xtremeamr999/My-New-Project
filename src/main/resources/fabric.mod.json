@@ -9,6 +9,8 @@
 	],
 	"contact": {
 		"sources": "https://github.com/mkram17/Bazaar-Utils/tree/modern",
+		"issues": "https://github.com/mkram17/Bazaar-Utils/issues",
+		"homepage": "https://modrinth.com/project/bazaar-utils",
 		"Modrinth": "https://modrinth.com/project/bazaar-utils",
 		"Discord": "https://discord.gg/xDKjvm5hQd"
 	},
@@ -37,6 +39,11 @@
 		"modmenu": "13.0.1"
 	},
 	"custom": {
-		"latestMajorUpdateNotes": "${major_update_notes}"
+		"latestMajorUpdateNotes": "${major_update_notes}",
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/xDKjvm5hQd"
+			}
+		}
 	}
 }

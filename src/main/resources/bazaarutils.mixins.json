@@ -6,17 +6,15 @@
   "mixins": [
     "AccessorScreen",
     "AccessorSignEditScreen",
+    "AccessorHandledScreen",
     "DrawContentMixin",
     "MixinHandledScreen",
     "MixinSignOpen",
     "MixinSimpleInventory",
     "DevOnly.YggdrasilMinecraftSessionServiceMixin",
-    "DevOnly.YggdrasilServicesKeyInfoMixin",
-    "BazaarScreenMixin"
+    "DevOnly.YggdrasilServicesKeyInfoMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "client": [
-  ]
+  }
 }

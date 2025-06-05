@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -165,6 +166,14 @@ public class BUConfig {
         return events;
 
 
+    }
+
+    public static List<ItemSlotButtonWidget> getWidgets(){
+        List<ItemSlotButtonWidget> widgets = new ArrayList<>();
+
+        widgets.addAll(Bookmark.getWidgets());
+        widgets.addAll(BazaarSettingsButton.getWidget());
+        return widgets;
     }
     private static ButtonOption createAmecsDownloadButton() {
         return ButtonOption.createBuilder()

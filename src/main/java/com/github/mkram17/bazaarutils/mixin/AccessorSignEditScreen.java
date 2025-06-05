@@ -16,8 +16,8 @@ public interface AccessorSignEditScreen {
 
     // Accessors for currentRow (private field)
     @Accessor("currentRow")
-    public abstract int getCurrentRow();
+    int getCurrentRow();
 
     @Accessor("currentRow")
-    public abstract void setCurrentRow(int row);
+    void setCurrentRow(int row);
 }

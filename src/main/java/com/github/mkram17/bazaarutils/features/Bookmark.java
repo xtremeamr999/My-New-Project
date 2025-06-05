@@ -6,14 +6,18 @@ import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,6 +25,9 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO when itemStack cant be found, do not show bookmark option
 public class Bookmark extends CustomItemButton {
@@ -30,8 +37,9 @@ public class Bookmark extends CustomItemButton {
     public ItemStack bookmarkedItem;
     protected boolean inCorrectGui = false;
     private static final int SIGN_SLOT_NUMBER = 45;
-    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_base");
-    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/blue_widget_hover");
+
+    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_base");
+    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_hover");
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
             HOVER);
@@ -180,6 +188,61 @@ public class Bookmark extends CustomItemButton {
                 return bookmark;
         }
         return null;
+    }
+
+    public static List<ItemSlotButtonWidget> getWidgets(){
+        List<ItemSlotButtonWidget> widgets = new ArrayList<>();
+
+        var screen = (AccessorHandledScreen)  MinecraftClient.getInstance().currentScreen;
+        String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
+        boolean isTargetScreen = screenTitle.startsWith("Bazaar");
+
+        if (isTargetScreen) {
+            int currentX = screen.getX();
+            int currentY = screen.getY();
+            int currentBgWidth = screen.getBackgroundWidth();
+
+            if (currentBgWidth <= 0) {
+                Util.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
+            }
+
+            int buttonSize = 16;
+            int spacing = 4;
+            int buttonX = currentX + currentBgWidth + spacing;
+            int currentButtonY = currentY + spacing;
+
+            List<Bookmark> bookmarks = BUConfig.get().bookmarks;
+
+            for (int i = 0; i < bookmarks.size(); i++) {
+                ItemStack configuredItem = bookmarks.get(i).getBookmarkedItem();
+
+                final int buttonIndex = i;
+                final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
+                final Bookmark bookmark = bookmarks.get(buttonIndex);
+
+                ItemSlotButtonWidget button = new ItemSlotButtonWidget(
+                        buttonX,
+                        currentButtonY,
+                        buttonSize, buttonSize,
+                        SLOT_BUTTON_TEXTURES,
+                        (btn) -> {
+                            if (Screen.hasShiftDown()) {
+                                Util.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
+                                bookmark.onWidgetShiftClick();
+                            } else {
+                                bookmark.onWidgetLeftClick();
+                            }
+
+                        },
+                        itemForButton,
+                        Text.of(bookmark.getName())
+                );
+
+                widgets.add(button);
+                currentButtonY += buttonSize + spacing;
+            }
+        }
+        return widgets;
     }
 
 }
