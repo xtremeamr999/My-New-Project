@@ -133,7 +133,10 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         if(!BazaarUtils.gui.inFlipGui || !isEnabled() || inCancelOrderScreen) return;
 
         ItemStack itemStack = new ItemStack(getReplaceItem(), 1);
-        if(item == null) {
+        if(flipPrice == 0) {
+            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("There are no competing sell offers.").formatted(Formatting.DARK_PURPLE));
+            itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "ANY");
+        } else if(item == null) {
             itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Could not find order").formatted(Formatting.DARK_PURPLE));
             itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "???");
         }else {

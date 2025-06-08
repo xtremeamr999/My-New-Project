@@ -109,6 +109,7 @@ public class BazaarUtils implements ClientModInitializer {
         });
     }
 
+
     public static final ComponentType<String> CUSTOM_SIZE_COMPONENT = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
             Identifier.of(BazaarUtils.MODID, "custom_size"),
@@ -119,4 +120,5 @@ public class BazaarUtils implements ClientModInitializer {
             Identifier.of(BazaarUtils.MODID, "has_price_chart"),
             ComponentType.<Boolean>builder().codec(Codec.BOOL).build()
     );
+
 }

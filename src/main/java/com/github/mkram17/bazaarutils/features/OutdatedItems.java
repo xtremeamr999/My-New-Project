@@ -38,7 +38,9 @@ public class OutdatedItems implements BUListener {
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated) {
-            Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
+            Util.tickExecuteLater(2, () -> {
+                Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
+            });
             if(notificationSound)
                 SoundUtil.notifyMultipleTimes(3);
         }

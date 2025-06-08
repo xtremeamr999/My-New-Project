@@ -130,13 +130,17 @@ public class Bookmark extends CustomItemButton {
     }
 
     public static String findName(ChestLoadedEvent e){
-        String containerName = BazaarUtils.gui.getContainerName();
+        String containerName = GUIUtils.getContainerName();
         String name = findNameFromContainer();
         if(containerName.length() > 30){
             for(ItemStack stack : e.getItemStacks()){
                 if(stack == null) continue;
                 if (!stack.isEmpty() && stack.getName().getString().startsWith(name)) {
+                    //? if >= 1.21.4 {
                     return stack.getCustomName().getString();
+                    //?} else {
+                    /*return stack.getComponentChanges().get(DataComponentTypes.CUSTOM_NAME).get().getString();
+                    *///?}
                 }
             }
         }
@@ -144,9 +148,11 @@ public class Bookmark extends CustomItemButton {
     }
 
     private static String findNameFromContainer(){
-        String containerName = BazaarUtils.gui.getContainerName();
-        if(BazaarUtils.gui.inInstaBuy())
+        String containerName = GUIUtils.getContainerName();
+        assert containerName != null;
+        if(BazaarUtils.gui.inInstaBuy()) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
+        }
         if(BazaarUtils.gui.inBuyOrderScreen()){
             containerName = BazaarUtils.gui.getPreviousScreenName();
             return containerName.substring(containerName.indexOf("➜")+2);

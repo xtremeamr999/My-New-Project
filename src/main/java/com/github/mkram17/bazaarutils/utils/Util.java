@@ -3,9 +3,9 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
+import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -107,9 +106,10 @@ public class Util implements BUListener {
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.WHITE);
 
-        if(notiType == notificationTypes.ERROR)
+        if(notiType == notificationTypes.ERROR) {
             messageText.append(Text.literal(message).formatted(Formatting.RED));
-        else
+
+        }else
             messageText.append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
 
@@ -138,24 +138,30 @@ public class Util implements BUListener {
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
 
             LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
+//            LogManager.getLogger(callingName).info("[Bazaar Utils] watchedItems state: " + BUConfig.get().watchedItems);
         }
     }
 
 
     public static void notifyChatCommand(String message, String command){
-        assert MinecraftClient.getInstance().player != null;
-        MinecraftClient.getInstance().player.sendMessage(Text.literal(message)
-                .styled(style -> style
-                        .withBold(true)
-                        .withColor(Formatting.GOLD)
-                        //? if > 1.21.4 {
-                        .withClickEvent(new ClickEvent.RunCommand("/" + command))
-                        .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
-                        //?} else {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client != null && client.player != null) { // Add this check
+            client.player.sendMessage(Text.literal(message)
+                    .styled(style -> style
+                                    .withBold(true)
+                                    .withColor(Formatting.GOLD)
+                                    //? if > 1.21.4 {
+                                    .withClickEvent(new ClickEvent.RunCommand("/" + command))
+                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
+                            //?} else {
                                 /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
                         *///?}
-                ), false);
+                    ), false);
+        } else {
+            // Optionally log that the message couldn't be sent because the player was null
+            LogManager.getLogger(Util.class).warn("[Bazaar Utils] Could not send chat command notification because player is null. Message: " + message);
+        }
     }
 
     public static void addWatchedItem(ItemData item){
@@ -168,15 +174,17 @@ public class Util implements BUListener {
         ItemData.update();
     }
 
-    public static void subscribeTicks(){
+    public static void subscribeTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             Iterator<ScheduledTask> iterator = tasks.iterator();
-            while (iterator.hasNext()) {
-                ScheduledTask task = iterator.next();
-                task.ticksLeft--;
-                if (task.ticksLeft <= 0) {
-                    task.action.run();
-                    iterator.remove();
+            synchronized (tasks) {
+                while (iterator.hasNext()) {
+                    ScheduledTask task = iterator.next();
+                    task.ticksLeft--;
+                    if (task.ticksLeft <= 0) {
+                        task.action.run();
+                        iterator.remove();
+                    }
                 }
             }
         });
@@ -185,17 +193,15 @@ public class Util implements BUListener {
 
     //this one runs asynch and other one runs on main thread (i think)
     public static void tickExecuteLater(int ticks, Runnable action) {
-        tasks.add(new ScheduledTask(ticks, action));
+        synchronized (tasks) {
+            tasks.add(new ScheduledTask(ticks, action));
+        }
     }
 
+    @AllArgsConstructor
     private static class ScheduledTask {
         int ticksLeft;
         Runnable action;
-
-        ScheduledTask(int ticks, Runnable action) {
-            this.ticksLeft = ticks;
-            this.action = action;
-        }
     }
 
 
@@ -248,21 +254,6 @@ public class Util implements BUListener {
             System.out.println("Failed to write data to file");
             e.printStackTrace();
         }
-    }
-
-    public static String getClipboardContents() {
-        try {
-            return (String) Toolkit.getDefaultToolkit()
-                    .getSystemClipboard()
-                    .getData(DataFlavor.stringFlavor);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static String capAtMinecraftLength(String input, int limit) {
-        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-        return capAtLength(input, limit, c -> renderer.getWidth(String.valueOf(c)));
     }
 
     private static String capAtLength(String input, int limit, LengthJudger lengthJudger) {

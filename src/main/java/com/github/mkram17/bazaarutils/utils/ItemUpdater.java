@@ -32,7 +32,11 @@ public class ItemUpdater implements BUListener {
     private static void updateWatchedItems(ArrayList<ItemStack> orderStacks){
         List<ItemData> foundItems = new ArrayList<>();
         for(ItemStack stack : orderStacks){
-            String customName = stack.getCustomName().getString();
+            //? if >= 1.21.4 {
+                    String customName = stack.getCustomName().getString();
+            //?} else {
+            /*String customName = stack.getComponentChanges().get(DataComponentTypes.CUSTOM_NAME).get().getString();
+            *///?}
             String name = "";
             boolean isSellOrder;
             double unitPrice;
@@ -57,14 +61,19 @@ public class ItemUpdater implements BUListener {
             } else {
                 fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
                 //havent tested fully, so might not work if number ever uses k/m or if it's not always the index 1 of the siblings
-                totalVolume = Integer.parseInt(changedComponents.get(2).getSiblings().get(1).getString());
+                totalVolume = Util.parseNumber(changedComponents.get(2).getSiblings().get(1).getString());
             }
             fullPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"))*totalVolume;
             if(volumeFilled != -1) {
                 if (Util.findComponentWith(changedComponents, "to claim!") != null) {
                     var amountUnclaimedString = Util.findComponentWith(changedComponents, "to claim!");
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf("items")-1));
-                    amountClaimed = volumeFilled - amountUnclaimed;
+                    if(amountUnclaimedString.indexOf("items") == -1) {
+                        amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(" coins")));
+                        amountClaimed = volumeFilled - amountUnclaimed;
+                    } else {
+                        amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf("items") - 1));
+                        amountClaimed = volumeFilled - amountUnclaimed;
+                    }
                 } else {
                     amountClaimed = volumeFilled;
                 }
@@ -72,11 +81,11 @@ public class ItemUpdater implements BUListener {
 
             ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
 
-            if(volumeFilled != -1)
-                tempItem.setAmountFilled(volumeFilled);
+            if(volumeFilled > -1)
+                tempItem.setFilled();
             if(volumeFilled == totalVolume)
-                tempItem.setStatus(ItemData.statuses.FILLED);
-            if(amountClaimed != -1)
+                tempItem.setFilled();
+            if(amountClaimed > -1)
                 tempItem.setAmountClaimed(amountClaimed);
 
             //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found

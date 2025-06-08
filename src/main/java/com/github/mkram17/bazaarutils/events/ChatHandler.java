@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatHandler implements BUListener{
-    private enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
+    public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
 
     @Override
     public void subscribe() {
@@ -73,7 +73,7 @@ public class ChatHandler implements BUListener{
                 if(item == null)
                     Util.notifyAll("Could not find item to fill with info vol: "+ volume + " name: " + itemName, Util.notificationTypes.ERROR);
                 else {
-                    ItemData.setItemFilled(item);
+                    item.setFilled();
                     Util.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ITEMDATA);
                 }
             }

@@ -125,44 +125,48 @@ public class BazaarData implements BUListener {
 //        }
 //    }
 
-    //(product id, what you are looking for in quick status-- either buyPrice or sellPrice)
     public static Double findItemPrice(String productId, ItemData.priceTypes priceType) {
-        double sellPrice = -1;
-        double buyPrice = -1;
-        if (bazaarReply == null){
+        if (bazaarReply == null) {
             Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
             return -1.0;
         }
         try {
-            var product = bazaarReply.getProduct(productId);
-            if(product == null){
+            SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
+            if (product == null) {
                 Util.notifyAll("Could not find item using product ID: " + productId, Util.notificationTypes.ERROR);
                 return -1.0;
             }
-            var buy_summary = product.getBuySummary();
-            var sell_summary = product.getSellSummary();
-            sellPrice = sell_summary.get(0).getPricePerUnit();
-            buyPrice = buy_summary.get(0).getPricePerUnit();
-            Util.notifyAll("Price found: " + sellPrice, Util.notificationTypes.BAZAARDATA);
-            Util.notifyAll("Price found: " +buyPrice, Util.notificationTypes.BAZAARDATA);
-            if(priceType == ItemData.priceTypes.INSTASELL)
-                return sellPrice;
-            else if(priceType == ItemData.priceTypes.INSTABUY)
-                return buyPrice;
-        } catch (Exception e) {
-            Util.notifyAll("There was an error fetching Json objects (probably caused by incorrect product ID [" + productId + "])", Util.notificationTypes.ERROR);
-            Util.notifyAll(e.getMessage(), Util.notificationTypes.ERROR);
-            Util.notifyAll(e.getCause().getMessage(), Util.notificationTypes.ERROR);
-            e.printStackTrace();
-        }
 
-        if (priceType == ItemData.priceTypes.INSTASELL) {
-            Util.notifyAll("Price found: " + sellPrice, Util.notificationTypes.BAZAARDATA);
-            return sellPrice;
-        } else if (priceType == ItemData.priceTypes.INSTABUY) {
-            Util.notifyAll("Price found: " +buyPrice, Util.notificationTypes.BAZAARDATA);
-            return buyPrice;
+            var sell_order_summary = product.getBuySummary();
+            var buy_order_summary = product.getSellSummary();
+
+            if (priceType == ItemData.priceTypes.INSTABUY) {
+                if (sell_order_summary.isEmpty()) {
+                    Util.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
+                    return 0.0;
+                }
+                double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
+                return sellOrderPrice;
+            } else if (priceType == ItemData.priceTypes.INSTASELL) {
+                if (buy_order_summary.isEmpty()) {
+                    Util.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
+                    return 0.0;
+                }
+                double buyOrderPrice = buy_order_summary.getFirst().getPricePerUnit();
+                return buyOrderPrice;
+            }
+        } catch (Exception e) {
+            Util.notifyAll("There was an error fetching product data (probably caused by incorrect product ID [" + productId + "])", Util.notificationTypes.ERROR);
+            if (e.getMessage() != null) {
+                Util.notifyAll(e.getMessage(), Util.notificationTypes.ERROR);
+            }
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                Util.notifyAll(e.getCause().getMessage(), Util.notificationTypes.ERROR);
+            }
+            e.printStackTrace();
+            return -1.0;
         }
+        // Should not be reached if priceType is INSTASELL or INSTABUY
         return null;
     }
 

@@ -1,10 +1,10 @@
 package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
-import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 
@@ -21,12 +19,6 @@ import java.util.function.Function;
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
 public class ItemData {
-    public static ItemData getItem(int index){
-        if(index != -1)
-            return BUConfig.get().watchedItems.get(index);
-        else return null;
-    }
-
     public String getProductID() {
         return productId;
     }
@@ -64,9 +56,6 @@ public class ItemData {
     }
     public enum statuses{SET,FILLED}
 
-    static ScheduledExecutorService timeExecutor = Executors.newScheduledThreadPool(5);
-    private static int notifyOutdatedSeconds = 0;
-
     //insta sell and insta buy
     @Setter
     @Getter
@@ -79,8 +68,6 @@ public class ItemData {
     private double marketPrice;
     //the price of the opposite type of order
     private double marketOppositePrice;
-    //item price * volume
-    private final double fullPrice;
     @Setter
     @Getter
     private statuses status;
@@ -97,10 +84,10 @@ public class ItemData {
 
     private static List<ItemData> outdated = new ArrayList<>(Collections.emptyList());
 
+//    @Param fullPrice is the price per unit * volume
     public ItemData(String name, Double fullPrice, priceTypes priceType, int volume) {
         this.name = name;
         this.priceType = priceType;
-        this.fullPrice = fullPrice;
         this.productId = BazaarData.findProductId(name);
         this.volume = volume;
         this.price = fullPrice/volume;
@@ -233,25 +220,6 @@ public class ItemData {
         }
         return itemList.getFirst();
     }
-//    public static ItemData findItemTotalPrice(double totalPrice) {
-//        ArrayList<ItemData> itemList = new ArrayList<>();
-//        for(ItemData item : BUConfig.get().watchedItems){
-//            if(totalPrice == item.fullPrice){
-//                itemList.add(item);
-//            }
-//        }
-//        if (itemList.isEmpty()) {
-//            Util.notifyAll("Could not find item with total price: " + totalPrice, Util.notificationTypes.ITEMDATA);
-//            return null;
-//        }
-//        if (itemList.size() > 1) {
-//            itemList.forEach(duplicate -> {
-//                Util.notifyAll("Duplicate totalprice item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-//            });
-//            return null;
-//        }
-//        return itemList.getFirst();
-//    }
 
     private static void findOutdated(){
         List<ItemData> oldOutdated = new ArrayList<>(outdated);
@@ -259,8 +227,20 @@ public class ItemData {
         for(ItemData item : BUConfig.get().watchedItems){
             if(item.isOutdated()) {
                 outdated.add(item);
-                if(ItemData.findItem(item, oldOutdated) == null)
+                boolean wasAlreadyOutdated = false;
+                for(ItemData oldItem : oldOutdated) {
+                    if(item.getName().equals(oldItem.getName()) && 
+                       Math.abs(item.getPrice() - oldItem.getPrice()) <= item.maximumRounding &&
+                       item.getVolume() == oldItem.getVolume() &&
+                       item.getPriceType() == oldItem.getPriceType()) {
+                        wasAlreadyOutdated = true;
+                        break;
+                    }
+                }
+
+                if(!wasAlreadyOutdated) {
                     BazaarUtils.eventBus.post(new OutdatedItemEvent(item));
+                }
             }
         }
     }
@@ -277,6 +257,8 @@ public class ItemData {
 
     public double getFlipPrice(){
         updateMarketPrices();
+        if(marketOppositePrice == 0)
+            return 0;
         if (priceType == priceTypes.INSTABUY) {
             return (marketOppositePrice + .1);
         } else {
@@ -284,9 +266,9 @@ public class ItemData {
         }
     }
 
-    public static void setItemFilled(ItemData item){
-        item.amountFilled = item.volume;
-        item.status = statuses.FILLED;
+    public void setFilled(){
+        amountFilled = volume;
+        status = statuses.FILLED;
     }
 
     public static void removeItem(ItemData item){
@@ -297,9 +279,5 @@ public class ItemData {
         if(!BUConfig.get().watchedItems.remove(this))
             Util.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
-    }
-    public static void clearItems(){
-        for(ItemData item: BUConfig.get().watchedItems)
-            removeItem(item);
     }
 }

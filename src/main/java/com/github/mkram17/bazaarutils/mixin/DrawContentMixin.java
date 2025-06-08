@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 //used to change stack size String
 @Mixin(DrawContext.class)
 public abstract class DrawContentMixin {
+//? if >= 1.21.4 {
     @ModifyVariable(
             method = "drawStackCount",
             at = @At("HEAD"),
@@ -27,14 +28,47 @@ public abstract class DrawContentMixin {
             else
                 return customData;
 
-            if(dataSize >= 1000000)
-                return (((int) dataSize) / 1000000) + "m";
-            if(dataSize >= 1000)
-                return (((int) dataSize) / 1000) + "k";
+            if(dataSize >= 1_000_000)
+                return (((int) dataSize) / 1_000_000) + "m";
+            if(dataSize >= 1_000)
+                return (((int) dataSize) / 1_000) + "k";
             return customData;
         }
 
         return text;
     }
+    //?} else {
+        /*@ModifyVariable(
+                method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V",
+                at = @At(
+                        value = "INVOKE",
+                        target = "Lnet/minecraft/client/font/TextRenderer;getWidth(Ljava/lang/String;)I"
+                ),
+                ordinal = 1
+        )
+        private String modifyStackCountString(String originalString, TextRenderer textRenderer, ItemStack stack) {
+            if (!stack.getComponents().contains(BazaarUtils.CUSTOM_SIZE_COMPONENT))
+                return originalString;
+            String customData = stack.get(BazaarUtils.CUSTOM_SIZE_COMPONENT);
+
+            if (customData != null) {
+                try {
+                    double dataSize = Double.parseDouble(customData);
+
+                    if (dataSize >= 1_000_000) {
+                        return ((int) (dataSize / 1_000_000)) + "m";
+                    }
+                    if (dataSize >= 1_000) {
+                        return ((int) (dataSize / 1_000)) + "k";
+                    }
+
+                    return customData;
+                } catch (NumberFormatException e) {
+                    return customData;
+                }
+            }
+            return originalString;
+        }
+    *///?}
 
 }

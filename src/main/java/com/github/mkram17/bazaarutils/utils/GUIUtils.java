@@ -39,35 +39,31 @@ public class GUIUtils implements BUListener {
     }
 
     public boolean inBuyOrderScreen(){
-        if(containerName == null) return false;
-        return containerName.contains("How many do you want?");
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("How many do you want?");
     }
     public boolean inInstaBuy(){
-        if(containerName == null) return false;
-        return containerName.contains("➜ Insta");
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("➜ Insta");
     }
     public boolean inBuyOrders(){
-        if(containerName == null) return false;
-        return containerName.contains("Co-op Bazaar Orders");
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("Co-op Bazaar Orders");
     }
 
     public boolean inBazaar(){
-        updateContainerName();
-//        return false;
-        if(containerName == null) return false;
-        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || containerName.contains("Bazaar") || inBuyOrders() || containerName.contains("➜");
+        if(getContainerName() == null) return false;
+        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inBuyOrders() || getContainerName().contains("➜");
     }
 
     //only for specific items
     public boolean inAnyItemScreen(){
-        if(containerName == null || containerName.contains("Bazaar")) return false;
-        return containerName.contains("➜")
+        if(getContainerName() == null || getContainerName().contains("Bazaar")) return false;
+        return getContainerName().contains("➜")
                 || inBuyOrderScreen()
                 || inInstaBuy();
     }
     private GenericContainerScreen chestScreen;
-    @Getter
-    private String containerName;
     @Getter
     @Setter
     private guiTypes guiType;
@@ -87,26 +83,23 @@ public class GUIUtils implements BUListener {
     }
 
     public enum guiTypes {CHEST, SIGN}
-    private void updateContainerName(){
+
+
+    public static String getContainerName(){
         var screen = MinecraftClient.getInstance().currentScreen;
-        if (screen instanceof GenericContainerScreen genericContainerScreen) {
-            containerName = Util.removeFormatting(genericContainerScreen.getTitle().getString());
-//                Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
-        }
+        if(screen != null)
+            return Util.removeFormatting(screen.getTitle().getString());
+        return null;
     }
 
     public void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             BazaarUtils.gui = this;
             lowerChestInventory= null;
-            if (screen instanceof GenericContainerScreen genericContainerScreen) {
-                containerName = Util.removeFormatting(genericContainerScreen.getTitle().getString());
-//                Util.notifyAll("Container Name: " + containerName, Util.notificationTypes.GUI);
-            }
         });
 
         ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
-            BazaarUtils.gui.previousScreenName = BazaarUtils.gui.containerName;
+            BazaarUtils.gui.previousScreenName = BazaarUtils.gui.getContainerName();
         });
     }
     @EventHandler(priority = EventPriority.HIGH)
@@ -248,11 +241,11 @@ public class GUIUtils implements BUListener {
     }
 
     public boolean inFlipGui() {
-        if (containerName == null || lowerChestInventory == null) {
+        if (getContainerName() == null || lowerChestInventory == null) {
             return false;
         }
 
-        if (!containerName.contains("Order options")) {
+        if (!getContainerName().contains("Order options")) {
             return false;
         }
 

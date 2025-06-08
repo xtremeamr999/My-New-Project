@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
@@ -40,7 +41,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
                     ScreenHandler handler = genericContainerScreen.getScreenHandler();
                     if (handler instanceof GenericContainerScreenHandler containerHandler) {
                         event.lowerChestInventory = containerHandler.getInventory();
-                        event.containerName = Util.removeFormatting(genericContainerScreen.getTitle().getString());
+                        event.containerName = GUIUtils.getContainerName();
                         event.itemStacks = returnItemStacks(event.lowerChestInventory);
 
                         // Post to custom event bus
