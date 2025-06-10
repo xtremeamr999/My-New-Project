@@ -5,8 +5,6 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
@@ -25,26 +23,18 @@ import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
 public class BazaarData implements BUListener {
-
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
-//    private static final String dataFile = "bazaar_json.json";
     static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;
     private static int exceptionCount = 0;
     private static int bazaarCalls = 0;
     private static boolean skipNextCall = false;
+    private static final long bazaarDataDelay = 3L;
 
     @Override
     public void subscribe(){
         scheduleBazaar();
-    }
-    public static<T> String getAsPrettyJsonObject(String object){
-        return gson.toJson(object);
-    }
-    public static JsonObject getAsJsonObjectFromString(String str){
-        return JsonParser.parseString(str).getAsJsonObject();
     }
 
     public static void scheduleBazaar(){
@@ -65,17 +55,15 @@ public class BazaarData implements BUListener {
                     if (throwable != null) {
                         skipNextCall = true;
                         exceptionCount++;
-                        Util.notifyAll("Exception thrown trying to get bazaar data", Util.notificationTypes.ERROR);
-                        System.out.println(throwable.getMessage());
+                        Util.notifyError("Exception thrown trying to get bazaar data", throwable);
                         System.out.println("[Bazaar Utils] Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
                         System.out.println("[Bazaar Utils] Status: " + APIUtils.API.getStatus(APIUtils.uuid));
-                        throwable.printStackTrace();
                         if(exceptionCount % 5 == 0){
                             bazaarDataPeriod++;
                         }
                     } else {
                         if(reply == null){
-                            Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
+                            Util.notifyError("Bazaar data is null", null);
                             return;
                         }
                         bazaarReply = reply;
@@ -86,7 +74,7 @@ public class BazaarData implements BUListener {
                         }
                     }
                 });
-        }, 1, 1, TimeUnit.SECONDS);
+        }, bazaarDataDelay, 1, TimeUnit.SECONDS);
     }
 
     public static JsonObject loadResourceJson(String resourcePath) {
@@ -102,12 +90,11 @@ public class BazaarData implements BUListener {
                     return JsonParser.parseReader(reader).getAsJsonObject();
                 }
             } else {
-                Util.notifyAll("Could not find resource: " + resourcePath, Util.notificationTypes.ERROR);
+                Util.notifyError("Could not find resource: " + resourcePath, null);
                 return new JsonObject();
             }
         } catch (IOException e) {
-            Util.notifyAll("Error reading resource: " + resourcePath, Util.notificationTypes.ERROR);
-            e.printStackTrace();
+            Util.notifyError("Error reading resource: " + resourcePath, e);
             return new JsonObject();
         }
     }
@@ -127,13 +114,13 @@ public class BazaarData implements BUListener {
 
     public static Double findItemPrice(String productId, ItemData.priceTypes priceType) {
         if (bazaarReply == null) {
-            Util.notifyAll("Bazaar data is null", Util.notificationTypes.ERROR);
+            Util.notifyError("Bazaar data is null", null);
             return -1.0;
         }
         try {
             SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
             if (product == null) {
-                Util.notifyAll("Could not find item using product ID: " + productId, Util.notificationTypes.ERROR);
+                Util.notifyError("Could not find item using product ID: " + productId, null);
                 return -1.0;
             }
 
@@ -156,14 +143,7 @@ public class BazaarData implements BUListener {
                 return buyOrderPrice;
             }
         } catch (Exception e) {
-            Util.notifyAll("There was an error fetching product data (probably caused by incorrect product ID [" + productId + "])", Util.notificationTypes.ERROR);
-            if (e.getMessage() != null) {
-                Util.notifyAll(e.getMessage(), Util.notificationTypes.ERROR);
-            }
-            if (e.getCause() != null && e.getCause().getMessage() != null) {
-                Util.notifyAll(e.getCause().getMessage(), Util.notificationTypes.ERROR);
-            }
-            e.printStackTrace();
+            Util.notifyError("There was an error fetching product data (probably caused by incorrect product ID [" + productId + "])", e);
             return -1.0;
         }
         // Should not be reached if priceType is INSTASELL or INSTABUY
@@ -185,8 +165,7 @@ public class BazaarData implements BUListener {
                 }
             }
         } catch (Exception e) {
-            Util.notifyAll("Error while finding product ID: " + e.getMessage(), Util.notificationTypes.ERROR);
-            e.printStackTrace();
+            Util.notifyError("Error while finding product ID: " + e.getMessage(), e);
         }
 
         Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);

@@ -128,12 +128,13 @@ public class GUIUtils implements BUListener {
         try {
             Util.notifyAll("Closing gui", Util.notificationTypes.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
-            if(!(client.currentScreen instanceof HandledScreen<?>))
-                return;
             if (client == null) {
-                Util.notifyAll("Client is null", Util.notificationTypes.ERROR);
+                Util.notifyError("Client is null", null);
                 return;
             }
+            if(!(client.currentScreen instanceof HandledScreen<?>))
+                return;
+
 
             client.execute(() -> {
                 ClientPlayerEntity player = client.player;
@@ -141,7 +142,7 @@ public class GUIUtils implements BUListener {
             });
         } catch (Exception e) {
             e.printStackTrace();
-            Util.notifyAll("Error closing gui", Util.notificationTypes.ERROR);
+            Util.notifyError("Error closing gui", e);
         }
     }
 
@@ -150,7 +151,7 @@ public class GUIUtils implements BUListener {
             MinecraftClient client = MinecraftClient.getInstance();
             ClientPlayerEntity player = client.player;
             if (player == null) {
-                Util.notifyAll("Player is null, cannot close screen", Util.notificationTypes.ERROR);
+                Util.notifyError("Player is null, cannot close screen", null);
                 return;
             }
             player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(player.currentScreenHandler.syncId));
@@ -158,7 +159,7 @@ public class GUIUtils implements BUListener {
             player.currentScreenHandler = player.playerScreenHandler;
 
         } catch (Exception e) {
-            Util.notifyAll("Error encountered while closing screen with custom method", Util.notificationTypes.ERROR);
+            Util.notifyError("Error encountered while closing screen with custom method", e);
             throw new RuntimeException(e);
         }
     }
@@ -170,11 +171,11 @@ public class GUIUtils implements BUListener {
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);
             } else {
-                Util.notifyAll("Error closing sign: client was null or not in a sign", Util.notificationTypes.ERROR);
+                Util.notifyError("Error closing sign: client was null or not in a sign", null);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Util.notifyAll("Unknown error while closing sign", Util.notificationTypes.ERROR);
+            Util.notifyError("Unknown error while closing sign", e);
         }
     }
 
@@ -202,7 +203,7 @@ public class GUIUtils implements BUListener {
                             }
                             signScreen.setCurrentRow(originalRow);
                         } catch (Exception e) {
-                            Util.notifyAll("Error executing sign text update: " + e.getMessage(), Util.notificationTypes.ERROR);
+                            Util.notifyError("Error executing sign text update: " + e.getMessage(), e);
                             e.printStackTrace();
                         }
                     });
@@ -217,7 +218,7 @@ public class GUIUtils implements BUListener {
                             Thread.currentThread().interrupt();
                             MinecraftClient finalClient = MinecraftClient.getInstance();
                             if (finalClient != null) {
-                                finalClient.execute(() -> Util.notifyAll("Sign text setting interrupted", Util.notificationTypes.ERROR));
+                                finalClient.execute(() -> Util.notifyError("Sign text setting interrupted", null));
                             }
                             return;
                         }
@@ -227,9 +228,9 @@ public class GUIUtils implements BUListener {
 
             MinecraftClient client = MinecraftClient.getInstance();
             if (client != null) {
-                client.execute(() -> Util.notifyAll("Error setting sign text: client was null or not in a sign after " + MAX_ATTEMPTS + " attempts", Util.notificationTypes.ERROR));
+                client.execute(() -> Util.notifyError("Error setting sign text: client was null or not in a sign after " + MAX_ATTEMPTS + " attempts", null));
             } else {
-                System.err.println("Error setting sign text: Failed after " + MAX_ATTEMPTS + " attempts, client was null.");
+                Util.notifyError("Error setting sign text: Failed after " + MAX_ATTEMPTS + " attempts, client was null.", null);
             }
         });
     }

@@ -221,26 +221,36 @@ public class ItemData {
         return itemList.getFirst();
     }
 
-    private static void findOutdated(){
-        List<ItemData> oldOutdated = new ArrayList<>(outdated);
+    private static void findOutdated() {
+        List<ItemData> previousOutdatedItems = new ArrayList<>(outdated);
         outdated.clear();
-        for(ItemData item : BUConfig.get().watchedItems){
-            if(item.isOutdated()) {
+        for (ItemData item : BUConfig.get().watchedItems) {
+            if (item.isOutdated()) {
                 outdated.add(item);
-                boolean wasAlreadyOutdated = false;
-                for(ItemData oldItem : oldOutdated) {
-                    if(item.getName().equals(oldItem.getName()) && 
-                       Math.abs(item.getPrice() - oldItem.getPrice()) <= item.maximumRounding &&
-                       item.getVolume() == oldItem.getVolume() &&
-                       item.getPriceType() == oldItem.getPriceType()) {
-                        wasAlreadyOutdated = true;
-                        break;
-                    }
-                }
+            }
+        }
 
-                if(!wasAlreadyOutdated) {
-                    BazaarUtils.eventBus.post(new OutdatedItemEvent(item));
+        List<ItemData> availableOldOutdated = new ArrayList<>(previousOutdatedItems);
+
+        for (ItemData currentNewOutdatedItem : outdated) {
+            boolean foundMatchInOldList = false;
+            ItemData matchedOldItem = null;
+
+            for (ItemData oldItem : availableOldOutdated) {
+                if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
+                        Math.abs(currentNewOutdatedItem.getPrice() - oldItem.getPrice()) <= currentNewOutdatedItem.maximumRounding &&
+                        currentNewOutdatedItem.getVolume() == oldItem.getVolume() &&
+                        currentNewOutdatedItem.getPriceType() == oldItem.getPriceType()) {
+                    foundMatchInOldList = true;
+                    matchedOldItem = oldItem;
+                    break;
                 }
+            }
+
+            if (foundMatchInOldList) {
+                availableOldOutdated.remove(matchedOldItem);
+            } else {
+                BazaarUtils.eventBus.post(new OutdatedItemEvent(currentNewOutdatedItem));
             }
         }
     }

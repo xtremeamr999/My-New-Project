@@ -19,7 +19,7 @@ public class ItemStackCodecGsonAdapter implements JsonSerializer<ItemStack>, Jso
         DataResult<JsonElement> result = ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, stack);
 
         return result.resultOrPartial(errorMessage -> {
-                    Util.notifyAll("Failed to serialize ItemStack to JSON: " + errorMessage + " - Stack: " + stack, Util.notificationTypes.ERROR);
+                    Util.notifyError("Failed to serialize ItemStack to JSON: " + errorMessage + " - Stack: " + stack, null);
                 })
                 .orElse(JsonNull.INSTANCE);
     }
@@ -33,7 +33,7 @@ public class ItemStackCodecGsonAdapter implements JsonSerializer<ItemStack>, Jso
         DataResult<ItemStack> result = ItemStack.CODEC.parse(JsonOps.INSTANCE, json);
 
         return result.resultOrPartial(errorMessage -> {
-                    Util.notifyAll("Failed to deserialize ItemStack from JSON: " + errorMessage + " - JSON: " + json.toString(), Util.notificationTypes.ERROR);
+                    Util.notifyError("Failed to deserialize ItemStack from JSON: " + errorMessage + " - JSON: " + json.toString(), null);
                 })
                 .orElse(ItemStack.EMPTY);
     }

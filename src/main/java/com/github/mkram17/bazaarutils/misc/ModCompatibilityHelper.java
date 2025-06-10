@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.Util.notificationTypes;
 import com.google.gson.*;
 import de.hysky.skyblocker.config.SkyblockerConfig;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
@@ -23,6 +22,7 @@ public class ModCompatibilityHelper {
     private static final String REI_CONFIG_FIELD = "horizontalEntriesBoundariesColumns";
     private static final int HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE = 16;
     public static final String AMECS_MODID = "amecs-reborn";
+    public static final String FIRMAMENT_MODID = "firmament";
     @Getter
     private static boolean amecsReborn = false;
 
@@ -42,7 +42,7 @@ public class ModCompatibilityHelper {
         Path reiConfigFile = configDir.resolve(REI_CONFIG_FILENAME);
 
         if (!Files.exists(reiConfigFile)) {
-            Util.notifyAll("Bazaar utils: Could not find REI config file at: " + reiConfigFile, notificationTypes.ERROR);
+            Util.notifyError("Could not find REI config file at: " + reiConfigFile, null);
             return;
         }
 
@@ -54,15 +54,15 @@ public class ModCompatibilityHelper {
             if (rootElement.isJsonObject()) {
                 rootObject = rootElement.getAsJsonObject();
             } else {
-                Util.notifyAll("Bazaar utils: REI config root is not a JSON object: " + reiConfigFile, notificationTypes.ERROR);
+                Util.notifyError("REI config root is not a JSON object: " + reiConfigFile, null);
                 return;
             }
 
         } catch (JsonSyntaxException e) {
-            Util.notifyAll("Bazaar utils: Failed to parse REI config file (likely due to non-standard JSON5 features like comments that Gson couldn't handle, or actual syntax errors): " + reiConfigFile, notificationTypes.ERROR);
+            Util.notifyError("Failed to parse REI config file (likely due to non-standard JSON5 features like comments that Gson couldn't handle, or actual syntax errors): " + reiConfigFile, e);
             return;
         } catch (IOException e) {
-            Util.notifyAll("Bazaar utils: Failed to read REI config file: " + reiConfigFile, notificationTypes.ERROR);
+            Util.notifyError("Failed to read REI config file: " + reiConfigFile, e);
             return;
         }
 
@@ -72,28 +72,28 @@ public class ModCompatibilityHelper {
 
                 if (appearanceObject.has(REI_CONFIG_FIELD)) {
                     JsonElement currentValue = appearanceObject.get(REI_CONFIG_FIELD);
-                    Util.notifyAll("Bazaar utils: Current REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "': " + currentValue, notificationTypes.ERROR);
+                    Util.notifyAll("Current REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "': " + currentValue, Util.notificationTypes.GUI);
                 } else {
-                    Util.notifyAll("Bazaar utils: Key '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' not found in REI config.", notificationTypes.ERROR);
+                    Util.notifyError("Key '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' not found in REI config.", null);
                 }
 
                 appearanceObject.addProperty(REI_CONFIG_FIELD, HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE);
-                Util.notifyAll("Bazaar utils: Set REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' to: " + HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE, notificationTypes.ERROR);
+                Util.notifyAll("Set REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' to: " + HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE, Util.notificationTypes.GUI);
 
             } else {
-                Util.notifyAll("Bazaar utils: REI config structure unexpected. Missing '" + REI_CONFIG_SECTION + "' object.", notificationTypes.ERROR);
+                Util.notifyError("REI config structure unexpected. Missing '" + REI_CONFIG_SECTION + "' object.", null);
                 return;
             }
         } catch (Exception e) {
-            Util.notifyAll("Bazaar utils: Error modifying the JSON structure in memory.", notificationTypes.ERROR);
+            Util.notifyError("Error modifying the JSON structure in memory.", e);
             return;
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(reiConfigFile, StandardCharsets.UTF_8)) {
             GSON_WRITER.toJson(rootObject, writer);
-            Util.notifyAll("Bazaar utils: Successfully saved modified REI config (comments removed): " + reiConfigFile, notificationTypes.ERROR);
+            Util.notifyAll("Successfully saved modified REI config (comments removed): " + reiConfigFile, Util.notificationTypes.GUI);
         } catch (IOException e) {
-            Util.notifyAll("Bazaar utils: Failed to write modified REI config file: " + reiConfigFile, notificationTypes.ERROR);
+            Util.notifyError("Failed to write modified REI config file: " + reiConfigFile, e);
         }
     }
 
@@ -103,26 +103,25 @@ public class ModCompatibilityHelper {
             try {
                 SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
                 boolean currentValue = skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar;
-                System.out.println("[Bazaar utils] Skyblocker Bazaar Overlay current state: " + currentValue);
+                Util.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, Util.notificationTypes.GUI);
 
                 if (currentValue) {
                     //TODO test to make sure this works instead of .save()
                     SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = false);
-                    System.out.println("[Bazaar utils] Attempting to disable Skyblocker Bazaar Overlay...");
+                    Util.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", Util.notificationTypes.GUI);
 
                     Util.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
                     return true;
                 } else {
-                    System.out.println("[Bazaar utils] Skyblocker Bazaar Overlay already disabled.");
+                    Util.notifyAll("Skyblocker Bazaar Overlay already disabled.", Util.notificationTypes.GUI);
                     return true;
                 }
             } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
-                System.err.println("[Bazaar utils] Failed to access or modify Skyblocker config setting.");
-                e.printStackTrace();
+                Util.notifyError("Failed to access or modify Skyblocker config setting.", e);
                 return false;
             }
         } else {
-            System.out.println("[Bazaar utils] Skyblocker not loaded, cannot change its config.");
+            System.out.println("Skyblocker not loaded, cannot change its config.");
             return false;
         }
     }
@@ -132,24 +131,23 @@ public class ModCompatibilityHelper {
             try {
                 SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
                 if (!skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar) {
-                    System.out.println("[Bazaar utils] Attempting to enable Skyblocker Bazaar Overlay...");
+                    System.out.println("Attempting to enable Skyblocker Bazaar Overlay...");
                     SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = true);
 
 
                     Util.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
                     return true;
                 } else {
-                    System.out.println("[Bazaar utils] Skyblocker Bazaar Overlay already enabled.");
+                    System.out.println("Skyblocker Bazaar Overlay already enabled.");
                     return true;
                 }
 
             } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
-                System.err.println("[Bazaar utils] Failed to access or modify Skyblocker config setting (enable attempt).");
-                e.printStackTrace();
+                Util.notifyError("Failed to access or modify Skyblocker config setting (enable attempt).", e);
                 return false;
             }
         } else {
-            System.out.println("[Bazaar utils] Skyblocker not loaded, cannot enable its config setting.");
+            System.out.println("Skyblocker not loaded, cannot enable its config setting.");
             return false;
         }
     }

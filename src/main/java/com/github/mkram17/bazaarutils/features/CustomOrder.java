@@ -117,6 +117,14 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         }
     }
 
+    public void remove(){
+        if (BUConfig.get().customOrders.contains(this)) {
+            BUConfig.get().customOrders.remove(this);
+            BUConfig.HANDLER.save();
+            eventBus.unsubscribe(this);
+        }
+    }
+
     @Override
     public void subscribe() {
         eventBus.subscribe(this);

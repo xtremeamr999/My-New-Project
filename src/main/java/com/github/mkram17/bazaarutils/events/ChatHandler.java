@@ -71,7 +71,7 @@ public class ChatHandler implements BUListener{
                 else
                     item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTASELL);
                 if(item == null)
-                    Util.notifyAll("Could not find item to fill with info vol: "+ volume + " name: " + itemName, Util.notificationTypes.ERROR);
+                    Util.notifyError("Could not find item to fill with info vol: "+ volume + " name: " + itemName, null);
                 else {
                     item.setFilled();
                     Util.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ITEMDATA);
@@ -126,9 +126,8 @@ public class ChatHandler implements BUListener{
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
                 Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Util.notifyAll("Error in order claim text: " + siblings, Util.notificationTypes.ERROR);
+        } catch (Exception e) {
+            Util.notifyError("Error in order claim text: " + siblings, e);
         }
     }
 

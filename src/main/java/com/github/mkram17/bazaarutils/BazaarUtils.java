@@ -120,5 +120,4 @@ public class BazaarUtils implements ClientModInitializer {
             Identifier.of(BazaarUtils.MODID, "has_price_chart"),
             ComponentType.<Boolean>builder().codec(Codec.BOOL).build()
     );
-
 }

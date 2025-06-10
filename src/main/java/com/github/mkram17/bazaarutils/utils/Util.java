@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,15 +37,14 @@ public class Util implements BUListener {
         subscribeTicks();
     }
 
-    public enum notificationTypes {
-        ERROR, GUI, FEATURE, BAZAARDATA, COMMAND, ITEMDATA;
+    public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ITEMDATA;
         public boolean isEnabled() {
             return BUConfig.get().developer.isDeveloperVariableEnabled(this);
         }
     }
     private static final LinkedList<ScheduledTask> tasks = new LinkedList<>();
     public static final String HELPMESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
-            "/bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
+            "/bu tax {amount} to set bazaar tax. This is important for the mod to function correctly. /bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
     public static final Text DISCORDLINK = Text.literal("Discord server")
             .styled(style -> {
                         //? if > 1.21.4 {
@@ -101,39 +101,44 @@ public class Util implements BUListener {
         LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
     }
 
-    public static void notifyAll(String message, notificationTypes notiType) {
+    public static void notifyError(String message, Throwable e) {
         String callingName = getCallingClassName();
-        String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
-        var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.WHITE);
-
-        if(notiType == notificationTypes.ERROR) {
-            messageText.append(Text.literal(message).formatted(Formatting.RED));
-
-        }else
-            messageText.append(Text.literal(message).formatted(Formatting.DARK_GREEN));
-
-
-        if(notiType == notificationTypes.ERROR){
-            messageText = Text.literal("[Bazaar Utils] ERROR: " + messageText.getString() + ". Click here for support.").styled(style -> {
-                        //? if > 1.21.4 {
-                try {
-                    return style
-                            .withColor(Formatting.RED)
-                            .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord for support")));
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            //?} else {
+        Text messageText = Text.literal("[Bazaar Utils Error]: " + message)
+                .styled(style -> {
+                    //? if > 1.21.4 {
+                    try {
+                        return style.withColor(Formatting.RED)
+                                .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord for support")));
+                    } catch (URISyntaxException uriSyntaxException) {
+                        throw new RuntimeException(uriSyntaxException);
+                    }
+                });
+        //?} else {
                         /*return style
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support")));
                     });
             *///?}
-        }
 
-        if (notiType.isEnabled() || BUConfig.get().developer.allMessages || notiType == notificationTypes.ERROR) {
+        if (MinecraftClient.getInstance().player != null)
+            MinecraftClient.getInstance().player.sendMessage(messageText, false);
+
+        if(e != null){
+            LogManager.getLogger(callingName).error("[Bazaar Utils Error]: " + e.getMessage());
+            LogManager.getLogger(callingName).error("[Bazaar Utils] Error Stacktrace: " + message + "Stacktrace: " + Arrays.toString(e.getStackTrace()));
+        e.printStackTrace();
+        } else {
+            LogManager.getLogger(callingName).error("[Bazaar Utils] Error: " + message);
+        }
+    }
+
+    public static void notifyAll(String message, notificationTypes notiType) {
+        String callingName = getCallingClassName();
+        String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
+        var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.WHITE).append(Text.literal(message).formatted(Formatting.DARK_GREEN));
+
+        if (notiType.isEnabled() || BUConfig.get().developer.allMessages) {
             if (MinecraftClient.getInstance().player != null)
                 MinecraftClient.getInstance().player.sendMessage(messageText, false);
 
@@ -176,8 +181,8 @@ public class Util implements BUListener {
 
     public static void subscribeTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            Iterator<ScheduledTask> iterator = tasks.iterator();
             synchronized (tasks) {
+                Iterator<ScheduledTask> iterator = tasks.iterator();
                 while (iterator.hasNext()) {
                     ScheduledTask task = iterator.next();
                     task.ticksLeft--;
@@ -207,7 +212,11 @@ public class Util implements BUListener {
 
     public static String getCallingClassName() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        return stackTrace[3].getClassName().substring(stackTrace[3].getClassName().lastIndexOf(".") + 1);
+        if (stackTrace.length > 3) {
+            String className = stackTrace[3].getClassName();
+            return className.substring(className.lastIndexOf(".") + 1);
+        }
+        return "UnknownClass";
     }
 
     //finds the first index that contains lookingFor, so there could be another later which would cause problems

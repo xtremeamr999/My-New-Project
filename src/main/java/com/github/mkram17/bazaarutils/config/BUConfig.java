@@ -160,7 +160,7 @@ public class BUConfig {
                     }
                 }
             } catch (IllegalAccessException e) {
-                Util.notifyAll("Error accessing field: " + field.getName() + " - " + e.getMessage(), Util.notificationTypes.ERROR);
+                Util.notifyError("Error accessing field: " + field.getName() + " - " + e.getMessage(), e);
             }
         }
         return events;
@@ -257,7 +257,6 @@ public class BUConfig {
 
         public boolean isDeveloperVariableEnabled(Util.notificationTypes type) {
             return switch (type) {
-                case ERROR -> errorMessages;
                 case GUI -> guiMessages;
                 case FEATURE -> featureMessages;
                 case BAZAARDATA -> bazaarDataMessages;

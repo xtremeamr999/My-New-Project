@@ -22,8 +22,8 @@ public class StashMessages implements BUListener {
     private boolean removeMessages;
     @Setter @Getter
     private boolean stashPreviouslyClaimed = false;
-    private transient ArrayList<String> previousMessages = new ArrayList<>(Collections.singleton(""));
-    private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "  "};
+    private transient ArrayList<String> pastMessages = new ArrayList<>(Collections.singleton(""));
+    private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "   "};
 
     public StashMessages(boolean removeMessages){
         this.removeMessages = removeMessages;
@@ -45,41 +45,49 @@ public class StashMessages implements BUListener {
     }
     private void registerStashRemover() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if (!BUConfig.get().stashMessages.shouldRemoveMessages()) return true;
+            if (!BUConfig.get().stashMessages.shouldRemoveMessages() || message.getString().contains("Mana")) return true;
 
             String currentMessageString = message.getString();
-            boolean shouldRemove = currentMessageString.equalsIgnoreCase(removeList[0]);
-            int indexOfMessage = indexOfMessage(currentMessageString);
-
-            if(previousMessages == null)
-                previousMessages = new ArrayList<>(Collections.singleton(""));
-
-            for(int index = indexOfMessage; index>=1; index--){
-                if(index > previousMessages.size()) {
-                    previousMessages.clear();
-                    break;
-                }
-                if(previousMessages.get(index-1).contains(removeList[index-1])) {
-                    shouldRemove = true;
-                } else {
-                    shouldRemove = false;
-                }
+            int currentMessageRoleIndex = indexOfMessage(currentMessageString);
+            if (pastMessages == null) {
+                pastMessages = new ArrayList<>();
             }
 
-            previousMessages.add(currentMessageString);
-            if(!shouldRemove)
-                previousMessages.clear();
-            return !shouldRemove;
-        });
+            boolean removeCurrentMessage;
 
+            if (currentMessageRoleIndex == -1) {
+                pastMessages.clear();
+                removeCurrentMessage = false;
+            } else {
+                if (currentMessageRoleIndex == pastMessages.size()) {
+                    pastMessages.add(currentMessageString);
+                    removeCurrentMessage = true;
+
+                    if (pastMessages.size() == removeList.length)
+                        pastMessages.clear();
+                } else {
+                    pastMessages.clear();
+                    removeCurrentMessage = false;
+
+                    if (currentMessageRoleIndex == 0) {
+                        pastMessages.add(currentMessageString);
+                        removeCurrentMessage = true;
+                    }
+                }
+            }
+            return !removeCurrentMessage;
+        });
     }
-    private static int indexOfMessage(String message){
-        for (int k = 1; k < removeList.length-1; k++) {
-            String flag = removeList[k];
-            if (message.contains(flag))
-                return k;
+    private static int indexOfMessage(String messageContent) {
+        if(messageContent.equals(" "))
+            return 0;
+        if(messageContent.equals("  "))
+            return 4;
+        for (int i = removeList.length - 2; i >= 1; i--) {
+            if (messageContent.contains(removeList[i])) {
+                return i;
+            }
         }
-        if(message.contains(removeList[removeList.length-1])) return removeList.length-1;
         return -1;
     }
 

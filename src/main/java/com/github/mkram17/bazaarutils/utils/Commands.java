@@ -49,7 +49,7 @@ public class Commands {
         bazaarutils.then(ClientCommandManager.literal("tax")
                         .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg())
                                         .executes((context) ->{
-                                            BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount");
+                                            BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount")/100;
                                             return 1;
                                         })
                                 )
@@ -101,15 +101,15 @@ public class Commands {
                         .then(ClientCommandManager.literal("remove")
                                 .then(ClientCommandManager.argument("order number", IntegerArgumentType.integer(1))
                                         .executes(context -> {
-                                            int orderNum = IntegerArgumentType.getInteger(context, "order number");
+                                            int orderNum = IntegerArgumentType.getInteger(context, "order number")-1;
                                             if(BUConfig.get().customOrders.size() < orderNum){
                                                 Util.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
                                                 return 0;
                                             }
-                                            CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum-1);
+                                            CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum);
                                             if(customOrder.getOrderAmount() != 71680) {
-                                                Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum-1).getOrderAmount());
-                                                BUConfig.get().customOrders.remove(orderNum);
+                                                Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
+                                                BUConfig.get().customOrders.get(orderNum).remove();
                                             } else{
                                                 Util.notifyAll("Cannot remove Max Buy Order.");
                                                 return 0;
