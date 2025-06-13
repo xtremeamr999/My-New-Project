@@ -80,11 +80,13 @@ public class ItemData {
     @Setter
     @Getter
     private int amountFilled = 0;
+    @Getter @Setter
     private double maximumRounding;
 
     private static List<ItemData> outdated = new ArrayList<>(Collections.emptyList());
 
 //    @Param fullPrice is the price per unit * volume
+    //When finding item price, it can round to the nearest coin sometimes, so maximumRounding is used to determine if the price is similar enough to be considered a match
     public ItemData(String name, Double fullPrice, priceTypes priceType, int volume) {
         this.name = name;
         this.priceType = priceType;

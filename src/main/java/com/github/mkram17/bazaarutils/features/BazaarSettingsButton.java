@@ -51,7 +51,7 @@ public class BazaarSettingsButton {
                     MinecraftClient.getInstance().setScreen(BUConfig.get().createGUI(MinecraftClient.getInstance().currentScreen));
                 },
                 null,
-                Text.literal("Open BU Settings")
+                Text.literal("Bazaar Utils Settings")
         );
         return Collections.singletonList(button);
     }

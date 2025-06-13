@@ -212,7 +212,7 @@ public class Bookmark extends CustomItemButton {
                 Util.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
             }
 
-            int buttonSize = 16;
+            int buttonSize = 18;
             int spacing = 4;
             int buttonX = currentX + currentBgWidth + spacing;
             int currentButtonY = currentY + spacing;

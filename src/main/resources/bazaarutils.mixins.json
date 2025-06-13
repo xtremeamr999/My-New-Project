@@ -10,9 +10,7 @@
     "DrawContentMixin",
     "MixinHandledScreen",
     "MixinSignOpen",
-    "MixinSimpleInventory",
-    "DevOnly.YggdrasilMinecraftSessionServiceMixin",
-    "DevOnly.YggdrasilServicesKeyInfoMixin"
+    "MixinSimpleInventory"
   ],
   "injectors": {
     "defaultRequire": 1

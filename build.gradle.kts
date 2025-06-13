@@ -4,6 +4,7 @@ plugins {
     id("maven-publish")
     `maven-publish`
     java
+    id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 
 //	id 'org.jetbrains.kotlin.jvm' version '2.0.0'
 }
@@ -29,6 +30,10 @@ repositories {
         name = "Terraformers (for gui)"
         url = uri("https://maven.terraformersmc.com/")
     }
+    maven("https://moulberry.repo.ax/v1") {
+        name = "Moulberry's Maven"
+    }
+
 
     exclusiveContent {
         forRepository {
@@ -51,24 +56,9 @@ repositories {
         }
     }
 
-    mavenCentral() // Good practice to include mavenCentral
+    mavenCentral()
 }
 
-//class Env {
-//    val mcVersion = get("core.mc.version_range")
-//    val fabricLoaderVersion = get("core.fabric.loader.version_range")
-//    operator fun get(name: String) = property("deps.$name").toString()
-//}
-//class ModProperties {
-//    val id = property("mod.id").toString()
-//    val displayName = property("mod.display_name").toString()
-//    val version = property("version").toString()
-//    val description = property("mod.description")
-//    val authors = property("mod.authors").toString()
-//    val license = property("mod.license")
-//    val sourceUrl = property("mod.source_url")
-//    val generalWebsite = property("mod.general_website")
-//}
 class ModDependencies {
     operator fun get(name: String) = property("deps.$name").toString()
 }
@@ -84,7 +74,6 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${deps["fabricLoaderVersion"]}")
 //    modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
@@ -106,10 +95,6 @@ dependencies {
 
     testCompileOnly("org.projectlombok:lombok:1.18.36")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.36")
-
-    // Modern Keybinding
-//    modImplementation("curse.maven:modernkeybinding-695433:6016136")
-//    include("curse.maven:modernkeybinding-695433:6016136")
 
     //Amecs Reborn
     modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${mcVersion}")
@@ -145,24 +130,6 @@ tasks {
             rename { "${it}_${archiveBaseName.get()}" }
         }
     }
-
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                artifact(remapJar) {
-                    builtBy(remapJar)
-                }
-            }
-        }
-
-        // select the repositories you want to publish to
-        repositories {
-            // uncomment to publish to the local maven
-            // mavenLocal()
-        }
-    }
-
-
 }
 loom {
     runConfigs.all {
@@ -175,4 +142,44 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
+}
+publishMods {
+    file = tasks.remapJar.get().archiveFile
+    additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
+    changelog = "Changelog"
+    type = BETA
+    modLoaders.add("fabric")
+    changelog = rootProject.file("UPDATES.md").readText()
+    displayName = "Bazaar Utils"
+    dryRun = true
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "c4u7nzUZ"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21.4")
+        minecraftVersions.add("1.21.5")
+
+        requires {
+            id = "P7dR8mSH"
+            slug = "fabric-api"
+        }
+        requires {
+            id = "1eAoo2KR"
+            slug = "yacl"
+        }
+        optional {
+            id = "mOgUt4GM"
+            slug = "modmenu"
+        }
+        optional {
+            id = "IjgEpZeq"
+            slug = "amecs-reborn"
+        }
+    }
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "Bazaar Utils"
+        commitish = "modern"
+    }
 }

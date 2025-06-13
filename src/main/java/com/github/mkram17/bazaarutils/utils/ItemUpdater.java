@@ -46,6 +46,7 @@ public class ItemUpdater implements BUListener {
             int amountUnclaimed = 0;
             int amountClaimed = -1;
             List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
+
             if(customName.contains("BUY")){
                 name = customName.substring(4);
                 isSellOrder = false;
@@ -53,27 +54,28 @@ public class ItemUpdater implements BUListener {
                 name = customName.substring(5);
                 isSellOrder = true;
             }
-            unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"));
+
             if(Util.findComponentWith(changedComponents, "Filled") != null) {
                 var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
                 volumeFilled = Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
                 totalVolume = Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
             } else {
-                fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
-                //havent tested fully, so might not work if number ever uses k/m or if it's not always the index 1 of the siblings
+//                fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
                 totalVolume = Util.parseNumber(changedComponents.get(2).getSiblings().get(1).getString());
+
             }
-            fullPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"))*totalVolume;
+            unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"));
+            fullPrice = unitPrice*totalVolume;
+
             if(volumeFilled != -1) {
                 if (Util.findComponentWith(changedComponents, "to claim!") != null) {
                     var amountUnclaimedString = Util.findComponentWith(changedComponents, "to claim!");
-                    if(amountUnclaimedString.indexOf("items") == -1) {
+                    if(!amountUnclaimedString.contains("items")) {
                         amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(" coins")));
-                        amountClaimed = volumeFilled - amountUnclaimed;
                     } else {
                         amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf("items") - 1));
-                        amountClaimed = volumeFilled - amountUnclaimed;
                     }
+                    amountClaimed = volumeFilled - amountUnclaimed;
                 } else {
                     amountClaimed = volumeFilled;
                 }
@@ -117,6 +119,11 @@ public class ItemUpdater implements BUListener {
         if(match == null) {
             Util.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
             return foundItem;
+        }
+
+        if (match.getMaximumRounding() != 0.0) {
+            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0", Util.notificationTypes.ITEMDATA);
+            match.setMaximumRounding(0.0);
         }
 //        Util.notifyAll("Match found", Util.notificationTypes.ITEMDATA);
         if(match.getPrice() != foundItem.getPrice()){

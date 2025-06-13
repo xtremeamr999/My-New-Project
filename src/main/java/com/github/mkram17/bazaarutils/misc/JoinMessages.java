@@ -25,22 +25,27 @@ public class JoinMessages implements BUListener {
             .append(Text.literal(BazaarUtils.getUpdateNotes())
                     .formatted(Formatting.DARK_GREEN));
 
+
     @Override
     public void subscribe(){
         registerWelcomeMessageSender();
     }
+
+    //TODO gotta be a better way to do the null checks
     private static void registerWelcomeMessageSender() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (client.player != null) {
                 var isFirstLoad = BUConfig.get().firstLoad;
                 if (isFirstLoad) {
                     Util.tickExecuteLater(40, () -> {
-                        client.player.sendMessage(welcomeMessage, false);
+                        if (client.player != null)
+                            client.player.sendMessage(welcomeMessage, false);
                         Util.tickExecuteLater(60, () -> {
-                            Util.notifyAll(Util.HELPMESSAGE);
+                            if (client.player != null)
+                                Util.notifyAll(Util.HELPMESSAGE);
 
                             Util.tickExecuteLater(40, () -> {
-                                client.player.sendMessage(discordMessage, false);
+                                if (client.player != null)
+                                    client.player.sendMessage(discordMessage, false);
                             });
 
                         });
@@ -54,7 +59,6 @@ public class JoinMessages implements BUListener {
                     Util.tickExecuteLater(41, () -> client.player.sendMessage(Util.CHANGELOG, false));
                     BazaarUtils.updatedMajorVersion = false;
                 }
-            }
         });
     }
 
