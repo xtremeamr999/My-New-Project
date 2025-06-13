@@ -65,7 +65,7 @@ class ModDependencies {
 //val env = Env()
 val deps = ModDependencies()
 //val modProperties = ModProperties()
-val mcVersion = deps.get("core.mcVersion").toString()
+val mcVersion = stonecutter.current.version
 
 dependencies {
     // To change the versions see the gradle.properties file
@@ -138,11 +138,9 @@ loom {
     }
 }
 java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
     withSourcesJar()
 }
+
 publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
@@ -150,36 +148,26 @@ publishMods {
     type = BETA
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.md").readText()
-    displayName = "Bazaar Utils"
-    dryRun = true
+    version = "v" + property("mod_version").toString()
+    displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
+//    dryRun = true
 
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "c4u7nzUZ"
-        minecraftVersions.add("1.21.1")
-        minecraftVersions.add("1.21.4")
-        minecraftVersions.add("1.21.5")
+        version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
+        minecraftVersions.add(mcVersion)
 
-        requires {
-            id = "P7dR8mSH"
-            slug = "fabric-api"
-        }
-        requires {
-            id = "1eAoo2KR"
-            slug = "yacl"
-        }
-        optional {
-            id = "mOgUt4GM"
-            slug = "modmenu"
-        }
-        optional {
-            id = "IjgEpZeq"
-            slug = "amecs-reborn"
-        }
+        requires("fabric-api")
+        requires("yacl")
+        optional("modmenu")
+        optional("amecs-reborn")
     }
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
-        repository = "Bazaar Utils"
+        repository = "mkram17/Bazaar-Utils"
         commitish = "modern"
+        type = STABLE
+
     }
 }

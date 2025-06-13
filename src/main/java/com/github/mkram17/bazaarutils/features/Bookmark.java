@@ -27,6 +27,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 //TODO when itemStack cant be found, do not show bookmark option
@@ -198,12 +199,12 @@ public class Bookmark extends CustomItemButton {
 
     public static List<ItemSlotButtonWidget> getWidgets(){
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
-
-        var screen = (AccessorHandledScreen)  MinecraftClient.getInstance().currentScreen;
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
         boolean isTargetScreen = screenTitle.startsWith("Bazaar");
 
-        if (isTargetScreen) {
+        if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+            return Collections.emptyList();
+
             int currentX = screen.getX();
             int currentY = screen.getY();
             int currentBgWidth = screen.getBackgroundWidth();
@@ -247,7 +248,7 @@ public class Bookmark extends CustomItemButton {
                 widgets.add(button);
                 currentButtonY += buttonSize + spacing;
             }
-        }
+
         return widgets;
     }
 

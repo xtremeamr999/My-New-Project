@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -28,7 +29,7 @@ public class RestrictSell implements BUListener {
     private int safetyClicksRequired;
     @Getter @Setter
     private ArrayList<RestrictSellControl> controls;
-    private static int SELLITEMID = 47;
+    private static int SELL_ITEM_SLOT_ID = 47;
     private boolean locked = false;
     @Getter
     private int safetyClicks = 0;
@@ -54,12 +55,13 @@ public class RestrictSell implements BUListener {
     @EventHandler
     private void onGUI(ReplaceItemEvent e){
         try {
-            if (e.getSlotId() != SELLITEMID || !BazaarUtils.gui.inBazaar())
+            if (e.getSlotId() != SELL_ITEM_SLOT_ID || !BazaarUtils.gui.inBazaar())
                 return;
             if (e.getOriginal() == null || e.getOriginal().getComponentChanges().get(DataComponentTypes.LORE) == null)
                 return;
             if (e.getOriginal().getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().size() < 6 || e.getOriginal().getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(4).getString().contains("Loading"))
                 return;
+
             ItemStack sellButton = e.getOriginal().copy();
             List<Text> changedComponents = sellButton.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
             int numItems = changedComponents.size()-8;
@@ -68,7 +70,7 @@ public class RestrictSell implements BUListener {
             double totalPrice = Double.parseDouble(coinsText.substring(coinsText.indexOf(": ") + 2, coinsText.indexOf(" coins")).replace(",", ""));
 
 
-            locked = isLocked(items, totalPrice);
+            locked = isInstaSellLocked(items, totalPrice);
             if(locked){
                 sellButton = e.getOriginal().copy();
                 if(safetyClicksRequired != safetyClicks)
@@ -83,21 +85,25 @@ public class RestrictSell implements BUListener {
         ArrayList<SellItem> items = new ArrayList<>();
 
         for(int i = 4; i<4+numItems; i++){
-            var component = changedComponents.get(i).getSiblings();
-            int volume = Integer.parseInt(component.get(1).getString().replace(",", ""));
-            String name = component.get(3).getString().trim();
+            var components = changedComponents.get(i).getSiblings();
+            int volume = Integer.parseInt(components.get(1).getString().replace(",", ""));
 
-            SellItem newItem = new SellItem(volume, name);
-            items.add(newItem);
+            if(components.size() > 2) {
+                String name = components.get(3).getString().trim();
+                SellItem newItem = new SellItem(volume, name);
+                items.add(newItem);
+            }else{
+                Util.notifyError("Not enough components to find item name. Size: " + components.size(), new Throwable("Restrict Sell Error"));
+            }
         }
-
         return items;
     }
+
     public boolean isSlotLocked(int slotId){
-        return BazaarUtils.gui.inBazaar() && slotId == SELLITEMID && locked;
+        return BazaarUtils.gui.inBazaar() && slotId == SELL_ITEM_SLOT_ID && locked;
     }
 
-    private boolean isLocked(ArrayList<SellItem> items, double totalPrice){
+    private boolean isInstaSellLocked(ArrayList<SellItem> items, double totalPrice){
         for(RestrictSellControl control : controls){
             if(control.isEnabled()) {
                 if (control.getRule() == restrictBy.PRICE && totalPrice > control.getAmount())
@@ -110,6 +116,7 @@ public class RestrictSell implements BUListener {
         }
         return false;
     }
+
     private boolean isItemRestricted(int volume, String name){
         for(RestrictSellControl control : controls){
             if(control.isEnabled()) {

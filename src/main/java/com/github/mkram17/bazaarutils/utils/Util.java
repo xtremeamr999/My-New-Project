@@ -48,7 +48,7 @@ public class Util implements BUListener {
     public static final Text DISCORDLINK = Text.literal("Discord server")
             .styled(style -> {
                         //? if > 1.21.4 {
-                        /*try {
+                        try {
                             return style
                                     .withBold(true)
                                     .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
@@ -57,17 +57,17 @@ public class Util implements BUListener {
                             throw new RuntimeException(e);
                         }
                     });
-                    *///?} else {
-                        return style
+                    //?} else {
+                        /*return style
                                 .withBold(true)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!")));
                     });
-        //?}
+        *///?}
         public static final Text CHANGELOG = Text.literal("Click To See Changelog")
             .styled(style -> {
                         //? if > 1.21.4 {
-                        /*try {
+                        try {
                             return style
                                     .withBold(true)
                                     .withClickEvent(new ClickEvent.OpenUrl(new URI("https://modrinth.com/mod/bazaar-utils/changelog")))
@@ -77,14 +77,14 @@ public class Util implements BUListener {
                             throw new RuntimeException(e);
                         }
                     });
-                    *///?} else {
-                        return style
+                    //?} else {
+                        /*return style
                                 .withBold(true)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/bazaar-utils/changelog"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to see the changelog")))
                                 .withFormatting(Formatting.GREEN);
                     });
-        //?}
+        *///?}
 
     public static void notifyAll(String message) {
         String callingName = getCallingClassName();
@@ -106,7 +106,7 @@ public class Util implements BUListener {
         Text messageText = Text.literal("[Bazaar Utils Error]: " + message)
                 .styled(style -> {
                     //? if > 1.21.4 {
-                    /*try {
+                    try {
                         return style.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
                                 .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord for support")));
@@ -114,12 +114,12 @@ public class Util implements BUListener {
                         throw new RuntimeException(uriSyntaxException);
                     }
                 });
-        *///?} else {
-                        return style
+        //?} else {
+                        /*return style
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support")));
                     });
-            //?}
+            *///?}
 
         if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(messageText, false);
@@ -156,12 +156,12 @@ public class Util implements BUListener {
                                     .withBold(true)
                                     .withColor(Formatting.GOLD)
                                     //? if > 1.21.4 {
-                                    /*.withClickEvent(new ClickEvent.RunCommand("/" + command))
+                                    .withClickEvent(new ClickEvent.RunCommand("/" + command))
                                     .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
-                            *///?} else {
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
+                            //?} else {
+                                /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
-                        //?}
+                        *///?}
                     ), false);
         } else {
             // Optionally log that the message couldn't be sent because the player was null
