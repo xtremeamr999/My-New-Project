@@ -83,6 +83,7 @@ public class ItemData {
     @Getter @Setter
     private double maximumRounding;
 
+    @Getter
     private static List<ItemData> outdated = new ArrayList<>(Collections.emptyList());
 
 //    @Param fullPrice is the price per unit * volume

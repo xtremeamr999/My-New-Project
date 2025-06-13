@@ -122,7 +122,7 @@ public class ItemUpdater implements BUListener {
         }
 
         if (match.getMaximumRounding() != 0.0) {
-            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0", Util.notificationTypes.ITEMDATA);
+            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0 . Price: " + foundItem.getPrice(), Util.notificationTypes.ITEMDATA);
             match.setMaximumRounding(0.0);
         }
 //        Util.notifyAll("Match found", Util.notificationTypes.ITEMDATA);

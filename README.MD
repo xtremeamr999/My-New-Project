@@ -14,6 +14,7 @@
 - Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
 - Disable Stash Messages (Option to disable reminders in chat to pick up your stash)
 - Bookmarks (easily and quickly access bookmarked items from the main Bazaar menu)
+- 
 
 ## ❓Using Bazaar Utils
 
@@ -31,9 +32,12 @@ REMEMBER -- if your bazaar flipper account upgrade is not level two, change your
 ### 🔗Must Have in Mods Folder
 
 - Fabric API (you probably already have this https://modrinth.com/mod/fabric-api)
-- Mod Menu (https://modrinth.com/mod/modmenu)
 - Yet Another Config Library (https://modrinth.com/mod/yacl)
+
+### Optional (But Recommended)
+
 - Amecs Reborn (https://modrinth.com/mod/amecs-reborn)
+- Mod Menu (https://modrinth.com/mod/modmenu)
 
 ### 📦Included in Mod Already
 

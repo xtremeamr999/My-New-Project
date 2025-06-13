@@ -205,18 +205,13 @@ public class Bookmark extends CustomItemButton {
         if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 
-            int currentX = screen.getX();
-            int currentY = screen.getY();
-            int currentBgWidth = screen.getBackgroundWidth();
 
-            if (currentBgWidth <= 0) {
-                Util.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
-            }
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
 
             int buttonSize = 18;
             int spacing = 4;
-            int buttonX = currentX + currentBgWidth + spacing;
-            int currentButtonY = currentY + spacing;
+            int buttonX = dimensions.x() + dimensions.backgroundWidth() + spacing;
+            int currentButtonY = dimensions.y() + spacing;
 
             List<Bookmark> bookmarks = BUConfig.get().bookmarks;
 

@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
-import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.text.Text;
@@ -22,24 +21,17 @@ public class BazaarSettingsButton {
 
     public static List<ItemSlotButtonWidget> getWidget() {
         boolean isTargetScreen = BazaarUtils.gui.inBazaar();
-        if (!isTargetScreen)
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 
-        var screen = (AccessorHandledScreen) MinecraftClient.getInstance().currentScreen;
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
 
-        int currentX = screen.getX();
-        int currentY = screen.getY();
-        int currentBgWidth = screen.getBackgroundWidth();
-
-        if (currentBgWidth <= 0) {
-            Util.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
-        }
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
 
         int buttonSize = 18;
         int spacing = 4;
-        int buttonX = currentX - buttonSize - spacing;
-        int currentButtonY = currentY + spacing;
+        int buttonX = dimensions.x() - buttonSize - spacing;
+        int currentButtonY = dimensions.y() + spacing;
 
 
         ItemSlotButtonWidget button = new ItemSlotButtonWidget(

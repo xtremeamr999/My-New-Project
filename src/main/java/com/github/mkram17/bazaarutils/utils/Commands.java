@@ -190,6 +190,14 @@ public class Commands {
                                     )
                             )
                     );
+            bazaarutils.then(ClientCommandManager.literal("outdated")
+                            .executes((source) -> {
+                                for(ItemData item : ItemData.getOutdated()){
+                                    Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice() + " Order Price: " + item.getPrice());
+                                }
+                                return 1;
+                            })
+                    );
             bazaarutils.then(ClientCommandManager.literal("list")
                             .executes(context -> {
                                         Util.notifyAll(ItemData.getVariables(ItemData::getName).toString());

@@ -54,7 +54,7 @@ public class BUConfig {
     @SerialEntry
     public ArrayList<ItemData> watchedItems = new ArrayList<>();
     @SerialEntry
-    public double bzTax = 0.01125;
+    public double bzTax = 1.125;
     @SerialEntry
     public ArrayList<CustomOrder> customOrders = new ArrayList<>();
     @SerialEntry

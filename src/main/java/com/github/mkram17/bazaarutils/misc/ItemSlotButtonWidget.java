@@ -1,5 +1,7 @@
 package com.github.mkram17.bazaarutils.misc;
 
+import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
+import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -9,6 +11,7 @@ import net.minecraft.text.Text;
 
 public class ItemSlotButtonWidget extends TexturedButtonWidget {
     private final ItemStack itemStack;
+    public record ScreenWidgetDimensions(int x, int y, int backgroundWidth) {}
 
     public ItemSlotButtonWidget(int x, int y, int width, int height, ButtonTextures textures, PressAction onPress, ItemStack itemStack, Text tooltip) {
         super(x, y, width, height, textures, onPress, Text.empty());
@@ -26,5 +29,16 @@ public class ItemSlotButtonWidget extends TexturedButtonWidget {
 
             context.drawItem(this.itemStack, itemX, itemY);
         }
+    }
+
+    public static ScreenWidgetDimensions getSafeScreenDimensions(AccessorHandledScreen screen, String screenTitle) {
+        int currentX = screen.getX();
+        int currentY = screen.getY();
+        int currentBgWidth = screen.getBackgroundWidth();
+
+        if (currentBgWidth <= 0) {
+            Util.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
+        }
+        return new ScreenWidgetDimensions(currentX, currentY, currentBgWidth);
     }
 }

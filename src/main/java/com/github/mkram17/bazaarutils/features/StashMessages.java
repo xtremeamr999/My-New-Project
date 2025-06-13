@@ -83,6 +83,8 @@ public class StashMessages implements BUListener {
             return 0;
         if(messageContent.equals("  "))
             return 4;
+        if(messageContent.contains("types of materials stashed"))
+            return 2;
         for (int i = removeList.length - 2; i >= 1; i--) {
             if (messageContent.contains(removeList[i])) {
                 return i;
