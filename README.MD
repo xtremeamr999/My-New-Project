@@ -17,11 +17,17 @@
 - **Price Charts** (CTRL+SHIFT + click on an item in the Bazaar to open the skyblock.finance page for that item)
 
 <details>
-<summary><span style="font-size:1.5em; font-weight:bold;">🖼️ Gallery</span></summary>
-
+<summary><strong>🖼️ Gallery</strong></summary>
 **Custom Orders**
 ![Custom Orders Screenshot](images/custom orders example.png)
 _Create custom order buttons (the glass panes on the right) which are shortcuts to buying a set amount of an item in buy orders or insta buy._
+
+**Bookmarks**
+![Bookmarks Screenshot](images/updated bookmarks ui.png)
+_Bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page._
+
+**Settings General Page**
+![Settings General Page Screenshot](images/updated general page.png)
 
 **Flip Helper**
 ![Flip Helper Screenshot](images/Flip Helper Example.png)
@@ -34,15 +40,6 @@ _Ctrl+Shift click an item in the bazaar to open that item's skyblock.finance pag
 **Sell Rules**
 ![Sell Rules Screenshot](images/sell rules example.png)
 _Create rules which stop you from insta selling items in your inventory. Ex: I can make a rule for "diamond" and a rule for price <100,000, and it would require three clicks to sell your inventory if you have diamonds or the items cost > 100,000._
-
-**Bookmarks**
-![Bookmarks Screenshot](images/updated bookmarks ui.png)
-_Bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page._
-
-**Settings General Page**
-![Settings General Page Screenshot](images/updated general page.png)
-
-
 </details>
 
 ## ❓Using Bazaar Utils
