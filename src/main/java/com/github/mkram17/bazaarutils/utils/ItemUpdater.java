@@ -82,6 +82,7 @@ public class ItemUpdater implements BUListener {
             }
 
             ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
+            tempItem.setMaximumRounding(0.0);
 
             if(volumeFilled > -1)
                 tempItem.setFilled();

@@ -15,7 +15,6 @@ public class APIUtils {
         if (apiKey != null) {
             return apiKey;
         }
-        Util.notifyAll("No API key found!", Util.notificationTypes.BAZAARDATA);
         //fake api key, but wont be used so it doesnt matter
         return "11111111-2222-3333-4444-555555555555";
     }
@@ -31,8 +30,7 @@ public class APIUtils {
     public static <T extends AbstractReply> BiConsumer<T, Throwable> getTestConsumer() {
         return (result, throwable) -> {
             if (throwable != null) {
-                throwable.printStackTrace();
-                System.exit(0);
+                Util.notifyError("Error while getting data from Hypixel API", throwable);
                 return;
             }
 

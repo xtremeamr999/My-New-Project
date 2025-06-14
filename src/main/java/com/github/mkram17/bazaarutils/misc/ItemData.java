@@ -256,6 +256,12 @@ public class ItemData {
                 BazaarUtils.eventBus.post(new OutdatedItemEvent(currentNewOutdatedItem));
             }
         }
+
+        for (ItemData noLongerOutdatedItem : availableOldOutdated) {
+            if (BUConfig.get().watchedItems.contains(noLongerOutdatedItem) && noLongerOutdatedItem.getStatus() != statuses.FILLED) {
+                Util.notifyAll(noLongerOutdatedItem.getName() + " is no longer outdated.");
+            }
+        }
     }
 
     private boolean isOutdated(){

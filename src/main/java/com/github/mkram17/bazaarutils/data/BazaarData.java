@@ -168,7 +168,7 @@ public class BazaarData implements BUListener {
             Util.notifyError("Error while finding product ID: " + e.getMessage(), e);
         }
 
-        Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);
+//        Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);
         return null;
     }
 

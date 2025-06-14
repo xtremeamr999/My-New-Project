@@ -52,7 +52,8 @@ public class ChatHandler implements BUListener{
                 price = Double.parseDouble(totalPriceString)/volume;
                 ItemData itemToAdd;
                 if (messageType == messageTypes.SELLORDER) {
-                    price *= ((100 - BUConfig.get().bzTax)/100);
+                    //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
+                    price /= ((100 - BUConfig.get().bzTax)/100);
                     itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTABUY, volume);
                 } else
                     itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTASELL, volume);

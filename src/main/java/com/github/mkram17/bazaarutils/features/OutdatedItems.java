@@ -11,7 +11,9 @@ import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,11 +40,19 @@ public class OutdatedItems implements BUListener {
     @EventHandler
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated) {
+            Text amount = Text.literal(e.getItem().getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
+            Text itemName = Text.literal(e.getItem().getName().formatted(Formatting.GOLD));
+            MutableText message = Text.literal("Your " + e.getItem().getPriceType().getString() + " for ")
+                    .append(amount)
+                    .append(itemName)
+                    .append(Text.literal( " is now outdated. Click for /bz"));
+
             Util.tickExecuteLater(2, () -> {
-                if(BUConfig.get().developerMode)
-                    Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Market Price: " + e.getItem().getMarketPrice() + " Order Price: " + e.getItem().getPrice(), "bz");
-                else
-                    Util.notifyChatCommand("Your " + e.getItem().getPriceType().getString() + " for " + e.getItem().getVolume() + "x " + e.getItem().getName() + " is now outdated. Click for /bz", "bz");
+                if(BUConfig.get().developerMode) {
+                    message.append(Text.literal("Market Price: " + e.getItem().getMarketPrice() + " Order Price: " + e.getItem().getPrice()));
+                    Util.notifyChatCommand(message, "bz");
+                } else
+                    Util.notifyChatCommand(message, "bz");
             });
             if(notificationSound)
                 SoundUtil.notifyMultipleTimes(3);
