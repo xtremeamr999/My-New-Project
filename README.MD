@@ -7,43 +7,82 @@
 
 ## 🔍Features
 
-- Custom Orders (buttons in buy order and insta buy menu so you can have options for different buy amounts)
-- Insta Sell Rules (stops accidental insta selling by locking button until clicked 3x, depending on restrictions you make about price, volume, or name of items)
-- Flip Helper (makes button in flip gui to flip for market price instead of having to find and type it into sign)
-- Outdated Item Notifications (tells you in chat when an order has been undercut, click message to open bazaar if you have a cookie)
-- Stash Helper (keybind (default alt + v) to close guis if applicable and pick up stash)
-- Disable Stash Messages (Option to disable reminders in chat to pick up your stash)
-- Bookmarks (easily and quickly access bookmarked items from the main Bazaar menu)
-- 
+- **Custom Orders** (buttons in buy order and insta buy menu so you can have options for different buy amounts)
+- **Insta Sell Rules** (stops accidental insta selling by locking button until clicked 3x, depending on restrictions you make about price, volume, or name of items)
+- **Flip Helper** (makes button in flip gui to flip for market price instead of having to find and type it into sign)
+- **Outdated Item Notifications** (tells you in chat when an order has been undercut, click message to open bazaar)
+- **Stash Helper** (keybind (default ALT + V) to close guis if applicable and pick up stash)
+- **Disable Stash Messages** (Option to disable reminders in chat to pick up your stash)
+- **Bookmarks** (easily and quickly access bookmarked items from the main Bazaar menu)
+- **Price Charts** (CTRL+SHIFT + click on an item in the Bazaar to open the skyblock.finance page for that item)
+
+<details>
+<summary><span style="font-size:1.5em; font-weight:bold;">🖼️ Gallery</span></summary>
+
+**Custom Orders**
+![Custom Orders Screenshot](images/custom orders example.png)
+_Create custom order buttons (the glass panes on the right) which are shortcuts to buying a set amount of an item in buy orders or insta buy._
+
+**Flip Helper**
+![Flip Helper Screenshot](images/Flip Helper Example.png)
+_Makes button (the cherry sign) that you can click to flip your order, undercutting the market price by .1 coin._
+
+**Price Charts**
+![Price Charts Screenshot](images/Price Charts.png)
+_Ctrl+Shift click an item in the bazaar to open that item's skyblock.finance page. There is a confirmation screen before you are redirected._
+
+**Sell Rules**
+![Sell Rules Screenshot](images/sell rules example.png)
+_Create rules which stop you from insta selling items in your inventory. Ex: I can make a rule for "diamond" and a rule for price <100,000, and it would require three clicks to sell your inventory if you have diamonds or the items cost > 100,000._
+
+**Bookmarks**
+![Bookmarks Screenshot](images/updated bookmarks ui.png)
+_Bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page._
+
+**Settings General Page**
+![Settings General Page Screenshot](images/updated general page.png)
+
+
+</details>
 
 ## ❓Using Bazaar Utils
 
 REMEMBER -- if your bazaar flipper account upgrade is not level two, change your bazaar tax with /bazaarutils tax or the mod wont work right
 ##### To open the mod config use `/bazaarutils` or `/bu`.
-🧾Other commands:
-- customorder add {order amount} {slot number} _(top left slot is slot #1, to the right is #2, etc etc)_
-- customorder remove {order number} _(the order it is shown in config)_
-- rule add {based on volume, price or item name} {amount over which will be restricted}
-- rule remove {rule number}
-- developer _(to enable developer settings, you probably wont use this)_
+<details>
+<summary><strong>🧾Other Commands</strong></summary>
+
+- `/bu customorder add {order amount} {slot number}` \_(top left slot is slot #1, to the right is #2, etc etc)\_
+- `/bu customorder remove {order number}` \_(the order it is shown in config)\_
+- `/bu rule add {based on volume, price or item name} {amount over which will be restricted}\`
+- `/bu rule remove {rule number}`
+- `/bu developer` \_(to enable developer settings, you probably wont use this)\_
+
+</details>
 
 ## 🧩Dependencies
 
-### 🔗Must Have in Mods Folder
+<details>
+<summary><strong>🔗Must Have in Mods Folder</strong></summary>
 
 - Fabric API (you probably already have this https://modrinth.com/mod/fabric-api)
 - Yet Another Config Library (https://modrinth.com/mod/yacl)
 
-### Optional (But Recommended)
+</details>
+
+<details>
+<summary><strong>✨Optional (But Recommended)</strong></summary>
 
 - Amecs Reborn (https://modrinth.com/mod/amecs-reborn)
 - Mod Menu (https://modrinth.com/mod/modmenu)
 
-### 📦Included in Mod Already
+</details>
+
+<details>
+<summary><strong>📦Included in Mod Already</strong></summary>
 
 - Orbit Event System (helps in mod development)
-### 🛠️Future Features
-
-- Option to control frequency of pick up stash messages
-- Option to change how often you are notified about outdated orders
-- Sounds for when order becomes outdated
+- Mixin Constructs (helps in mod development)
+- Hypixel API Transport (for getting bazaar data)
+- Hypixel API Core (for getting bazaar data)
+</details>
