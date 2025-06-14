@@ -18,27 +18,28 @@
 
 <details>
 <summary><strong>🖼️ Gallery</strong></summary>
+
 **Custom Orders**
-![Custom Orders Screenshot](images/custom orders example.png)
+![Custom Orders Screenshot](images/custom_orders_example.png)
 _Create custom order buttons (the glass panes on the right) which are shortcuts to buying a set amount of an item in buy orders or insta buy._
 
 **Bookmarks**
-![Bookmarks Screenshot](images/updated bookmarks ui.png)
+![Bookmarks Screenshot](images/updated_bookmarks_ui.png)
 _Bookmarks for items in the bazaar. When you open the main page of the bazaar, you will see your bookmarks on the right. Clicking one will search for that item. To create a bookmark, you can click the button in the top left when you are in an item's page._
 
 **Settings General Page**
-![Settings General Page Screenshot](images/updated general page.png)
+![Settings General Page Screenshot](images/updated_general_page.png)
 
 **Flip Helper**
-![Flip Helper Screenshot](images/Flip Helper Example.png)
+![Flip Helper Screenshot](images/Flip_Helper_Example.png)
 _Makes button (the cherry sign) that you can click to flip your order, undercutting the market price by .1 coin._
 
 **Price Charts**
-![Price Charts Screenshot](images/Price Charts.png)
+![Price Charts Screenshot](images/Price_Charts.png)
 _Ctrl+Shift click an item in the bazaar to open that item's skyblock.finance page. There is a confirmation screen before you are redirected._
 
 **Sell Rules**
-![Sell Rules Screenshot](images/sell rules example.png)
+![Sell Rules Screenshot](images/sell_rules_example.png)
 _Create rules which stop you from insta selling items in your inventory. Ex: I can make a rule for "diamond" and a rule for price <100,000, and it would require three clicks to sell your inventory if you have diamonds or the items cost > 100,000._
 </details>
 
