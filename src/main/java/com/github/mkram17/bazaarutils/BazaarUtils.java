@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Commands;
@@ -19,6 +20,7 @@ import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.component.ComponentType;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -50,7 +52,7 @@ public class BazaarUtils implements ClientModInitializer {
         subscribeEvents();
         registerCommands();
         registerKeybinds();
-
+        setDefaultValues();
     }
 
     private void registerEventBus() {
@@ -87,6 +89,11 @@ public class BazaarUtils implements ClientModInitializer {
         }
     }
 
+    private void setDefaultValues(){
+        if(BUConfig.get().bookmarks.isEmpty()) {
+            BUConfig.get().bookmarks.add(new Bookmark("Diamond", Items.DIAMOND.getDefaultStack()));
+        }
+    }
     private void getModProperties(){
         FabricLoader.getInstance().getModContainer(MODID).ifPresent(modContainer -> {
             ModMetadata metadata = modContainer.getMetadata();

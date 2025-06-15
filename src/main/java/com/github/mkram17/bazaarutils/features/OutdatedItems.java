@@ -41,15 +41,18 @@ public class OutdatedItems implements BUListener {
     public void onOutdated(OutdatedItemEvent e){
         if(notifyOutdated) {
             Text amount = Text.literal(e.getItem().getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
-            Text itemName = Text.literal(e.getItem().getName().formatted(Formatting.GOLD));
-            MutableText message = Text.literal("Your " + e.getItem().getPriceType().getString() + " for ")
+            Text itemName = Text.literal(e.getItem().getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
+            MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
+                    .append(Text.literal("Your " + e.getItem().getPriceType().getString() + " for ").formatted(Formatting.WHITE))
                     .append(amount)
                     .append(itemName)
-                    .append(Text.literal( " is now outdated. Click for /bz"));
+                    .append(Text.literal( " is now outdated.").formatted(Formatting.WHITE))
+                    .append(Text.literal(" Click for /bz").formatted(Formatting.GOLD));
+
 
             Util.tickExecuteLater(2, () -> {
                 if(BUConfig.get().developerMode) {
-                    message.append(Text.literal("Market Price: " + e.getItem().getMarketPrice() + " Order Price: " + e.getItem().getPrice()));
+                    message.append(Text.literal(". Market Price: " + e.getItem().getMarketPrice() + " Order Price: " + e.getItem().getPrice()));
                     Util.notifyChatCommand(message, "bz");
                 } else
                     Util.notifyChatCommand(message, "bz");

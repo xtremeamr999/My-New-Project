@@ -96,6 +96,7 @@ public class ItemUpdater implements BUListener {
             Util.addWatchedItem(updateWithItem(tempItem));
         }
         removeOldItems(foundItems);
+        ItemData.update();
     }
 
     private static void removeOldItems(List<ItemData> foundItems){
@@ -108,7 +109,7 @@ public class ItemUpdater implements BUListener {
         }
 
         for(ItemData item : itemsToRemove) {
-            item.remove();
+            item.removeFromWatchedItems();
             Util.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
         }
 

@@ -122,7 +122,7 @@ public class ChatHandler implements BUListener{
             }
             if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
                 Util.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
-                ItemData.removeItem(item);
+                ItemData.removeFromWatchedItems(item);
             } else if(volumeClaimed != null){
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
                 Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);

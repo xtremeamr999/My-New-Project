@@ -8,6 +8,10 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -233,6 +237,11 @@ public class ItemData {
             }
         }
 
+        if (outdated.isEmpty()) {
+            Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
+            return;
+        }
+
         List<ItemData> availableOldOutdated = new ArrayList<>(previousOutdatedItems);
 
         for (ItemData currentNewOutdatedItem : outdated) {
@@ -259,9 +268,20 @@ public class ItemData {
 
         for (ItemData noLongerOutdatedItem : availableOldOutdated) {
             if (BUConfig.get().watchedItems.contains(noLongerOutdatedItem) && noLongerOutdatedItem.getStatus() != statuses.FILLED) {
-                Util.notifyAll(noLongerOutdatedItem.getName() + " is no longer outdated.");
+                Text amount = Text.literal(noLongerOutdatedItem.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
+                Text itemName = Text.literal(noLongerOutdatedItem.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
+                MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
+                        .append(Text.literal("Your " + noLongerOutdatedItem.getPriceType().getString() + " for ").formatted(Formatting.WHITE))
+                        .append(amount)
+                        .append(itemName)
+                        .append(Text.literal( " is no longer outdated.").formatted(Formatting.WHITE));
+                if(MinecraftClient.getInstance().player != null)
+                    MinecraftClient.getInstance().player.sendMessage(message, false);
+                else
+                    Util.notifyError("Could not send no longer outdated notif because player is null.", null);
             }
         }
+
     }
 
     private boolean isOutdated(){
@@ -290,13 +310,15 @@ public class ItemData {
         status = statuses.FILLED;
     }
 
-    public static void removeItem(ItemData item){
+    public static void removeFromWatchedItems(ItemData item){
         BUConfig.get().watchedItems.remove(item);
         BUConfig.HANDLER.save();
+        ItemData.update();
     }
-    public void remove(){
+    public void removeFromWatchedItems(){
         if(!BUConfig.get().watchedItems.remove(this))
             Util.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
+        ItemData.update();
     }
 }

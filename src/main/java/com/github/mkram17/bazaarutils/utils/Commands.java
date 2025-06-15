@@ -47,7 +47,7 @@ public class Commands {
 //                );
 
         bazaarutils.then(ClientCommandManager.literal("tax")
-                        .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg())
+                        .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1,1.25))
                                         .executes((context) ->{
                                             BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount")/100;
                                             return 1;

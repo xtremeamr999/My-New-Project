@@ -7,14 +7,14 @@
 
 ## 🔍Features
 
-- **Custom Orders** (buttons in buy order and insta buy menu so you can have options for different buy amounts)
-- **Insta Sell Rules** (stops accidental insta selling by locking button until clicked 3x, depending on restrictions you make about price, volume, or name of items)
-- **Flip Helper** (makes button in flip gui to flip for market price instead of having to find and type it into sign)
-- **Outdated Item Notifications** (tells you in chat when an order has been undercut, click message to open bazaar)
-- **Stash Helper** (keybind (default ALT + V) to close guis if applicable and pick up stash)
-- **Disable Stash Messages** (Option to disable reminders in chat to pick up your stash)
-- **Bookmarks** (easily and quickly access bookmarked items from the main Bazaar menu)
-- **Price Charts** (CTRL+SHIFT + click on an item in the Bazaar to open the skyblock.finance page for that item)
+-   **Custom Orders**: Create buttons in the buy order and insta buy menu for options of different buy amountss.
+-   **Insta Sell Rules**: Prevent accidental insta selling by requiring multiple clicks based on price, volume, or item name restrictions you choose.
+-   **Flip Helper**: Adds a button in the flip GUI to easily flip order at market price.
+-   **Outdated Item Notifications**: Receive chat alerts when an order is undercut, click the message to open the bazaar.
+-   **Stash Helper**: Keybind (default ALT + V) to close GUIs and pick up your stash.
+-   **Disable Stash Messages**: Option to turn off chat reminders to pick up your stash.
+-   **Bookmarks**: Easily search for bookmarked items from the main Bazaar menu.
+-   **Price Charts**: CTRL+SHIFT + click an item in the Bazaar to open its skyblock.finance page.
 
 <details>
 <summary><strong>🖼️ Gallery</strong></summary>
@@ -45,7 +45,7 @@ _Create rules which stop you from insta selling items in your inventory. Ex: I c
 
 ## ❓Using Bazaar Utils
 
-REMEMBER -- if your bazaar flipper account upgrade is not level two, change your bazaar tax with /bazaarutils tax or the mod wont work right
+REMEMBER -- if your bazaar flipper account upgrade is not level one, change your bazaar tax with /bazaarutils tax or the mod wont work right
 ##### To open the mod config use `/bazaarutils` or `/bu`.
 <details>
 <summary><strong>🧾Other Commands</strong></summary>
