@@ -88,7 +88,7 @@ public class ItemData {
     private double maximumRounding;
 
     @Getter
-    private static List<ItemData> outdated = new ArrayList<>(Collections.emptyList());
+    private static List<ItemData> outdatedItems = new ArrayList<>(Collections.emptyList());
 
 //    @Param fullPrice is the price per unit * volume
     //When finding item price, it can round to the nearest coin sometimes, so maximumRounding is used to determine if the price is similar enough to be considered a match
@@ -115,20 +115,12 @@ public class ItemData {
         }
     }
 
-
-    public static void update(){
-        updateMarketPrices();
-        findOutdated();
-    }
-
-    private static void updateMarketPrices(){
-        for(ItemData item: BUConfig.get().watchedItems) {
-            double oldPrice = item.marketPrice;
-            item.marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(item.productId, item.priceType));
-            item.marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(item.productId, item.priceType.getOpposite()));
-            if(oldPrice != item.marketPrice)
-                Util.notifyAll(item.getGeneralInfo() + " has new market price: " + item.getMarketPrice(), Util.notificationTypes.BAZAARDATA);
-        }
+    private void updateMarketPrice(){
+        double oldPrice = marketPrice;
+        marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
+        marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
+//        if(oldPrice != marketPrice)
+//            Util.notifyAll(getGeneralInfo() + " has new market price: " + getMarketPrice(), Util.notificationTypes.BAZAARDATA);
     }
 
     public void flipItem(double newPrice){
@@ -228,23 +220,23 @@ public class ItemData {
         return itemList.getFirst();
     }
 
-    private static void findOutdated() {
-        List<ItemData> previousOutdatedItems = new ArrayList<>(outdated);
-        outdated.clear();
+    public static void updateOutdatedItems() {
+        List<ItemData> previousOutdatedItems = new ArrayList<>(outdatedItems);
+        outdatedItems.clear();
         for (ItemData item : BUConfig.get().watchedItems) {
             if (item.isOutdated()) {
-                outdated.add(item);
+                outdatedItems.add(item);
             }
         }
 
-        if (outdated.isEmpty()) {
+        if (outdatedItems.isEmpty()) {
             Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
             return;
         }
 
         List<ItemData> availableOldOutdated = new ArrayList<>(previousOutdatedItems);
 
-        for (ItemData currentNewOutdatedItem : outdated) {
+        for (ItemData currentNewOutdatedItem : outdatedItems) {
             boolean foundMatchInOldList = false;
             ItemData matchedOldItem = null;
 
@@ -284,7 +276,8 @@ public class ItemData {
 
     }
 
-    private boolean isOutdated(){
+    public boolean isOutdated(){
+        updateMarketPrice();
         if(status == statuses.FILLED)
             return false;
         if (priceType == priceTypes.INSTABUY) {
@@ -295,7 +288,7 @@ public class ItemData {
     }
 
     public double getFlipPrice(){
-        updateMarketPrices();
+        updateMarketPrice();
         if(marketOppositePrice == 0)
             return 0;
         if (priceType == priceTypes.INSTABUY) {
@@ -313,12 +306,12 @@ public class ItemData {
     public static void removeFromWatchedItems(ItemData item){
         BUConfig.get().watchedItems.remove(item);
         BUConfig.HANDLER.save();
-        ItemData.update();
+        ItemData.updateOutdatedItems();
     }
     public void removeFromWatchedItems(){
         if(!BUConfig.get().watchedItems.remove(this))
             Util.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
-        ItemData.update();
+        ItemData.updateOutdatedItems();
     }
 }

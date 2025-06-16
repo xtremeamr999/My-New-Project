@@ -12,6 +12,7 @@ import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
@@ -39,17 +40,26 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         this.slotNumber = slotNumber;
         this.replaceItem = item;
     }
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void guiChestOpenedEvent(ChestLoadedEvent e) {
-        if(isEnabled() && BazaarUtils.gui.inFlipGui) {
-            item = getFlipItem(e);
+        try {
+            if (isEnabled() && BazaarUtils.gui.inFlipGui) {
+                item = getFlipItem(e);
 
-            inCancelOrderScreen = false;
-            ItemStack cancelItem = e.getItemStacks().get(11);
-            if(!cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"))
-                inCancelOrderScreen = true;
+                if(item == null){
+//                    Util.notifyError("Could not find flip item in Flip Helper", null);
+                    return;
+                }
 
-            flipPrice = item.getFlipPrice();
+                inCancelOrderScreen = false;
+                ItemStack cancelItem = e.getItemStacks().get(11);
+                if (!cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"))
+                    inCancelOrderScreen = true;
+
+                flipPrice = item.getFlipPrice();
+            }
+        } catch (Exception ex) {
+            Util.notifyError("Error while trying to find flip item in Flip Helper", ex);
         }
     }
 
@@ -127,10 +137,11 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         shouldAddToSign = false;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
         if(!(event.getSlotId() == slotNumber)) return;
-        if(!BazaarUtils.gui.inFlipGui || !isEnabled() || inCancelOrderScreen) return;
+        if(!BazaarUtils.gui.inFlipGui || !isEnabled() || inCancelOrderScreen)
+            return;
 
         ItemStack itemStack = new ItemStack(getReplaceItem(), 1);
         if(flipPrice == 0) {

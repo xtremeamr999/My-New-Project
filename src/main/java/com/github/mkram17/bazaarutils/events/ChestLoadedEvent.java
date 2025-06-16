@@ -42,7 +42,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
                     if (handler instanceof GenericContainerScreenHandler containerHandler) {
                         event.lowerChestInventory = containerHandler.getInventory();
                         event.containerName = GUIUtils.getContainerName();
-                        event.itemStacks = returnItemStacks(event.lowerChestInventory);
+                        event.itemStacks = getChestItemSlots(event.lowerChestInventory);
 
                         // Post to custom event bus
                         BazaarUtils.eventBus.post(event);
@@ -53,7 +53,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
         });
     }
 
-    private static List<ItemStack> returnItemStacks(Inventory inventory) {
+    private static List<ItemStack> getChestItemSlots(Inventory inventory) {
         List<ItemStack> stacks = new ArrayList<>();
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);

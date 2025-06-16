@@ -70,7 +70,7 @@ public class BazaarData implements BUListener {
 //                        writeJsonToFile(jsonString);
 
                         if (!BUConfig.get().watchedItems.isEmpty()) {
-                            ItemData.update();
+                            ItemData.updateOutdatedItems();
                         }
                     }
                 });

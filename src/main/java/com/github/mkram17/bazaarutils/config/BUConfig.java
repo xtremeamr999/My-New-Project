@@ -72,6 +72,8 @@ public class BUConfig {
     public ArrayList<Bookmark> bookmarks = new ArrayList<>();
     @SerialEntry
     public PriceCharts priceCharts = new PriceCharts();
+    @SerialEntry
+    public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight();
 
 
     public static void openGUI() {
@@ -95,7 +97,8 @@ public class BUConfig {
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
                     .option(stashMessages.createOption())
-                    .option(priceCharts.createOption());
+                    .option(priceCharts.createOption())
+                    .option(orderStatusHighlight.createOption());
             if(!ModCompatibilityHelper.isAmecsReborn())
                 generalBuilder.option(createAmecsDownloadButton());
 

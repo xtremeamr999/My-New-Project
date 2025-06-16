@@ -177,7 +177,7 @@ public class Util implements BUListener {
         BUConfig.get().watchedItems.add(item);
         notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
         BUConfig.HANDLER.save();
-        ItemData.update();
+        ItemData.updateOutdatedItems();
     }
 
     public static void subscribeTicks() {

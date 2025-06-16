@@ -4,8 +4,10 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.misc.ItemData;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,9 +21,10 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 public class ItemUpdater implements BUListener {
     private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
     private static List<ItemStack> orderScreen;
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e){
-        if(!BazaarUtils.gui.inBuyOrders())
+        if(!BazaarUtils.gui.inOrderScreen())
             return;
 
         orderScreen = e.getItemStacks();
@@ -33,7 +36,7 @@ public class ItemUpdater implements BUListener {
         List<ItemData> foundItems = new ArrayList<>();
         for(ItemStack stack : orderStacks){
             //? if >= 1.21.4 {
-                    String customName = stack.getCustomName().getString();
+            String customName = stack.getCustomName().getString();
             //?} else {
             /*String customName = stack.getComponentChanges().get(DataComponentTypes.CUSTOM_NAME).get().getString();
             *///?}
@@ -43,8 +46,11 @@ public class ItemUpdater implements BUListener {
             double fullPrice;
             int volumeFilled = -1;
             int totalVolume;
-            int amountUnclaimed = 0;
+            int amountUnclaimed;
             int amountClaimed = -1;
+
+            if(stack.getComponentChanges().get(DataComponentTypes.LORE) == null)
+                continue;
             List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
 
             if(customName.contains("BUY")){
@@ -94,9 +100,18 @@ public class ItemUpdater implements BUListener {
             //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found
             foundItems.add(tempItem);
             Util.addWatchedItem(updateWithItem(tempItem));
+
+            //if item is filled, dont give it an order status highlight
+            if(tempItem.getStatus() == ItemData.statuses.FILLED)
+                continue;
+
+            if(tempItem.isOutdated())
+                OrderStatusHighlight.addOutdatedSlotIndex(orderScreen.indexOf(stack));
+            else
+                OrderStatusHighlight.addCompetitiveSlotIndex(orderScreen.indexOf(stack));
         }
         removeOldItems(foundItems);
-        ItemData.update();
+        ItemData.updateOutdatedItems();
     }
 
     private static void removeOldItems(List<ItemData> foundItems){

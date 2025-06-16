@@ -36,7 +36,6 @@ public class Bookmark extends CustomItemButton {
     public String name;
     @Getter @Setter
     public ItemStack bookmarkedItem;
-    protected boolean inCorrectGui = false;
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_base");
@@ -50,13 +49,17 @@ public class Bookmark extends CustomItemButton {
             BazaarUtils.eventBus.unsubscribe(this);
     }
 
+    public static boolean inItemScreen(){
+        String screenName = GUIUtils.getContainerName();
+        return screenName != null && !screenName.contains("How many do you want?") && (BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen());
+    }
+
     public Bookmark(String name, ItemStack bookmarkedItem) {
         this.name = name;
         this.slotNumber = 0;
         this.bookmarkedItem = bookmarkedItem;
         changeVisuals(isBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
-        inCorrectGui = true;
 
         BazaarUtils.eventBus.subscribe(this);
     }
@@ -64,7 +67,7 @@ public class Bookmark extends CustomItemButton {
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
         try {
-            if (!inCorrectGui || !super.shouldReplaceItem(event))
+            if (!inItemScreen() || !super.shouldReplaceItem(event))
                 return;
 
             if (replacementItem == null)
@@ -78,7 +81,7 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     private void onBookmarkClick(SlotClickEvent event){
-        if(!inCorrectGui || !super.shouldUseSlot(event))
+        if(!inItemScreen() || !super.shouldUseSlot(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         switchBookmarked();
@@ -93,13 +96,6 @@ public class Bookmark extends CustomItemButton {
         GUIUtils.setSignText(name, true);
         Util.tickExecuteLater(4, ModCompatibilityHelper::tryEnableSkyblockerBazaarOverlay);
     }
-
-    //requires cookie?
-    public void alternateOnWidgetLeftClick(){
-        GUIUtils.closeHandledScreen();
-        Util.sendCommand("bz " + name);
-    }
-
 
     public void onWidgetShiftClick(){
         BUConfig.get().bookmarks.remove(this);

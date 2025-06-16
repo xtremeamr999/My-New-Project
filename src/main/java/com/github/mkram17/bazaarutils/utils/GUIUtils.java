@@ -46,14 +46,14 @@ public class GUIUtils implements BUListener {
         if(getContainerName() == null) return false;
         return getContainerName().contains("➜ Insta");
     }
-    public boolean inBuyOrders(){
+    public boolean inOrderScreen(){
         if(getContainerName() == null) return false;
         return getContainerName().contains("Co-op Bazaar Orders");
     }
 
     public boolean inBazaar(){
         if(getContainerName() == null) return false;
-        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inBuyOrders() || getContainerName().contains("➜");
+        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inOrderScreen() || getContainerName().contains("➜");
     }
 
     //only for specific items
@@ -111,16 +111,16 @@ public class GUIUtils implements BUListener {
     private void onChestLoaded(ChestLoadedEvent e){
         guiType = guiType.CHEST;
         itemStacks = e.getItemStacks();
-        currentBookmark = null;
 
-        if(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen()){
-            String name = Bookmark.findName(e);
-            if(Bookmark.isBookmarked(name)){
-                currentBookmark = Bookmark.findMatchingBookmark(name);
-                eventBus.subscribe(currentBookmark);
-            } else
-                currentBookmark = new Bookmark(name, Items.BARRIER.getDefaultStack());
-        }
+        currentBookmark = null;
+        if(!Bookmark.inItemScreen())
+            return;
+        String name = Bookmark.findName(e);
+        if (Bookmark.isBookmarked(name)) {
+            currentBookmark = Bookmark.findMatchingBookmark(name);
+            eventBus.subscribe(currentBookmark);
+        } else
+            currentBookmark = new Bookmark(name, Items.BARRIER.getDefaultStack());
     }
 
     //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why
