@@ -88,13 +88,17 @@ public class Util implements BUListener {
         *///?}
 
     public static void notifyAll(String message) {
-        String callingName = getCallingClassName();
 
         MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
         messageText.append(Text.literal(message).formatted(Formatting.WHITE));
 
         if (MinecraftClient.getInstance().player != null)
             MinecraftClient.getInstance().player.sendMessage(messageText, false);
+        logMessage(message);
+    }
+
+    public static void logMessage(String message) {
+        String callingName = getCallingClassName();
         LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
     }
 
@@ -126,7 +130,7 @@ public class Util implements BUListener {
             LogManager.getLogger(callingName).error("[Bazaar Utils] Error Stacktrace: " + message + "Stacktrace: " + Arrays.toString(e.getStackTrace()));
         e.printStackTrace();
         } else {
-            LogManager.getLogger(callingName).error("[Bazaar Utils] Error: " + message);
+                LogManager.getLogger(callingName).error("[Bazaar Utils] Error Message: " + message);
         }
     }
 
@@ -137,7 +141,7 @@ public class Util implements BUListener {
 
         if(!notiType.isEnabled() && !BUConfig.get().developer.allMessages) {
             if (BUConfig.get().developerMode)
-                LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
+                logMessage(message);
             else
                 return;
         }
@@ -166,7 +170,7 @@ public class Util implements BUListener {
                     ), false);
         } else {
             // Optionally log that the message couldn't be sent because the player was null
-            LogManager.getLogger(Util.class).warn("[Bazaar Utils] Could not send chat command notification because player is null. Message: " + message);
+            notifyError("Could not send chat command notification because player is null. Message: " + message.getString(), null);
         }
     }
 
@@ -266,16 +270,6 @@ public class Util implements BUListener {
         }
     }
 
-    private static String capAtLength(String input, int limit, LengthJudger lengthJudger) {
-        int currentLength = 0;
-        int index = 0;
-        for (char c : input.toCharArray()) {
-            currentLength += lengthJudger.judgeLength(c);
-            if (currentLength >= limit) break;
-            index++;
-        }
-        return input.substring(0, index);
-    }
     public static String extractTextAfterWord(String text, String word) {
         if (text == null || word == null || text.isEmpty() || word.isEmpty()) {
             return "";
@@ -319,10 +313,5 @@ public class Util implements BUListener {
 
     public static double getPrettyNumber(double num) {
         return truncateNumber(removeTrailingZeroes(num));
-    }
-
-    @FunctionalInterface
-    public interface LengthJudger {
-        int judgeLength(char c);
     }
 }

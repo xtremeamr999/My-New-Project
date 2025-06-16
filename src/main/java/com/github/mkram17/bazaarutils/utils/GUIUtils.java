@@ -242,19 +242,10 @@ public class GUIUtils implements BUListener {
     }
 
     public boolean inFlipGui() {
-        if (getContainerName() == null || lowerChestInventory == null) {
+        if (getContainerName() == null) {
             return false;
         }
-
-        if (!getContainerName().contains("Order options")) {
-            return false;
-        }
-
-        ItemStack stack = lowerChestInventory.getStack(13);
-
-        // Check if the item name contains "Cancel Order"
-        String customName = stack.getName().getString();
-        return !customName.contains("Cancel Order");
+        return getContainerName().contains("Order options");
     }
 
     public void updateFlipGui(){

@@ -3,20 +3,23 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.*;
+import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ItemData;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
-import com.github.mkram17.bazaarutils.misc.ItemData;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -29,7 +32,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private int orderVolumeFilled = -1;
     private ItemData item;
     private boolean shouldAddToSign = false;
-    private boolean inCancelOrderScreen = false;
     @Getter @Setter
     private boolean enabled;
     @Getter
@@ -43,18 +45,13 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void guiChestOpenedEvent(ChestLoadedEvent e) {
         try {
-            if (isEnabled() && BazaarUtils.gui.inFlipGui) {
+            if (isEnabled() && inCorrectScreen()) {
                 item = getFlipItem(e);
 
                 if(item == null){
 //                    Util.notifyError("Could not find flip item in Flip Helper", null);
                     return;
                 }
-
-                inCancelOrderScreen = false;
-                ItemStack cancelItem = e.getItemStacks().get(11);
-                if (!cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"))
-                    inCancelOrderScreen = true;
 
                 flipPrice = item.getFlipPrice();
             }
@@ -123,7 +120,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!BazaarUtils.gui.inFlipGui || !isEnabled() || event.slot.getIndex() != slotNumber)
+        if (event.slot.getIndex() != slotNumber || !inCorrectScreen())
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         GUIUtils.clickSlot(15,0);
@@ -139,8 +136,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!(event.getSlotId() == slotNumber)) return;
-        if(!BazaarUtils.gui.inFlipGui || !isEnabled() || inCancelOrderScreen)
+        if(!(event.getSlotId() == slotNumber) || !inCorrectScreen())
             return;
 
         ItemStack itemStack = new ItemStack(getReplaceItem(), 1);
@@ -155,6 +151,29 @@ public class FlipHelper extends CustomItemButton implements BUListener {
             itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, String.valueOf(Util.getPrettyNumber(flipPrice)));
         }
         event.setReplacement(itemStack);
+    }
+
+    private boolean inCorrectScreen(){
+        return BazaarUtils.gui.inFlipGui() && isEnabled() && !inCancelOrderScreen();
+    }
+
+    private boolean inCancelOrderScreen() {
+        try {
+            if (!(MinecraftClient.getInstance().currentScreen instanceof GenericContainerScreen inventory))
+                return false;
+
+            ItemStack cancelItem = inventory.getScreenHandler().getInventory().getStack(11);
+            if(inventory.getScreenHandler().getInventory().getStack(13).getItem().equals(Items.GREEN_TERRACOTTA)) {
+                cancelItem = inventory.getScreenHandler().getInventory().getStack(13);
+                return cancelItem.get(DataComponentTypes.CUSTOM_NAME).getString().contains("Cancel Order");
+            }
+            if (cancelItem.isEmpty() || cancelItem.getComponentChanges().get(DataComponentTypes.LORE) == null)
+                return false;
+            return !(cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"));
+        } catch (Exception ex) {
+            Util.notifyError("Error while trying to find if in cancel screen", ex);
+            return false;
+        }
     }
 
     public Option<Boolean> createOption() {

@@ -230,7 +230,7 @@ public class ItemData {
         }
 
         if (outdatedItems.isEmpty()) {
-            Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
+//            Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
             return;
         }
 

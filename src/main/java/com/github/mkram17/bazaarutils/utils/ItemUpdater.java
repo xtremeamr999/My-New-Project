@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.misc.ItemData;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -21,12 +22,14 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 public class ItemUpdater implements BUListener {
     private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
     private static List<ItemStack> orderScreen;
+    private static Inventory lowerChestInventory;
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e){
         if(!BazaarUtils.gui.inOrderScreen())
             return;
 
+        lowerChestInventory = e.getLowerChestInventory();
         orderScreen = e.getItemStacks();
         orderStacks = findOrders(orderScreen);
         updateWatchedItems(orderStacks);
@@ -90,9 +93,8 @@ public class ItemUpdater implements BUListener {
             ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
             tempItem.setMaximumRounding(0.0);
 
-            if(volumeFilled > -1)
-                tempItem.setFilled();
-            if(volumeFilled == totalVolume)
+
+            if(volumeFilled > -1 && volumeFilled == totalVolume)
                 tempItem.setFilled();
             if(amountClaimed > -1)
                 tempItem.setAmountClaimed(amountClaimed);
@@ -106,12 +108,27 @@ public class ItemUpdater implements BUListener {
                 continue;
 
             if(tempItem.isOutdated())
-                OrderStatusHighlight.addOutdatedSlotIndex(orderScreen.indexOf(stack));
+                OrderStatusHighlight.addOutdatedSlotIndex(mapScreenIndexToInventoryIndex(stack));
             else
-                OrderStatusHighlight.addCompetitiveSlotIndex(orderScreen.indexOf(stack));
+                OrderStatusHighlight.addCompetitiveSlotIndex(mapScreenIndexToInventoryIndex(stack));
         }
         removeOldItems(foundItems);
         ItemData.updateOutdatedItems();
+    }
+
+    private static int mapScreenIndexToInventoryIndex(ItemStack stack) {
+        if (lowerChestInventory == null) {
+            return -1;
+        }
+        for (int i = 0; i < lowerChestInventory.size(); i++) {
+            ItemStack inventoryStack = lowerChestInventory.getStack(i);
+            // ItemStack.areItemsAndComponentsEqual compares the item type and its components, ignoring the count.
+            // If the count also needs to match, you could use ItemStack.areEqual(stack, inventoryStack).
+            if (!inventoryStack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, inventoryStack)) {
+                return i;
+            }
+        }
+        return -1; // Return -1 if the stack is not found
     }
 
     private static void removeOldItems(List<ItemData> foundItems){
