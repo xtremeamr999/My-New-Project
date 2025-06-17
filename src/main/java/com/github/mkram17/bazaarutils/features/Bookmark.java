@@ -2,12 +2,14 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
@@ -23,7 +25,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -87,6 +92,20 @@ public class Bookmark extends CustomItemButton {
         switchBookmarked();
         bookmarkedItem = findItem(name, event);
         BUConfig.HANDLER.save();
+    }
+
+    public OrderPriceInfo getPriceInfo() {
+        if (name == null)
+            return null;
+        OrderPriceInfo priceInfo = new OrderPriceInfo(0, OrderPriceInfo.priceTypes.INSTABUY);
+
+        priceInfo.updateMarketPrice(BazaarData.findProductId(name));
+        if (priceInfo.getPrice() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
+            Util.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
+            return null;
+        }
+
+        return priceInfo;
     }
 
     public void onWidgetLeftClick(){
@@ -202,6 +221,7 @@ public class Bookmark extends CustomItemButton {
             return Collections.emptyList();
 
 
+
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
 
             int buttonSize = 18;
@@ -217,6 +237,16 @@ public class Bookmark extends CustomItemButton {
                 final int buttonIndex = i;
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
+                MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
+                OrderPriceInfo priceInfo = bookmark.getPriceInfo();
+
+                if (priceInfo != null) {
+                    Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
+                    text.append(Text.literal("\n"+priceInfo.getMarketPriceString()).setStyle(style));
+                    text.append(Text.literal("\n"+priceInfo.getOppositeMarketPriceString()).setStyle(style));
+                } else {
+                    text.append(Text.literal("\nPrice not available").formatted(Formatting.GRAY));
+                }
 
                 ItemSlotButtonWidget button = new ItemSlotButtonWidget(
                         buttonX,
@@ -233,7 +263,7 @@ public class Bookmark extends CustomItemButton {
 
                         },
                         itemForButton,
-                        Text.of(bookmark.getName())
+                        text
                 );
 
                 widgets.add(button);

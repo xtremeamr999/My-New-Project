@@ -4,7 +4,8 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -30,7 +31,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     public double flipPrice;
     private double orderPrice = -1;
     private int orderVolumeFilled = -1;
-    private ItemData item;
+    private OrderData item;
     private boolean shouldAddToSign = false;
     @Getter @Setter
     private boolean enabled;
@@ -68,7 +69,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     //not an event, just uses data from the event
-    public ItemData getFlipItem(ChestLoadedEvent e){
+    public OrderData getFlipItem(ChestLoadedEvent e){
 
         for (ItemStack itemStack : e.getItemStacks()) {
 
@@ -105,9 +106,9 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     public boolean matchFound() {
-        item = ItemData.findItem(null, orderPrice, orderVolumeFilled, ItemData.priceTypes.INSTASELL);
+        item = OrderData.findItem(null, orderPrice, orderVolumeFilled, OrderPriceInfo.priceTypes.INSTASELL);
         if (item != null) {
-            if (item.getStatus() == ItemData.statuses.FILLED) {
+            if (item.getFillStatus() == OrderData.statuses.FILLED) {
                 Util.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);
                 return true;
             }else {

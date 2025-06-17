@@ -147,7 +147,7 @@ publishMods {
     changelog = "Changelog"
     type = BETA
     modLoaders.add("fabric")
-    changelog = rootProject.file("UPDATES.md").readText()
+    changelog = rootProject.file("UPDATES.MD").readText()
     version = "v" + property("mod_version").toString()
     displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
 //    dryRun = true

@@ -3,7 +3,8 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -69,8 +70,8 @@ public class BazaarData implements BUListener {
                         bazaarReply = reply;
 //                        writeJsonToFile(jsonString);
 
-                        if (!BUConfig.get().watchedItems.isEmpty()) {
-                            ItemData.updateOutdatedItems();
+                        if (!BUConfig.get().watchedOrders.isEmpty()) {
+                            OrderData.updateOutdatedItems();
                         }
                     }
                 });
@@ -112,7 +113,7 @@ public class BazaarData implements BUListener {
 //        }
 //    }
 
-    public static Double findItemPrice(String productId, ItemData.priceTypes priceType) {
+    public static Double findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
         if (bazaarReply == null) {
             Util.notifyError("Bazaar data is null", null);
             return -1.0;
@@ -127,14 +128,14 @@ public class BazaarData implements BUListener {
             var sell_order_summary = product.getBuySummary();
             var buy_order_summary = product.getSellSummary();
 
-            if (priceType == ItemData.priceTypes.INSTABUY) {
+            if (priceType == OrderPriceInfo.priceTypes.INSTABUY) {
                 if (sell_order_summary.isEmpty()) {
                     Util.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
                     return 0.0;
                 }
                 double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
                 return sellOrderPrice;
-            } else if (priceType == ItemData.priceTypes.INSTASELL) {
+            } else if (priceType == OrderPriceInfo.priceTypes.INSTASELL) {
                 if (buy_order_summary.isEmpty()) {
                     Util.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
                     return 0.0;

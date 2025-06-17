@@ -5,7 +5,8 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -36,7 +37,7 @@ public class ItemUpdater implements BUListener {
     }
 
     private static void updateWatchedItems(ArrayList<ItemStack> orderStacks){
-        List<ItemData> foundItems = new ArrayList<>();
+        List<OrderData> foundItems = new ArrayList<>();
         for(ItemStack stack : orderStacks){
             //? if >= 1.21.4 {
             String customName = stack.getCustomName().getString();
@@ -90,12 +91,14 @@ public class ItemUpdater implements BUListener {
                 }
             }
 
-            ItemData tempItem = isSellOrder ? new ItemData(name, fullPrice, ItemData.priceTypes.INSTABUY, totalVolume) : new ItemData(name, fullPrice, ItemData.priceTypes.INSTASELL, totalVolume);
+            OrderData tempItem = isSellOrder ? new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTABUY, totalVolume) : new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTASELL, totalVolume);
             tempItem.setMaximumRounding(0.0);
 
-
-            if(volumeFilled > -1 && volumeFilled == totalVolume)
-                tempItem.setFilled();
+            if(volumeFilled > -1) {
+                tempItem.setAmountFilled(volumeFilled);
+                if (volumeFilled == totalVolume)
+                    tempItem.setFilled();
+            }
             if(amountClaimed > -1)
                 tempItem.setAmountClaimed(amountClaimed);
 
@@ -104,16 +107,18 @@ public class ItemUpdater implements BUListener {
             Util.addWatchedItem(updateWithItem(tempItem));
 
             //if item is filled, dont give it an order status highlight
-            if(tempItem.getStatus() == ItemData.statuses.FILLED)
+            if(tempItem.getFillStatus() == OrderData.statuses.FILLED)
                 continue;
 
-            if(tempItem.isOutdated())
+            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED)
                 OrderStatusHighlight.addOutdatedSlotIndex(mapScreenIndexToInventoryIndex(stack));
-            else
+            else if(tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE)
                 OrderStatusHighlight.addCompetitiveSlotIndex(mapScreenIndexToInventoryIndex(stack));
+            else if(tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED)
+                OrderStatusHighlight.addMatchedSlotIndex(mapScreenIndexToInventoryIndex(stack));
         }
         removeOldItems(foundItems);
-        ItemData.updateOutdatedItems();
+        OrderData.updateOutdatedItems();
     }
 
     private static int mapScreenIndexToInventoryIndex(ItemStack stack) {
@@ -122,25 +127,23 @@ public class ItemUpdater implements BUListener {
         }
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
-            // ItemStack.areItemsAndComponentsEqual compares the item type and its components, ignoring the count.
-            // If the count also needs to match, you could use ItemStack.areEqual(stack, inventoryStack).
             if (!inventoryStack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, inventoryStack)) {
                 return i;
             }
         }
-        return -1; // Return -1 if the stack is not found
+        return -1;
     }
 
-    private static void removeOldItems(List<ItemData> foundItems){
-        List<ItemData> itemsToRemove = new ArrayList<>();
+    private static void removeOldItems(List<OrderData> foundItems){
+        List<OrderData> itemsToRemove = new ArrayList<>();
 
-        for(ItemData item : BUConfig.get().watchedItems){
-            if(ItemData.findItem(item, foundItems) == null) {
+        for(OrderData item : BUConfig.get().watchedOrders){
+            if(OrderData.findItem(item, foundItems) == null) {
                 itemsToRemove.add(item);
             }
         }
 
-        for(ItemData item : itemsToRemove) {
+        for(OrderData item : itemsToRemove) {
             item.removeFromWatchedItems();
             Util.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
         }
@@ -148,25 +151,25 @@ public class ItemUpdater implements BUListener {
         BUConfig.HANDLER.save();
     }
 
-    private static ItemData updateWithItem(ItemData foundItem){
-        ItemData match = ItemData.findItem(foundItem, BUConfig.get().watchedItems);
+    private static OrderData updateWithItem(OrderData foundItem){
+        OrderData match = OrderData.findItem(foundItem, BUConfig.get().watchedOrders);
         if(match == null) {
             Util.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
             return foundItem;
         }
 
         if (match.getMaximumRounding() != 0.0) {
-            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0 . Price: " + foundItem.getPrice(), Util.notificationTypes.ITEMDATA);
+            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             match.setMaximumRounding(0.0);
         }
 //        Util.notifyAll("Match found", Util.notificationTypes.ITEMDATA);
-        if(match.getPrice() != foundItem.getPrice()){
-            Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPrice() + " to " + foundItem.getPrice(), Util.notificationTypes.ITEMDATA);
-            match.setPrice(foundItem.getPrice());
+        if(match.getPriceInfo().getPrice() != foundItem.getPriceInfo().getPrice()){
+            Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+            match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
         }
-        if(match.getStatus() != foundItem.getStatus()){
-            Util.notifyAll("Updating status of " + match.getName() + " from " + match.getStatus() + " to " + foundItem.getStatus(), Util.notificationTypes.ITEMDATA);
-            match.setStatus(foundItem.getStatus());
+        if(match.getFillStatus() != foundItem.getFillStatus()){
+            Util.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ITEMDATA);
+            match.setFillStatus(foundItem.getFillStatus());
         }
         if(match.getAmountFilled() != foundItem.getAmountFilled()){
             Util.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);

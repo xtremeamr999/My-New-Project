@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -109,22 +110,32 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 			return;
 
 		if (OrderStatusHighlight.shouldHighlightCompetitive(slot.getIndex())) {
-			draw(context, slot.x, slot.y, true);
+			draw(context, slot.x, slot.y, OrderData.statuses.COMPETITIVE);
 		} else if (OrderStatusHighlight.shouldHighlightOutdated(slot.getIndex())) {
-			draw(context, slot.x, slot.y, false);
+			draw(context, slot.x, slot.y, OrderData.statuses.OUTDATED);
+		}else if (OrderStatusHighlight.shouldHighlightMatched(slot.getIndex())) {
+			draw(context, slot.x, slot.y, OrderData.statuses.MATCHED);
 		}
 	}
 
 	@IfModLoaded(ModCompatibilityHelper.SKYBLOCKER_MOD_ID)
 	@Unique
-	protected void draw(DrawContext context, int x, int y, boolean green) {
-		if (green) {
+	protected void draw(DrawContext context, int x, int y, OrderData.statuses orderStatus) {
+		if (orderStatus == OrderData.statuses.COMPETITIVE) {
 			context.drawSpriteStretched(RenderLayer::getGuiTextured,
 					MinecraftClient.getInstance()
 							.getGuiAtlasManager()
 							.getSprite(OrderStatusHighlight.IDENTIFIER)
 					, x, y, 16, 16,
-					ColorHelper.fromFloats(0.5f, 0.0f, 1.0f, 0.0f)
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 0.0f, 1.0f, 0.0f)
+			);
+		} else if(orderStatus == OrderData.statuses.OUTDATED) {
+			context.drawSpriteStretched(RenderLayer::getGuiTextured,
+					MinecraftClient.getInstance()
+							.getGuiAtlasManager()
+							.getSprite(OrderStatusHighlight.IDENTIFIER)
+					, x, y, 16, 16,
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 0.0f, 0.0f)
 			);
 		} else {
 			context.drawSpriteStretched(RenderLayer::getGuiTextured,
@@ -132,7 +143,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 							.getGuiAtlasManager()
 							.getSprite(OrderStatusHighlight.IDENTIFIER)
 					, x, y, 16, 16,
-					ColorHelper.fromFloats(0.5f, 1.0f, 0.0f, 0.0f)
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
 			);
 		}
 	}

@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -32,7 +33,7 @@ public class ChatHandler implements BUListener{
             String itemName;
             int volume;
             double price;
-            ItemData item;
+            OrderData item;
             messageTypes messageType = null;
             List<Text> messageSiblings = message.getSiblings();
 
@@ -50,17 +51,17 @@ public class ChatHandler implements BUListener{
                 String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
                 totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
                 price = Double.parseDouble(totalPriceString)/volume;
-                ItemData itemToAdd;
+                OrderData itemToAdd;
                 if (messageType == messageTypes.SELLORDER) {
                     //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
                     price /= ((100 - BUConfig.get().bzTax)/100);
-                    itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTABUY, volume);
+                    itemToAdd = new OrderData(itemName, price*volume, OrderPriceInfo.priceTypes.INSTABUY, volume);
                 } else
-                    itemToAdd = new ItemData(itemName, price*volume, ItemData.priceTypes.INSTASELL, volume);
+                    itemToAdd = new OrderData(itemName, price*volume, OrderPriceInfo.priceTypes.INSTASELL, volume);
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedItem(itemToAdd);
-                Util.notifyAll(itemName + " was added with a price of " + itemToAdd.getPrice(), Util.notificationTypes.ITEMDATA);
+                Util.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             }
 
             if (messageType == messageTypes.FILLED) {
@@ -68,9 +69,9 @@ public class ChatHandler implements BUListener{
                 volume = Integer.parseInt(messageText.substring(messageText.indexOf("for") + 4, messageText.indexOf("x")).replace(",", ""));
                 itemName = messageText.substring(messageText.indexOf("x") + 2, messageText.indexOf("was") - 1);
                 if(messageText.contains("Sell Offer"))
-                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTABUY);
+                    item = OrderData.findItem(itemName, null, volume, OrderPriceInfo.priceTypes.INSTABUY);
                 else
-                    item = ItemData.findItem(itemName, null, volume, ItemData.priceTypes.INSTASELL);
+                    item = OrderData.findItem(itemName, null, volume, OrderPriceInfo.priceTypes.INSTASELL);
                 if(item == null)
                     Util.notifyError("Could not find item to fill with info vol: "+ volume + " name: " + itemName, null);
                 else {
@@ -89,7 +90,7 @@ public class ChatHandler implements BUListener{
         Integer volumeClaimed = null;
         Double price = null;
         String itemName = null;
-        ItemData item;
+        OrderData item;
         messageTypes orderType;
 
         if (siblings.get(6).getString().contains("worth")) orderType = messageTypes.BUYORDER;
@@ -101,10 +102,10 @@ public class ChatHandler implements BUListener{
                 itemName = siblings.get(5).getString().trim();
                 String priceString = siblings.get(7).getString();
                 price = Double.parseDouble(priceString.substring(0, priceString.indexOf(" coins")).replace(",", ""))/volumeClaimed;
-                if(ItemData.getVariables(ItemData::getVolume).contains(volumeClaimed))
-                    item = ItemData.findItem(itemName, price, volumeClaimed, ItemData.priceTypes.INSTASELL);
+                if(OrderData.getVariables(OrderData::getVolume).contains(volumeClaimed))
+                    item = OrderData.findItem(itemName, price, volumeClaimed, OrderPriceInfo.priceTypes.INSTASELL);
                 else
-                    item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTASELL);
+                    item = OrderData.findItem(itemName, price, null, OrderPriceInfo.priceTypes.INSTASELL);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
                 //TODO figure out when there is a volume included in message
@@ -112,7 +113,7 @@ public class ChatHandler implements BUListener{
                 itemName = siblings.get(7).getString().trim();
                 String priceString = siblings.get(9).getString();
                 price = Double.parseDouble(priceString.trim().replace(",", ""));
-                item = ItemData.findItem(itemName, price, null, ItemData.priceTypes.INSTABUY);
+                item = OrderData.findItem(itemName, price, null, OrderPriceInfo.priceTypes.INSTABUY);
             }
 
 //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
@@ -122,7 +123,7 @@ public class ChatHandler implements BUListener{
             }
             if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
                 Util.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
-                ItemData.removeFromWatchedItems(item);
+                item.removeFromWatchedItems();
             } else if(volumeClaimed != null){
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
                 Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);

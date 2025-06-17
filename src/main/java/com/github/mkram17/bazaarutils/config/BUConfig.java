@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
@@ -52,7 +52,7 @@ public class BUConfig {
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17, Items.CHERRY_SIGN);
     @SerialEntry
-    public ArrayList<ItemData> watchedItems = new ArrayList<>();
+    public ArrayList<OrderData> watchedOrders = new ArrayList<>();
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry

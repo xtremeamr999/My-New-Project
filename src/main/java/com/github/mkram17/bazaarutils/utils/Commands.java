@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
-import com.github.mkram17.bazaarutils.misc.ItemData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -192,15 +192,15 @@ public class Commands {
                     );
             bazaarutils.then(ClientCommandManager.literal("outdated")
                             .executes((source) -> {
-                                for(ItemData item : ItemData.getOutdatedItems()){
-                                    Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice() + " Order Price: " + item.getPrice());
+                                for(OrderData item : OrderData.getOutdatedItems()){
+                                    Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
                                 }
                                 return 1;
                             })
                     );
             bazaarutils.then(ClientCommandManager.literal("list")
                             .executes(context -> {
-                                        Util.notifyAll(ItemData.getVariables(ItemData::getName).toString());
+                                        Util.notifyAll(OrderData.getVariables(OrderData::getName).toString());
                                         return 1;
                                     }
                             )
@@ -219,15 +219,15 @@ public class Commands {
     }
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        String itemInfo = BUConfig.get().watchedItems.get(index).getGeneralInfo();
-        BUConfig.get().watchedItems.remove(index);  // Changed to directly use config.watchedItems.remove()
+        String itemInfo = BUConfig.get().watchedOrders.get(index).getGeneralInfo();
+        BUConfig.get().watchedOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
         Util.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
         return 1;
     }
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        Util.notifyAll(BUConfig.get().watchedItems.get(index).getGeneralInfo());
+        Util.notifyAll(BUConfig.get().watchedOrders.get(index).getGeneralInfo());
         return 1;
     }
 }
