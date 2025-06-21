@@ -48,7 +48,6 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
         this.item = item;
-        eventBus.subscribe(this);
     }
     public static Item getNextColoredPane(){
         int size = BUConfig.get().customOrders.size();
@@ -102,7 +101,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
 
     public Option<Boolean> createOption() {
         return super.createOption(
-                getOrderAmount() == 71680 ? "Buy Max Button" : "Buy " + getOrderAmount() + " Button",
+                "Buy " + getOrderAmount() + " Button",
                 "Buy order button for " + getOrderAmount() + " of an item.",
                 this::isEnabled,
                 this::setEnabled

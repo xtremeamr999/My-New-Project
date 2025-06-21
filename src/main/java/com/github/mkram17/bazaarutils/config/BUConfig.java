@@ -4,10 +4,10 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
-import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -56,7 +56,7 @@ public class BUConfig {
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry
-    public ArrayList<CustomOrder> customOrders = new ArrayList<>();
+    public ArrayList<CustomOrder> customOrders = new ArrayList<>(List.of(new MaxBuyOrder(true)));
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
@@ -73,7 +73,7 @@ public class BUConfig {
     @SerialEntry
     public PriceCharts priceCharts = new PriceCharts();
     @SerialEntry
-    public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight();
+    public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
 
 
     public static void openGUI() {
@@ -99,16 +99,13 @@ public class BUConfig {
                     .option(stashMessages.createOption())
                     .option(priceCharts.createOption())
                     .option(orderStatusHighlight.createOption());
-            if(!ModCompatibilityHelper.isAmecsReborn())
+            if(!BUCompatibilityHelper.isAmecsReborn())
                 generalBuilder.option(createAmecsDownloadButton());
 
             generalBuilder.group(restrictSellGroupBuilder.build());
 
             builder.category(generalBuilder.build());
 
-            if (customOrders.isEmpty()) {
-                customOrders.add(new CustomOrder(true, 71680, 17, CustomOrder.COLORMAP.get(0)));
-            }
             OptionGroup.Builder customOrdersGroupBuilder = OptionGroup.createBuilder()
                     .name(Text.literal("Custom Buy Amounts"))
                     .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));

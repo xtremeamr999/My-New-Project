@@ -6,7 +6,6 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -19,55 +18,33 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 //drawing done in MixinHandledScreen
-@NoArgsConstructor
 public class OrderStatusHighlight implements BUListener {
     @Getter @Setter
     private boolean enabled = true;
-    private static final Set<Integer> redHighlightIndices = new HashSet<>();
-    private static final Set<Integer> greenHighlightIndices = new HashSet<>();
-    private static final Set<Integer> yellowHighlightIndices = new HashSet<>();
+    private static final HashMap<Integer, OrderData> highlightedOrders = new HashMap<>();
     public static final Identifier IDENTIFIER = Identifier.tryParse("bazaarutils", "orderstatushighlight/background_test");
     public static final float BACKGROUND_TRANSPARENCY = 0.8f;
 
-    public static void addOutdatedSlotIndex(int slotIndex) {
-        redHighlightIndices.add(slotIndex);
-    }
-    public static void addCompetitiveSlotIndex(int slotIndex) {
-        greenHighlightIndices.add(slotIndex);
-    }
-    public static void addMatchedSlotIndex(int slotIndex) {
-        yellowHighlightIndices.add(slotIndex);
+    public OrderStatusHighlight(boolean enabled){
+        this.enabled = enabled;
     }
 
-    public static boolean shouldHighlightOutdated(int slotIndex) {
-        return redHighlightIndices.contains(slotIndex);
-    }
-    public static boolean shouldHighlightCompetitive(int slotIndex) {
-        return greenHighlightIndices.contains(slotIndex);
-    }
-    public static boolean shouldHighlightMatched(int slotIndex) {
-        return yellowHighlightIndices.contains(slotIndex);
-    }
-    private static OrderData.statuses getHighlightType(int slotIndex){
-        if (shouldHighlightOutdated(slotIndex)) {
-            return OrderData.statuses.OUTDATED;
-        } else if (shouldHighlightCompetitive(slotIndex)) {
-            return OrderData.statuses.COMPETITIVE;
-        } else if (shouldHighlightMatched(slotIndex)) {
-            return OrderData.statuses.MATCHED;
+    public static OrderData.statuses getHighlightType(int slotIndex) {
+        OrderData orderData = highlightedOrders.get(slotIndex);
+        if (orderData == null || orderData.getOutdatedStatus() == null) {
+            return null; // No highlight for this slot
         }
-        return null;
+        return orderData.getOutdatedStatus();
     }
-
+    public static void addHighlightedOrder(int slotIndex, OrderData orderData) {
+        highlightedOrders.put(slotIndex, orderData);
+    }
     public static void clearHighlightedSlots() {
-        redHighlightIndices.clear();
-        greenHighlightIndices.clear();
-        yellowHighlightIndices.clear();
+        highlightedOrders.clear();
     }
 
     private void registerScreenRenderEvents() {
@@ -116,14 +93,16 @@ public class OrderStatusHighlight implements BUListener {
             if(index == -1)
                 return;
 
-            OrderData.statuses highlightType = getHighlightType(index);
-            if (highlightType == null) {
+//            OrderData.statuses highlightType = getHighlightType(index);
+            OrderData order = highlightedOrders.get(index);
+            if (order == null) {
                 return;
             }
 
-            switch (highlightType) {
+            switch (order.getOutdatedStatus()) {
                 case OUTDATED:
                     lines.add(1, Text.literal("OUTDATED").formatted(Formatting.RED, Formatting.BOLD));
+                    lines.add(2, Text.literal("Market Price: " + order.getPriceInfo().getPrettyString(order.getPriceInfo().getMarketPrice())).formatted(Formatting.RED));
                     break;
                 case COMPETITIVE:
                     lines.add(1, Text.literal("COMPETITIVE").formatted(Formatting.GREEN, Formatting.BOLD));

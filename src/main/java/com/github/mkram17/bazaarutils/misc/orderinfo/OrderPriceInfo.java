@@ -51,10 +51,14 @@ public class OrderPriceInfo {
         this.price = newPrice;
     }
 
+    public String getPrettyString(double theDouble){
+        return String.format("$%,.1f", theDouble);
+    }
+
     public String getMarketPriceString() {
-        return priceType.getString() + " " + String.format("$%,.1f", marketPrice);
+        return priceType.getString() + " " + getPrettyString(marketPrice);
     }
     public String getOppositeMarketPriceString() {
-        return priceType.getOpposite().getString() + " " + String.format("$%,.1f", marketOppositePrice);
+        return priceType.getOpposite().getString() + " " +  getPrettyString(marketOppositePrice);
     }
 }

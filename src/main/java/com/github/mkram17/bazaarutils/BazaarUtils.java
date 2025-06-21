@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.Commands;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.mojang.serialization.Codec;
@@ -45,7 +45,7 @@ public class BazaarUtils implements ClientModInitializer {
     public void onInitializeClient() {
         BUConfig.HANDLER.load();
 
-        ModCompatibilityHelper.initializePatches();
+        BUCompatibilityHelper.initializePatches();
 
         getModProperties();
         registerEventBus();
@@ -77,7 +77,7 @@ public class BazaarUtils implements ClientModInitializer {
     }
 
     private void registerKeybinds(){
-        if(!ModCompatibilityHelper.isAmecsReborn())
+        if(!BUCompatibilityHelper.isAmecsReborn())
             return;
         stashHelper = new StashHelper();
         stashHelper.registerTickCounter();

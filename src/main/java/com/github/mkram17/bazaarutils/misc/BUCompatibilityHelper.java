@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ModCompatibilityHelper {
+public class BUCompatibilityHelper {
     private static final String REI_MOD_ID = "roughlyenoughitems";
     public static final String SKYBLOCKER_MOD_ID = "skyblocker";
     private static final String REI_CONFIG_FILENAME = "roughlyenoughitems/config.json5";
@@ -37,6 +37,7 @@ public class ModCompatibilityHelper {
             amecsReborn = true;
     }
 
+    //TODO use dependency instead of reflection
     private static void modifyReiConfigWithGson() {
         Path configDir = FabricLoader.getInstance().getConfigDir();
         Path reiConfigFile = configDir.resolve(REI_CONFIG_FILENAME);

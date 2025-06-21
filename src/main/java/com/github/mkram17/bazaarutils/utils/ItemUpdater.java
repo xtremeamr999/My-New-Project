@@ -110,12 +110,18 @@ public class ItemUpdater implements BUListener {
             if(tempItem.getFillStatus() == OrderData.statuses.FILLED)
                 continue;
 
-            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED)
-                OrderStatusHighlight.addOutdatedSlotIndex(mapScreenIndexToInventoryIndex(stack));
-            else if(tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE)
-                OrderStatusHighlight.addCompetitiveSlotIndex(mapScreenIndexToInventoryIndex(stack));
-            else if(tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED)
-                OrderStatusHighlight.addMatchedSlotIndex(mapScreenIndexToInventoryIndex(stack));
+            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED ||
+               tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE ||
+               tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED) {
+                OrderStatusHighlight.addHighlightedOrder(mapScreenIndexToInventoryIndex(stack), tempItem);
+            }
+
+//            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED)
+//                OrderStatusHighlight.addOutdatedSlotIndex(mapScreenIndexToInventoryIndex(stack));
+//            else if(tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE)
+//                OrderStatusHighlight.addCompetitiveSlotIndex(mapScreenIndexToInventoryIndex(stack));
+//            else if(tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED)
+//                OrderStatusHighlight.addMatchedSlotIndex(mapScreenIndexToInventoryIndex(stack));
         }
         removeOldItems(foundItems);
         OrderData.updateOutdatedItems();

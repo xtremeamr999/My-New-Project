@@ -12,6 +12,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -20,7 +21,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
@@ -74,6 +74,8 @@ public class GUIUtils implements BUListener {
     @Getter @Setter
     private Bookmark currentBookmark;
     @Getter @Setter
+    private Screen previousScreen;
+    @Getter @Setter
     private String previousScreenName;
 
     @Override
@@ -99,9 +101,17 @@ public class GUIUtils implements BUListener {
         });
 
         ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
-            BazaarUtils.gui.previousScreenName = BazaarUtils.gui.getContainerName();
+            previousScreen = screen;
+            previousScreenName = getContainerName();
         });
     }
+
+    public static ScreenHandler getHandledScreen() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null || client.player == null) return null;
+        return client.player.currentScreenHandler;
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     private void loadSign(SignOpenEvent e){
         guiType = guiType.SIGN;
@@ -120,7 +130,7 @@ public class GUIUtils implements BUListener {
             currentBookmark = Bookmark.findMatchingBookmark(name);
             eventBus.subscribe(currentBookmark);
         } else
-            currentBookmark = new Bookmark(name, Items.BARRIER.getDefaultStack());
+            currentBookmark = new Bookmark(name, null);
     }
 
     //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why

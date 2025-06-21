@@ -8,7 +8,7 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -40,7 +40,7 @@ public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
     @Getter @Setter
-    public ItemStack bookmarkedItem;
+    public ItemStack bookmarkedItemStack;
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_base");
@@ -59,20 +59,23 @@ public class Bookmark extends CustomItemButton {
         return screenName != null && !screenName.contains("How many do you want?") && (BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy() || BazaarUtils.gui.inAnyItemScreen());
     }
 
-    public Bookmark(String name, ItemStack bookmarkedItem) {
+    public Bookmark(String name, ItemStack bookmarkedItemStack) {
         this.name = name;
         this.slotNumber = 0;
-        this.bookmarkedItem = bookmarkedItem;
+        this.bookmarkedItemStack = bookmarkedItemStack;
         changeVisuals(isBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
-
+        if(bookmarkedItemStack == null) {
+            this.bookmarkedItemStack = findItemStack(name);
+        }
         BazaarUtils.eventBus.subscribe(this);
     }
 
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
         try {
-            if (!inItemScreen() || !super.shouldReplaceItem(event))
+            //The bookmark can be null if it was a previously added one, not a potential new one
+            if (!inItemScreen() || !super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
                 return;
 
             if (replacementItem == null)
@@ -90,7 +93,7 @@ public class Bookmark extends CustomItemButton {
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         switchBookmarked();
-        bookmarkedItem = findItem(name, event);
+        bookmarkedItemStack = findItemStack(name);
         BUConfig.HANDLER.save();
     }
 
@@ -110,10 +113,10 @@ public class Bookmark extends CustomItemButton {
 
     public void onWidgetLeftClick(){
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        ModCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
+        BUCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.setSignText(name, true);
-        Util.tickExecuteLater(4, ModCompatibilityHelper::tryEnableSkyblockerBazaarOverlay);
+        Util.tickExecuteLater(4, BUCompatibilityHelper::tryEnableSkyblockerBazaarOverlay);
     }
 
     public void onWidgetShiftClick(){
@@ -179,9 +182,10 @@ public class Bookmark extends CustomItemButton {
     }
 
 
-    private static ItemStack findItem(String name, SlotClickEvent event){
-        ScreenHandler handler = event.handledScreen.getScreenHandler();
+    private static ItemStack findItemStack(String name){
+        ScreenHandler handler = GUIUtils.getHandledScreen();
 
+        assert handler != null;
         for(Slot slot : handler.slots){
             ItemStack itemStack = slot.getStack();
             if(itemStack == null) continue;
@@ -232,7 +236,7 @@ public class Bookmark extends CustomItemButton {
             List<Bookmark> bookmarks = BUConfig.get().bookmarks;
 
             for (int i = 0; i < bookmarks.size(); i++) {
-                ItemStack configuredItem = bookmarks.get(i).getBookmarkedItem();
+                ItemStack configuredItem = bookmarks.get(i).getBookmarkedItemStack();
 
                 final int buttonIndex = i;
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;

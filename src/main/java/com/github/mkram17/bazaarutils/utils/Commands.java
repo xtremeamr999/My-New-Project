@@ -14,7 +14,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.text.Text;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.github.mkram17.bazaarutils.config.BUConfig.HANDLER;
 import static com.github.mkram17.bazaarutils.config.BUConfig.openGUI;
@@ -54,6 +59,21 @@ public class Commands {
                                         })
                                 )
                         )
+                );
+        bazaarutils.then(ClientCommandManager.literal("discord")
+                        .executes((context) ->{
+                            MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
+                                if (confirmed) {
+                                    try {
+                                        net.minecraft.util.Util.getOperatingSystem().open(new URI(Util.DISCORDLINK.getString()));
+                                    } catch (URISyntaxException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                                MinecraftClient.getInstance().setScreen(null);
+                            },Util.DISCORDLINK.getString() , true));
+                                            return 1;
+                                        })
                 );
         bazaarutils.then(ClientCommandManager.literal("developer")
                         .executes((context) ->{

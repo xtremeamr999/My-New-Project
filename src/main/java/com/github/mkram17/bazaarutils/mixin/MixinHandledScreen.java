@@ -7,16 +7,15 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.ModCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -28,6 +27,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//? if > 1.21.5 {
+/*import net.minecraft.client.gl.RenderPipelines;
+*///?} else {
+import net.minecraft.client.render.RenderLayer;
+//?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -78,12 +82,12 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		}
 	}
 
-	@IfModLoaded(ModCompatibilityHelper.AMECS_MODID)
+	@IfModLoaded(BUCompatibilityHelper.AMECS_MODID)
 	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
 	public void onkeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
 		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();
 		if (!keyBinding.isPressed() && keyBinding.getDefaultKey().getCode() == keyCode && keyBinding.getDefaultModifiers().getAlt()) {
-			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
+//			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
 			if (keyBinding.getTicksBetweenPresses() > 10)
 				keyBinding.setPressed(true);
 			cir.setReturnValue(true);
@@ -101,26 +105,54 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		}
 	}
 
-	@IfModLoaded(ModCompatibilityHelper.SKYBLOCKER_MOD_ID)
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
-		if(slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !slot.hasStack())
+		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !slot.hasStack())
 			return;
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		if (OrderStatusHighlight.shouldHighlightCompetitive(slot.getIndex())) {
+		OrderData.statuses orderStatus = OrderStatusHighlight.getHighlightType(slot.getIndex());
+
+		if (orderStatus == OrderData.statuses.COMPETITIVE) {
 			draw(context, slot.x, slot.y, OrderData.statuses.COMPETITIVE);
-		} else if (OrderStatusHighlight.shouldHighlightOutdated(slot.getIndex())) {
+		} else if (orderStatus == OrderData.statuses.OUTDATED) {
 			draw(context, slot.x, slot.y, OrderData.statuses.OUTDATED);
-		}else if (OrderStatusHighlight.shouldHighlightMatched(slot.getIndex())) {
+		} else if (orderStatus == OrderData.statuses.MATCHED) {
 			draw(context, slot.x, slot.y, OrderData.statuses.MATCHED);
 		}
 	}
 
-	@IfModLoaded(ModCompatibilityHelper.SKYBLOCKER_MOD_ID)
+
 	@Unique
 	protected void draw(DrawContext context, int x, int y, OrderData.statuses orderStatus) {
+		//? if > 1.21.5 {
+		/*if (orderStatus == OrderData.statuses.COMPETITIVE) {
+			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+					MinecraftClient.getInstance()
+							.getGuiAtlasManager()
+							.getSprite(OrderStatusHighlight.IDENTIFIER)
+					, x, y, 16, 16,
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 0.0f, 1.0f, 0.0f)
+			);
+		} else if (orderStatus == OrderData.statuses.OUTDATED) {
+			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+					MinecraftClient.getInstance()
+							.getGuiAtlasManager()
+							.getSprite(OrderStatusHighlight.IDENTIFIER)
+					, x, y, 16, 16,
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 0.0f, 0.0f)
+			);
+		} else {
+			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+					MinecraftClient.getInstance()
+							.getGuiAtlasManager()
+							.getSprite(OrderStatusHighlight.IDENTIFIER)
+					, x, y, 16, 16,
+					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
+			);
+		}
+		*///?} else {
 		if (orderStatus == OrderData.statuses.COMPETITIVE) {
 			context.drawSpriteStretched(RenderLayer::getGuiTextured,
 					MinecraftClient.getInstance()
@@ -146,5 +178,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
 			);
 		}
+		//?}
 	}
+
 }

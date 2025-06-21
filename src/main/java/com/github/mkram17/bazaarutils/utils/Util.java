@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -186,15 +185,28 @@ public class Util implements BUListener {
 
     public static void subscribeTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            List<Runnable> actionsToRun = new LinkedList<>();
+            List<ScheduledTask> tasksToRemove = new LinkedList<>();
+
             synchronized (tasks) {
-                Iterator<ScheduledTask> iterator = tasks.iterator();
-                while (iterator.hasNext()) {
-                    ScheduledTask task = iterator.next();
+                for (ScheduledTask task : tasks) {
                     task.ticksLeft--;
                     if (task.ticksLeft <= 0) {
-                        task.action.run();
-                        iterator.remove();
+                        actionsToRun.add(task.action);
+                        tasksToRemove.add(task);
                     }
+                }
+                if (!tasksToRemove.isEmpty()) {
+                    tasks.removeAll(tasksToRemove);
+                }
+            }
+
+            // Run actions outside the synchronized block to prevent re-entrant modification
+            for (Runnable action : actionsToRun) {
+                try {
+                    action.run();
+                } catch (Exception e) {
+                    notifyError("Error executing scheduled task", e);
                 }
             }
         });

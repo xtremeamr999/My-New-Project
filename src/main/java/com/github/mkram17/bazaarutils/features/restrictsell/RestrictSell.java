@@ -64,7 +64,8 @@ public class RestrictSell implements BUListener {
 
             ItemStack sellButton = e.getOriginal().copy();
             List<Text> changedComponents = sellButton.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
-            int numItems = changedComponents.size()-8;
+
+            int numItems = findNumItems(changedComponents);
             ArrayList<SellItem> items = getItems(changedComponents, numItems);
             String coinsText = changedComponents.get(5 + numItems).getString();
             double totalPrice = Double.parseDouble(coinsText.substring(coinsText.indexOf(": ") + 2, coinsText.indexOf(" coins")).replace(",", ""));
@@ -78,23 +79,36 @@ public class RestrictSell implements BUListener {
                 }
             e.setReplacement(sellButton);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Util.notifyError("Error parsing sell item components", ex);
+        }
+    }
+
+    private int findNumItems(List<Text> changedComponents) {
+        //if there are items with no buy orders in inv, you get "Some items can't be sold" and there are 2 extra components
+        if(Util.findComponentWith(changedComponents, "Some items can't be sold") == null){
+            return changedComponents.size()-8;
+        } else {
+            return changedComponents.size()-10;
         }
     }
     public ArrayList<SellItem> getItems(List<Text> changedComponents, int numItems){
         ArrayList<SellItem> items = new ArrayList<>();
 
-        for(int i = 4; i<4+numItems; i++){
-            var components = changedComponents.get(i).getSiblings();
-            int volume = Integer.parseInt(components.get(1).getString().replace(",", ""));
+        try {
+            for (int i = 4; i < 4 + numItems; i++) {
+                var components = changedComponents.get(i).getSiblings();
+                int volume = Integer.parseInt(components.get(1).getString().replace(",", ""));
 
-            if(components.size() > 2) {
-                String name = components.get(3).getString().trim();
-                SellItem newItem = new SellItem(volume, name);
-                items.add(newItem);
-            }else{
-                Util.notifyError("Not enough components to find item name. Size: " + components.size(), new Throwable("Restrict Sell Error"));
+                if (components.size() > 2) {
+                    String name = components.get(3).getString().trim();
+                    SellItem newItem = new SellItem(volume, name);
+                    items.add(newItem);
+                } else {
+                    Util.notifyError("Not enough components to find item name. Size: " + components.size(), new Throwable("Restrict Sell Error"));
+                }
             }
+        } catch (Exception e) {
+            Util.notifyError("Error parsing sell item components", e);
         }
         return items;
     }
@@ -136,23 +150,23 @@ public class RestrictSell implements BUListener {
     }
 
     public String getMessage(){
-        String message = "Sell protected by rules:";
+        StringBuilder message = new StringBuilder("Sell protected by rules:");
         for(RestrictSellControl control : controls) {
             if(!control.isEnabled())
                 continue;
             if (control.getRule() == restrictBy.PRICE)
-                message += " PRICE: ";
+                message.append(" PRICE: ");
             else if(control.getRule() == restrictBy.VOLUME)
-                message += " VOLUME: ";
+                message.append(" VOLUME: ");
             else {
-                message += " NAME: ";
-                message += control.getName();
+                message.append(" NAME: ");
+                message.append(control.getName());
                 continue;
             }
-            message += control.getAmount();
+            message.append(control.getAmount());
         }
-        message += " (Safety Clicks Left: " + (3-safetyClicks) + ")";
-        return message;
+        message.append(" (Safety Clicks Left: ").append(3 - safetyClicks).append(")");
+        return message.toString();
     }
 
     public Option<Boolean> createRuleOption(RestrictSellControl control) {
