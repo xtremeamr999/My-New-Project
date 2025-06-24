@@ -2,8 +2,13 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import lombok.Getter;
+import lombok.Setter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
@@ -12,6 +17,17 @@ import java.util.List;
 
 public class ChatHandler implements BUListener{
     public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
+
+    public static Option<Boolean> createDisableOrderFilledSound() {
+        return Option.<Boolean>createBuilder()
+                .name(Text.literal("Disable Order Filled Sound"))
+                .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order is filled.")))
+                .binding(false,
+                        BUConfig.get()::isOrderFilledSound,
+                        BUConfig.get()::setOrderFilledSound)
+                .controller(BUConfig::createBooleanController)
+                .build();
+    }
 
     @Override
     public void subscribe() {
@@ -68,6 +84,10 @@ public class ChatHandler implements BUListener{
                 String messageText = Util.removeFormatting(message.getString());
                 volume = Integer.parseInt(messageText.substring(messageText.indexOf("for") + 4, messageText.indexOf("x")).replace(",", ""));
                 itemName = messageText.substring(messageText.indexOf("x") + 2, messageText.indexOf("was") - 1);
+
+                if(!BUConfig.get().isOrderFilledSound())
+                    SoundUtil.notifyMultipleTimes(2);
+
                 if(messageText.contains("Sell Offer"))
                     item = OrderData.findItem(itemName, null, volume, OrderPriceInfo.priceTypes.INSTABUY);
                 else

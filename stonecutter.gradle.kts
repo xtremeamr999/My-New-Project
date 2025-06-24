@@ -10,10 +10,6 @@ stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chisele
     ofTask("build")
 }
 
-stonecutter registerChiseled tasks.register("chiseledPublishMods", stonecutter.chiseled) {
-    group = "project"
-    ofTask("publishMods")
-}
 stonecutter registerChiseled tasks.register("chiseledPublishModrinth", stonecutter.chiseled) {
     group = "project"
     ofTask("publishModrinth")

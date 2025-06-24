@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.ChatHandler;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
@@ -88,6 +89,8 @@ public class BUConfig {
     public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
     @SerialEntry @Getter @Setter
     public boolean disableErrorNotifications = false;
+    @SerialEntry @Getter @Setter
+    public boolean orderFilledSound = true;
 
 
     public static void openGUI() {
@@ -110,6 +113,7 @@ public class BUConfig {
             generalBuilder.name(Text.literal("General"))
                     .option(flipHelper.createOption())
                     .options(outdatedItems.createOptions())
+                    .option(ChatHandler.createDisableOrderFilledSound())
                     .option(stashMessages.createOption())
                     .option(priceCharts.createOption())
                     .option(orderStatusHighlight.createOption())

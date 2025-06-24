@@ -44,7 +44,7 @@ public class OutdatedItems implements BUListener {
             Text amount = Text.literal(e.getItem().getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
             Text itemName = Text.literal(e.getItem().getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
             MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
-                    .append(Text.literal("Your " + e.getItem().getPriceInfo().getPriceType().getString().toLowerCase() + "order for ").formatted(Formatting.WHITE))
+                    .append(Text.literal("Your " + e.getItem().getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE))
                     .append(amount)
                     .append(itemName)
                     .append(Text.literal( " is now outdated.").formatted(Formatting.WHITE))

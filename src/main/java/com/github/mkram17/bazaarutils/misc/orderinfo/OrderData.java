@@ -77,7 +77,7 @@ public class OrderData {
         this.maximumRounding = getMaxRounding(fullPrice, volume);
 
         if(productId == null){
-            Util.notifyAll("Could not find product id for item: " + name, Util.notificationTypes.ITEMDATA);
+            Util.notifyError("Could not find product id for item: " + name, null);
         }
     }
     public OrderData(String name, int volume, OrderPriceInfo priceInfo) {
@@ -255,8 +255,16 @@ public class OrderData {
 
     }
 
-    public statuses getOutdatedStatus(){
+    public void updateMarketPrice(){
+        if(productId == null){
+            Util.notifyError("Could not find market price for " + name + ". If this keeps happening, please report to the developer to fix. You can disable error notifications in settings", null);
+            return;
+        }
         priceInfo.updateMarketPrice(productId);
+    }
+
+    public statuses getOutdatedStatus(){
+        updateMarketPrice();
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
         if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productId, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
@@ -272,7 +280,7 @@ public class OrderData {
     }
 
     public double getFlipPrice(){
-        priceInfo.updateMarketPrice(productId);
+        updateMarketPrice();
         if(priceInfo.getMarketOppositePrice() == 0)
             return 0;
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {

@@ -40,10 +40,11 @@ public class OrderPriceInfo {
 
     public void updateMarketPrice(String productId) {
 //        double oldPrice = marketPrice;
+        if(productId == null) {
+            return;
+        }
         marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
         marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
-//        if(oldPrice != marketPrice)
-//            Util.notifyAll(getGeneralInfo() + " has new market price: " + getMarketPrice(), Util.notificationTypes.BAZAARDATA);
     }
 
     public void flipPrices(double newPrice){
