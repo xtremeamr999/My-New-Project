@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -79,9 +80,11 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
         MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
             if (confirmed) {
                 try {
-                    net.minecraft.util.Util.getOperatingSystem().open(new URI(link));
+                    //screen is closed after doing command, so must execute later
+                        net.minecraft.util.Util.getOperatingSystem().open(new URI(link));
+
                 } catch (URISyntaxException exception) {
-                    throw new RuntimeException(exception);
+                    Util.notifyError("Failed to open skyblock.finance link.", exception);
                 }
             }
             MinecraftClient.getInstance().setScreen(null);
@@ -96,7 +99,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     }
 
     private boolean shouldShow(){
-        return (BazaarUtils.gui.inBazaar() || showOutsideBazaar) && !GUIUtils.getContainerName().contains("Bazaar");
+        return (GUIUtils.inBazaar() || showOutsideBazaar) && !GUIUtils.getContainerName().contains("Bazaar");
     }
 
     public Option<Boolean> createOption() {

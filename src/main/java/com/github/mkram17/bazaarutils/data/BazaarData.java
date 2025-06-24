@@ -38,44 +38,80 @@ public class BazaarData implements BUListener {
         scheduleBazaar();
     }
 
-    public static void scheduleBazaar(){
+    public static void scheduleBazaar() {
 
         bzExecutor.scheduleAtFixedRate(() -> {
-            if(!(bazaarCalls % bazaarDataPeriod == 0))
+            if (!(bazaarCalls % bazaarDataPeriod == 0))
                 return;
-            if(skipNextCall) {
+            if (skipNextCall) {
                 skipNextCall = false;
                 return;
             }
 
             APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
-                    bazaarCalls++;
-                    if(bazaarCalls % 10 == 0 || bazaarCalls < 5)
-                        skipNextCall = true;
+                bazaarCalls++;
+                if (bazaarCalls % 10 == 0 || bazaarCalls < 5)
+                    skipNextCall = true;
 
-                    if (throwable != null) {
-                        skipNextCall = true;
-                        exceptionCount++;
-                        Util.notifyError("Exception thrown trying to get bazaar data", throwable);
-                        System.out.println("[Bazaar Utils] Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
-                        System.out.println("[Bazaar Utils] Status: " + APIUtils.API.getStatus(APIUtils.uuid));
-                        if(exceptionCount % 5 == 0){
-                            bazaarDataPeriod++;
-                        }
-                    } else {
-                        if(reply == null){
-                            Util.notifyError("Bazaar data is null", null);
-                            return;
-                        }
-                        bazaarReply = reply;
+                if (throwable != null) {
+                    skipNextCall = true;
+                    exceptionCount++;
+                    Util.notifyError("Exception thrown trying to get bazaar data", throwable);
+                    System.out.println("[Bazaar Utils] Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
+                    System.out.println("[Bazaar Utils] Status: " + APIUtils.API.getStatus(APIUtils.uuid));
+                    if (exceptionCount % 5 == 0) {
+                        bazaarDataPeriod++;
+                    }
+                } else {
+                    if (reply == null) {
+                        Util.notifyError("Bazaar data is null", null);
+                        return;
+                    }
+                    bazaarReply = reply;
 //                        writeJsonToFile(jsonString);
 
-                        if (!BUConfig.get().watchedOrders.isEmpty()) {
-                            OrderData.updateOutdatedItems();
-                        }
+                    if (!BUConfig.get().watchedOrders.isEmpty()) {
+                        OrderData.updateOutdatedItems();
                     }
-                });
+                }
+            });
         }, bazaarDataDelay, 1, TimeUnit.SECONDS);
+    }
+
+    public static int getOrderCount(String productId, OrderPriceInfo.priceTypes priceType, double price) {
+        if (bazaarReply == null) {
+            Util.notifyError("Bazaar data is null", null);
+            return -1;
+        }
+        try {
+            SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
+            if (product == null) {
+                Util.notifyError("Could not find item using product ID: " + productId, null);
+                return -1;
+            }
+
+            java.util.List<SkyBlockBazaarReply.Product.Summary> summaryList;
+            if (priceType == OrderPriceInfo.priceTypes.INSTABUY) {
+                summaryList = product.getBuySummary();
+            } else if (priceType == OrderPriceInfo.priceTypes.INSTASELL) {
+                summaryList = product.getSellSummary();
+            } else {
+                return -1; // invalid price type
+            }
+
+            int numOrders =0;
+
+            for( SkyBlockBazaarReply.Product.Summary summary : summaryList) {
+                if (summary.getPricePerUnit() == price) {
+                    return (int) summary.getOrders();
+                }
+            }
+
+            return numOrders;
+        } catch (Exception e) {
+            Util.notifyError("There was an error fetching order count (probably caused by incorrect product ID [" + productId + "])", e);
+            return -1;
+        }
     }
 
     public static JsonObject loadResourceJson(String resourcePath) {
@@ -99,19 +135,6 @@ public class BazaarData implements BUListener {
             return new JsonObject();
         }
     }
-
-//    public static File getDataFile() {
-//        return FabricLoader.getInstance().getConfigDir().resolve("bazaarutils_data.json").toFile();
-//    }
-
-//    private static void writeJsonToFile(String jsonString) {
-//        try (FileWriter writer = new FileWriter(getDataFile())) {
-//            writer.write(jsonString);
-//        } catch (IOException e) {
-//            Util.notifyAll("Error writing JSON data to file: " + e.getMessage(), Util.notificationTypes.BAZAARDATA);
-//            e.printStackTrace();
-//        }
-//    }
 
     public static Double findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
         if (bazaarReply == null) {
@@ -166,7 +189,7 @@ public class BazaarData implements BUListener {
                 }
             }
         } catch (Exception e) {
-            Util.notifyError("Error while finding product ID: " + e.getMessage(), e);
+            Util.logMessage("Error while finding product ID from name: " + name + "." + e.getStackTrace());
         }
 
 //        Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);

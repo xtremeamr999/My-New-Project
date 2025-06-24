@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -60,7 +61,7 @@ public class OutdatedItems implements BUListener {
             if(notificationSound)
                 SoundUtil.notifyMultipleTimes(3);
         }
-        if(BazaarUtils.gui.inBazaar() || !autoOpenEnabled)
+        if(GUIUtils.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{
             for(int i = 3; i >= 1; i--) {

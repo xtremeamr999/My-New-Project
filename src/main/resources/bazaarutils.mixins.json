@@ -3,16 +3,17 @@
   "package": "com.github.mkram17.bazaarutils.mixin",
   "compatibilityLevel": "JAVA_21",
   "plugin": "com.moulberry.mixinconstraints.ConstraintsMixinPlugin",
-  "mixins": [
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MinecraftClientMixin",
+    "AccessorHandledScreen",
     "AccessorScreen",
     "AccessorSignEditScreen",
-    "AccessorHandledScreen",
     "DrawContentMixin",
     "MixinHandledScreen",
     "MixinSignOpen",
     "MixinSimpleInventory"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+  ]
 }

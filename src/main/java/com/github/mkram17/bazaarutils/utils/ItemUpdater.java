@@ -27,7 +27,7 @@ public class ItemUpdater implements BUListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e){
-        if(!BazaarUtils.gui.inOrderScreen())
+        if(!GUIUtils.inOrderScreen())
             return;
 
         lowerChestInventory = e.getLowerChestInventory();

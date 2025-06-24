@@ -38,11 +38,11 @@ public class Commands {
 //                        )
 //        );
         bazaarutils.then(ClientCommandManager.literal("help")
-                        .executes((context) -> {
-                                    Util.notifyAll(Util.HELPMESSAGE);
-                                    return 1;
-                                }
-                        ));
+                .executes((context) -> {
+                            Util.notifyAll(Util.HELP_MESSAGE);
+                            return 1;
+                        }
+                ));
 
 //        bazaarutils.then(ClientCommandManager.literal("info")
 //                        .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
@@ -52,41 +52,44 @@ public class Commands {
 //                );
 
         bazaarutils.then(ClientCommandManager.literal("tax")
-                        .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1,1.25))
-                                        .executes((context) ->{
-                                            BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount")/100;
-                                            return 1;
-                                        })
-                                )
+                .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1, 1.25))
+                                .executes((context) -> {
+                                    BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount") / 100;
+                                    return 1;
+                                })
                         )
-                );
+                )
+        );
         bazaarutils.then(ClientCommandManager.literal("discord")
-                        .executes((context) ->{
-                            MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
-                                if (confirmed) {
+                .executes((context) -> {
+                    MinecraftClient client = MinecraftClient.getInstance();
+                    client.send(() -> {
+                        context.getSource().getClient().setScreen(new ConfirmLinkScreen((confirmed) -> {
+                            if (confirmed) {
                                     try {
-                                        net.minecraft.util.Util.getOperatingSystem().open(new URI(Util.DISCORDLINK.getString()));
+                                        net.minecraft.util.Util.getOperatingSystem().open(new URI(Util.DISCORD_LINK));
                                     } catch (URISyntaxException e) {
                                         throw new RuntimeException(e);
                                     }
-                                }
-                                MinecraftClient.getInstance().setScreen(null);
-                            },Util.DISCORDLINK.getString() , true));
-                                            return 1;
-                                        })
-                );
+                            }
+                            MinecraftClient.getInstance().setScreen(null);
+                        }, Util.DISCORD_LINK, true));
+                    });
+                    return 1;
+                })
+        );
         bazaarutils.then(ClientCommandManager.literal("developer")
-                        .executes((context) ->{
-                            BUConfig.get().developerMode = !BUConfig.get().developerMode;
-                            HANDLER.save();
-                            Util.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
-                            return 1;
-                        })
-                );
+                .executes((context) -> {
+                    BUConfig.get().developerMode = !BUConfig.get().developerMode;
+                    HANDLER.save();
+                    Util.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
+                    return 1;
+                })
+        );
 
         bazaarutils.then(ClientCommandManager.literal("customorder")
-                        .then(ClientCommandManager.literal("add")
-                            .then(ClientCommandManager.argument("order amount", IntegerArgumentType.integer(1, 71680))
+                .then(ClientCommandManager.literal("add")
+                        .then(ClientCommandManager.argument("order amount", IntegerArgumentType.integer(1, 71680))
                                 .then(ClientCommandManager.argument("slot number", IntegerArgumentType.integer(1, 36))
                                         .executes(context -> {
                                             int orderAmount = IntegerArgumentType.getInteger(context, "order amount");
@@ -114,31 +117,31 @@ public class Commands {
                                             return 1;
                                         })
                                 )
-                            )
                         )
+                )
         );
         bazaarutils.then(ClientCommandManager.literal("customorder")
-                        .then(ClientCommandManager.literal("remove")
-                                .then(ClientCommandManager.argument("order number", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            int orderNum = IntegerArgumentType.getInteger(context, "order number")-1;
-                                            if(BUConfig.get().customOrders.size() < orderNum){
-                                                Util.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
-                                                return 0;
-                                            }
-                                            CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum);
-                                            if(customOrder.getOrderAmount() != 71680) {
-                                                Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
-                                                BUConfig.get().customOrders.get(orderNum).remove();
-                                            } else{
-                                                Util.notifyAll("Cannot remove Max Buy Order.");
-                                                return 0;
-                                            }
-                                            HANDLER.save();
-                                            return 1;
-                                        })
-                                )
+                .then(ClientCommandManager.literal("remove")
+                        .then(ClientCommandManager.argument("order number", IntegerArgumentType.integer(1))
+                                .executes(context -> {
+                                    int orderNum = IntegerArgumentType.getInteger(context, "order number") - 1;
+                                    if (BUConfig.get().customOrders.size() < orderNum) {
+                                        Util.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
+                                        return 0;
+                                    }
+                                    CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum);
+                                    if (customOrder.getOrderAmount() != 71680) {
+                                        Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
+                                        BUConfig.get().customOrders.get(orderNum).remove();
+                                    } else {
+                                        Util.notifyAll("Cannot remove Max Buy Order.");
+                                        return 0;
+                                    }
+                                    HANDLER.save();
+                                    return 1;
+                                })
                         )
+                )
         );
         bazaarutils.then(ClientCommandManager.literal("rule")
                 .then(ClientCommandManager.literal("add")
@@ -181,50 +184,50 @@ public class Commands {
                 )
         );
         bazaarutils.then(ClientCommandManager.literal("rule")
-                        .then(ClientCommandManager.literal("remove")
-                                .then(ClientCommandManager.argument("rule number", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            int restrictNum = IntegerArgumentType.getInteger(context, "rule number")-1;
-                                            RestrictSellControl rule = BUConfig.get().restrictSell.getControls().get(restrictNum);
-                                            if(rule == null)
-                                                context.getSource().sendError(Text.literal("Invalid rule number. Check the order in /bu"));
-                                            if(rule.getRule() != null) {
-                                                Util.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
-                                            }
-                                            BUConfig.get().restrictSell.getControls().remove(restrictNum);
-                                            HANDLER.save();
-                                            return 1;
-                                        })
-                                )
+                .then(ClientCommandManager.literal("remove")
+                        .then(ClientCommandManager.argument("rule number", IntegerArgumentType.integer(1))
+                                .executes(context -> {
+                                    int restrictNum = IntegerArgumentType.getInteger(context, "rule number") - 1;
+                                    RestrictSellControl rule = BUConfig.get().restrictSell.getControls().get(restrictNum);
+                                    if (rule == null)
+                                        context.getSource().sendError(Text.literal("Invalid rule number. Check the order in /bu"));
+                                    if (rule.getRule() != null) {
+                                        Util.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
+                                    }
+                                    BUConfig.get().restrictSell.getControls().remove(restrictNum);
+                                    HANDLER.save();
+                                    return 1;
+                                })
                         )
+                )
         );
-        if(BUConfig.get().developerMode){
+        if (BUConfig.get().developerMode) {
             bazaarutils.then(ClientCommandManager.literal("remove")
-                            .then(ClientCommandManager.argument("index", IntegerArgumentType.integer())
-                                    .executes(Commands::executeRemove)
-                            )
+                    .then(ClientCommandManager.argument("index", IntegerArgumentType.integer())
+                            .executes(Commands::executeRemove)
+                    )
             );
             bazaarutils.then(ClientCommandManager.literal("info")
-                            .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
-                                            .executes(Commands::executeInfo)
-                                    )
+                    .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
+                                    .executes(Commands::executeInfo)
                             )
-                    );
+                    )
+            );
             bazaarutils.then(ClientCommandManager.literal("outdated")
-                            .executes((source) -> {
-                                for(OrderData item : OrderData.getOutdatedItems()){
-                                    Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
-                                }
-                                return 1;
-                            })
-                    );
+                    .executes((source) -> {
+                        for (OrderData item : OrderData.getOutdatedItems()) {
+                            Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
+                        }
+                        return 1;
+                    })
+            );
             bazaarutils.then(ClientCommandManager.literal("list")
-                            .executes(context -> {
-                                        Util.notifyAll(OrderData.getVariables(OrderData::getName).toString());
-                                        return 1;
-                                    }
-                            )
-                    );
+                    .executes(context -> {
+                                Util.notifyAll(OrderData.getVariables(OrderData::getName).toString());
+                                return 1;
+                            }
+                    )
+            );
         }
 //
         CommandNode<FabricClientCommandSource> bazaarutilsNode = dispatcher.register(bazaarutils);
@@ -237,6 +240,7 @@ public class Commands {
                         .redirect(bazaarutilsNode) // Inherit subcommands
         );
     }
+
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
         String itemInfo = BUConfig.get().watchedOrders.get(index).getGeneralInfo();

@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import dev.isxander.yacl3.api.Option;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -43,15 +44,16 @@ public class Util implements BUListener {
         }
     }
     private static final LinkedList<ScheduledTask> tasks = new LinkedList<>();
-    public static final String HELPMESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
+    public static final String HELP_MESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
             "/bu tax {amount} to set bazaar tax. This is important for the mod to function correctly. /bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
-    public static final Text DISCORDLINK = Text.literal("Discord server")
+    public static final String DISCORD_LINK = "https://discord.gg/xDKjvm5hQd";
+    public static final Text DISCORD_TEXT = Text.literal("Discord server")
             .styled(style -> {
                         //? if > 1.21.4 {
                         try {
                             return style
                                     .withBold(true)
-                                    .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
+                                    .withClickEvent(new ClickEvent.OpenUrl(new URI(DISCORD_LINK)))
                                     .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);
@@ -103,7 +105,8 @@ public class Util implements BUListener {
 
     public static void notifyError(String message, Throwable e) {
         String callingName = getCallingClassName();
-        Text messageText = Text.literal("[Bazaar Utils Error]: " + message)
+        String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
+        Text messageText = Text.literal("[Bazaar Utils Error]: " + message + ". Click here for support.")
                 .styled(style -> {
                     //? if > 1.21.4 {
                     try {
@@ -121,15 +124,12 @@ public class Util implements BUListener {
                     });
             *///?}
 
-        if (MinecraftClient.getInstance().player != null)
+        if (MinecraftClient.getInstance().player != null && !BUConfig.get().disableErrorNotifications)
             MinecraftClient.getInstance().player.sendMessage(messageText, false);
 
+        LogManager.getLogger(callingName).error("[Bazaar Utils Error] (" + callingName + ") "  + "Message: " + message);
         if(e != null){
-            LogManager.getLogger(callingName).error("[Bazaar Utils Error]: " + e.getMessage());
-            LogManager.getLogger(callingName).error("[Bazaar Utils] Error Stacktrace: " + message + "Stacktrace: " + Arrays.toString(e.getStackTrace()));
-        e.printStackTrace();
-        } else {
-                LogManager.getLogger(callingName).error("[Bazaar Utils] Error Message: " + message);
+            LogManager.getLogger(callingName).error("[Bazaar Utils Error]: " + e.getMessage() + " Stacktrace: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -326,4 +326,5 @@ public class Util implements BUListener {
     public static double getPrettyNumber(double num) {
         return truncateNumber(removeTrailingZeroes(num));
     }
+
 }

@@ -17,7 +17,7 @@ public class JoinMessages implements BUListener {
             .formatted(Formatting.WHITE)
             .append(Text.literal("For more help or to report a bug, join the ")
                     .formatted(Formatting.GREEN)
-                    .append(Util.DISCORDLINK)
+                    .append(Util.DISCORD_TEXT)
                     .append(Text.literal("!")
                             .formatted(Formatting.GREEN)));
     private static final Text updateMessage = Text.literal("[Bazaar Utils] ")
@@ -41,7 +41,7 @@ public class JoinMessages implements BUListener {
                             client.player.sendMessage(welcomeMessage, false);
                         Util.tickExecuteLater(60, () -> {
                             if (client.player != null)
-                                Util.notifyAll(Util.HELPMESSAGE);
+                                Util.notifyAll(Util.HELP_MESSAGE);
 
                             Util.tickExecuteLater(40, () -> {
                                 if (client.player != null)

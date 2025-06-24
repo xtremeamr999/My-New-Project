@@ -9,11 +9,16 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import lombok.Getter;
+import lombok.Setter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
@@ -28,15 +33,22 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 
 public class BUConfig {
+    public static RuntimeTypeAdapterFactory<CustomOrder> customOrderAdapterFactory = RuntimeTypeAdapterFactory.of(CustomOrder.class)
+            .registerSubtype(MaxBuyOrder.class)
+            .registerSubtype(CustomOrder.class);
+
+
     public static final ConfigClassHandler<BUConfig> HANDLER = ConfigClassHandler.createBuilder(BUConfig.class)
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("bazaarutils.json"))
                     .appendGsonBuilder(gsonBuilder -> gsonBuilder
-                            .setPrettyPrinting()
-                            .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())) // not needed, pretty print by default
+                            .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())
+                            .registerTypeAdapterFactory(customOrderAdapterFactory))
                     .build())
             .build();
 
@@ -74,6 +86,8 @@ public class BUConfig {
     public PriceCharts priceCharts = new PriceCharts();
     @SerialEntry
     public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
+    @SerialEntry @Getter @Setter
+    public boolean disableErrorNotifications = false;
 
 
     public static void openGUI() {
@@ -98,7 +112,8 @@ public class BUConfig {
                     .options(outdatedItems.createOptions())
                     .option(stashMessages.createOption())
                     .option(priceCharts.createOption())
-                    .option(orderStatusHighlight.createOption());
+                    .option(orderStatusHighlight.createOption())
+                    .option(createDisableErrorNotifsOption());
             if(!BUCompatibilityHelper.isAmecsReborn())
                 generalBuilder.option(createAmecsDownloadButton());
 
@@ -192,6 +207,17 @@ public class BUConfig {
                         MinecraftClient.getInstance().setScreen(null);
                     }, "https://modrinth.com/mod/amecs-reborn", true));
                 })
+                .build();
+    }
+
+    private Option<Boolean> createDisableErrorNotifsOption() {
+        return Option.<Boolean>createBuilder()
+                .name(Text.literal("Disable Error Notifications"))
+                .description(OptionDescription.of(Text.literal("Not recommended to enable this unless you are experiencing error spam. This will disable all error notifications, but not the errors themselves.")))
+                .binding(false,
+                        this::isDisableErrorNotifications,
+                        this::setDisableErrorNotifications)
+                .controller(BUConfig::createBooleanController)
                 .build();
     }
     public static class Developer {

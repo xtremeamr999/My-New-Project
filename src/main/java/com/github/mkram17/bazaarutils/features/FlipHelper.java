@@ -62,7 +62,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     public void handleFlip() {
-        if(item != null && flipPrice != 0 && BazaarUtils.gui.wasLastChestFlip()) {
+        if(item != null && flipPrice != 0 && GUIUtils.wasLastChestFlip()) {
             GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
             item.flipItem(flipPrice);
         }
@@ -155,7 +155,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private boolean inCorrectScreen(){
-        return BazaarUtils.gui.inFlipGui() && isEnabled() && !inCancelOrderScreen();
+        return GUIUtils.inFlipGui() && isEnabled() && !inCancelOrderScreen();
     }
 
     private boolean inCancelOrderScreen() {

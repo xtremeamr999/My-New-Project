@@ -1,12 +1,20 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.scoreboard.*;
 import net.minecraft.text.Text;
@@ -27,31 +35,64 @@ public class MaxBuyOrder extends CustomOrder {
     private static double purse;
 
     public MaxBuyOrder(boolean enabled) {
-        super(enabled, 71680, 17, Items.PURPLE_STAINED_GLASS_PANE);
-//        registerScreenOpen();
+        super(enabled);
     }
 
-    private void registerScreenOpen(){
-            ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-                try {
-                    if(!(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy())) {
-                        return;
-                    }
-                    updateScoreboard(client);
-
-                } catch (Exception e) {
-                    Util.notifyError("Could not parse coins from scoreboard text.", null);
-                }
-            });
-    }
     @Override
     public void subscribe() {
         super.subscribe();
-        registerScreenOpen();
+    }
+
+    @EventHandler
+    public void onScreenChange(ScreenChangeEvent event){
+        try {
+            if(!inCorrectScreen(event)) {
+                return;
+            }
+            ItemStack itemStack = getItemStack(event.getOldScreen());
+            if(itemStack == null)
+                return;
+
+            MinecraftClient client = MinecraftClient.getInstance();
+            updateScoreboard(client);
+
+            String name = itemStack.getCustomName().getString();
+            String productID = BazaarData.findProductId(name);
+
+            if(productID == null)
+                return;
+
+
+            double cost = BazaarData.findItemPrice(productID, OrderPriceInfo.priceTypes.INSTASELL) + .1;//.1 is for lowest competitive price
+
+            int amountCanBuy = (int) (Math.floor(purse / cost));
+            super.setOrderAmount(Math.min(amountCanBuy, 71680));
+
+        } catch (Exception e) {
+            Util.notifyError("Could not parse coins from scoreboard text", e);
+        }
+    }
+
+    private static boolean inCorrectScreen(ScreenChangeEvent event){
+        return (event.getNewScreen().getTitle().getString().contains("How many do you want?") || event.getNewScreen().getTitle().getString().contains("➜ Insta"))
+                && event.getNewScreen() instanceof GenericContainerScreen;
+    }
+
+    private static ItemStack getItemStack(Screen previousScreen) {
+
+        if(!(previousScreen instanceof GenericContainerScreen containerScreen))
+            return null;
+
+        ItemStack itemStack = containerScreen.getScreenHandler().getInventory().getStack(13);
+        if (itemStack.isEmpty()) {
+            Util.notifyError("Could not find item in previous container.", null);
+            return null;
+        }
+        return itemStack;
     }
 
 //    private static int calculateMaximumCanBuy(){
-//        if(BazaarUtils.gui.inBuyOrderScreen()){
+//        if(GUIUtils.inBuyOrderScreen()){
 //        }
 //    }
 

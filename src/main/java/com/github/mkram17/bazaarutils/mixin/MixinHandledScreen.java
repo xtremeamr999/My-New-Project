@@ -28,10 +28,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? if > 1.21.5 {
-/*import net.minecraft.client.gl.RenderPipelines;
-*///?} else {
-import net.minecraft.client.render.RenderLayer;
-//?}
+import net.minecraft.client.gl.RenderPipelines;
+//?} else {
+/*import net.minecraft.client.render.RenderLayer;
+*///?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -127,7 +127,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	@Unique
 	protected void draw(DrawContext context, int x, int y, OrderData.statuses orderStatus) {
 		//? if > 1.21.5 {
-		/*if (orderStatus == OrderData.statuses.COMPETITIVE) {
+		if (orderStatus == OrderData.statuses.COMPETITIVE) {
 			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 					MinecraftClient.getInstance()
 							.getGuiAtlasManager()
@@ -152,8 +152,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
 			);
 		}
-		*///?} else {
-		if (orderStatus == OrderData.statuses.COMPETITIVE) {
+		//?} else {
+		/*if (orderStatus == OrderData.statuses.COMPETITIVE) {
 			context.drawSpriteStretched(RenderLayer::getGuiTextured,
 					MinecraftClient.getInstance()
 							.getGuiAtlasManager()
@@ -178,7 +178,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
 			);
 		}
-		//?}
+		*///?}
 	}
 
 }

@@ -259,7 +259,7 @@ public class OrderData {
         priceInfo.updateMarketPrice(productId);
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
-        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0)
+        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productId, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
             if(priceInfo.getPrice()-maximumRounding > priceInfo.getMarketPrice())

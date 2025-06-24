@@ -33,50 +33,46 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO make inBazaar() work all the time
 public class GUIUtils implements BUListener {
-    private static boolean closedScreen = false;
-    public boolean wasLastChestFlip(){
+    public static boolean wasLastChestFlip(){
         return inFlipGui;
     }
 
-    public boolean inBuyOrderScreen(){
+    public static boolean inBuyOrderScreen(){
         if(getContainerName() == null) return false;
         return getContainerName().contains("How many do you want?");
     }
-    public boolean inInstaBuy(){
+    public static boolean inInstaBuy(){
         if(getContainerName() == null) return false;
         return getContainerName().contains("➜ Insta");
     }
-    public boolean inOrderScreen(){
+    public static boolean inOrderScreen(){
         if(getContainerName() == null) return false;
         return getContainerName().contains("Co-op Bazaar Orders");
     }
 
-    public boolean inBazaar(){
+    public static boolean inBazaar(){
         if(getContainerName() == null) return false;
         return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inOrderScreen() || getContainerName().contains("➜");
     }
 
     //only for specific items
-    public boolean inAnyItemScreen(){
+    public static boolean inAnyItemScreen(){
         if(getContainerName() == null || getContainerName().contains("Bazaar")) return false;
         return getContainerName().contains("➜")
                 || inBuyOrderScreen()
                 || inInstaBuy();
     }
-    private GenericContainerScreen chestScreen;
-    @Getter
-    @Setter
-    private guiTypes guiType;
-    private  List<ItemStack> itemStacks = new ArrayList<>();
-    public boolean inFlipGui;
+    @Getter @Setter
+    private static guiTypes guiType;
+    public static boolean inFlipGui;
     @Getter @Setter
     private static Inventory lowerChestInventory;
     @Getter @Setter
-    private Bookmark currentBookmark;
+    private static Bookmark currentBookmark;
     @Getter @Setter
-    private Screen previousScreen;
+    private static Screen previousScreen;
     @Getter @Setter
-    private String previousScreenName;
+    private static String previousScreenName;
 
     @Override
     public void subscribe() {
@@ -94,14 +90,14 @@ public class GUIUtils implements BUListener {
         return null;
     }
 
-    public void registerScreenEvent(){
+    public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            BazaarUtils.gui = this;
-            lowerChestInventory= null;
+            lowerChestInventory = null;
         });
 
         ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
-            previousScreen = screen;
+            if(client.currentScreen != null)
+                previousScreen = client.currentScreen;
             previousScreenName = getContainerName();
         });
     }
@@ -113,14 +109,13 @@ public class GUIUtils implements BUListener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    private void loadSign(SignOpenEvent e){
+    private static void loadSign(SignOpenEvent e){
         guiType = guiType.SIGN;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    private void onChestLoaded(ChestLoadedEvent e){
+    private static void onChestLoaded(ChestLoadedEvent e){
         guiType = guiType.CHEST;
-        itemStacks = e.getItemStacks();
 
         currentBookmark = null;
         if(!Bookmark.inItemScreen())
@@ -251,14 +246,14 @@ public class GUIUtils implements BUListener {
         updateFlipGui();
     }
 
-    public boolean inFlipGui() {
+    public static boolean inFlipGui() {
         if (getContainerName() == null) {
             return false;
         }
         return getContainerName().contains("Order options");
     }
 
-    public void updateFlipGui(){
+    public static void updateFlipGui(){
         if(inFlipGui()) {
             inFlipGui = true;
             Util.notifyAll("In flip gui", Util.notificationTypes.GUI);
@@ -276,20 +271,14 @@ public class GUIUtils implements BUListener {
 
         ScreenHandler screenHandler = player.currentScreenHandler;
         int syncId = screenHandler.syncId;
-        CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(30);
-                // Use the interaction manager to handle the click
-                interactionManager.clickSlot(
-                        syncId,       // Sync ID of the screen handler
-                        slotIndex,    // Slot index to click
-                        button,       // Mouse button (0 = left, 1 = right)
-                        SlotActionType.PICKUP,   // Slot action type (e.g., PICKUP, QUICK_MOVE)
-                        player        // The player performing the action
-                );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        Util.tickExecuteLater(1, () -> {
+            interactionManager.clickSlot(
+                    syncId,
+                    slotIndex,
+                    button,
+                    SlotActionType.PICKUP,
+                    player
+            );
         });
     }
 

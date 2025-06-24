@@ -31,7 +31,6 @@ import java.util.List;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
-    public static GUIUtils gui = new GUIUtils();
     public static StashHelper stashHelper;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
@@ -94,6 +93,8 @@ public class BazaarUtils implements ClientModInitializer {
         if(BUConfig.get().bookmarks.isEmpty()) {
             BUConfig.get().bookmarks.add(new Bookmark("Diamond", Items.DIAMOND.getDefaultStack()));
         }
+
+
     }
     private void getModProperties(){
         FabricLoader.getInstance().getModContainer(MODID).ifPresent(modContainer -> {

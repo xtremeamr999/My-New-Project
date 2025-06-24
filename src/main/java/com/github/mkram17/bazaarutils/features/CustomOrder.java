@@ -48,6 +48,13 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
         this.item = item;
+        eventBus.subscribe(this);
+    }
+    protected CustomOrder(boolean enabled) {
+        this.enabled = enabled;
+        this.orderAmount = 71680;
+        this.slotNumber = 17;
+        this.item = Items.PURPLE_STAINED_GLASS_PANE;
     }
     public static Item getNextColoredPane(){
         int size = BUConfig.get().customOrders.size();
@@ -61,7 +68,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if (!(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy()) || !isEnabled())
+        if (!(GUIUtils.inBuyOrderScreen() || GUIUtils.inInstaBuy()) || !isEnabled())
             return;
 
         if (event.getSlotId() != slotNumber)
@@ -76,7 +83,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!(BazaarUtils.gui.inBuyOrderScreen() || BazaarUtils.gui.inInstaBuy()) || !isEnabled())
+        if (!(GUIUtils.inBuyOrderScreen() || GUIUtils.inInstaBuy()) || !isEnabled())
             return;
 
         if (event.slot.getIndex() != slotNumber)

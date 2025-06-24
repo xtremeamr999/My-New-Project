@@ -102,26 +102,32 @@ dependencies {
     // Mixin Constraints
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
 
-
+    //gson extras for easy type adapters
+//    implementation("com.google.code.gson:gson:2.13.1")
+    implementation("org.danilopianini:gson-extras:3.3.0")
+    include("org.danilopianini:gson-extras:3.3.0")
     // Skyblocker for compatibility
-//    modCompileOnly("maven.modrinth:y6DuFGwJ:v${property("skyblocker_version")}+${deps["core.mcVersion"]}")
-    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
+    //? if <= 1.21.5 {
+    modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
+    //? } else {
+//    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
+    //? }
 
 }
 tasks {
 
     processResources {
         inputs.property("version", project.version)
-        inputs.property("minecraft", stonecutter.current.version)
         inputs.property("mcVersion", mcVersion)
+        inputs.property("major_update_notes", rootProject.property("major_update_notes") as String)
 
         filesMatching("fabric.mod.json") {
-            val expansionProps = project.properties.toMutableMap()
-
-            expansionProps["mcVersion"] = mcVersion
-            expansionProps["version"] = project.version
-
-            expand(expansionProps)
+            expand(mapOf(
+                "version" to project.version,
+                "mod_version" to rootProject.property("mod_version"),
+                "mcVersion" to mcVersion,
+                "major_update_notes" to rootProject.property("major_update_notes")
+            ))
         }
     }
 
