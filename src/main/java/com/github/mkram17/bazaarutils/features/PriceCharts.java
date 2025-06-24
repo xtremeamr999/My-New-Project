@@ -40,8 +40,13 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
 
         String itemName = stack.getName().getString();
 
-        if(itemName.indexOf("x") == itemName.length()-2)
-            itemName = itemName.substring(0, itemName.indexOf("x")-1);
+        try {
+            if (itemName.contains("x") && itemName.indexOf("x") == itemName.length() - 2)
+                itemName = itemName.substring(0, itemName.indexOf("x") - 1);
+        } catch (Exception e) {
+            Util.notifyError("Failed to parse item name for price charts: " + itemName, e);
+            return;
+        }
 
         productID = BazaarData.findProductId(itemName);
         if(productID == null) {
