@@ -21,7 +21,7 @@ public class ChatHandler implements BUListener{
     public static Option<Boolean> createDisableOrderFilledSound() {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal("Disable Order Filled Sound"))
-                .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order is filled.")))
+                .description(OptionDescription.of(Text.literal("Plays two short notification sounds when your order is filled.")))
                 .binding(false,
                         BUConfig.get()::isOrderFilledSound,
                         BUConfig.get()::setOrderFilledSound)
