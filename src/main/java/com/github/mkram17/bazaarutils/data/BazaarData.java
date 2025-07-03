@@ -189,10 +189,10 @@ public class BazaarData implements BUListener {
                 }
             }
         } catch (Exception e) {
-            Util.logMessage("Error while finding product ID from name: " + name + "." + e.getStackTrace());
+            Util.notifyError("Exception caught while finding product ID from name: " + name + ". If this keeps happening, please report to the developer to fix. You can disable error notifications in settings", e);
         }
 
-//        Util.notifyAll("Couldn't find product id", Util.notificationTypes.BAZAARDATA);
+//        Util.logError("Couldn't find product id from name: " + name, null);
         return null;
     }
 

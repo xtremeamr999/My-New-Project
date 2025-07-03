@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import dev.isxander.yacl3.api.Option;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -88,19 +87,17 @@ public class Util implements BUListener {
                     });
         *///?}
 
-    public static void notifyAll(String message) {
-
-        MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
-        messageText.append(Text.literal(message).formatted(Formatting.WHITE));
-
-        if (MinecraftClient.getInstance().player != null)
-            MinecraftClient.getInstance().player.sendMessage(messageText, false);
-        logMessage(message);
-    }
-
     public static void logMessage(String message) {
         String callingName = getCallingClassName();
         LogManager.getLogger(callingName).info("[Bazaar Utils] Message [" + message + "]");
+    }
+    public static void logError(String message, Throwable e) {
+        String callingName = getCallingClassName();
+        if(e == null) {
+            LogManager.getLogger(callingName).error("[Bazaar Utils Error]" + "(" + callingName + ") Developer Message: " + message);
+        } else {
+            LogManager.getLogger(callingName).error("[Bazaar Utils Error]" + "(" + callingName + ") Developer Message: " + message + "\n Throwable Message " + e.getMessage() + "\n Stacktrace: " + Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public static void notifyError(String message, Throwable e) {
@@ -127,10 +124,23 @@ public class Util implements BUListener {
         if (MinecraftClient.getInstance().player != null && !BUConfig.get().disableErrorNotifications)
             MinecraftClient.getInstance().player.sendMessage(messageText, false);
 
-        LogManager.getLogger(callingName).error("[Bazaar Utils Error] (" + callingName + ") "  + "Message: " + message);
-        if(e != null){
-            LogManager.getLogger(callingName).error("[Bazaar Utils Error]: " + e.getMessage() + " Stacktrace: " + Arrays.toString(e.getStackTrace()));
+        logError(message, e);
+    }
+    public static void notifyAll(Text message) {
+        MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
+        messageText.append(message.copy().formatted(Formatting.WHITE));
+
+        if (MinecraftClient.getInstance().player != null) {
+            MinecraftClient.getInstance().player.sendMessage(messageText, false);
+        } else {
+            logError("Could not send notification because player is null. Message: " + message, null);
+            tickExecuteLater(50, () -> notifyAll(message));
         }
+        logMessage(message.getString());
+    }
+
+    public static void notifyAll(String message) {
+        notifyAll(Text.literal(message));
     }
 
     public static void notifyAll(String message, notificationTypes notiType) {
@@ -138,39 +148,21 @@ public class Util implements BUListener {
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.GOLD).append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
-        if(!notiType.isEnabled() && !BUConfig.get().developer.allMessages) {
-            if (BUConfig.get().developerMode)
-                logMessage(message);
-            else
-                return;
-        }
-
-//            LogManager.getLogger(callingName).info("[Bazaar Utils] watchedItems state: " + BUConfig.get().watchedItems);
-
-            if (MinecraftClient.getInstance().player != null)
-                MinecraftClient.getInstance().player.sendMessage(messageText, false);
-            else
-                notifyError("Could not send notification because player is null. Message: " + message, null);
+        if(notiType.isEnabled() || BUConfig.get().developer.allMessages)
+            notifyAll(messageText);
     }
 
 
     public static void notifyChatCommand(MutableText message, String command){
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client != null && client.player != null) { // Add this check
-            client.player.sendMessage(message
-                    .styled(style -> style
+        message.styled(style -> style
                                     //? if > 1.21.4 {
                                     .withClickEvent(new ClickEvent.RunCommand("/" + command))
-                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command)))
+                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command))));
                             //?} else {
                                 /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command)))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command))));
                         *///?}
-                    ), false);
-        } else {
-            // Optionally log that the message couldn't be sent because the player was null
-            notifyError("Could not send chat command notification because player is null. Message: " + message.getString(), null);
-        }
+        notifyAll(message);
     }
 
     public static void addWatchedItem(OrderData item){

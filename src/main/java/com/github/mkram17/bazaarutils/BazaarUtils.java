@@ -54,6 +54,7 @@ public class BazaarUtils implements ClientModInitializer {
         setDefaultValues();
     }
 
+    //uses orbit for custom events
     private void registerEventBus() {
         eventBus.registerLambdaFactory("com.github.mkram17.bazaarutils", (lookupInMethod, klass) ->
                 (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
@@ -64,6 +65,7 @@ public class BazaarUtils implements ClientModInitializer {
             Commands.register(dispatcher);
         });
     }
+
     //must be run after config load
     private void subscribeEvents(){
         BUListener.addTransientEvents();
