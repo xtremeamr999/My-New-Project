@@ -54,8 +54,9 @@ public class OutdatedItems implements BUListener {
                 if(BUConfig.get().developerMode) {
                     message.append(Text.literal(". Market Price: " + e.getItem().getPriceInfo().getMarketPrice() + " Order Price: " + e.getItem().getPriceInfo().getPrice()));
                     Util.notifyChatCommand(message, "managebazaarorders");
-                } else
+                } else {
                     Util.notifyChatCommand(message, "managebazaarorders");
+                }
             });
             if(notificationSound)
                 SoundUtil.notifyMultipleTimes(3);

@@ -27,7 +27,7 @@ public class OrderStatusHighlight implements BUListener {
     private boolean enabled = true;
     private static final HashMap<Integer, OrderData> highlightedOrders = new HashMap<>();
     public static final Identifier IDENTIFIER = Identifier.tryParse("bazaarutils", "orderstatushighlight/background_test");
-    public static final float BACKGROUND_TRANSPARENCY = 0.8f;
+    public static final float BACKGROUND_TRANSPARENCY = 0.9f;
 
     public OrderStatusHighlight(boolean enabled){
         this.enabled = enabled;

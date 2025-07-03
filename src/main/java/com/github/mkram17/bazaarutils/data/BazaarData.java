@@ -86,7 +86,7 @@ public class BazaarData implements BUListener {
         try {
             SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
             if (product == null) {
-                Util.notifyError("Could not find item using product ID: " + productId, null);
+                Util.logError("Could not find item using product ID: " + productId, null);
                 return -1;
             }
 
@@ -141,10 +141,15 @@ public class BazaarData implements BUListener {
             Util.notifyError("Bazaar data is null", null);
             return -1.0;
         }
+        if (productId == null) {
+            Util.logError("Could not find item price due to null product id", null);
+            return -1.0;
+        }
+
         try {
             SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
             if (product == null) {
-                Util.notifyError("Could not find item using product ID: " + productId, null);
+                Util.logError("Could not find item using product ID: " + productId, null);
                 return -1.0;
             }
 
