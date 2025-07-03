@@ -7,8 +7,6 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
-import lombok.Getter;
-import lombok.Setter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
@@ -62,7 +60,7 @@ public class ChatHandler implements BUListener{
 //            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
 
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
-                itemName = Util.removeFormatting(siblings.get(5).getString());
+                itemName = Util.removeFormatting(getName(siblings));
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
                 String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
                 totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
@@ -76,7 +74,7 @@ public class ChatHandler implements BUListener{
                     itemToAdd = new OrderData(itemName, price*volume, OrderPriceInfo.priceTypes.INSTASELL, volume);
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
-                Util.addWatchedItem(itemToAdd);
+                Util.addWatchedOrder(itemToAdd);
                 Util.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             }
 
@@ -104,6 +102,14 @@ public class ChatHandler implements BUListener{
                 handleClaimed(siblings);
             }
         });
+    }
+
+    private static String getName(List<Text> siblings) {
+        if (siblings.size() == 10){
+            return Util.removeFormatting(siblings.get(6).getString());
+        } else {
+            return Util.removeFormatting(siblings.get(5).getString());
+        }
     }
 
     public static void handleClaimed(ArrayList<Text> siblings) {

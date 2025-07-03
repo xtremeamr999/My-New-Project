@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
@@ -104,7 +103,7 @@ public class ItemUpdater implements BUListener {
 
             //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found
             foundItems.add(tempItem);
-            Util.addWatchedItem(updateWithItem(tempItem));
+            Util.addWatchedOrder(updateWithItem(tempItem));
 
             //if item is filled, dont give it an order status highlight
             if(tempItem.getFillStatus() == OrderData.statuses.FILLED)

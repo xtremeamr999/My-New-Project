@@ -84,6 +84,7 @@ public class OrderData {
 
         if(productID == null){
             Util.notifyError("Product ID for " + name + " is null. This may cause issues.", null);
+            return;
         }
     }
 
@@ -261,13 +262,15 @@ public class OrderData {
             return statuses.FILLED;
         if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
+
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
             if(priceInfo.getPrice()-maximumRounding > priceInfo.getMarketPrice())
                 return statuses.OUTDATED;
-        } else {
+        } else if(priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTASELL){
             if(priceInfo.getPrice()+maximumRounding < priceInfo.getMarketPrice())
                 return statuses.OUTDATED;
         }
+
         return statuses.COMPETITIVE;
     }
 

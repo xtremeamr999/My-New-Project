@@ -93,6 +93,10 @@ public class Util implements BUListener {
     }
     public static void logError(String message, Throwable e) {
         String callingName = getCallingClassName();
+        logError(message, callingName, e);
+    }
+
+    private static void logError(String message, String callingName, Throwable e) {
         if(e == null) {
             LogManager.getLogger(callingName).error("[Bazaar Utils Error]" + "(" + callingName + ") Developer Message: " + message);
         } else {
@@ -121,21 +125,25 @@ public class Util implements BUListener {
                     });
             *///?}
 
-        if (MinecraftClient.getInstance().player != null && !BUConfig.get().disableErrorNotifications)
-            MinecraftClient.getInstance().player.sendMessage(messageText, false);
+        if (!BUConfig.get().disableErrorNotifications)
+            sendPlayerMessage(messageText);
 
-        logError(message, e);
+        logError(message,simpleCallingName, e);
+    }
+
+    private static void sendPlayerMessage(Text message){
+        if (MinecraftClient.getInstance().player != null) {
+            MinecraftClient.getInstance().player.sendMessage(message, false);
+        } else {
+            logError("Could not send notification because player is null. Message: " + message, null);
+            tickExecuteLater(50, () -> notifyAll(message));
+        }
     }
     public static void notifyAll(Text message) {
         MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
         messageText.append(message.copy().formatted(Formatting.WHITE));
 
-        if (MinecraftClient.getInstance().player != null) {
-            MinecraftClient.getInstance().player.sendMessage(messageText, false);
-        } else {
-            logError("Could not send notification because player is null. Message: " + message, null);
-            tickExecuteLater(50, () -> notifyAll(message));
-        }
+        sendPlayerMessage(messageText);
         logMessage(message.getString());
     }
 
@@ -165,7 +173,7 @@ public class Util implements BUListener {
         notifyAll(message);
     }
 
-    public static void addWatchedItem(OrderData item){
+    public static void addWatchedOrder(OrderData item){
         if(item == null)
             return;
         assert item.getProductID() != null;
