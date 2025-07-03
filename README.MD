@@ -45,16 +45,16 @@ _Create rules which stop you from insta selling items in your inventory. Ex: I c
 
 ## ❓Using Bazaar Utils
 
-REMEMBER -- if your bazaar flipper account upgrade is not level one, change your bazaar tax with /bazaarutils tax or the mod wont work right
+REMEMBER -- if your bazaar flipper account upgrade is not level one, change your bazaar tax with `/bazaarutils tax {tax percentage}` or the mod wont work right
 ##### To open the mod config use `/bazaarutils` or `/bu`.
 <details>
 <summary><strong>🧾Other Commands</strong></summary>
 
-- `/bu customorder add {order amount} {slot number}` \_(top left slot is slot #1, to the right is #2, etc etc)\_
-- `/bu customorder remove {order number}` \_(the order it is shown in config)\_
+- `/bu customorder add {order amount} {slot number}` \(top left slot is slot #1, to the right is #2, etc etc)\
+- `/bu customorder remove {order number}` \(the order it is shown in config)\
 - `/bu rule add {based on volume, price or item name} {amount over which will be restricted}\`
 - `/bu rule remove {rule number}`
-- `/bu developer` \_(to enable developer settings, you probably wont use this)\_
+- `/bu developer` \(to enable developer settings, you probably wont use this)\
 
 </details>
 
