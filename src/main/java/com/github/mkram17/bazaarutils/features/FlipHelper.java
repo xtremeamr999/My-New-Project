@@ -26,7 +26,7 @@ import net.minecraft.util.Formatting;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
-//TODO switch to finding market price without finding the ItemData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
+//TODO switch to finding market price without finding the OrderData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
 public class FlipHelper extends CustomItemButton implements BUListener {
     public double flipPrice;
     private double orderPrice = -1;
@@ -137,7 +137,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!(event.getSlotId() == slotNumber) || !inCorrectScreen())
+        if(!(event.getSlotId() == slotNumber) || !inCorrectScreen() || getReplaceItem() == null)
             return;
 
         ItemStack itemStack = new ItemStack(getReplaceItem(), 1);

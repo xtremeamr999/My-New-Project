@@ -24,12 +24,14 @@ import java.util.function.Function;
 @Slf4j
 public class OrderData {
     public String getProductID() {
-        return productId;
+        return productID;
     }
 
+    //name of the item in game
     @Getter
     private final String name;
-    private final String productId;
+    //hypixel's code for the product
+    private final String productID;
 
     public int getIndex(){return BUConfig.get().watchedOrders.indexOf(this);}
 
@@ -45,6 +47,8 @@ public class OrderData {
     }
 
     public enum statuses{SET,FILLED, OUTDATED, COMPETITIVE, MATCHED}
+
+    //only used to determine if order is set or filled, not outdated, competitive, or matched
     @Setter @Getter
     private statuses fillStatus;
     @Getter
@@ -68,30 +72,18 @@ public class OrderData {
     //When finding item price, it can round to the nearest coin sometimes, so maximumRounding is used to determine if the price is similar enough to be considered a match
     @Deprecated
     public OrderData(String name, Double fullPrice, OrderPriceInfo.priceTypes priceType, int volume) {
-        priceInfo = new OrderPriceInfo(fullPrice/volume, priceType);
-
-        this.name = name;
-        this.productId = BazaarData.findProductId(name);
-        this.volume = volume;
-        this.fillStatus = statuses.SET;
-        this.maximumRounding = getMaxRounding(fullPrice, volume);
-
-        if(productId == null){
-            Util.notifyError("Could not find product id for item: " + name, null);
-        }
+        this(name, volume,  new OrderPriceInfo(fullPrice/volume, priceType));
     }
     public OrderData(String name, int volume, OrderPriceInfo priceInfo) {
         this.name = name;
         this.volume = volume;
-        this.productId = BazaarData.findProductId(name);
+        this.productID = BazaarData.findProductId(name);
         this.fillStatus = statuses.SET;
         this.priceInfo = priceInfo;
         this.maximumRounding = getMaxRounding(priceInfo.getPrice(), volume);
 
-
-
-        if(productId == null){
-            Util.notifyAll("Could not find product id for item: " + name, Util.notificationTypes.ITEMDATA);
+        if(productID == null){
+            Util.notifyError("Product ID for " + name + " is null. This may cause issues.", null);
         }
     }
 
@@ -245,7 +237,7 @@ public class OrderData {
                         .append(Text.literal("Your " + noLongerOutdatedItem.getPriceInfo().getPriceType().getString().toLowerCase() + "order for ").formatted(Formatting.WHITE))
                         .append(amount)
                         .append(itemName)
-                        .append(Text.literal( " is no longer outdated.").formatted(Formatting.WHITE));
+                        .append(Text.literal( " is no longer outdated.").formatted(Formatting.DARK_PURPLE));
                 if(MinecraftClient.getInstance().player != null)
                     MinecraftClient.getInstance().player.sendMessage(message, false);
                 else
@@ -256,18 +248,18 @@ public class OrderData {
     }
 
     public void updateMarketPrice(){
-        if(productId == null){
-            Util.notifyError("Could not find market price for " + name + ". If this keeps happening, please report to the developer to fix. You can disable error notifications in settings", null);
+        if(productID == null){
+            Util.logError("Could not find market price for " + name + " due to null product ID", null);
             return;
         }
-        priceInfo.updateMarketPrice(productId);
+        priceInfo.updateMarketPrice(productID);
     }
 
     public statuses getOutdatedStatus(){
         updateMarketPrice();
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
-        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productId, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
+        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
             if(priceInfo.getPrice()-maximumRounding > priceInfo.getMarketPrice())
