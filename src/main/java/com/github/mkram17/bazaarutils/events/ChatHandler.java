@@ -63,8 +63,8 @@ public class ChatHandler implements BUListener{
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(getName(siblings));
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
-                String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
-                totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+                String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "");
+                totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
                 price = Double.parseDouble(totalPriceString)/volume;
                 OrderData itemToAdd;
                 if (messageType == messageTypes.SELLORDER) {

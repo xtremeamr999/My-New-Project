@@ -238,14 +238,11 @@ public class OrderData {
                 Text amount = Text.literal(noLongerOutdatedItem.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
                 Text itemName = Text.literal(noLongerOutdatedItem.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
                 MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
-                        .append(Text.literal("Your " + noLongerOutdatedItem.getPriceInfo().getPriceType().getString().toLowerCase() + "order for ").formatted(Formatting.WHITE))
+                        .append(Text.literal("Your " + noLongerOutdatedItem.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE))
                         .append(amount)
                         .append(itemName)
                         .append(Text.literal( " is no longer outdated.").formatted(Formatting.DARK_PURPLE));
-                if(MinecraftClient.getInstance().player != null)
-                    MinecraftClient.getInstance().player.sendMessage(message, false);
-                else
-                    Util.notifyError("Could not send no longer outdated notif because player is null.", null);
+                PlayerActionUtil.notifyAll(message);
             }
         }
 
