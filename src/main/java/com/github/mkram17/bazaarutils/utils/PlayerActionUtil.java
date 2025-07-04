@@ -37,13 +37,13 @@ public class PlayerActionUtil {
         notifyAll(Text.literal(message));
     }
 
-    private static void notifyAll(Text message, Util.notificationTypes notiType) {
+    private static void notifyAll(MutableText message, Util.notificationTypes notiType) {
         String callingName = Util.getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         Text messageText = Text.literal("(" + simpleCallingName + ") ")
                 .formatted(Formatting.GOLD)
-                    .append(message)
-                    .formatted(Formatting.DARK_GREEN);
+                    .append(message.formatted(Formatting.DARK_GREEN));
+
 
         if(notiType.isEnabled() || BUConfig.get().developer.allMessages)
             notifyAll(messageText);

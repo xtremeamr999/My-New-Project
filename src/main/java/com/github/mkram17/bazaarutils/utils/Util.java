@@ -186,7 +186,7 @@ public class Util implements BUListener {
     }
 
     //finds the first index that contains lookingFor, so there could be another later which would cause problems
-    public static int findComponentIndex(List<Text> components, String lookingFor){
+    public static int componentIndexOf(List<Text> components, String lookingFor){
         int num = 0;
         for(Text component : components){
             if(component.getString().contains(lookingFor))
@@ -194,6 +194,14 @@ public class Util implements BUListener {
             num++;
         }
             return -1;
+    }
+    public static int componentLastIndexOf(List<Text> components, String lookingFor){
+        for (int i = components.size() - 1; i >= 0; i--) {
+            if (components.get(i).getString().contains(lookingFor)) {
+                return i;
+            }
+        }
+        return -1;
     }
     public static String findComponentWith(List<Text> components, String lookingFor){
         for(Text component : components){
