@@ -65,7 +65,7 @@ public class OrderStatusHighlight implements BUListener {
     public Option<Boolean> createOption() {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal("Order Status Highlight"))
-                .description(OptionDescription.of(Text.literal("Puts a red border around orders that are outdated and a green border around orders that are not outdated.")))
+                .description(OptionDescription.of(Text.literal("Adds a colored background and tooltip for orders that are competitive, matched or outdated in the orders gui inside the bazaar. For outdated orders, also adds the market price in the tooltip.")))
                 .binding(false,
                         this::isEnabled,
                         this::setEnabled)
@@ -73,6 +73,7 @@ public class OrderStatusHighlight implements BUListener {
                 .build();
     }
 
+    //maybe could be split into separate methods, but this is fine for now
     private void registerTooltipListener() {
         ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
             if (!enabled) return;
@@ -84,16 +85,26 @@ public class OrderStatusHighlight implements BUListener {
             if (client.player == null || !(client.currentScreen instanceof HandledScreen<?> handledScreen)) {
                 return;
             }
+
+            for (Text line : lines) {
+                String lineText = line.getString();
+                if (lineText.contains("FILLED") || lineText.contains("OUTDATED") ||
+                        lineText.contains("COMPETITIVE") || lineText.contains("MATCHED")) {
+                    // Our tooltip is already present, skip processing
+                    return;
+                }
+            }
+
             int index = -1;
             for (Slot slot : handledScreen.getScreenHandler().slots) {
                 if (!(slot.hasStack() && slot.getStack() == stack))
                     continue;
-                index = slot.id;
+                index = slot.getIndex();
             }
+
             if(index == -1)
                 return;
 
-//            OrderData.statuses highlightType = getHighlightType(index);
             OrderData order = highlightedOrders.get(index);
             if (order == null) {
                 return;

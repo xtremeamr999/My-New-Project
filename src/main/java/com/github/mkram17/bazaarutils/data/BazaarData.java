@@ -40,7 +40,6 @@ public class BazaarData implements BUListener {
     }
 
     public static void scheduleBazaar() {
-
         bzExecutor.scheduleAtFixedRate(() -> {
             if (!(bazaarCalls % bazaarDataPeriod == 0))
                 return;

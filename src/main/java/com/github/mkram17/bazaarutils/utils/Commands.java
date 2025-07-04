@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
@@ -12,10 +13,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
+import net.minecraft.command.CommandSource;
+import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 
 import java.net.URI;
@@ -82,7 +87,8 @@ public class Commands {
                 .executes((context) -> {
                     BUConfig.get().developerMode = !BUConfig.get().developerMode;
                     HANDLER.save();
-                    PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
+                    PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
+
                     return 1;
                 })
         );

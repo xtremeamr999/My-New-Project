@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 //TODO change the message number instead of sending more
-public class OutdatedItems implements BUListener {
+public class OutdatedOrders implements BUListener {
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter
@@ -32,7 +32,7 @@ public class OutdatedItems implements BUListener {
     private boolean notificationSound;
 
 
-    public OutdatedItems(boolean autoOpenEnabled, boolean notifyOutdated) {
+    public OutdatedOrders(boolean autoOpenEnabled, boolean notifyOutdated) {
         this.autoOpenEnabled = autoOpenEnabled;
         this.notifyOutdated = notifyOutdated;
         this.notificationSound = true;

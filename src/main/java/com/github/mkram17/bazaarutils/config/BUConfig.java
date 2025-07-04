@@ -10,8 +10,6 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -34,8 +32,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 
 public class BUConfig {
@@ -73,7 +69,7 @@ public class BUConfig {
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
-    public OutdatedItems outdatedItems = new OutdatedItems(false, true);
+    public OutdatedOrders outdatedOrders = new OutdatedOrders(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
     public RestrictSell restrictSell = new RestrictSell(true, 3, new ArrayList<>(List.of(new RestrictSellControl(RestrictSell.restrictBy.PRICE, 1000000))));
@@ -112,7 +108,7 @@ public class BUConfig {
             ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder();
             generalBuilder.name(Text.literal("General"))
                     .option(flipHelper.createOption())
-                    .options(outdatedItems.createOptions())
+                    .options(outdatedOrders.createOptions())
                     .option(ChatHandler.createDisableOrderFilledSound())
                     .option(stashMessages.createOption())
                     .option(priceCharts.createOption())
@@ -133,9 +129,10 @@ public class BUConfig {
             builder.category(CustomOrder.createOrdersCategory().group(customOrdersGroupBuilder.build()).build());
 
             if(developerMode) {
+                ConfigCategory.Builder developerBuilder = Developer.createDevBuilder();
+
                 builder.category(
-                        Developer.createDevBuilder()
-                                .option(Option.<Boolean>createBuilder()
+                        developerBuilder.option(Option.<Boolean>createBuilder()
                                         .name(Text.literal("All Messages"))
                                         .binding(developer.allMessages,
                                                 () -> developer.allMessages,
