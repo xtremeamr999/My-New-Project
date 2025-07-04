@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -100,7 +101,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
             this.orderVolumeFilled = Integer.parseInt(orderVolume);
 
         } catch (Exception ex) {
-            Util.notifyAll("Error while trying to find order price or volume in Flip Helper");
+            PlayerActionUtil.notifyAll("Error while trying to find order price or volume in Flip Helper");
             ex.printStackTrace();
         }
     }
@@ -109,10 +110,10 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         item = OrderData.findItem(null, orderPrice, orderVolumeFilled, OrderPriceInfo.priceTypes.INSTASELL);
         if (item != null) {
             if (item.getFillStatus() == OrderData.statuses.FILLED) {
-                Util.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);
                 return true;
             }else {
-                Util.notifyAll("found match, but isnt filled", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("found match, but isnt filled", Util.notificationTypes.GUI);
                 return true;
             }
         }

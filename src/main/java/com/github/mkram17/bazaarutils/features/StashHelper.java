@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyModifiers;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class StashHelper extends AmecsKeyBinding {
         if(ticksBetweenPresses>10) {
             ticksBetweenPresses = 0;
             GUIUtils.closeHandledScreen();
-            Util.sendCommand("pickupstash");
+            PlayerActionUtil.useCommand("pickupstash");
         }
     }
 

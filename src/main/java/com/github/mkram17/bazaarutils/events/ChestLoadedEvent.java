@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
@@ -96,7 +97,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
             if (customName != null) {
                 String displayName = Util.removeFormatting(customName.getString());
                 if (displayName.contains("Loading")) {
-                    Util.notifyAll("Loading item...", Util.notificationTypes.GUI);
+                    PlayerActionUtil.notifyAll("Loading item...", Util.notificationTypes.GUI);
                     return true;
                 }
             }

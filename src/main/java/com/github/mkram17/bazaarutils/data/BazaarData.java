@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -158,14 +159,14 @@ public class BazaarData implements BUListener {
 
             if (priceType == OrderPriceInfo.priceTypes.INSTABUY) {
                 if (sell_order_summary.isEmpty()) {
-                    Util.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
+                    PlayerActionUtil.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
                     return 0.0;
                 }
                 double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
                 return sellOrderPrice;
             } else if (priceType == OrderPriceInfo.priceTypes.INSTASELL) {
                 if (buy_order_summary.isEmpty()) {
-                    Util.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
+                    PlayerActionUtil.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
                     return 0.0;
                 }
                 double buyOrderPrice = buy_order_summary.getFirst().getPricePerUnit();

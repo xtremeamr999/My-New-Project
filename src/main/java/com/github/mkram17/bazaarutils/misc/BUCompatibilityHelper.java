@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.misc;
 
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.*;
 import de.hysky.skyblocker.config.SkyblockerConfig;
@@ -30,7 +31,7 @@ public class BUCompatibilityHelper {
 
     public static void initializePatches(){
         if (FabricLoader.getInstance().isModLoaded(REI_MOD_ID)) {
-            Util.notifyAll("Bazaar utils: REI detected. Attempting to modify REI config.");
+            PlayerActionUtil.notifyAll("Bazaar utils: REI detected. Attempting to modify REI config.");
             modifyReiConfigWithGson();
         }
         if(FabricLoader.getInstance().isModLoaded(AMECS_MODID))
@@ -110,7 +111,7 @@ public class BUCompatibilityHelper {
         try {
             SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
             boolean currentValue = skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar;
-            Util.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, Util.notificationTypes.GUI);
 
             if (currentValue) {
                 //? if >= 1.21.5 {
@@ -119,11 +120,11 @@ public class BUCompatibilityHelper {
                 /*SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.enableBazaar = false;
                 SkyblockerConfigManager.save();
                 *///?}
-                Util.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", Util.notificationTypes.GUI);
 
-                Util.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
             } else {
-                Util.notifyAll("Skyblocker Bazaar Overlay already disabled.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay already disabled.", Util.notificationTypes.GUI);
             }
         } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
             Util.notifyError("Failed to access or modify Skyblocker config setting.", e);
@@ -146,7 +147,7 @@ public class BUCompatibilityHelper {
                 SkyblockerConfigManager.save();
                 *///?}
 
-                Util.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
             } else {
                 System.out.println("Skyblocker Bazaar Overlay already enabled.");
             }

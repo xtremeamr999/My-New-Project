@@ -1,9 +1,9 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -53,9 +53,9 @@ public class OutdatedItems implements BUListener {
             Util.tickExecuteLater(2, () -> {
                 if(BUConfig.get().developerMode) {
                     message.append(Text.literal(". Market Price: " + e.getItem().getPriceInfo().getMarketPrice() + " Order Price: " + e.getItem().getPriceInfo().getPrice()));
-                    Util.notifyChatCommand(message, "managebazaarorders");
+                    PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
                 } else {
-                    Util.notifyChatCommand(message, "managebazaarorders");
+                    PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
                 }
             });
             if(notificationSound)
@@ -67,16 +67,16 @@ public class OutdatedItems implements BUListener {
             for(int i = 3; i >= 1; i--) {
                 try {
                     if(i == 3)
-                        Util.notifyAll("Opening bazaar in 3");
+                        PlayerActionUtil.notifyAll("Opening bazaar in 3");
                     else
-                        Util.notifyAll(String.valueOf(i));
+                        PlayerActionUtil.notifyAll(String.valueOf(i));
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
             }
 
-            Util.sendCommand("bz");
+            PlayerActionUtil.useCommand("bz");
         });
     }
     public Collection<Option<Boolean>> createOptions() {

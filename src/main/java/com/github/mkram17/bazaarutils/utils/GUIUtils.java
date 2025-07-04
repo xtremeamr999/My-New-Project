@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
@@ -14,19 +13,15 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
@@ -131,7 +126,7 @@ public class GUIUtils implements BUListener {
     //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why
     public static void closeHandledScreen() {
         try {
-            Util.notifyAll("Closing gui", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing gui", Util.notificationTypes.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
             if (client == null) {
                 Util.notifyError("Client is null", null);
@@ -171,7 +166,7 @@ public class GUIUtils implements BUListener {
 
     public static void closeSign(){
         try {
-            Util.notifyAll("Closing sign", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing sign", Util.notificationTypes.GUI);
             MinecraftClient mcclient = MinecraftClient.getInstance();
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);
@@ -256,7 +251,7 @@ public class GUIUtils implements BUListener {
     public static void updateFlipGui(){
         if(inFlipGui()) {
             inFlipGui = true;
-            Util.notifyAll("In flip gui", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("In flip gui", Util.notificationTypes.GUI);
         }
         else
             inFlipGui = false;

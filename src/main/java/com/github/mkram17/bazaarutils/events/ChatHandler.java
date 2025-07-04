@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -75,7 +76,7 @@ public class ChatHandler implements BUListener{
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedOrder(itemToAdd);
-                Util.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             }
 
             if (messageType == messageTypes.FILLED) {
@@ -94,7 +95,7 @@ public class ChatHandler implements BUListener{
                     Util.notifyError("Could not find item to fill with info vol: "+ volume + " name: " + itemName, null);
                 else {
                     item.setFilled();
-                    Util.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ITEMDATA);
+                    PlayerActionUtil.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ITEMDATA);
                 }
             }
 
@@ -144,15 +145,15 @@ public class ChatHandler implements BUListener{
 
 //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
             if (item == null) {
-                Util.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ITEMDATA);
                 return;
             }
             if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
-                Util.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
                 item.removeFromWatchedItems();
             } else if(volumeClaimed != null){
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
-                Util.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
             }
         } catch (Exception e) {
             Util.notifyError("Error in order claim text: " + siblings, e);
