@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,15 +62,15 @@ public class OrderData {
     @Getter
     private int amountFilled = 0;
     @Getter @Setter
-    private double maximumRounding;
+    private double tolerance;
     @Getter
     private OrderPriceInfo priceInfo;
 
     @Getter
     private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
 
-//    @Param fullPrice is the price per unit * volume
-    //When finding item price, it can round to the nearest coin sometimes, so maximumRounding is used to determine if the price is similar enough to be considered a match
+    //@Param fullPrice is the price per unit * volume
+    //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
     @Deprecated
     public OrderData(String name, Double fullPrice, OrderPriceInfo.priceTypes priceType, int volume) {
         this(name, volume,  new OrderPriceInfo(fullPrice/volume, priceType));
@@ -80,7 +81,7 @@ public class OrderData {
         this.productID = BazaarData.findProductId(name);
         this.fillStatus = statuses.SET;
         this.priceInfo = priceInfo;
-        this.maximumRounding = getMaxRounding(priceInfo.getPrice(), volume);
+        this.tolerance = calculateTolerance();
 
         if(productID == null){
             Util.notifyError("Product ID for " + name + " is null. This may cause issues.", null);
@@ -88,11 +89,13 @@ public class OrderData {
         }
     }
 
-    private static double getMaxRounding(double price, int volume){
-        if(price*volume < 10000)
+    private double calculateTolerance(){
+        //doesnt round prices when total is over 10k
+        if(priceInfo.getPrice()*volume < 10000)
             return 0;
         else{
-            return (Math.ceil((.9 / volume) * 10))/10;
+            double priceMaximumInaccuracy = .9 / volume; //0.9 coins is the most that it can be off per unit and not show in places where it rounds
+            return (Math.round(priceMaximumInaccuracy * 10)) / 10.0;
         }
     }
 
@@ -104,7 +107,7 @@ public class OrderData {
 
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
     public boolean isSimilarPrice(double price) {
-        return Math.abs(priceInfo.getPrice() - price) <= maximumRounding;
+        return Math.abs(priceInfo.getPrice() - price) <= tolerance;
     }
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
@@ -148,13 +151,13 @@ public class OrderData {
             itemList = findLooseVolumeMatches(name, price, volume, priceType);
 
         if (itemList.isEmpty()) {
-            Util.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);
             return null;
         }
         if (itemList.size() > 1) {
             OrderData bestMatch = itemList.getFirst();
             for (OrderData duplicate : itemList) {
-                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
                 if (volume == null) {
                     continue;
                 }
@@ -186,7 +189,7 @@ public class OrderData {
         }
         if (itemList.size() > 1) {
             itemList.forEach(duplicate -> {
-                Util.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
             });
         }
         return itemList.getFirst();
@@ -214,7 +217,7 @@ public class OrderData {
 
             for (OrderData oldItem : availableOldOutdated) {
                 if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
-                        Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.maximumRounding &&
+                        Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.tolerance &&
                         currentNewOutdatedItem.getVolume() == oldItem.getVolume() &&
                         currentNewOutdatedItem.getPriceInfo().getPriceType() == oldItem.getPriceInfo().getPriceType()) {
                     foundMatchInOldList = true;
@@ -260,14 +263,14 @@ public class OrderData {
         updateMarketPrice();
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
-        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && maximumRounding == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
+        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
 
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
-            if(priceInfo.getPrice()-maximumRounding > priceInfo.getMarketPrice())
+            if(priceInfo.getPrice()- tolerance > priceInfo.getMarketPrice())
                 return statuses.OUTDATED;
         } else if(priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTASELL){
-            if(priceInfo.getPrice()+maximumRounding < priceInfo.getMarketPrice())
+            if(priceInfo.getPrice()+ tolerance < priceInfo.getMarketPrice())
                 return statuses.OUTDATED;
         }
 
@@ -292,7 +295,7 @@ public class OrderData {
 
     public void removeFromWatchedItems(){
         if(!BUConfig.get().watchedOrders.remove(this))
-            Util.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
+            PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
         OrderData.updateOutdatedItems();
     }

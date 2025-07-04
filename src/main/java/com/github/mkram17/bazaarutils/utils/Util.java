@@ -5,17 +5,12 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -24,13 +19,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+//main utility class. More specific utility classes are in utils package
 public class Util implements BUListener {
-    public static void sendCommand(String command){
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player != null) {
-            client.player.networkHandler.sendChatCommand(command);
-        }
-    }
 
     @Override
     public void subscribe() {
@@ -126,59 +116,18 @@ public class Util implements BUListener {
             *///?}
 
         if (!BUConfig.get().disableErrorNotifications)
-            sendPlayerMessage(messageText);
+            PlayerActionUtil.sendPlayerMessage(messageText);
 
         logError(message,simpleCallingName, e);
     }
 
-    private static void sendPlayerMessage(Text message){
-        if (MinecraftClient.getInstance().player != null) {
-            MinecraftClient.getInstance().player.sendMessage(message, false);
-        } else {
-            logError("Could not send notification because player is null. Message: " + message, null);
-            tickExecuteLater(50, () -> notifyAll(message));
-        }
-    }
-    public static void notifyAll(Text message) {
-        MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
-        messageText.append(message.copy().formatted(Formatting.WHITE));
-
-        sendPlayerMessage(messageText);
-        logMessage(message.getString());
-    }
-
-    public static void notifyAll(String message) {
-        notifyAll(Text.literal(message));
-    }
-
-    public static void notifyAll(String message, notificationTypes notiType) {
-        String callingName = getCallingClassName();
-        String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
-        var messageText = Text.literal("[" + simpleCallingName + "] ").formatted(Formatting.GOLD).append(Text.literal(message).formatted(Formatting.DARK_GREEN));
-
-        if(notiType.isEnabled() || BUConfig.get().developer.allMessages)
-            notifyAll(messageText);
-    }
-
-
-    public static void notifyChatCommand(MutableText message, String command){
-        message.styled(style -> style
-                                    //? if > 1.21.4 {
-                                    .withClickEvent(new ClickEvent.RunCommand("/" + command))
-                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command))));
-                            //?} else {
-                                /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command))));
-                        *///?}
-        notifyAll(message);
-    }
 
     public static void addWatchedOrder(OrderData item){
         if(item == null)
             return;
         assert item.getProductID() != null;
         BUConfig.get().watchedOrders.add(item);
-        notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
+        PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
         BUConfig.HANDLER.save();
         OrderData.updateOutdatedItems();
     }
@@ -254,11 +203,6 @@ public class Util implements BUListener {
             return null;
     }
 
-    public static void copyToClipboard(String clip) {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(new StringSelection(clip), null);
-    }
-
     public static String removeFormatting(String str) {
         return str.replaceAll("§.", "").replace(",", "").trim();
     }
@@ -275,7 +219,7 @@ public class Util implements BUListener {
     public static <T> void writeFile(T content) {
         try {
             Files.write(Paths.get("bazaar_data.json"), content.toString().getBytes());
-            notifyAll("Data written to file successfully.");
+            PlayerActionUtil.notifyAll("Data written to file successfully.");
         } catch (Exception e) {
             System.out.println("Failed to write data to file");
             e.printStackTrace();

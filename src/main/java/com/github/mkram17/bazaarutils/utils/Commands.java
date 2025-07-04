@@ -39,7 +39,7 @@ public class Commands {
 //        );
         bazaarutils.then(ClientCommandManager.literal("help")
                 .executes((context) -> {
-                            Util.notifyAll(Util.HELP_MESSAGE);
+                            PlayerActionUtil.notifyAll(Util.HELP_MESSAGE);
                             return 1;
                         }
                 ));
@@ -82,7 +82,7 @@ public class Commands {
                 .executes((context) -> {
                     BUConfig.get().developerMode = !BUConfig.get().developerMode;
                     HANDLER.save();
-                    Util.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
+                    PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled. You must restart for some changes to take effect." : "Developer mode disabled. You must restart for some changes to take effect.");
                     return 1;
                 })
         );
@@ -112,7 +112,7 @@ public class Commands {
                                             );
 
                                             BUConfig.get().customOrders.add(orderToAdd);
-                                            Util.notifyAll("Added order for " + orderToAdd.getOrderAmount() + " in slot number " + slotNumber);
+                                            PlayerActionUtil.notifyAll("Added order for " + orderToAdd.getOrderAmount() + " in slot number " + slotNumber);
                                             HANDLER.save();
                                             return 1;
                                         })
@@ -126,15 +126,15 @@ public class Commands {
                                 .executes(context -> {
                                     int orderNum = IntegerArgumentType.getInteger(context, "order number") - 1;
                                     if (BUConfig.get().customOrders.size() < orderNum) {
-                                        Util.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
+                                        PlayerActionUtil.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
                                         return 0;
                                     }
                                     CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum);
                                     if (customOrder.getOrderAmount() != 71680) {
-                                        Util.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
+                                        PlayerActionUtil.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
                                         BUConfig.get().customOrders.get(orderNum).remove();
                                     } else {
-                                        Util.notifyAll("Cannot remove Max Buy Order.");
+                                        PlayerActionUtil.notifyAll("Cannot remove Max Buy Order.");
                                         return 0;
                                     }
                                     HANDLER.save();
@@ -152,7 +152,7 @@ public class Commands {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.VOLUME, limit);
                                             HANDLER.save();
-                                            Util.notifyAll("Added rule: VOLUME" + ": " + limit);
+                                            PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
                                             return 1;
                                         })
                                 )
@@ -164,7 +164,7 @@ public class Commands {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.PRICE, limit);
                                             HANDLER.save();
-                                            Util.notifyAll("Added rule: PRICE" + ": " + limit);
+                                            PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
                                             return 1;
                                         })
                                 )
@@ -176,7 +176,7 @@ public class Commands {
                                             String name = StringArgumentType.getString(context, "itemName");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.NAME, name);
                                             HANDLER.save();
-                                            Util.notifyAll("Added rule: NAME" + ": " + name);
+                                            PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
                                             return 1;
                                         })
                                 )
@@ -192,7 +192,7 @@ public class Commands {
                                     if (rule == null)
                                         context.getSource().sendError(Text.literal("Invalid rule number. Check the order in /bu"));
                                     if (rule.getRule() != null) {
-                                        Util.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
+                                        PlayerActionUtil.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
                                     }
                                     BUConfig.get().restrictSell.getControls().remove(restrictNum);
                                     HANDLER.save();
@@ -216,14 +216,14 @@ public class Commands {
             bazaarutils.then(ClientCommandManager.literal("outdated")
                     .executes((source) -> {
                         for (OrderData item : OrderData.getOutdatedItems()) {
-                            Util.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
+                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
                         }
                         return 1;
                     })
             );
             bazaarutils.then(ClientCommandManager.literal("list")
                     .executes(context -> {
-                                Util.notifyAll(OrderData.getVariables(OrderData::getName).toString());
+                                PlayerActionUtil.notifyAll(OrderData.getVariables(OrderData::getName).toString());
                                 return 1;
                             }
                     )
@@ -245,13 +245,13 @@ public class Commands {
         int index = IntegerArgumentType.getInteger(context, "index");
         String itemInfo = BUConfig.get().watchedOrders.get(index).getGeneralInfo();
         BUConfig.get().watchedOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
-        Util.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
+        PlayerActionUtil.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
         return 1;
     }
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        Util.notifyAll(BUConfig.get().watchedOrders.get(index).getGeneralInfo());
+        PlayerActionUtil.notifyAll(BUConfig.get().watchedOrders.get(index).getGeneralInfo());
         return 1;
     }
 }

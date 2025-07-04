@@ -12,6 +12,7 @@ import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
@@ -104,7 +105,7 @@ public class Bookmark extends CustomItemButton {
 
         priceInfo.updateMarketPrice(BazaarData.findProductId(name));
         if (priceInfo.getPrice() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
-            Util.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
+            PlayerActionUtil.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
             return null;
         }
 
@@ -259,7 +260,7 @@ public class Bookmark extends CustomItemButton {
                         SLOT_BUTTON_TEXTURES,
                         (btn) -> {
                             if (Screen.hasShiftDown()) {
-                                Util.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
+                                PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
                                 bookmark.onWidgetShiftClick();
                             } else {
                                 bookmark.onWidgetLeftClick();

@@ -10,7 +10,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -51,7 +51,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (sell.isSlotLocked(slotId)) {
 			if (sell.getSafetyClicks() < 3) {
 				sell.addSafetyClick();
-				Util.notifyAll(sell.getMessage());
+				PlayerActionUtil.notifyAll(sell.getMessage());
 				ci.cancel();
 			} else {
 				sell.resetSafetyClicks();

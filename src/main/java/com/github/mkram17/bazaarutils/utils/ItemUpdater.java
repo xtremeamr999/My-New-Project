@@ -91,7 +91,7 @@ public class ItemUpdater implements BUListener {
             }
 
             OrderData tempItem = isSellOrder ? new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTABUY, totalVolume) : new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTASELL, totalVolume);
-            tempItem.setMaximumRounding(0.0);
+            tempItem.setTolerance(0.0);
 
             if(volumeFilled > -1) {
                 tempItem.setAmountFilled(volumeFilled);
@@ -150,7 +150,7 @@ public class ItemUpdater implements BUListener {
 
         for(OrderData item : itemsToRemove) {
             item.removeFromWatchedItems();
-            Util.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
         }
 
         BUConfig.HANDLER.save();
@@ -159,29 +159,29 @@ public class ItemUpdater implements BUListener {
     private static OrderData updateWithItem(OrderData foundItem){
         OrderData match = OrderData.findItem(foundItem, BUConfig.get().watchedOrders);
         if(match == null) {
-            Util.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
             return foundItem;
         }
 
-        if (match.getMaximumRounding() != 0.0) {
-            Util.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getMaximumRounding() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
-            match.setMaximumRounding(0.0);
+        if (match.getTolerance() != 0.0) {
+            PlayerActionUtil.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getTolerance() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+            match.setTolerance(0.0);
         }
 //        Util.notifyAll("Match found", Util.notificationTypes.ITEMDATA);
         if(match.getPriceInfo().getPrice() != foundItem.getPriceInfo().getPrice()){
-            Util.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
         }
         if(match.getFillStatus() != foundItem.getFillStatus()){
-            Util.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ITEMDATA);
             match.setFillStatus(foundItem.getFillStatus());
         }
         if(match.getAmountFilled() != foundItem.getAmountFilled()){
-            Util.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
             match.setAmountFilled(foundItem.getAmountFilled());
         }
         if(match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0){
-            Util.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
             match.setAmountClaimed(foundItem.getAmountClaimed());
         }
         BUConfig.HANDLER.save();
