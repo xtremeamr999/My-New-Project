@@ -60,7 +60,7 @@ public class BazaarUtils implements ClientModInitializer {
                 (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
     }
 
-    private void registerCommands() {
+    public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             Commands.register(dispatcher);
         });
