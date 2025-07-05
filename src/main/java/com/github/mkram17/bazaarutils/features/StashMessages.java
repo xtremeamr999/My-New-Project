@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -39,7 +40,10 @@ public class StashMessages implements BUListener {
                 stashPreviouslyClaimed = true;
                 BUConfig.HANDLER.save();
                 Util.tickExecuteLater(2, () ->{
-                    PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
+                    if(BUCompatibilityHelper.isAmecsReborn())
+                        PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
+                    else
+                        PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use download Amecs Reborn and use the Stash Helper keybinnd to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
                     });
             }
         });
