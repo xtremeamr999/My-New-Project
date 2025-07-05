@@ -24,16 +24,16 @@ public class OrderPriceInfo {
     }
 
     @Setter @Getter
-    private double price;
+    private Double price;
     @Setter @Getter
     private priceTypes priceType;
     @Getter
-    private double marketPrice;
+    private Double marketPrice;
     //the price of the opposite type of order
     @Getter @Setter
-    private double marketOppositePrice;
+    private Double marketOppositePrice;
 
-    public OrderPriceInfo(double price, priceTypes priceType) {
+    public OrderPriceInfo(Double price, priceTypes priceType) {
         this.priceType = priceType;
         this.price = (double) Math.round(price * 100) / 100;
     }

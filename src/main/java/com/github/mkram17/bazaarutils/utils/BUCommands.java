@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
@@ -13,48 +12,61 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
-import net.minecraft.command.CommandSource;
-import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static com.github.mkram17.bazaarutils.config.BUConfig.HANDLER;
 import static com.github.mkram17.bazaarutils.config.BUConfig.openGUI;
 
-public class Commands {
+public class BUCommands {
+
+    private static final List<LiteralArgumentBuilder<FabricClientCommandSource>> developerCommands = List.of(
+            ClientCommandManager.literal("remove")
+                    .then(ClientCommandManager.argument("index", IntegerArgumentType.integer())
+                            .executes(BUCommands::executeRemove)
+                    ),
+            ClientCommandManager.literal("info")
+                    .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
+                                    .executes(BUCommands::executeInfo)
+                            )
+                    ),
+            ClientCommandManager.literal("outdated")
+                    .executes((source) -> {
+                        for (OrderData item : OrderData.getOutdatedItems()) {
+                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
+                        }
+                        return 1;
+                    }),
+            ClientCommandManager.literal("list")
+                    .executes(context -> {
+                                PlayerActionUtil.notifyAll(OrderData.getVariables(OrderData::getName).toString());
+                                return 1;
+                            }
+                    )
+    );
+    private static final LiteralArgumentBuilder<FabricClientCommandSource> bazaarutils = ClientCommandManager.literal("bazaarutils").executes(context -> {
+        openGUI();
+        return 1;
+    });
+
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        // Main command: /bazaarutils
-        LiteralArgumentBuilder<FabricClientCommandSource> bazaarutils = ClientCommandManager.literal("bazaarutils").executes(context -> {
-            openGUI();
-            return 1;
-        });
-        // Subcommand: /bazaarutils remove <index>
-//        bazaarutils.then(ClientCommandManager.literal("remove")
-//                        .then(ClientCommandManager.argument("index", IntegerArgumentType.integer())
-//                                .executes(Commands::executeRemove)
-//                        )
-//        );
+
+
+
+
         bazaarutils.then(ClientCommandManager.literal("help")
                 .executes((context) -> {
                             PlayerActionUtil.notifyAll(Util.HELP_MESSAGE);
                             return 1;
                         }
                 ));
-
-//        bazaarutils.then(ClientCommandManager.literal("info")
-//                        .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
-//                                        .executes(Commands::executeInfo)
-//                                )
-//                        )
-//                );
 
         bazaarutils.then(ClientCommandManager.literal("tax")
                 .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1, 1.25))
@@ -87,8 +99,12 @@ public class Commands {
                 .executes((context) -> {
                     BUConfig.get().developerMode = !BUConfig.get().developerMode;
                     HANDLER.save();
+                    //TODO register new commands so they can be used without restarting
                     PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
+                    if(BUConfig.get().developerMode) {
+                        registerDeveloperCommands(dispatcher);
+                    }
                     return 1;
                 })
         );
@@ -207,33 +223,10 @@ public class Commands {
                         )
                 )
         );
+
+
         if (BUConfig.get().developerMode) {
-            bazaarutils.then(ClientCommandManager.literal("remove")
-                    .then(ClientCommandManager.argument("index", IntegerArgumentType.integer())
-                            .executes(Commands::executeRemove)
-                    )
-            );
-            bazaarutils.then(ClientCommandManager.literal("info")
-                    .then((ClientCommandManager.argument("index", IntegerArgumentType.integer())
-                                    .executes(Commands::executeInfo)
-                            )
-                    )
-            );
-            bazaarutils.then(ClientCommandManager.literal("outdated")
-                    .executes((source) -> {
-                        for (OrderData item : OrderData.getOutdatedItems()) {
-                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
-                        }
-                        return 1;
-                    })
-            );
-            bazaarutils.then(ClientCommandManager.literal("list")
-                    .executes(context -> {
-                                PlayerActionUtil.notifyAll(OrderData.getVariables(OrderData::getName).toString());
-                                return 1;
-                            }
-                    )
-            );
+            registerDeveloperCommands(dispatcher);
         }
 //
         CommandNode<FabricClientCommandSource> bazaarutilsNode = dispatcher.register(bazaarutils);
@@ -245,6 +238,13 @@ public class Commands {
                         })
                         .redirect(bazaarutilsNode) // Inherit subcommands
         );
+    }
+
+    private static void registerDeveloperCommands(CommandDispatcher<FabricClientCommandSource> dispatcher){
+        for(LiteralArgumentBuilder<FabricClientCommandSource> command : developerCommands) {
+            bazaarutils.then(command);
+        }
+        dispatcher.register(bazaarutils);
     }
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {

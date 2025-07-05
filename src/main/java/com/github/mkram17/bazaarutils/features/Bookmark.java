@@ -101,7 +101,7 @@ public class Bookmark extends CustomItemButton {
     public OrderPriceInfo getPriceInfo() {
         if (name == null)
             return null;
-        OrderPriceInfo priceInfo = new OrderPriceInfo(0, OrderPriceInfo.priceTypes.INSTABUY);
+        OrderPriceInfo priceInfo = new OrderPriceInfo(0.0, OrderPriceInfo.priceTypes.INSTABUY);
 
         priceInfo.updateMarketPrice(BazaarData.findProductId(name));
         if (priceInfo.getPrice() == 0.0 && priceInfo.getMarketPrice() == 0.0) {

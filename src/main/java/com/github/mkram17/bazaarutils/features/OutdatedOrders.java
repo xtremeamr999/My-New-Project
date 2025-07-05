@@ -76,7 +76,7 @@ public class OutdatedOrders implements BUListener {
                 }
             }
 
-            PlayerActionUtil.useCommand("bz");
+            PlayerActionUtil.runCommand("bz");
         });
     }
     public Collection<Option<Boolean>> createOptions() {

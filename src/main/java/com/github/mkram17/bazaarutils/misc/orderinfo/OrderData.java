@@ -9,7 +9,6 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -53,7 +52,7 @@ public class OrderData {
     @Setter @Getter
     private statuses fillStatus;
     @Getter
-    private final int volume;
+    private final Integer volume;
 
     @Setter
     @Getter
@@ -65,6 +64,8 @@ public class OrderData {
     private double tolerance;
     @Getter
     private OrderPriceInfo priceInfo;
+    @Getter
+    private OrderItemInfo itemInfo;
 
     @Getter
     private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
@@ -72,10 +73,10 @@ public class OrderData {
     //@Param fullPrice is the price per unit * volume
     //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
     @Deprecated
-    public OrderData(String name, Double fullPrice, OrderPriceInfo.priceTypes priceType, int volume) {
-        this(name, volume,  new OrderPriceInfo(fullPrice/volume, priceType));
+    public OrderData(String name, Double price, OrderPriceInfo.priceTypes priceType, int volume) {
+        this(name, volume,  new OrderPriceInfo(price, priceType));
     }
-    public OrderData(String name, int volume, OrderPriceInfo priceInfo) {
+    public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {
         this.name = name;
         this.volume = volume;
         this.productID = BazaarData.findProductId(name);
@@ -90,6 +91,9 @@ public class OrderData {
     }
 
     private double calculateTolerance(){
+        //default tolerance
+        if(priceInfo.getPrice() == null || volume == null)
+            return 0.9;
         //doesnt round prices when total is over 10k
         if(priceInfo.getPrice()*volume < 10000)
             return 0;
@@ -119,19 +123,6 @@ public class OrderData {
         return variables;
     }
 
-    //TODO refactor of match finding -- it can definitely be improved
-    private static ArrayList<OrderData> findExactMatches(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType){
-        ArrayList<OrderData> itemList = new ArrayList<>();
-        for(OrderData item : BUConfig.get().watchedOrders){
-            if((price == null || item.isSimilarPrice(price)) &&
-                    (volume == null || Math.abs(item.getVolume() - volume) <= (0.05 * volume)) &&
-                    (name == null || name.equalsIgnoreCase(item.getName())) &&
-                    (priceType == null || priceType == item.getPriceInfo().getPriceType())){
-                itemList.add(item);
-            }
-        }
-        return itemList;
-    }
     private static ArrayList<OrderData> findLooseVolumeMatches(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType){
         ArrayList<OrderData> itemList = new ArrayList<>();
         for(OrderData item : BUConfig.get().watchedOrders){
@@ -145,52 +136,60 @@ public class OrderData {
         return itemList;
     }
 
-    public static OrderData findItem(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType) {
-        ArrayList<OrderData> itemList = findExactMatches(name, price, volume, priceType);
-        if(itemList.isEmpty())
-            itemList = findLooseVolumeMatches(name, price, volume, priceType);
+    public boolean equals(OrderData order, boolean isStrict) {
+        String name = order.getName();
+        Double price = order.getPriceInfo().getPrice();
+        Integer volume = order.getVolume();
+        OrderPriceInfo.priceTypes priceType = order.getPriceInfo().getPriceType();
 
+        if (isStrict) {
+            return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
+                    (cantCompare(this.getVolume(), volume) || this.getVolume() == volume) &&
+                    (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+                    (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+        }
+        return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
+                (cantCompare(this.getVolume(), volume) || Math.abs(this.getVolume() - volume) <= (0.05 * volume)) &&
+                (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+                (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+    }
+
+    private boolean cantCompare(Object... objects) {
+        for (Object object : objects) {
+            if (object == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public OrderData findItemInList(List<OrderData> list) {
+        ArrayList<OrderData> itemList = new ArrayList<>();
+        for(OrderData item : list){
+            if(this.equals(item, true)){
+                itemList.add(item);
+            }
+        }
         if (itemList.isEmpty()) {
-            PlayerActionUtil.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);
-            return null;
+            for(OrderData item : list){
+                if(this.equals(item, false)){
+                    itemList.add(item);
+                }
+            }
         }
         if (itemList.size() > 1) {
             OrderData bestMatch = itemList.getFirst();
             for (OrderData duplicate : itemList) {
                 PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-                if (volume == null) {
+                if (this.getVolume() == null) {
                     continue;
                 }
-                if (Math.abs(duplicate.getVolume() - volume) < Math.abs(bestMatch.getVolume() - volume)) {
+                // Find the duplicate with the closest volume to the matching item
+                if (Math.abs(duplicate.getVolume() - this.getVolume()) < Math.abs(bestMatch.getVolume() - this.getVolume())) {
                     bestMatch = duplicate;
                 }
             }
             return bestMatch;
-        }
-
-        return itemList.getFirst();
-    }
-    public static OrderData findItem(OrderData matchingItem, List<OrderData> list) {
-        String name = matchingItem.getName();
-        double price = matchingItem.getPriceInfo().getPrice();
-        int volume = matchingItem.getVolume();
-        OrderPriceInfo.priceTypes priceType = matchingItem.getPriceInfo().getPriceType();
-        ArrayList<OrderData> itemList = new ArrayList<>();
-        for(OrderData item : list){
-            if(item.isSimilarPrice(price) &&
-                    item.getVolume() == volume &&
-                    name.equalsIgnoreCase(item.getName()) &&
-                    priceType == item.getPriceInfo().getPriceType()){
-                itemList.add(item);
-            }
-        }
-        if (itemList.isEmpty()) {
-            return null;
-        }
-        if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
-                PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
         }
         return itemList.getFirst();
     }

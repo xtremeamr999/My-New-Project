@@ -31,7 +31,7 @@ public class BUCompatibilityHelper {
 
     public static void initializePatches(){
         if (FabricLoader.getInstance().isModLoaded(REI_MOD_ID)) {
-            PlayerActionUtil.notifyAll("Bazaar utils: REI detected. Attempting to modify REI config.");
+            Util.logMessage("REI detected. Attempting to modify REI config.");
             modifyReiConfigWithGson();
         }
         if(FabricLoader.getInstance().isModLoaded(AMECS_MODID))
@@ -105,7 +105,7 @@ public class BUCompatibilityHelper {
     //true == success, false == failure
     public static void tryDisableSkyblockerBazaarOverlay() {
         if (!isSkyblockerLoaded()) {
-            System.out.println("Skyblocker not loaded, cannot change its config.");
+            Util.logMessage("Skyblocker not loaded, cannot change its config.");
             return;
         }
         try {
@@ -133,13 +133,13 @@ public class BUCompatibilityHelper {
 
     public static void tryEnableSkyblockerBazaarOverlay() {
         if (!FabricLoader.getInstance().isModLoaded(SKYBLOCKER_MOD_ID)) {
-            System.out.println("Skyblocker not loaded, cannot enable its config setting.");
+            Util.logMessage("Skyblocker not loaded, cannot enable its config setting.");
             return;
         }
         try {
             SkyblockerConfig skyblockerConfig = SkyblockerConfigManager.get();
             if (!skyblockerConfig.uiAndVisuals.searchOverlay.enableBazaar) {
-                System.out.println("Attempting to enable Skyblocker Bazaar Overlay...");
+                Util.logMessage("Attempting to enable Skyblocker Bazaar Overlay...");
                 //? if >= 1.21.5 {
                 SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = true);
                 //?} else {
@@ -149,7 +149,7 @@ public class BUCompatibilityHelper {
 
                 PlayerActionUtil.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
             } else {
-                System.out.println("Skyblocker Bazaar Overlay already enabled.");
+                Util.logMessage("Skyblocker Bazaar Overlay already enabled.");
             }
 
         } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {

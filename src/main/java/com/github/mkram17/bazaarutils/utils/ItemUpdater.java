@@ -8,7 +8,9 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,211 +18,209 @@ import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
 
 public class ItemUpdater implements BUListener {
-    private static ArrayList<ItemStack> orderStacks = new ArrayList<>();
-    private static List<ItemStack> orderScreen;
     private static Inventory lowerChestInventory;
 
+    private static final String BUY_ORDER_PREFIX = "BUY";
+    private static final String SELL_ORDER_PREFIX = "SELL";
+    private static final String FILLED_LORE = "Filled";
+    private static final String PER_UNIT_LORE = "per unit";
+    private static final String TO_CLAIM_LORE = "to claim!";
+    private static final String ITEMS_LORE = "items";
+    private static final String COINS_LORE = " coins";
+
     @EventHandler(priority = EventPriority.HIGH)
-    public static void onGUI(ChestLoadedEvent e){
-        if(!GUIUtils.inOrderScreen())
-            return;
+    public static void onGUI(ChestLoadedEvent e) {
+        if (!GUIUtils.inOrderScreen()) return;
 
         lowerChestInventory = e.getLowerChestInventory();
-        orderScreen = e.getItemStacks();
-        orderStacks = findOrders(orderScreen);
+        List<ItemStack> orderScreen = e.getItemStacks();
+        List<ItemStack> orderStacks = findOrders(orderScreen);
         updateWatchedItems(orderStacks);
     }
 
-    private static void updateWatchedItems(ArrayList<ItemStack> orderStacks){
-        List<OrderData> foundItems = new ArrayList<>();
-        for(ItemStack stack : orderStacks){
-            //? if >= 1.21.4 {
-            String customName = stack.getCustomName().getString();
-            //?} else {
-            /*String customName = stack.getComponentChanges().get(DataComponentTypes.CUSTOM_NAME).get().getString();
-            *///?}
-            String name = "";
-            boolean isSellOrder;
-            double unitPrice;
-            double fullPrice;
-            int volumeFilled = -1;
-            int totalVolume;
-            int amountUnclaimed;
-            int amountClaimed = -1;
+    private static void updateWatchedItems(List<ItemStack> orderStacks) {
+        List<OrderData> foundItems = orderStacks.stream()
+                .map(ItemUpdater::parseOrderFromItemStack)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-            if(stack.getComponentChanges().get(DataComponentTypes.LORE) == null)
-                continue;
-            List<Text> changedComponents = stack.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines();
-
-            if(customName.contains("BUY")){
-                name = customName.substring(4);
-                isSellOrder = false;
-            } else {
-                name = customName.substring(5);
-                isSellOrder = true;
+        for (OrderData item : foundItems) {
+            if (!updateExistingOrderItem(item)) {
+                Util.addWatchedOrder(item);
             }
 
-            if(Util.findComponentWith(changedComponents, "Filled") != null) {
-                var volumeFilledString = Util.findComponentWith(changedComponents, "Filled");
-                volumeFilled = Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
-                totalVolume = Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
-            } else {
-//                fullPrice = Util.parseNumber(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "Worth"), "Worth"));
-                totalVolume = Util.parseNumber(changedComponents.get(2).getSiblings().get(1).getString());
-
+            if (item.getFillStatus() != OrderData.statuses.FILLED &&
+                    (item.getOutdatedStatus() == OrderData.statuses.OUTDATED ||
+                            item.getOutdatedStatus() == OrderData.statuses.COMPETITIVE ||
+                            item.getOutdatedStatus() == OrderData.statuses.MATCHED)) {
+                OrderStatusHighlight.addHighlightedOrder(mapScreenIndexToInventoryIndex(item), item);
             }
-            unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(changedComponents, "per unit"), "unit:"));
-            fullPrice = unitPrice*totalVolume;
-
-            if(volumeFilled != -1) {
-                if (Util.findComponentWith(changedComponents, "to claim!") != null) {
-                    var amountUnclaimedString = Util.findComponentWith(changedComponents, "to claim!");
-                    if(!amountUnclaimedString.contains("items")) {
-                        amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(" coins")));
-                    } else {
-                        amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf("items") - 1));
-                    }
-                    amountClaimed = volumeFilled - amountUnclaimed;
-                } else {
-                    amountClaimed = volumeFilled;
-                }
-            }
-
-            OrderData tempItem = isSellOrder ? new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTABUY, totalVolume) : new OrderData(name, fullPrice, OrderPriceInfo.priceTypes.INSTASELL, totalVolume);
-            tempItem.setTolerance(0.0);
-
-            if(volumeFilled > -1) {
-                tempItem.setAmountFilled(volumeFilled);
-                if (volumeFilled == totalVolume)
-                    tempItem.setFilled();
-            }
-            if(amountClaimed > -1)
-                tempItem.setAmountClaimed(amountClaimed);
-
-            //if updateWithItem() returns null addWatchedItem returns, so it is only called when no match is found
-            foundItems.add(tempItem);
-            Util.addWatchedOrder(updateWithItem(tempItem));
-
-            //if item is filled, dont give it an order status highlight
-            if(tempItem.getFillStatus() == OrderData.statuses.FILLED)
-                continue;
-
-            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED ||
-               tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE ||
-               tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED) {
-                OrderStatusHighlight.addHighlightedOrder(mapScreenIndexToInventoryIndex(stack), tempItem);
-            }
-
-//            if(tempItem.getOutdatedStatus() == OrderData.statuses.OUTDATED)
-//                OrderStatusHighlight.addOutdatedSlotIndex(mapScreenIndexToInventoryIndex(stack));
-//            else if(tempItem.getOutdatedStatus() == OrderData.statuses.COMPETITIVE)
-//                OrderStatusHighlight.addCompetitiveSlotIndex(mapScreenIndexToInventoryIndex(stack));
-//            else if(tempItem.getOutdatedStatus() == OrderData.statuses.MATCHED)
-//                OrderStatusHighlight.addMatchedSlotIndex(mapScreenIndexToInventoryIndex(stack));
         }
+
         removeOldItems(foundItems);
         OrderData.updateOutdatedItems();
     }
 
-    private static int mapScreenIndexToInventoryIndex(ItemStack stack) {
-        if (lowerChestInventory == null) {
-            return -1;
+    private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
+        String customName = stack.getName().getString();
+        var loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
+        if (loreComponent == null || loreComponent.isEmpty()) return Optional.empty();
+
+        List<Text> lore = loreComponent.get().styledLines();
+        boolean isSellOrder;
+        String name;
+
+        if (customName.contains(BUY_ORDER_PREFIX)) {
+            name = customName.substring(BUY_ORDER_PREFIX.length() + 1);
+            isSellOrder = false;
+        } else if (customName.contains(SELL_ORDER_PREFIX)) {
+            name = customName.substring(SELL_ORDER_PREFIX.length() + 1);
+            isSellOrder = true;
+        } else {
+            return Optional.empty();
         }
+
+        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(lore, PER_UNIT_LORE), "unit:"));
+        int totalVolume;
+        int volumeFilled = -1;
+        int amountClaimed = -1;
+
+        String volumeFilledString = Util.findComponentWith(lore, FILLED_LORE);
+        if (volumeFilledString != null) {
+            volumeFilled = Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
+            totalVolume = Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
+        } else {
+            totalVolume = Util.parseNumber(lore.get(2).getSiblings().get(1).getString());
+        }
+
+        if (volumeFilled != -1) {
+            String amountUnclaimedString = Util.findComponentWith(lore, TO_CLAIM_LORE);
+            if (amountUnclaimedString != null) {
+                int amountUnclaimed;
+                if (!amountUnclaimedString.contains(ITEMS_LORE)) {
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(COINS_LORE)));
+                } else {
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(ITEMS_LORE) - 1));
+                }
+                amountClaimed = volumeFilled - amountUnclaimed;
+            } else {
+                amountClaimed = volumeFilled;
+            }
+        }
+
+        OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
+        OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
+        OrderData orderData = new OrderData(name, totalVolume, priceInfo);
+        orderData.setTolerance(0.0);
+
+        if (volumeFilled > -1) {
+            orderData.setAmountFilled(volumeFilled);
+            if (volumeFilled == totalVolume) orderData.setFilled();
+        }
+        if (amountClaimed > -1) {
+            orderData.setAmountClaimed(amountClaimed);
+        }
+
+        return Optional.of(orderData);
+    }
+
+    private static int mapScreenIndexToInventoryIndex(OrderData item) {
+        if (lowerChestInventory == null) return -1;
+
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
-            if (!inventoryStack.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, inventoryStack)) {
-                return i;
+            if (!inventoryStack.isEmpty()) {
+                Optional<OrderData> parsed = parseOrderFromItemStack(inventoryStack);
+                if (parsed.isPresent() && parsed.get().equals(item)) {
+                    return i;
+                }
             }
         }
         return -1;
     }
 
-    private static void removeOldItems(List<OrderData> foundItems){
-        List<OrderData> itemsToRemove = new ArrayList<>();
+    private static void removeOldItems(List<OrderData> foundItems) {
+        List<OrderData> itemsToRemove = BUConfig.get().watchedOrders.stream()
+                .filter(watchedItem -> watchedItem.findItemInList(foundItems) == null)
+                .toList();
 
-        for(OrderData item : BUConfig.get().watchedOrders){
-            if(OrderData.findItem(item, foundItems) == null) {
-                itemsToRemove.add(item);
-            }
-        }
-
-        for(OrderData item : itemsToRemove) {
+        itemsToRemove.forEach(item -> {
             item.removeFromWatchedItems();
             PlayerActionUtil.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
-        }
+        });
 
-        BUConfig.HANDLER.save();
+        if (!itemsToRemove.isEmpty()) {
+            BUConfig.HANDLER.save();
+        }
     }
 
-    private static OrderData updateWithItem(OrderData foundItem){
-        OrderData match = OrderData.findItem(foundItem, BUConfig.get().watchedOrders);
-        if(match == null) {
-            PlayerActionUtil.notifyAll("No match found", Util.notificationTypes.ITEMDATA);
-            return foundItem;
+    private static boolean updateExistingOrderItem(OrderData foundItem) {
+        OrderData match = foundItem.findItemInList(BUConfig.get().watchedOrders);
+        if (match == null) {
+            PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ITEMDATA);
+            return false;
         }
 
+        boolean updated = false;
         if (match.getTolerance() != 0.0) {
             PlayerActionUtil.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getTolerance() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             match.setTolerance(0.0);
+            updated = true;
         }
-//        Util.notifyAll("Match found", Util.notificationTypes.ITEMDATA);
-        if(match.getPriceInfo().getPrice() != foundItem.getPriceInfo().getPrice()){
+        if (match.getPriceInfo().getPrice() != foundItem.getPriceInfo().getPrice()) {
             PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
+            updated = true;
         }
-        if(match.getFillStatus() != foundItem.getFillStatus()){
+        if (match.getFillStatus() != foundItem.getFillStatus()) {
             PlayerActionUtil.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ITEMDATA);
             match.setFillStatus(foundItem.getFillStatus());
+            updated = true;
         }
-        if(match.getAmountFilled() != foundItem.getAmountFilled()){
+        if (match.getAmountFilled() != foundItem.getAmountFilled()) {
             PlayerActionUtil.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
             match.setAmountFilled(foundItem.getAmountFilled());
+            updated = true;
         }
-        if(match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0){
+        if (match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0) {
             PlayerActionUtil.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
             match.setAmountClaimed(foundItem.getAmountClaimed());
+            updated = true;
         }
-        BUConfig.HANDLER.save();
-        return null;
+
+        if (updated) {
+            BUConfig.HANDLER.save();
+        }
+        return true;
     }
 
-    //TODO  low priority -- there is definitely a better way to do this
-    private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks){
-            ArrayList<ItemStack> items = new ArrayList<>();
-            int lastBlackPaneIndex = -1, firstAfterIndex = -1;
+    private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks) {
+        int firstOrderIndex = -1;
+        int lastOrderIndex = -1;
 
-            for (int i = 0; i < orderScreenStacks.size(); i++) {
-                if (orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE)) {
-                    lastBlackPaneIndex = i;
-                } else{
+        for (int i = 0; i < orderScreenStacks.size(); i++) {
+            if (!orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE)) {
+                if (firstOrderIndex == -1) firstOrderIndex = i;
+            } else {
+                if (firstOrderIndex != -1) {
+                    lastOrderIndex = i;
                     break;
                 }
             }
+        }
 
-            for (int i = lastBlackPaneIndex + 1; i < orderScreenStacks.size() - 2; i++) {
-                if (orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE) && orderScreenStacks.get(i+1).isOf(Items.BLACK_STAINED_GLASS_PANE) && orderScreenStacks.get(i+2).isOf(Items.BLACK_STAINED_GLASS_PANE)) {
-                    firstAfterIndex = i;
-                    break;
-                }
-            }
+        if (firstOrderIndex == -1 || lastOrderIndex == -1 || orderScreenStacks.get(firstOrderIndex).isOf(Items.ARROW)) {
+            return new ArrayList<>();
+        }
 
-            if (firstAfterIndex == -1)
-                return items;
-
-            for (int i = lastBlackPaneIndex + 1; i < firstAfterIndex; i++) {
-                if(!orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE))
-                    items.add(orderScreenStacks.get(i));
-            }
-
-            //if there are no items last index+1 will be arrow, so in that case it should return empty list
-            if(orderScreenStacks.get(lastBlackPaneIndex+1).isOf(Items.ARROW))
-                return new ArrayList<>();
-
-            return items;
+        return new ArrayList<>(orderScreenStacks.subList(firstOrderIndex, lastOrderIndex));
     }
 
     @Override
