@@ -72,12 +72,7 @@ public class OrderData implements BUListener {
     @Getter
     private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
 
-    //@Param fullPrice is the price per unit * volume
     //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
-    @Deprecated
-    public OrderData(String name, Double price, OrderPriceInfo.priceTypes priceType, int volume) {
-        this(name, volume,  new OrderPriceInfo(price, priceType));
-    }
     public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {
         this.name = name;
         this.volume = volume;

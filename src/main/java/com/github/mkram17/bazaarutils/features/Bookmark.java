@@ -51,7 +51,7 @@ public class Bookmark extends CustomItemButton {
             HOVER);
 
     @EventHandler
-    protected void checkGui(ChestLoadedEvent event) {
+    protected void onGuiLoad(ChestLoadedEvent event) {
             BazaarUtils.eventBus.unsubscribe(this);
     }
 

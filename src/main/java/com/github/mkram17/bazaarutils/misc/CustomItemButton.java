@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class CustomItemButton {
     protected static final RegistryEntry<SoundEvent> BUTTON_SOUND = SoundEvents.UI_BUTTON_CLICK;
     protected static final float BUTTON_VOLUME = .2f;
 
-    protected void checkGui(ChestLoadedEvent event) {
+    protected void onGuiLoad(ChestLoadedEvent event) {
 
     }
 

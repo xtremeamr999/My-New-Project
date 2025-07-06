@@ -40,7 +40,6 @@ public class BazaarUtils implements ClientModInitializer {
     public static ScheduledExecutorService BUExecutorService = Executors.newSingleThreadScheduledExecutor();
 
 
-    //TODO combine both groups of listeners into one and just subscribe after handler load
     @Override
     public void onInitializeClient() {
         BUConfig.HANDLER.load();

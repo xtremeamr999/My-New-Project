@@ -64,16 +64,17 @@ public class ChatHandler implements BUListener{
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(getName(siblings));
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
+
                 String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "");
                 totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
                 price = Double.parseDouble(totalPriceString)/volume;
-                OrderData itemToAdd;
                 if (messageType == messageTypes.SELLORDER) {
                     //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
                     price /= ((100 - BUConfig.get().bzTax)/100);
-                    itemToAdd = new OrderData(itemName, price, OrderPriceInfo.priceTypes.INSTABUY, volume);
-                } else
-                    itemToAdd = new OrderData(itemName, price, OrderPriceInfo.priceTypes.INSTASELL, volume);
+                }
+
+                OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
+                OrderData itemToAdd = new OrderData(itemName, volume, priceInfo);
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedOrder(itemToAdd);
