@@ -174,7 +174,7 @@ public class ItemUpdater implements BUListener {
             match.setTolerance(0.0);
             updated = true;
         }
-        if (match.getPriceInfo().getPrice() != foundItem.getPriceInfo().getPrice()) {
+        if (!match.getPriceInfo().getPrice().equals(foundItem.getPriceInfo().getPrice())) {
             PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
             match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
             updated = true;

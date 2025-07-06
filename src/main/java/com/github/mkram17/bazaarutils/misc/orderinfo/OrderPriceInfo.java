@@ -39,10 +39,6 @@ public class OrderPriceInfo {
     }
 
     public void updateMarketPrice(String productId) {
-//        double oldPrice = marketPrice;
-        if(productId == null || productId.isEmpty()) {
-            return;
-        }
         marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
         marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
     }

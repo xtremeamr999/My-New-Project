@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -16,13 +17,14 @@ import net.minecraft.util.Formatting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData {
+public class OrderData implements BUListener {
     public String getProductID() {
         return productID;
     }
@@ -144,7 +146,7 @@ public class OrderData {
 
         if (isStrict) {
             return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
-                    (cantCompare(this.getVolume(), volume) || this.getVolume() == volume) &&
+                    (cantCompare(this.getVolume(), volume) || this.getVolume().equals(volume)) &&
                     (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
                     (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
         }
@@ -217,7 +219,7 @@ public class OrderData {
             for (OrderData oldItem : availableOldOutdated) {
                 if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
                         Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.tolerance &&
-                        currentNewOutdatedItem.getVolume() == oldItem.getVolume() &&
+                        currentNewOutdatedItem.getVolume().equals(oldItem.getVolume()) &&
                         currentNewOutdatedItem.getPriceInfo().getPriceType() == oldItem.getPriceInfo().getPriceType()) {
                     foundMatchInOldList = true;
                     matchedOldItem = oldItem;
@@ -248,18 +250,46 @@ public class OrderData {
     }
 
     public void updateMarketPrice(){
-        if(productID == null){
-            Util.logError("Could not find market price for " + name + " due to null product ID", null);
-            return;
-        }
         priceInfo.updateMarketPrice(productID);
+    }
+
+    @Override
+    public void subscribe() {
+        scheduleHealthCheck();
+    }
+
+    private void scheduleHealthCheck(){
+        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() ->{
+                if(!fixProductID()){
+                   Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", null);
+                }
+        }, 1, 30, TimeUnit.SECONDS);
+    }
+
+    //returns true if productID is safe/fixed after run, and false if it is not
+    private boolean fixProductID(){
+        if(isProductIDHealthy()) {
+            return true;
+        }
+        String newProductID = BazaarData.findProductId(name);
+        if(newProductID == null){
+            Util.logError("While refinding product id, could not find product ID for " + name, null);
+            return false;
+        } else {
+            Util.logMessage("Successfully fixed product ID for " + name + ": " + newProductID);
+            return true;
+        }
+    }
+
+    private boolean isProductIDHealthy(){
+        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, priceInfo.getPriceType()) == null);
     }
 
     public statuses getOutdatedStatus(){
         updateMarketPrice();
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
-        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
+        if(priceInfo.getPrice().equals(priceInfo.getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
 
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {

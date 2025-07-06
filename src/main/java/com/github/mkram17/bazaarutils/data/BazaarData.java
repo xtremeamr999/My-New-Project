@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 //TODO more efficient timing of api requests
 public class BazaarData implements BUListener {
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
-    static ScheduledExecutorService bzExecutor = Executors.newScheduledThreadPool(5);
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;
     private static int exceptionCount = 0;
@@ -40,7 +39,7 @@ public class BazaarData implements BUListener {
     }
 
     public static void scheduleBazaar() {
-        bzExecutor.scheduleAtFixedRate(() -> {
+        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
             if (!(bazaarCalls % bazaarDataPeriod == 0))
                 return;
             if (skipNextCall) {
@@ -141,11 +140,6 @@ public class BazaarData implements BUListener {
             Util.notifyError("Bazaar data is null", null);
             return -1.0;
         }
-        if (productId == null) {
-            Util.logError("Could not find item price due to null product id", null);
-            return -1.0;
-        }
-
         try {
             SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
             if (product == null) {

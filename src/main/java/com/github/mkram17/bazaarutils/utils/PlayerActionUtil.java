@@ -20,7 +20,7 @@ public class PlayerActionUtil {
         if (MinecraftClient.getInstance().player != null) {
             MinecraftClient.getInstance().player.sendMessage(message, false);
         } else {
-            Util.logError("Could not send notification because player is null. Message: " + message, null);
+            Util.logMessage("Could not send notification because player is null. Message: " + message);
             Util.tickExecuteLater(50, () -> sendPlayerMessage(message));
         }
     }
@@ -38,14 +38,14 @@ public class PlayerActionUtil {
     }
 
     //only used for developer messages and debugging. notifyAll(String/Text messsage) is used to send messages to the player
-    public static void notifyAll(String message, Util.notificationTypes notiType) {
+    public static void notifyAll(String message, Util.notificationTypes notificationType) {
         String callingName = Util.getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         MutableText messageText = Text.literal("(" + simpleCallingName + ") ")
                 .formatted(Formatting.GOLD)
                 .append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
-        if(notiType.isEnabled() || BUConfig.get().developer.allMessages)
+        if(notificationType.isEnabled() || BUConfig.get().developer.allMessages)
             notifyAll(messageText);
     }
 
