@@ -252,7 +252,7 @@ public class ChatHandler implements BUListener{
                 PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ITEMDATA);
                 return;
             }
-            if (volumeClaimed != null && item.getVolume() == volumeClaimed) {
+            if (item.getVolume().equals(volumeClaimed)) {
                 PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
                 item.removeFromWatchedItems();
             } else if(volumeClaimed != null){

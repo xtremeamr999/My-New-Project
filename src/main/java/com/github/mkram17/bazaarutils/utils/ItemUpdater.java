@@ -70,8 +70,9 @@ public class ItemUpdater implements BUListener {
 
     private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
         String customName = stack.getName().getString();
-        var loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
-        if (loreComponent == null || loreComponent.isEmpty()) return Optional.empty();
+        Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
+        if (loreComponent == null || loreComponent.isEmpty())
+            return Optional.empty();
 
         List<Text> lore = loreComponent.get().styledLines();
         boolean isSellOrder;

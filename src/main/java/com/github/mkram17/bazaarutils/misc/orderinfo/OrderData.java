@@ -193,6 +193,9 @@ public class OrderData implements BUListener {
             }
             return bestMatch;
         }
+        if (itemList.isEmpty()) {
+            return null;
+        }
         return itemList.getFirst();
     }
 
