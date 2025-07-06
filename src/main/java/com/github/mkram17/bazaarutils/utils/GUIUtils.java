@@ -46,7 +46,8 @@ public class GUIUtils implements BUListener {
     }
 
     public static boolean inBazaar(){
-        if(getContainerName() == null) return false;
+        if(getContainerName() == null)
+            return false;
         return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inOrderScreen() || getContainerName().contains("➜");
     }
 

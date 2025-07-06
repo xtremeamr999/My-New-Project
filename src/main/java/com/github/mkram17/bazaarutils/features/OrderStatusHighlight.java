@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import dev.isxander.yacl3.api.Option;
@@ -69,7 +70,7 @@ public class OrderStatusHighlight implements BUListener {
                 .binding(false,
                         this::isEnabled,
                         this::setEnabled)
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build();
     }
 

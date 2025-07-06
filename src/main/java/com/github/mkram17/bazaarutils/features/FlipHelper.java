@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
@@ -107,7 +108,10 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     public boolean matchFound() {
-        item = OrderData.findItem(null, orderPrice, orderVolumeFilled, OrderPriceInfo.priceTypes.INSTASELL);
+        OrderPriceInfo priceInfo = new OrderPriceInfo(orderPrice, OrderPriceInfo.priceTypes.INSTASELL);
+        item = new OrderData(null, orderVolumeFilled, priceInfo);
+        item = item.findItemInList(BUConfig.get().watchedOrders);
+
         if (item != null) {
             if (item.getFillStatus() == OrderData.statuses.FILLED) {
                 PlayerActionUtil.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);

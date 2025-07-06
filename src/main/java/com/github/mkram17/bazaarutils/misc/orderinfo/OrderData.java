@@ -3,13 +3,13 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -17,13 +17,14 @@ import net.minecraft.util.Formatting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData {
+public class OrderData implements BUListener {
     public String getProductID() {
         return productID;
     }
@@ -53,7 +54,7 @@ public class OrderData {
     @Setter @Getter
     private statuses fillStatus;
     @Getter
-    private final int volume;
+    private final Integer volume;
 
     @Setter
     @Getter
@@ -65,17 +66,14 @@ public class OrderData {
     private double tolerance;
     @Getter
     private OrderPriceInfo priceInfo;
+    @Getter
+    private OrderItemInfo itemInfo;
 
     @Getter
     private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
 
-    //@Param fullPrice is the price per unit * volume
     //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
-    @Deprecated
-    public OrderData(String name, Double fullPrice, OrderPriceInfo.priceTypes priceType, int volume) {
-        this(name, volume,  new OrderPriceInfo(fullPrice/volume, priceType));
-    }
-    public OrderData(String name, int volume, OrderPriceInfo priceInfo) {
+    public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {
         this.name = name;
         this.volume = volume;
         this.productID = BazaarData.findProductId(name);
@@ -90,6 +88,9 @@ public class OrderData {
     }
 
     private double calculateTolerance(){
+        //default tolerance
+        if(priceInfo.getPrice() == null || volume == null)
+            return 0.9;
         //doesnt round prices when total is over 10k
         if(priceInfo.getPrice()*volume < 10000)
             return 0;
@@ -119,19 +120,6 @@ public class OrderData {
         return variables;
     }
 
-    //TODO refactor of match finding -- it can definitely be improved
-    private static ArrayList<OrderData> findExactMatches(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType){
-        ArrayList<OrderData> itemList = new ArrayList<>();
-        for(OrderData item : BUConfig.get().watchedOrders){
-            if((price == null || item.isSimilarPrice(price)) &&
-                    (volume == null || Math.abs(item.getVolume() - volume) <= (0.05 * volume)) &&
-                    (name == null || name.equalsIgnoreCase(item.getName())) &&
-                    (priceType == null || priceType == item.getPriceInfo().getPriceType())){
-                itemList.add(item);
-            }
-        }
-        return itemList;
-    }
     private static ArrayList<OrderData> findLooseVolumeMatches(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType){
         ArrayList<OrderData> itemList = new ArrayList<>();
         for(OrderData item : BUConfig.get().watchedOrders){
@@ -145,52 +133,63 @@ public class OrderData {
         return itemList;
     }
 
-    public static OrderData findItem(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType) {
-        ArrayList<OrderData> itemList = findExactMatches(name, price, volume, priceType);
-        if(itemList.isEmpty())
-            itemList = findLooseVolumeMatches(name, price, volume, priceType);
+    public boolean equals(OrderData order, boolean isStrict) {
+        String name = order.getName();
+        Double price = order.getPriceInfo().getPrice();
+        Integer volume = order.getVolume();
+        OrderPriceInfo.priceTypes priceType = order.getPriceInfo().getPriceType();
 
+        if (isStrict) {
+            return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
+                    (cantCompare(this.getVolume(), volume) || this.getVolume().equals(volume)) &&
+                    (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+                    (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+        }
+        return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
+                (cantCompare(this.getVolume(), volume) || Math.abs(this.getVolume() - volume) <= (0.05 * volume)) &&
+                (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+                (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+    }
+
+    private boolean cantCompare(Object... objects) {
+        for (Object object : objects) {
+            if (object == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public OrderData findItemInList(List<OrderData> list) {
+        ArrayList<OrderData> itemList = new ArrayList<>();
+        for(OrderData item : list){
+            if(this.equals(item, true)){
+                itemList.add(item);
+            }
+        }
         if (itemList.isEmpty()) {
-            PlayerActionUtil.notifyAll("Could not find item with info: [name: " + name + ", price: " + price + ", volume: " + volume + "]", Util.notificationTypes.ITEMDATA);
-            return null;
+            for(OrderData item : list){
+                if(this.equals(item, false)){
+                    itemList.add(item);
+                }
+            }
         }
         if (itemList.size() > 1) {
             OrderData bestMatch = itemList.getFirst();
             for (OrderData duplicate : itemList) {
                 PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-                if (volume == null) {
+                if (this.getVolume() == null) {
                     continue;
                 }
-                if (Math.abs(duplicate.getVolume() - volume) < Math.abs(bestMatch.getVolume() - volume)) {
+                // Find the duplicate with the closest volume to the matching item
+                if (Math.abs(duplicate.getVolume() - this.getVolume()) < Math.abs(bestMatch.getVolume() - this.getVolume())) {
                     bestMatch = duplicate;
                 }
             }
             return bestMatch;
         }
-
-        return itemList.getFirst();
-    }
-    public static OrderData findItem(OrderData matchingItem, List<OrderData> list) {
-        String name = matchingItem.getName();
-        double price = matchingItem.getPriceInfo().getPrice();
-        int volume = matchingItem.getVolume();
-        OrderPriceInfo.priceTypes priceType = matchingItem.getPriceInfo().getPriceType();
-        ArrayList<OrderData> itemList = new ArrayList<>();
-        for(OrderData item : list){
-            if(item.isSimilarPrice(price) &&
-                    item.getVolume() == volume &&
-                    name.equalsIgnoreCase(item.getName()) &&
-                    priceType == item.getPriceInfo().getPriceType()){
-                itemList.add(item);
-            }
-        }
         if (itemList.isEmpty()) {
             return null;
-        }
-        if (itemList.size() > 1) {
-            itemList.forEach(duplicate -> {
-                PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-            });
         }
         return itemList.getFirst();
     }
@@ -218,7 +217,7 @@ public class OrderData {
             for (OrderData oldItem : availableOldOutdated) {
                 if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
                         Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.tolerance &&
-                        currentNewOutdatedItem.getVolume() == oldItem.getVolume() &&
+                        currentNewOutdatedItem.getVolume().equals(oldItem.getVolume()) &&
                         currentNewOutdatedItem.getPriceInfo().getPriceType() == oldItem.getPriceInfo().getPriceType()) {
                     foundMatchInOldList = true;
                     matchedOldItem = oldItem;
@@ -249,18 +248,46 @@ public class OrderData {
     }
 
     public void updateMarketPrice(){
-        if(productID == null){
-            Util.logError("Could not find market price for " + name + " due to null product ID", null);
-            return;
-        }
         priceInfo.updateMarketPrice(productID);
+    }
+
+    @Override
+    public void subscribe() {
+        scheduleHealthCheck();
+    }
+
+    private void scheduleHealthCheck(){
+        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() ->{
+                if(!fixProductID()){
+                   Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", null);
+                }
+        }, 1, 30, TimeUnit.SECONDS);
+    }
+
+    //returns true if productID is safe/fixed after run, and false if it is not
+    private boolean fixProductID(){
+        if(isProductIDHealthy()) {
+            return true;
+        }
+        String newProductID = BazaarData.findProductId(name);
+        if(newProductID == null){
+            Util.logError("While refinding product id, could not find product ID for " + name, null);
+            return false;
+        } else {
+            Util.logMessage("Successfully fixed product ID for " + name + ": " + newProductID);
+            return true;
+        }
+    }
+
+    private boolean isProductIDHealthy(){
+        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, priceInfo.getPriceType()) == null);
     }
 
     public statuses getOutdatedStatus(){
         updateMarketPrice();
         if(fillStatus == statuses.FILLED)
             return statuses.FILLED;
-        if(priceInfo.getPrice() == priceInfo.getMarketPrice() && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
+        if(priceInfo.getPrice().equals(priceInfo.getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1)
             return statuses.MATCHED;
 
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {

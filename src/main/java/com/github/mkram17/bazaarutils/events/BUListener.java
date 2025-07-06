@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -11,22 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface BUListener {
-    List<BUListener> transientEvents = new ArrayList<>();
     //must add to getTransientEvents()
     void subscribe();
 
-    static void addTransientEvents(){
-        transientEvents.add(new ChestLoadedEvent());
-        transientEvents.add(new ChatHandler());
-        transientEvents.add(new JoinMessages());
-        transientEvents.add(new GUIUtils());
-        transientEvents.add(new ItemUpdater());
-        transientEvents.add(new BazaarData());
-        transientEvents.add(new Util());
+    //if an instance of the class is not present as an object in BUConfig, it must be added here like the others
+    static List<BUListener> getTransientEventListeners(){
+        List<BUListener> transientEventListeners = new ArrayList<>();
+        transientEventListeners.add(new ChestLoadedEvent());
+        transientEventListeners.add(new ChatHandler());
+        transientEventListeners.add(new JoinMessages());
+        transientEventListeners.add(new GUIUtils());
+        transientEventListeners.add(new ItemUpdater());
+        transientEventListeners.add(new BazaarData());
+        transientEventListeners.add(new Util());
+        return transientEventListeners;
     }
 
-    //dont use lombok here, it fucks shit up
-    static List<BUListener> getTransientEvents(){
-        return transientEvents;
+    static List<BUListener> getEventListeners(){
+        List<BUListener> listeners = getTransientEventListeners();
+        listeners.addAll(BUConfig.get().getSerializedEvents());
+        return listeners;
     }
 }

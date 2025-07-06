@@ -5,8 +5,7 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.utils.Commands;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.mojang.serialization.Codec;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import lombok.Getter;
@@ -27,7 +26,8 @@ import net.minecraft.util.Identifier;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus eventBus = new EventBus();
@@ -37,9 +37,9 @@ public class BazaarUtils implements ClientModInitializer {
     public static boolean updatedMajorVersion = false;
     @Getter
     private static String updateNotes;
+    public static ScheduledExecutorService BUExecutorService = Executors.newSingleThreadScheduledExecutor();
 
 
-    //TODO combine both groups of listeners into one and just subscribe after handler load
     @Override
     public void onInitializeClient() {
         BUConfig.HANDLER.load();
@@ -62,17 +62,13 @@ public class BazaarUtils implements ClientModInitializer {
 
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            Commands.register(dispatcher);
+            BUCommands.register(dispatcher);
         });
     }
 
     //must be run after config load
     private void subscribeEvents(){
-        BUListener.addTransientEvents();
-        List<BUListener> listeners = BUListener.getTransientEvents();
-        listeners.addAll(BUConfig.get().getSerializedEvents());
-
-        for(BUListener listener : listeners) {
+        for(BUListener listener : BUListener.getEventListeners()) {
             listener.subscribe();
         }
     }
