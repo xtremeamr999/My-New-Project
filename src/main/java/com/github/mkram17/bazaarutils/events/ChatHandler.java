@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.events;
 
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -24,7 +25,7 @@ public class ChatHandler implements BUListener{
                 .binding(false,
                         BUConfig.get()::isOrderFilledSound,
                         BUConfig.get()::setOrderFilledSound)
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build();
     }
 

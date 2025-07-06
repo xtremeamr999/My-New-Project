@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.misc;
 
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
@@ -44,7 +45,7 @@ public class CustomItemButton {
                         getter,
                         setter)
                 .description(OptionDescription.of(Text.literal(description)))
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build();
     }
 }

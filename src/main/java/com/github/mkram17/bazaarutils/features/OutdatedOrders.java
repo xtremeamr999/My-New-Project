@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.features;
 
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -87,7 +88,7 @@ public class OutdatedOrders implements BUListener {
                 .binding(false,
                         this::isAutoOpenEnabled,
                         this::setAutoOpenEnabled)
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
                 .name(Text.literal("Notify on Outdated Orders"))
@@ -95,7 +96,7 @@ public class OutdatedOrders implements BUListener {
                 .binding(true,
                         this::isNotifyOutdated,
                         this::setNotifyOutdated)
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
                 .name(Text.literal("Sound for Outdated Orders"))
@@ -103,7 +104,7 @@ public class OutdatedOrders implements BUListener {
                 .binding(true,
                         this::isNotificationSound,
                         this::setNotificationSound)
-                .controller(BUConfig::createBooleanController)
+                .controller(BUConfigGui::createBooleanController)
                 .build());
         return options;
     }
