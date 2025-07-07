@@ -1,6 +1,7 @@
 **Changes**
 
   - Improved error handling and notification so it _shouldn't_ spam the chat anymore
+  - Outdated order notifications now give the option to open the orders page in the bazaar, instead of the main bazaar page
   - Improved calculation for tolerance, so outdated order notifications are more accurate
   - Major code refactor to improve maintainability and clarity
 

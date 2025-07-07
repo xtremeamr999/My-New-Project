@@ -129,7 +129,7 @@ public class Util implements BUListener {
         BUConfig.get().watchedOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
         BUConfig.HANDLER.save();
-        OrderData.updateOutdatedItems();
+        OrderData.updateOrdersOutdatedStatuses();
     }
 
     public static void subscribeTicks() {

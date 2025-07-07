@@ -67,7 +67,7 @@ public class OrderData implements BUListener {
     @Getter
     private OrderPriceInfo priceInfo;
     @Getter
-    private OrderItemInfo itemInfo;
+    private final OrderItemInfo itemInfo = new OrderItemInfo();
 
     @Getter
     private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
@@ -194,7 +194,7 @@ public class OrderData implements BUListener {
         return itemList.getFirst();
     }
 
-    public static void updateOutdatedItems() {
+    public static void updateOrdersOutdatedStatuses() {
         List<OrderData> previousOutdatedItems = new ArrayList<>(outdatedItems);
         outdatedItems.clear();
         for (OrderData item : BUConfig.get().watchedOrders) {
@@ -321,6 +321,6 @@ public class OrderData implements BUListener {
         if(!BUConfig.get().watchedOrders.remove(this))
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
-        OrderData.updateOutdatedItems();
+        OrderData.updateOrdersOutdatedStatuses();
     }
 }

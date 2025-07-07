@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
@@ -70,7 +68,7 @@ public class BazaarData implements BUListener {
 //                        writeJsonToFile(jsonString);
 
                     if (!BUConfig.get().watchedOrders.isEmpty()) {
-                        OrderData.updateOutdatedItems();
+                        OrderData.updateOrdersOutdatedStatuses();
                     }
                 }
             });

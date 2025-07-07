@@ -3,12 +3,10 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.inventory.Inventory;
@@ -55,17 +53,10 @@ public class ItemUpdater implements BUListener {
             if (!updateExistingOrderItem(item)) {
                 Util.addWatchedOrder(item);
             }
-
-            if (item.getFillStatus() != OrderData.statuses.FILLED &&
-                    (item.getOutdatedStatus() == OrderData.statuses.OUTDATED ||
-                            item.getOutdatedStatus() == OrderData.statuses.COMPETITIVE ||
-                            item.getOutdatedStatus() == OrderData.statuses.MATCHED)) {
-                OrderStatusHighlight.addHighlightedOrder(mapScreenIndexToInventoryIndex(item), item);
-            }
         }
 
         removeOldItems(foundItems);
-        OrderData.updateOutdatedItems();
+        OrderData.updateOrdersOutdatedStatuses();
     }
 
     private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
@@ -119,6 +110,8 @@ public class ItemUpdater implements BUListener {
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderData orderData = new OrderData(name, totalVolume, priceInfo);
+        orderData.getItemInfo().setItemStack(stack);
+        orderData.getItemInfo().setSlotIndex(mapScreenIndexToInventoryIndex(orderData));
         orderData.setTolerance(0.0);
 
         if (volumeFilled > -1) {
@@ -132,14 +125,16 @@ public class ItemUpdater implements BUListener {
         return Optional.of(orderData);
     }
 
+    //TODO switch to using ItemStack instead of OrderData so it's faster
     private static int mapScreenIndexToInventoryIndex(OrderData item) {
-        if (lowerChestInventory == null) return -1;
+        if (lowerChestInventory == null)
+            return -1;
 
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
             if (!inventoryStack.isEmpty()) {
                 Optional<OrderData> parsed = parseOrderFromItemStack(inventoryStack);
-                if (parsed.isPresent() && parsed.get().equals(item)) {
+                if (parsed.isPresent() && parsed.get().equals(item, false)) {
                     return i;
                 }
             }
@@ -168,6 +163,8 @@ public class ItemUpdater implements BUListener {
             PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ITEMDATA);
             return false;
         }
+
+        match.getItemInfo().setSlotIndex(mapScreenIndexToInventoryIndex(foundItem));
 
         boolean updated = false;
         if (match.getTolerance() != 0.0) {
