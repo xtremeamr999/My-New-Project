@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -23,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
 public class BazaarData implements BUListener {
+    public static final BazaarData INSTANCE = new BazaarData();
+
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;

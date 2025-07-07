@@ -10,25 +10,26 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO switch to using fabric event system with annotation processor
 public interface BUListener {
     //must add to getTransientEvents()
     void subscribe();
 
     //if an instance of the class is not present as an object in BUConfig, it must be added here like the others
-    static List<BUListener> getTransientEventListeners(){
+    static List<BUListener> getStaticEventListeners(){
         List<BUListener> transientEventListeners = new ArrayList<>();
-        transientEventListeners.add(new ChestLoadedEvent());
-        transientEventListeners.add(new ChatHandler());
-        transientEventListeners.add(new JoinMessages());
-        transientEventListeners.add(new GUIUtils());
-        transientEventListeners.add(new ItemUpdater());
-        transientEventListeners.add(new BazaarData());
-        transientEventListeners.add(new Util());
+        transientEventListeners.add(ChestLoadedEvent.INSTANCE);
+        transientEventListeners.add(ChatHandler.INSTANCE);
+        transientEventListeners.add(JoinMessages.INSTANCE);
+        transientEventListeners.add(GUIUtils.INSTANCE);
+        transientEventListeners.add(ItemUpdater.INSTANCE);
+        transientEventListeners.add(BazaarData.INSTANCE);
+        transientEventListeners.add(Util.INSTANCE);
         return transientEventListeners;
     }
 
     static List<BUListener> getEventListeners(){
-        List<BUListener> listeners = getTransientEventListeners();
+        List<BUListener> listeners = getStaticEventListeners();
         listeners.addAll(BUConfig.get().getSerializedEvents());
         return listeners;
     }

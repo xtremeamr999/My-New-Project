@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatHandler implements BUListener{
+    public static final ChatHandler INSTANCE = new ChatHandler();
     public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
 
     public static Option<Boolean> createDisableOrderFilledSound() {

@@ -52,7 +52,7 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     protected void onGuiLoad(ChestLoadedEvent event) {
-            BazaarUtils.eventBus.unsubscribe(this);
+            BazaarUtils.EVENT_BUS.unsubscribe(this);
     }
 
     public static boolean inItemScreen(){
@@ -69,7 +69,7 @@ public class Bookmark extends CustomItemButton {
         if(bookmarkedItemStack == null) {
             this.bookmarkedItemStack = findItemStack(name);
         }
-        BazaarUtils.eventBus.subscribe(this);
+        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     @EventHandler

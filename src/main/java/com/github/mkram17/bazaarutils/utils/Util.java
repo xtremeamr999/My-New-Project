@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -21,6 +22,8 @@ import java.util.List;
 
 //main utility class. More specific utility classes are in utils package
 public class Util implements BUListener {
+    public static final Util INSTANCE = new Util();
+
 
     @Override
     public void subscribe() {

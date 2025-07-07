@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
 public class OutdatedOrders implements BUListener {
@@ -111,6 +111,6 @@ public class OutdatedOrders implements BUListener {
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

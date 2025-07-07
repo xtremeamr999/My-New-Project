@@ -24,10 +24,11 @@ import net.minecraft.screen.slot.SlotActionType;
 
 import java.util.concurrent.CompletableFuture;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO make inBazaar() work all the time
 public class GUIUtils implements BUListener {
+    public static final GUIUtils INSTANCE = new GUIUtils();
     public static boolean wasLastChestFlip(){
         return inFlipGui;
     }
@@ -72,7 +73,7 @@ public class GUIUtils implements BUListener {
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
         registerScreenEvent();
     }
 
@@ -119,7 +120,7 @@ public class GUIUtils implements BUListener {
         String name = Bookmark.findName(e);
         if (Bookmark.isBookmarked(name)) {
             currentBookmark = Bookmark.findMatchingBookmark(name);
-            eventBus.subscribe(currentBookmark);
+            EVENT_BUS.subscribe(currentBookmark);
         } else
             currentBookmark = new Bookmark(name, null);
     }

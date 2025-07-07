@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class ItemUpdater implements BUListener {
+    public static final ItemUpdater INSTANCE = new ItemUpdater();
     private static Inventory lowerChestInventory;
 
     private static final String BUY_ORDER_PREFIX = "BUY";
@@ -223,6 +224,6 @@ public class ItemUpdater implements BUListener {
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

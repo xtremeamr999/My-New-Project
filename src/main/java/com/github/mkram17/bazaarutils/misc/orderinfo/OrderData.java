@@ -228,7 +228,7 @@ public class OrderData implements BUListener {
             if (foundMatchInOldList) {
                 availableOldOutdated.remove(matchedOldItem);
             } else {
-                BazaarUtils.eventBus.post(new OutdatedItemEvent(currentNewOutdatedItem));
+                BazaarUtils.EVENT_BUS.post(new OutdatedItemEvent(currentNewOutdatedItem));
             }
         }
 

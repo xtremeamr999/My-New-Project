@@ -61,7 +61,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
-		BazaarUtils.eventBus.post(event);
+		BazaarUtils.EVENT_BUS.post(event);
 //		Util.notifyAll("Mouse Click Posted");
 // Use the accessor to safely get the client instance
 		MinecraftClient client = ((AccessorScreen) screen).getClient();
