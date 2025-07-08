@@ -58,7 +58,7 @@ public class ItemUpdater implements BUListener {
         }
 
         removeOldItems(foundItems);
-        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
+        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 
     private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
@@ -145,12 +145,12 @@ public class ItemUpdater implements BUListener {
 
     private static void removeOldItems(List<OrderData> foundItems) {
         List<OrderData> itemsToRemove = BUConfig.get().watchedOrders.stream()
-                .filter(watchedItem -> watchedItem.findItemInList(foundItems) == null)
+                .filter(watchedItem -> watchedItem.findOrderInList(foundItems) == null)
                 .toList();
 
         itemsToRemove.forEach(item -> {
             item.removeFromWatchedItems();
-            PlayerActionUtil.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ORDERDATA);
         });
 
         if (!itemsToRemove.isEmpty()) {
@@ -159,9 +159,9 @@ public class ItemUpdater implements BUListener {
     }
 
     private static boolean updateExistingOrderItem(OrderData foundItem) {
-        OrderData match = foundItem.findItemInList(BUConfig.get().watchedOrders);
+        OrderData match = foundItem.findOrderInList(BUConfig.get().watchedOrders);
         if (match == null) {
-            PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ORDERDATA);
             return false;
         }
 
@@ -170,27 +170,27 @@ public class ItemUpdater implements BUListener {
 
         boolean updated = false;
         if (match.getTolerance() != 0.0) {
-            PlayerActionUtil.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getTolerance() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getTolerance() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
             match.setTolerance(0.0);
             updated = true;
         }
         if (!match.getPriceInfo().getPrice().equals(foundItem.getPriceInfo().getPrice())) {
-            PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
             match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
             updated = true;
         }
         if (match.getFillStatus() != foundItem.getFillStatus()) {
-            PlayerActionUtil.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ORDERDATA);
             match.setFillStatus(foundItem.getFillStatus());
             updated = true;
         }
         if (match.getAmountFilled() != foundItem.getAmountFilled()) {
-            PlayerActionUtil.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ORDERDATA);
             match.setAmountFilled(foundItem.getAmountFilled());
             updated = true;
         }
         if (match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0) {
-            PlayerActionUtil.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ITEMDATA);
+            PlayerActionUtil.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ORDERDATA);
             match.setAmountClaimed(foundItem.getAmountClaimed());
             updated = true;
         }

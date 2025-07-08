@@ -132,7 +132,6 @@ public class Util implements BUListener {
         BUConfig.get().watchedOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ORDERDATA);
         BUConfig.HANDLER.save();
-        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 
     public static void subscribeTicks() {
