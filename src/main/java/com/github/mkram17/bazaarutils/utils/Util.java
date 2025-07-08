@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -132,7 +132,7 @@ public class Util implements BUListener {
         BUConfig.get().watchedOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
         BUConfig.HANDLER.save();
-        OrderData.updateOrdersOutdatedStatuses();
+        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
     }
 
     public static void subscribeTicks() {

@@ -4,11 +4,14 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 
-public class OutdatedItemEvent implements ICancellable {
+public class OutdatedOrderEvent implements ICancellable {
     @Getter
-    private final OrderData item;
-    public OutdatedItemEvent(OrderData item) {
-        this.item = item;
+    private final OrderData order;
+    @Getter
+    private boolean isOutdated;
+    public OutdatedOrderEvent(OrderData order, boolean isOutdated) {
+        this.order = order;
+        this.isOutdated = isOutdated;
     }
     @Override
     public void setCancelled(boolean b) {

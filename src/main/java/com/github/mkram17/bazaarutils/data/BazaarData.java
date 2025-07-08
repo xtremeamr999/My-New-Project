@@ -3,8 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -71,7 +70,7 @@ public class BazaarData implements BUListener {
 //                        writeJsonToFile(jsonString);
 
                     if (!BUConfig.get().watchedOrders.isEmpty()) {
-                        OrderData.updateOrdersOutdatedStatuses();
+                        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
                     }
                 }
             });
