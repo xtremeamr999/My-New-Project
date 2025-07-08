@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -21,7 +20,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO maybe color chest if it is locked
 public class RestrictSell implements BUListener {
@@ -221,6 +220,6 @@ public class RestrictSell implements BUListener {
     @Override
     public void subscribe() {
         registerScreenEvent();
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

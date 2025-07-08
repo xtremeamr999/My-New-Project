@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//TODO when itemStack cant be found, do not show bookmark option
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public String name;
@@ -52,7 +51,7 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     protected void onGuiLoad(ChestLoadedEvent event) {
-            BazaarUtils.eventBus.unsubscribe(this);
+            BazaarUtils.EVENT_BUS.unsubscribe(this);
     }
 
     public static boolean inItemScreen(){
@@ -69,7 +68,7 @@ public class Bookmark extends CustomItemButton {
         if(bookmarkedItemStack == null) {
             this.bookmarkedItemStack = findItemStack(name);
         }
-        BazaarUtils.eventBus.subscribe(this);
+        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     @EventHandler
@@ -114,10 +113,18 @@ public class Bookmark extends CustomItemButton {
 
     public void onWidgetLeftClick(){
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        BUCompatibilityHelper.tryDisableSkyblockerBazaarOverlay();
+        boolean userHasSkyblockerBazaarOverlay = BUCompatibilityHelper.isSkyblockerBazaarOverlayEnabled();
+
+        if(userHasSkyblockerBazaarOverlay) {
+            BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(false);
+        }
+
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.setSignText(name, true);
-        Util.tickExecuteLater(4, BUCompatibilityHelper::tryEnableSkyblockerBazaarOverlay);
+
+        if(userHasSkyblockerBazaarOverlay) {
+            Util.tickExecuteLater(4, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
+        }
     }
 
     public void onWidgetShiftClick(){

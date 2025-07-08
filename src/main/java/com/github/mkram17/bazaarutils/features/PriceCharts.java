@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
@@ -101,7 +100,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     @Override
     public void subscribe() {
         ItemTooltipCallback.EVENT.register(this);
-        BazaarUtils.eventBus.subscribe(this);
+        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     private boolean shouldShow(){

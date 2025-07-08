@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class BazaarUtils implements ClientModInitializer {
-    public static IEventBus eventBus = new EventBus();
+    public static IEventBus EVENT_BUS = new EventBus();
     public static StashHelper stashHelper;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
@@ -56,7 +56,7 @@ public class BazaarUtils implements ClientModInitializer {
 
     //uses orbit for custom events
     private void registerEventBus() {
-        eventBus.registerLambdaFactory("com.github.mkram17.bazaarutils", (lookupInMethod, klass) ->
+        EVENT_BUS.registerLambdaFactory("com.github.mkram17.bazaarutils", (lookupInMethod, klass) ->
                 (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
     }
 

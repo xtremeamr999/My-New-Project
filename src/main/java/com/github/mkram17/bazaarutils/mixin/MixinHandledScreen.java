@@ -10,6 +10,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
@@ -60,7 +61,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
-		BazaarUtils.eventBus.post(event);
+		BazaarUtils.EVENT_BUS.post(event);
 //		Util.notifyAll("Mouse Click Posted");
 // Use the accessor to safely get the client instance
 		MinecraftClient client = ((AccessorScreen) screen).getClient();
@@ -107,19 +108,18 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
-		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !slot.hasStack())
+		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !GUIUtils.inOrderScreen() || !slot.hasStack())
 			return;
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		OrderData.statuses orderStatus = OrderStatusHighlight.getHighlightType(slot.getIndex());
+		OrderData order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
+		if(order == null)
+			return;
+		OrderData.statuses orderStatus = order.getOutdatedStatus();
 
-		if (orderStatus == OrderData.statuses.COMPETITIVE) {
-			draw(context, slot.x, slot.y, OrderData.statuses.COMPETITIVE);
-		} else if (orderStatus == OrderData.statuses.OUTDATED) {
-			draw(context, slot.x, slot.y, OrderData.statuses.OUTDATED);
-		} else if (orderStatus == OrderData.statuses.MATCHED) {
-			draw(context, slot.x, slot.y, OrderData.statuses.MATCHED);
+		if (orderStatus == OrderData.statuses.COMPETITIVE || orderStatus == OrderData.statuses.OUTDATED || orderStatus == OrderData.statuses.MATCHED) {
+			draw(context, slot.x, slot.y, orderStatus);
 		}
 	}
 

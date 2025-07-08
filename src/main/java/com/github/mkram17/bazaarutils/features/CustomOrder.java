@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 //TODO find new name for this
@@ -48,7 +48,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
         this.item = item;
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
     protected CustomOrder(boolean enabled) {
         this.enabled = enabled;
@@ -128,12 +128,12 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         if (BUConfig.get().customOrders.contains(this)) {
             BUConfig.get().customOrders.remove(this);
             BUConfig.HANDLER.save();
-            eventBus.unsubscribe(this);
+            EVENT_BUS.unsubscribe(this);
         }
     }
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

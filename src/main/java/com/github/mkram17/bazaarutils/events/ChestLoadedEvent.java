@@ -27,6 +27,8 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
     @Getter
     private String containerName;
 
+    public static final ChestLoadedEvent INSTANCE = new ChestLoadedEvent();
+
     @Override
     public void subscribe(){
         registerScreenEvent();
@@ -46,7 +48,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
                         event.itemStacks = getChestItemSlots(event.lowerChestInventory);
 
                         // Post to custom event bus
-                        BazaarUtils.eventBus.post(event);
+                        BazaarUtils.EVENT_BUS.post(event);
 //                        Util.notifyAll("Chest Loaded Event posted!");
                     }
                 });

@@ -4,18 +4,14 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.events.OutdatedItemEvent;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -67,10 +63,7 @@ public class OrderData implements BUListener {
     @Getter
     private OrderPriceInfo priceInfo;
     @Getter
-    private OrderItemInfo itemInfo;
-
-    @Getter
-    private static final List<OrderData> outdatedItems = new ArrayList<>(Collections.emptyList());
+    private final OrderItemInfo itemInfo = new OrderItemInfo();
 
     //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
     public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {
@@ -81,8 +74,8 @@ public class OrderData implements BUListener {
         this.priceInfo = priceInfo;
         this.tolerance = calculateTolerance();
 
-        if(productID == null){
-            Util.notifyError("Product ID for " + name + " is null. This may cause issues.", null);
+        if(productID == null && name != null){
+            Util.notifyError("Product ID for " + name + " is null. This may cause issues", null);
             return;
         }
     }
@@ -194,59 +187,6 @@ public class OrderData implements BUListener {
         return itemList.getFirst();
     }
 
-    public static void updateOutdatedItems() {
-        List<OrderData> previousOutdatedItems = new ArrayList<>(outdatedItems);
-        outdatedItems.clear();
-        for (OrderData item : BUConfig.get().watchedOrders) {
-            if (item.getOutdatedStatus() == statuses.OUTDATED) {
-                outdatedItems.add(item);
-            }
-        }
-
-        if (outdatedItems.isEmpty()) {
-//            Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
-            return;
-        }
-
-        List<OrderData> availableOldOutdated = new ArrayList<>(previousOutdatedItems);
-
-        for (OrderData currentNewOutdatedItem : outdatedItems) {
-            boolean foundMatchInOldList = false;
-            OrderData matchedOldItem = null;
-
-            for (OrderData oldItem : availableOldOutdated) {
-                if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
-                        Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.tolerance &&
-                        currentNewOutdatedItem.getVolume().equals(oldItem.getVolume()) &&
-                        currentNewOutdatedItem.getPriceInfo().getPriceType() == oldItem.getPriceInfo().getPriceType()) {
-                    foundMatchInOldList = true;
-                    matchedOldItem = oldItem;
-                    break;
-                }
-            }
-
-            if (foundMatchInOldList) {
-                availableOldOutdated.remove(matchedOldItem);
-            } else {
-                BazaarUtils.eventBus.post(new OutdatedItemEvent(currentNewOutdatedItem));
-            }
-        }
-
-        for (OrderData noLongerOutdatedItem : availableOldOutdated) {
-            if (BUConfig.get().watchedOrders.contains(noLongerOutdatedItem) && noLongerOutdatedItem.getFillStatus() != statuses.FILLED) {
-                Text amount = Text.literal(noLongerOutdatedItem.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
-                Text itemName = Text.literal(noLongerOutdatedItem.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
-                MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
-                        .append(Text.literal("Your " + noLongerOutdatedItem.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE))
-                        .append(amount)
-                        .append(itemName)
-                        .append(Text.literal( " is no longer outdated.").formatted(Formatting.DARK_PURPLE));
-                PlayerActionUtil.notifyAll(message);
-            }
-        }
-
-    }
-
     public void updateMarketPrice(){
         priceInfo.updateMarketPrice(productID);
     }
@@ -321,6 +261,6 @@ public class OrderData implements BUListener {
         if(!BUConfig.get().watchedOrders.remove(this))
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
-        OrderData.updateOutdatedItems();
+        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
     }
 }

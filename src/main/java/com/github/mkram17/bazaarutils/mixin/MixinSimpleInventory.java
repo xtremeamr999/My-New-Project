@@ -25,7 +25,7 @@ public abstract class MixinSimpleInventory {
         if (slot < 0 || slot >= this.heldStacks.size()) return;
 
         ReplaceItemEvent event = new ReplaceItemEvent(this.heldStacks.get(slot),(SimpleInventory) (Object) this,slot);
-        BazaarUtils.eventBus.post(event);
+        BazaarUtils.EVENT_BUS.post(event);
 //        Util.notifyAll("Replace Item Event posted!");
         if (event.getReplacement() != event.getOriginal()) {
             cir.setReturnValue(event.getReplacement());

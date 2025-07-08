@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatHandler implements BUListener{
+    public static final ChatHandler INSTANCE = new ChatHandler();
     public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
 
     public static Option<Boolean> createDisableOrderFilledSound() {
@@ -126,7 +127,7 @@ public class ChatHandler implements BUListener{
                     SoundUtil.notifyMultipleTimes(2);
 
                 OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-                OrderPriceInfo itemPriceInfo = new OrderPriceInfo(null, priceType);
+                OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
                 item = new OrderData(itemName, volume, itemPriceInfo);
 
                 item = item.findItemInList(BUConfig.get().watchedOrders);

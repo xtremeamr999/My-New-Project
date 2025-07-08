@@ -4,6 +4,8 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
+import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -25,8 +27,7 @@ import java.util.List;
 //drawing done in MixinHandledScreen
 public class OrderStatusHighlight implements BUListener {
     @Getter @Setter
-    private boolean enabled = true;
-    private static final HashMap<Integer, OrderData> highlightedOrders = new HashMap<>();
+    private boolean enabled;
     public static final Identifier IDENTIFIER = Identifier.tryParse("bazaarutils", "orderstatushighlight/background_test");
     public static final float BACKGROUND_TRANSPARENCY = 0.9f;
 
@@ -34,32 +35,22 @@ public class OrderStatusHighlight implements BUListener {
         this.enabled = enabled;
     }
 
-    public static OrderData.statuses getHighlightType(int slotIndex) {
-        OrderData orderData = highlightedOrders.get(slotIndex);
-        if (orderData == null || orderData.getOutdatedStatus() == null) {
-            return null; // No highlight for this slot
-        }
-        return orderData.getOutdatedStatus();
-    }
-    public static void addHighlightedOrder(int slotIndex, OrderData orderData) {
-        highlightedOrders.put(slotIndex, orderData);
-    }
-    public static void clearHighlightedSlots() {
-        highlightedOrders.clear();
+    private static List<OrderData> getHighlightedOrders() {
+        return BUConfig.get().watchedOrders.stream()
+                .filter(order -> order.getItemInfo().getSlotIndex() != null)
+                .toList();
     }
 
-    private void registerScreenRenderEvents() {
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            // Clear highlights when any HandledScreen initializes.
-            if (screen instanceof HandledScreen) {
-                OrderStatusHighlight.clearHighlightedSlots();
-            }
-        });
+    public static OrderData getHighlightedOrder(int slotIndex) {
+        return getHighlightedOrders().stream()
+                .filter(order -> order.getItemInfo().getSlotIndex() == slotIndex)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public void subscribe() {
-        registerScreenRenderEvents();
+//        registerScreenRenderEvents();
         registerTooltipListener();
     }
 
@@ -78,7 +69,7 @@ public class OrderStatusHighlight implements BUListener {
     private void registerTooltipListener() {
         ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
             if (!enabled) return;
-            if (stack == null || stack.isEmpty() || stack.getItem().getName().getString().contains("GLASS_PANE")) {
+            if (stack == null || stack.isEmpty() || stack.getItem().getName().getString().contains("GLASS_PANE") || !GUIUtils.inOrderScreen()) {
                 return;
             }
 
@@ -91,14 +82,14 @@ public class OrderStatusHighlight implements BUListener {
                 String lineText = line.getString();
                 if (lineText.contains("FILLED") || lineText.contains("OUTDATED") ||
                         lineText.contains("COMPETITIVE") || lineText.contains("MATCHED")) {
-                    // Our tooltip is already present, skip processing
+                    // the tooltip is already present, skip processing
                     return;
                 }
             }
 
             int index = -1;
             for (Slot slot : handledScreen.getScreenHandler().slots) {
-                if (!(slot.hasStack() && slot.getStack() == stack))
+                if (!slot.hasStack() || !(slot.getStack() == stack))
                     continue;
                 index = slot.getIndex();
             }
@@ -106,7 +97,7 @@ public class OrderStatusHighlight implements BUListener {
             if(index == -1)
                 return;
 
-            OrderData order = highlightedOrders.get(index);
+            OrderData order = getHighlightedOrder(index);
             if (order == null) {
                 return;
             }

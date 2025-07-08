@@ -26,7 +26,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
 public class FlipHelper extends CustomItemButton implements BUListener {
@@ -188,7 +188,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }
 

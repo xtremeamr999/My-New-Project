@@ -4,10 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +23,6 @@ public class MinecraftClientMixin {
         if(screen == null || currentScreen == null) {
             return;
         }
-        BazaarUtils.eventBus.post(new ScreenChangeEvent(currentScreen, screen));
+        BazaarUtils.EVENT_BUS.post(new ScreenChangeEvent(currentScreen, screen));
     }
 }

@@ -3,12 +3,11 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.inventory.Inventory;
@@ -21,9 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.eventBus;
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class ItemUpdater implements BUListener {
+    public static final ItemUpdater INSTANCE = new ItemUpdater();
     private static Inventory lowerChestInventory;
 
     private static final String BUY_ORDER_PREFIX = "BUY";
@@ -55,17 +55,10 @@ public class ItemUpdater implements BUListener {
             if (!updateExistingOrderItem(item)) {
                 Util.addWatchedOrder(item);
             }
-
-            if (item.getFillStatus() != OrderData.statuses.FILLED &&
-                    (item.getOutdatedStatus() == OrderData.statuses.OUTDATED ||
-                            item.getOutdatedStatus() == OrderData.statuses.COMPETITIVE ||
-                            item.getOutdatedStatus() == OrderData.statuses.MATCHED)) {
-                OrderStatusHighlight.addHighlightedOrder(mapScreenIndexToInventoryIndex(item), item);
-            }
         }
 
         removeOldItems(foundItems);
-        OrderData.updateOutdatedItems();
+        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
     }
 
     private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
@@ -119,6 +112,8 @@ public class ItemUpdater implements BUListener {
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderData orderData = new OrderData(name, totalVolume, priceInfo);
+        orderData.getItemInfo().setItemStack(stack);
+        orderData.getItemInfo().setSlotIndex(mapScreenIndexToInventoryIndex(orderData));
         orderData.setTolerance(0.0);
 
         if (volumeFilled > -1) {
@@ -132,14 +127,15 @@ public class ItemUpdater implements BUListener {
         return Optional.of(orderData);
     }
 
+    //TODO switch to using ItemStack instead of OrderData so it's faster
     private static int mapScreenIndexToInventoryIndex(OrderData item) {
-        if (lowerChestInventory == null) return -1;
+        if (lowerChestInventory == null)
+            return -1;
 
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
             if (!inventoryStack.isEmpty()) {
-                Optional<OrderData> parsed = parseOrderFromItemStack(inventoryStack);
-                if (parsed.isPresent() && parsed.get().equals(item)) {
+                if (inventoryStack.equals(item.getItemInfo().getItemStack())) {
                     return i;
                 }
             }
@@ -168,6 +164,9 @@ public class ItemUpdater implements BUListener {
             PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ITEMDATA);
             return false;
         }
+
+        match.getItemInfo().setSlotIndex(foundItem.getItemInfo().getSlotIndex());
+        match.getItemInfo().setItemStack(foundItem.getItemInfo().getItemStack());
 
         boolean updated = false;
         if (match.getTolerance() != 0.0) {
@@ -203,29 +202,23 @@ public class ItemUpdater implements BUListener {
     }
 
     private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks) {
-        int firstOrderIndex = -1;
-        int lastOrderIndex = -1;
+        ArrayList<ItemStack> orderStacks = new ArrayList<>();
 
-        for (int i = 0; i < orderScreenStacks.size(); i++) {
-            if (!orderScreenStacks.get(i).isOf(Items.BLACK_STAINED_GLASS_PANE)) {
-                if (firstOrderIndex == -1) firstOrderIndex = i;
-            } else {
-                if (firstOrderIndex != -1) {
-                    lastOrderIndex = i;
-                    break;
-                }
+        for (ItemStack orderScreenStack : orderScreenStacks) {
+            if (orderScreenStack.isOf(Items.BLACK_STAINED_GLASS_PANE)) {
+                continue;
             }
+            if (orderScreenStack.isOf(Items.ARROW)) {
+                break; // the back arrow will be the first item that isnt a glass pane, so we know to stop adding items to the orders when we get here
+            }
+            orderStacks.add(orderScreenStack);
         }
 
-        if (firstOrderIndex == -1 || lastOrderIndex == -1 || orderScreenStacks.get(firstOrderIndex).isOf(Items.ARROW)) {
-            return new ArrayList<>();
-        }
-
-        return new ArrayList<>(orderScreenStacks.subList(firstOrderIndex, lastOrderIndex));
+        return orderStacks;
     }
 
     @Override
     public void subscribe() {
-        eventBus.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
 public class BazaarData implements BUListener {
+    public static final BazaarData INSTANCE = new BazaarData();
+
     private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;
@@ -70,7 +70,7 @@ public class BazaarData implements BUListener {
 //                        writeJsonToFile(jsonString);
 
                     if (!BUConfig.get().watchedOrders.isEmpty()) {
-                        OrderData.updateOutdatedItems();
+                        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
                     }
                 }
             });
