@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -31,7 +30,7 @@ public class BazaarData implements BUListener {
     private static int exceptionCount = 0;
     private static int bazaarCalls = 0;
     private static boolean skipNextCall = false;
-    private static final long bazaarDataDelay = 3L;
+    private static final long bazaarDataDelay = 10L;
 
     @Override
     public void subscribe(){
@@ -67,10 +66,8 @@ public class BazaarData implements BUListener {
                         return;
                     }
                     bazaarReply = reply;
-//                        writeJsonToFile(jsonString);
-
                     if (!BUConfig.get().watchedOrders.isEmpty()) {
-                        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
+                        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
                     }
                 }
             });

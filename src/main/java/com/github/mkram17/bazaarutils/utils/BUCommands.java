@@ -40,7 +40,7 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
-                        for (OrderData item : OutdatedOrderHandler.outdatedOrders) {
+                        for (OrderData item : BUConfig.get().outdatedOrderHandler.outdatedOrders) {
                             PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPrice());
                         }
                         return 1;

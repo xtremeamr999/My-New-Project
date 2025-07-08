@@ -110,11 +110,11 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     public boolean matchFound() {
         OrderPriceInfo priceInfo = new OrderPriceInfo(orderPrice, OrderPriceInfo.priceTypes.INSTASELL);
         item = new OrderData(null, orderVolumeFilled, priceInfo);
-        item = item.findItemInList(BUConfig.get().watchedOrders);
+        item = item.findOrderInList(BUConfig.get().watchedOrders);
 
         if (item != null) {
             if (item.getFillStatus() == OrderData.statuses.FILLED) {
-                PlayerActionUtil.notifyAll("Found match.", Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Found match.", Util.notificationTypes.ORDERDATA);
                 return true;
             }else {
                 PlayerActionUtil.notifyAll("found match, but isnt filled", Util.notificationTypes.GUI);

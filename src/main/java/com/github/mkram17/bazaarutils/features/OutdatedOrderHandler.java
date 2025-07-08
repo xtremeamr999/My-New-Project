@@ -28,7 +28,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
 public class OutdatedOrderHandler implements BUListener {
-    public final List<OrderData> outdatedOrders = new ArrayList<>(Collections.emptyList());
+    public List<OrderData> outdatedOrders = new ArrayList<>(Collections.emptyList());
 
     @Getter @Setter
     private boolean autoOpenEnabled;
@@ -44,91 +44,80 @@ public class OutdatedOrderHandler implements BUListener {
         this.notificationSound = true;
     }
 
-    public static void updateOrdersOutdatedStatuses() {
-        List<OrderData> previousOutdatedItems = new ArrayList<>(outdatedOrders);
-        outdatedOrders.clear();
-        for (OrderData item : BUConfig.get().watchedOrders) {
-            if (item.getOutdatedStatus() == OrderData.statuses.OUTDATED) {
-                outdatedOrders.add(item);
+    public void postOutdatedOrderEvents() {
+        List<OrderData> previouslyOutdated = new ArrayList<>(this.outdatedOrders);
+        this.outdatedOrders = getOutdatedOrders();
+
+        // find newly outdated orders (in current list but not in previous)
+        for (OrderData currentOrder : this.outdatedOrders) {
+            if(!BUConfig.get().watchedOrders.contains(currentOrder)) {
+                continue;
+            }
+
+            if (currentOrder.findOrderInList(previouslyOutdated) == null) {
+                EVENT_BUS.post(new OutdatedOrderEvent(currentOrder, true));
             }
         }
 
-        if (outdatedOrders.isEmpty()) {
-//            Util.notifyAll("No outdated items found.", Util.notificationTypes.ITEMDATA);
-            return;
-        }
+        // find orders that are no longer outdated (in previous list but not in current)
+        for (OrderData previousOrder : previouslyOutdated) {
+            if(!BUConfig.get().watchedOrders.contains(previousOrder)) {
+                continue;
+            }
 
-        List<OrderData> availableOldOutdated = new ArrayList<>(previousOutdatedItems);
-
-        for (OrderData currentNewOutdatedItem : outdatedOrders) {
-            boolean foundMatchInOldList = false;
-            OrderData matchedOldItem = null;
-
-            for (OrderData oldItem : availableOldOutdated) {
-                if (currentNewOutdatedItem.getName().equals(oldItem.getName()) &&
-                        Math.abs(currentNewOutdatedItem.getPriceInfo().getPrice() - oldItem.getPriceInfo().getPrice()) <= currentNewOutdatedItem.getTolerance() &&
-                        currentNewOutdatedItem.getVolume().equals(oldItem.getVolume()) &&
-                        currentNewOutdatedItem.getPriceInfo().getPriceType() == oldItem.getPriceInfo().getPriceType()) {
-                    foundMatchInOldList = true;
-                    matchedOldItem = oldItem;
-                    break;
+            if (previousOrder.findOrderInList(this.outdatedOrders) == null) {
+                if (previousOrder.getFillStatus() == OrderData.statuses.SET) {
+                    EVENT_BUS.post(new OutdatedOrderEvent(previousOrder, false));
                 }
             }
-
-            if (foundMatchInOldList) {
-                availableOldOutdated.remove(matchedOldItem);
-            } else {
-                EVENT_BUS.post(new OutdatedOrderEvent(currentNewOutdatedItem, true));
-            }
         }
+    }
 
-        for (OrderData order : availableOldOutdated) {
-            if (BUConfig.get().watchedOrders.contains(order) && order.getFillStatus() != OrderData.statuses.FILLED) {
-                EVENT_BUS.post(new OutdatedOrderEvent(order, false));
-            }
-        }
-
+    private static List<OrderData> getOutdatedOrders() {
+        return BUConfig.get().watchedOrders.stream()
+                .filter(order -> order.getOutdatedStatus() == OrderData.statuses.OUTDATED)
+                .toList();
     }
 
     @EventHandler
     public void onOutdated(OutdatedOrderEvent e){
         OrderData order = e.getOrder();
-        if(notifyOutdated) {
-            if(e.isOutdated()) {
-                Text amount = Text.literal(order.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
-                Text itemName = Text.literal(order.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
-                MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
-                        .append(amount)
-                        .append(itemName)
-                        .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
-                        .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
+        if(!notifyOutdated)
+            return;
 
+        Text amount = Text.literal(order.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
+        Text itemName = Text.literal(order.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
 
-                Util.tickExecuteLater(2, () -> {
-                    if (BUConfig.get().developerMode) {
-                        message.append(Text.literal(". Market Price: " + order.getPriceInfo().getMarketPrice() + " Order Price: " + order.getPriceInfo().getPrice()));
-                        PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
-                    } else {
-                        PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
-                    }
-                });
-                if (notificationSound)
-                    SoundUtil.notifyMultipleTimes(3);
-            } else {
-                Text amount = Text.literal(e.getOrder().getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
-                Text itemName = Text.literal(order.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
-                MutableText message = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD)
-                        .append(Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE))
-                        .append(amount)
-                        .append(itemName)
-                        .append(Text.literal( " is no longer outdated.").formatted(Formatting.DARK_PURPLE));
-                PlayerActionUtil.notifyAll(message);
+        if (e.isOutdated()) {
+            MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+                    .append(amount)
+                    .append(itemName)
+                    .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
+                    .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
+            if (BUConfig.get().developerMode) {
+                message.append(Text.literal(". Market Price: " + order.getPriceInfo().getMarketPrice() + " Order Price: " + order.getPriceInfo().getPrice()));
             }
+            Util.tickExecuteLater(2, () -> {
+                    PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
+            });
+
+            if (notificationSound) {
+                SoundUtil.notifyMultipleTimes(3);
+            }
+        } else {
+            MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+                    .append(amount)
+                    .append(itemName)
+                    .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
+            Util.tickExecuteLater(2, () -> {
+                PlayerActionUtil.notifyAll(message);
+            });
         }
 
+    }
 
-
-
+    @EventHandler
+    public void openBazaarOnOutdated(OutdatedOrderEvent e) {
         if(GUIUtils.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{

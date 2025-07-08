@@ -79,7 +79,7 @@ public class ChatHandler implements BUListener{
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
                 Util.addWatchedOrder(itemToAdd);
-                PlayerActionUtil.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
             }
 
             if (messageType == messageTypes.FILLED) {
@@ -130,12 +130,12 @@ public class ChatHandler implements BUListener{
                 OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
                 item = new OrderData(itemName, volume, itemPriceInfo);
 
-                item = item.findItemInList(BUConfig.get().watchedOrders);
+                item = item.findOrderInList(BUConfig.get().watchedOrders);
                 if(item == null)
                     Util.notifyError("Could not find item to fill with info vol: "+ volume + " name: " + itemName, null);
                 else {
                     item.setFilled();
-                    PlayerActionUtil.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ITEMDATA);
+                    PlayerActionUtil.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
                 }
             }
 
@@ -220,7 +220,7 @@ public class ChatHandler implements BUListener{
                 } else {
                     item = new OrderData(itemName, null, itemPriceInfo);
                 }
-                item = item.findItemInList(BUConfig.get().watchedOrders);
+                item = item.findOrderInList(BUConfig.get().watchedOrders);
             } else {
 //                Util.notifyAll("claimed message, but not worth");
                 //TODO figure out when there is a volume included in message
@@ -247,20 +247,20 @@ public class ChatHandler implements BUListener{
 
                 OrderPriceInfo priceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTABUY);
                 item = new OrderData(itemName, null, priceInfo);
-                item = item.findItemInList(BUConfig.get().watchedOrders);
+                item = item.findOrderInList(BUConfig.get().watchedOrders);
             }
 
 //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
             if (item == null) {
-                PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
                 return;
             }
             if (item.getVolume().equals(volumeClaimed)) {
-                PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ORDERDATA);
                 item.removeFromWatchedItems();
             } else if(volumeClaimed != null){
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
-                PlayerActionUtil.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ITEMDATA);
+                PlayerActionUtil.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ORDERDATA);
             }
         } catch (NumberFormatException e) {
             Util.notifyError("Failed to parse number in claimed order - Volume: " + volumeClaimed + ", Item: "

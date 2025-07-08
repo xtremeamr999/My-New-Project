@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
@@ -12,6 +11,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -113,19 +113,6 @@ public class OrderData implements BUListener {
         return variables;
     }
 
-    private static ArrayList<OrderData> findLooseVolumeMatches(String name, Double price, Integer volume, OrderPriceInfo.priceTypes priceType){
-        ArrayList<OrderData> itemList = new ArrayList<>();
-        for(OrderData item : BUConfig.get().watchedOrders){
-            if((price == null || item.isSimilarPrice(price)) &&
-                    (volume == null || Math.abs(item.getVolume() - volume) <= (0.05 * volume) || Math.abs(item.getVolume()-item.getAmountClaimed() - volume) <= (0.05 * volume)) &&
-                    (name == null || name.equalsIgnoreCase(item.getName())) &&
-                    (priceType == null || priceType == item.getPriceInfo().getPriceType())){
-                itemList.add(item);
-            }
-        }
-        return itemList;
-    }
-
     public boolean equals(OrderData order, boolean isStrict) {
         String name = order.getName();
         Double price = order.getPriceInfo().getPrice();
@@ -153,8 +140,19 @@ public class OrderData implements BUListener {
         return false;
     }
 
-    public OrderData findItemInList(List<OrderData> list) {
-        ArrayList<OrderData> itemList = new ArrayList<>();
+    public OrderData findOrderInList(List<OrderData> list) {
+        List<OrderData> itemList = findAllMatchesInList(list);
+        if (itemList.size() > 1) {
+            return findBestMatch(itemList);
+        }
+        if (itemList.isEmpty()) {
+            return null;
+        }
+        return itemList.getFirst();
+    }
+
+    public List<OrderData> findAllMatchesInList(List<OrderData> list) {
+        List<OrderData> itemList = new ArrayList<>();
         for(OrderData item : list){
             if(this.equals(item, true)){
                 itemList.add(item);
@@ -167,24 +165,39 @@ public class OrderData implements BUListener {
                 }
             }
         }
-        if (itemList.size() > 1) {
-            OrderData bestMatch = itemList.getFirst();
-            for (OrderData duplicate : itemList) {
-                PlayerActionUtil.notifyAll("Duplicate item: " + duplicate.getGeneralInfo(), Util.notificationTypes.ITEMDATA);
-                if (this.getVolume() == null) {
-                    continue;
-                }
-                // Find the duplicate with the closest volume to the matching item
-                if (Math.abs(duplicate.getVolume() - this.getVolume()) < Math.abs(bestMatch.getVolume() - this.getVolume())) {
-                    bestMatch = duplicate;
-                }
+        return itemList;
+    }
+
+    /* Used for when there are duplicate matches found and the best should be chosen to use.
+    Typically, volume is the variable that is different, but it can also be price
+    */
+    private OrderData findBestMatch(List<OrderData> itemList) {
+        OrderData bestMatch = itemList.getFirst();
+
+        for (OrderData item : itemList) {
+            if (getVolumeThenPriceComparator().compare(item, bestMatch) < 0) {
+                bestMatch = item;
             }
-            return bestMatch;
         }
-        if (itemList.isEmpty()) {
-            return null;
-        }
-        return itemList.getFirst();
+        return bestMatch;
+    }
+
+    private Comparator<OrderData> getVolumeThenPriceComparator() {
+        Comparator<OrderData> volumeComparator = Comparator.comparingDouble(order -> {
+            if (cantCompare(this.getVolume(), order.getVolume())) {
+                return Double.MAX_VALUE;
+            }
+            return Math.abs(order.getVolume() - this.getVolume());
+        });
+
+        Comparator<OrderData> priceComparator = Comparator.comparingDouble(order -> {
+            if (cantCompare(this.getPriceInfo().getPrice(), order.getPriceInfo().getPrice())) {
+                return Double.MAX_VALUE;
+            }
+            return Math.abs(order.getPriceInfo().getPrice() - this.getPriceInfo().getPrice());
+        });
+
+        return volumeComparator.thenComparing(priceComparator);
     }
 
     public void updateMarketPrice(){
@@ -197,11 +210,13 @@ public class OrderData implements BUListener {
     }
 
     private void scheduleHealthCheck(){
+        long START_DELAY_SECONDS = 60;
+        long CHECK_INTERVAL_SECONDS = 30;
         BazaarUtils.BUExecutorService.scheduleAtFixedRate(() ->{
                 if(!fixProductID()){
                    Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", null);
                 }
-        }, 1, 30, TimeUnit.SECONDS);
+        }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
     //returns true if productID is safe/fixed after run, and false if it is not
@@ -261,6 +276,6 @@ public class OrderData implements BUListener {
         if(!BUConfig.get().watchedOrders.remove(this))
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         BUConfig.HANDLER.save();
-        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
+        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 }

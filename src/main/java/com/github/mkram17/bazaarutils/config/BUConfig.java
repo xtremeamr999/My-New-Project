@@ -189,7 +189,7 @@ public class BUConfig {
                 case FEATURE -> featureMessages;
                 case BAZAARDATA -> bazaarDataMessages;
                 case COMMAND -> commandMessages;
-                case ITEMDATA -> itemDataMessages;
+                case ORDERDATA -> itemDataMessages;
             };
         }
     }

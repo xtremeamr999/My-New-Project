@@ -37,7 +37,7 @@ public class OrderPriceInfo {
         this.priceType = priceType;
     }
 
-    public OrderPriceInfo(Double price, priceTypes priceType) {
+    public OrderPriceInfo(double price, priceTypes priceType) {
         this.priceType = priceType;
         this.price = (double) Math.round(price * 100) / 100;
     }

@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -30,7 +29,7 @@ public class Util implements BUListener {
         subscribeTicks();
     }
 
-    public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ITEMDATA;
+    public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA;
         public boolean isEnabled() {
             return BUConfig.get().developer.isDeveloperVariableEnabled(this);
         }
@@ -97,6 +96,7 @@ public class Util implements BUListener {
         }
     }
 
+    //TODO switch from null throwables to creating a new one for better logging because it shows where it happened
     public static void notifyError(String message, Throwable e) {
         String callingName = getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
@@ -130,9 +130,9 @@ public class Util implements BUListener {
             return;
         assert item.getProductID() != null;
         BUConfig.get().watchedOrders.add(item);
-        PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ITEMDATA);
+        PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ORDERDATA);
         BUConfig.HANDLER.save();
-        OutdatedOrderHandler.updateOrdersOutdatedStatuses();
+        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 
     public static void subscribeTicks() {
