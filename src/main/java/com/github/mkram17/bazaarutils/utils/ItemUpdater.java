@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
@@ -15,9 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
@@ -45,19 +42,16 @@ public class ItemUpdater implements BUListener {
     }
 
     private static void updateWatchedItems(List<ItemStack> orderStacks) {
-        List<OrderData> foundItems = orderStacks.stream()
+        List<OrderData> foundOrders = orderStacks.stream()
                 .map(ItemUpdater::parseOrderFromItemStack)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
-        for (OrderData item : foundItems) {
-            if (!updateExistingOrderItem(item)) {
-                Util.addWatchedOrder(item);
-            }
+        BUConfig.get().watchedOrders.clear();
+        for (OrderData item : foundOrders) {
+            Util.addWatchedOrder(item);
         }
-
-        removeOldItems(foundItems);
         BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 
@@ -141,64 +135,6 @@ public class ItemUpdater implements BUListener {
             }
         }
         return -1;
-    }
-
-    private static void removeOldItems(List<OrderData> foundItems) {
-        List<OrderData> itemsToRemove = BUConfig.get().watchedOrders.stream()
-                .filter(watchedItem -> watchedItem.findOrderInList(foundItems) == null)
-                .toList();
-
-        itemsToRemove.forEach(item -> {
-            item.removeFromWatchedItems();
-            PlayerActionUtil.notifyAll("Removed " + item.getGeneralInfo() + " from watched items.", Util.notificationTypes.ORDERDATA);
-        });
-
-        if (!itemsToRemove.isEmpty()) {
-            BUConfig.HANDLER.save();
-        }
-    }
-
-    private static boolean updateExistingOrderItem(OrderData foundItem) {
-        OrderData match = foundItem.findOrderInList(BUConfig.get().watchedOrders);
-        if (match == null) {
-            PlayerActionUtil.notifyAll("No match found for " + foundItem.getName(), Util.notificationTypes.ORDERDATA);
-            return false;
-        }
-
-        match.getItemInfo().setSlotIndex(foundItem.getItemInfo().getSlotIndex());
-        match.getItemInfo().setItemStack(foundItem.getItemInfo().getItemStack());
-
-        boolean updated = false;
-        if (match.getTolerance() != 0.0) {
-            PlayerActionUtil.notifyAll("Updating maximum rounding of " + match.getName() + " from " + match.getTolerance() + " to 0.0 . Price: " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
-            match.setTolerance(0.0);
-            updated = true;
-        }
-        if (!match.getPriceInfo().getPrice().equals(foundItem.getPriceInfo().getPrice())) {
-            PlayerActionUtil.notifyAll("Updating price of " + match.getName() + " from " + match.getPriceInfo().getPrice() + " to " + foundItem.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
-            match.getPriceInfo().setPrice(foundItem.getPriceInfo().getPrice());
-            updated = true;
-        }
-        if (match.getFillStatus() != foundItem.getFillStatus()) {
-            PlayerActionUtil.notifyAll("Updating status of " + match.getName() + " from " + match.getFillStatus() + " to " + foundItem.getFillStatus(), Util.notificationTypes.ORDERDATA);
-            match.setFillStatus(foundItem.getFillStatus());
-            updated = true;
-        }
-        if (match.getAmountFilled() != foundItem.getAmountFilled()) {
-            PlayerActionUtil.notifyAll("Updating volume filled of " + match.getName() + " from " + match.getAmountFilled() + " to " + foundItem.getAmountFilled(), Util.notificationTypes.ORDERDATA);
-            match.setAmountFilled(foundItem.getAmountFilled());
-            updated = true;
-        }
-        if (match.getAmountClaimed() != foundItem.getAmountClaimed() && foundItem.getAmountClaimed() >= 0) {
-            PlayerActionUtil.notifyAll("Updating amount claimed of " + match.getName() + " from " + match.getAmountClaimed() + " to " + foundItem.getAmountClaimed(), Util.notificationTypes.ORDERDATA);
-            match.setAmountClaimed(foundItem.getAmountClaimed());
-            updated = true;
-        }
-
-        if (updated) {
-            BUConfig.HANDLER.save();
-        }
-        return true;
     }
 
     private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks) {

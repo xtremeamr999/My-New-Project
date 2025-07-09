@@ -8,7 +8,6 @@ import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -22,119 +21,79 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
 public class FlipHelper extends CustomItemButton implements BUListener {
-    public double flipPrice;
-    private double orderPrice = -1;
-    private int orderVolumeFilled = -1;
-    private OrderData item;
+
+    private static final int FLIP_HELPER_BUTTON_SLOT = 15;
+    private static final int FLIP_ORDER_SLOT = 13;
+    private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
+    private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
+    private static final String FLIP_ORDER_IDENTIFIER = "Flip Order";
+    private static final String CANCEL_ORDER_IDENTIFIER = "Cancel Order";
+    private static final String CANNOT_CANCEL_IDENTIFIER = "Cannot cancel";
+    private static final int LORE_LINE_VOLUME = 1;
+    private static final int LORE_LINE_PRICE = 3;
+
+
     private boolean shouldAddToSign = false;
     @Getter @Setter
     private boolean enabled;
     @Getter
-    private Item replaceItem;
+    private final Item buttonItem;
+    private OrderData order;
 
-    public FlipHelper(boolean enabled, int slotNumber, Item item) {
+    public FlipHelper(boolean enabled, int slotNumber, Item buttonItem) {
         this.enabled = enabled;
         this.slotNumber = slotNumber;
-        this.replaceItem = item;
+        this.buttonItem = buttonItem;
     }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void guiChestOpenedEvent(ChestLoadedEvent e) {
+    public void onChestLoaded(ChestLoadedEvent e) {
+        if (!enabled) {
+            return;
+        }
+        if(!inCorrectScreen()){
+            resetState();
+            return;
+        }
+
         try {
-            if (isEnabled() && inCorrectScreen()) {
-                item = getFlipItem(e);
-
-                if(item == null){
-//                    Util.notifyError("Could not find flip item in Flip Helper", null);
-                    return;
-                }
-
-                flipPrice = item.getFlipPrice();
+            ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElseThrow();
+            Optional<OrderData> orderOptional = matchToWatchedOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
+            if (orderOptional.isEmpty()) {
+                return;
             }
+            order = orderOptional.get();
         } catch (Exception ex) {
             Util.notifyError("Error while trying to find flip item in Flip Helper", ex);
         }
     }
 
-    public void handleFlip() {
-        if(item != null && flipPrice != 0 && GUIUtils.wasLastChestFlip()) {
-            GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
-            item.flipItem(flipPrice);
-        }
-    }
-
-    //not an event, just uses data from the event
-    public OrderData getFlipItem(ChestLoadedEvent e){
-
-        for (ItemStack itemStack : e.getItemStacks()) {
-
-            if (itemStack == null) continue;
-
-            String displayName = itemStack.getName().getString();
-            LoreComponent lore = itemStack.getComponents().get(DataComponentTypes.LORE);
-
-            if(displayName.contains("Flip Order")) {
-                getItemInfo(lore);
-
-                //method updates item var
-                if (matchFound()) {
-                    return item;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void getItemInfo(LoreComponent lore) {
-        //get order volume and price of item that is being flipped
-        try {
-            String orderPrice = lore.lines().get(3).getSiblings().get(1).getString();
-            orderPrice = orderPrice.substring(0, orderPrice.indexOf(" coins")).replace(",","");
-            this.orderPrice = Double.parseDouble(orderPrice);
-            String orderVolume = lore.lines().get(1).getSiblings().get(1).getString().replace(",","");
-            this.orderVolumeFilled = Integer.parseInt(orderVolume);
-
-        } catch (Exception ex) {
-            PlayerActionUtil.notifyAll("Error while trying to find order price or volume in Flip Helper");
-            ex.printStackTrace();
-        }
-    }
-
-    public boolean matchFound() {
-        OrderPriceInfo priceInfo = new OrderPriceInfo(orderPrice, OrderPriceInfo.priceTypes.INSTASELL);
-        item = new OrderData(null, orderVolumeFilled, priceInfo);
-        item = item.findOrderInList(BUConfig.get().watchedOrders);
-
-        if (item != null) {
-            if (item.getFillStatus() == OrderData.statuses.FILLED) {
-                PlayerActionUtil.notifyAll("Found match.", Util.notificationTypes.ORDERDATA);
-                return true;
-            }else {
-                PlayerActionUtil.notifyAll("found match, but isnt filled", Util.notificationTypes.GUI);
-                return true;
-            }
-        }
-        return false;
-    }
-
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (event.slot.getIndex() != slotNumber || !inCorrectScreen())
+        if (!enabled || event.slot.getIndex() != slotNumber || !inCorrectScreen()) {
             return;
+        }
+
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        GUIUtils.clickSlot(15,0);
-        if (item != null)
+        GUIUtils.clickSlot(FLIP_HELPER_BUTTON_SLOT,0);
+        if (order != null)
             shouldAddToSign = true;
     }
+
     @EventHandler
-    private void onSignOpen(SignOpenEvent e){
+    public void onSignOpen(SignOpenEvent e){
         if(!shouldAddToSign) return;
         handleFlip();
         shouldAddToSign = false;
@@ -142,48 +101,171 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!(event.getSlotId() == slotNumber) || !inCorrectScreen() || getReplaceItem() == null)
+        if(!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || buttonItem == null)
             return;
 
-        ItemStack itemStack = new ItemStack(getReplaceItem(), 1);
-        if(flipPrice == 0) {
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("There are no competing sell offers.").formatted(Formatting.DARK_PURPLE));
-            itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "ANY");
-        } else if(item == null) {
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Could not find order").formatted(Formatting.DARK_PURPLE));
-            itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "???");
-        }else {
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Flip order for " + Util.getPrettyNumber(flipPrice) + " coins").formatted(Formatting.DARK_PURPLE));
-            itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, String.valueOf(Util.getPrettyNumber(flipPrice)));
-        }
+        ItemStack itemStack = new ItemStack(buttonItem, 1);
+        itemStack.set(DataComponentTypes.CUSTOM_NAME, getButtonText());
+        itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, getButtonStackSize());
         event.setReplacement(itemStack);
     }
 
-    private boolean inCorrectScreen(){
-        return GUIUtils.inFlipGui() && isEnabled() && !inCancelOrderScreen();
+    private Text getButtonText() {
+        double flipPrice = order.getFlipPrice();
+        if (flipPrice == 0) {
+            return Text.literal("There are no competing sell offers.").formatted(Formatting.DARK_PURPLE);
+        } else if (order == null) {
+            return Text.literal("Could not find order").formatted(Formatting.DARK_PURPLE);
+        } else {
+            return Text.literal("Flip order for " + Util.getPrettyNumber(flipPrice) + " coins").formatted(Formatting.DARK_PURPLE);
+        }
     }
 
-    private boolean inCancelOrderScreen() {
-        try {
-            if (!(MinecraftClient.getInstance().currentScreen instanceof GenericContainerScreen inventory))
-                return false;
+    private String getButtonStackSize() {
+        double flipPrice = order.getFlipPrice();
+        if (order.getFlipPrice() == 0) {
+            return "ANY";
+        } else if (order == null) {
+            return "???";
+        } else {
+            return String.valueOf(Util.getPrettyNumber(flipPrice));
+        }
+    }
 
-            ItemStack cancelItem = inventory.getScreenHandler().getInventory().getStack(11);
-            if(inventory.getScreenHandler().getInventory().getStack(13).getItem().equals(Items.GREEN_TERRACOTTA)) {
-                cancelItem = inventory.getScreenHandler().getInventory().getStack(13);
-                return cancelItem.get(DataComponentTypes.CUSTOM_NAME).getString().contains("Cancel Order");
+    private void resetState() {
+        this.order = null;
+        this.shouldAddToSign = false;
+    }
+
+    private void handleFlip() {
+        double flipPrice = order.getFlipPrice();
+        if(order != null && flipPrice != 0 && GUIUtils.wasLastChestFlip()) {
+            GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
+            order.flipItem(flipPrice);
+        }
+    }
+
+    private Optional<ItemStack> getFlipSign(List<ItemStack> chestItemStacks) {
+        for (ItemStack itemStack : chestItemStacks) {
+            if (itemStack == null || itemStack.isEmpty()) {
+                continue;
             }
-            if (cancelItem.isEmpty() || cancelItem.getComponentChanges().get(DataComponentTypes.LORE) == null)
-                return false;
-            return !(cancelItem.getComponentChanges().get(DataComponentTypes.LORE).get().styledLines().get(0).getString().contains("Cannot cancel"));
+
+            if (itemStack.getName().getString().contains(FLIP_ORDER_IDENTIFIER)) {
+                LoreComponent lore = itemStack.getComponents().get(DataComponentTypes.LORE);
+                if (lore != null) {
+                    return Optional.of(itemStack);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<OrderPriceInfo> getOrderPriceInfo(LoreComponent lore) {
+        if (lore.lines().size() <= LORE_LINE_PRICE) return Optional.empty();
+
+        String priceLine = lore.lines().get(LORE_LINE_PRICE).getString();
+        Matcher matcher = PRICE_PATTERN.matcher(priceLine);
+
+        if (matcher.find()) {
+            try {
+                double orderPrice = Double.parseDouble(matcher.group(1).replace(",", ""));
+                return Optional.of(new OrderPriceInfo(orderPrice, OrderPriceInfo.priceTypes.INSTASELL));
+            } catch (NumberFormatException e) {
+                Util.notifyError("Error while trying to parse order price in Flip Helper", e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Integer> getVolumeFilled(LoreComponent lore) {
+        if (lore.lines().size() <= LORE_LINE_VOLUME) return Optional.empty();
+
+        String volumeLine = lore.lines().get(LORE_LINE_VOLUME).getString();
+        Matcher matcher = VOLUME_PATTERN.matcher(volumeLine);
+
+        if (matcher.find()) {
+            try {
+                return Optional.of(Integer.parseInt(matcher.group(1).replace(",", "")));
+            } catch (NumberFormatException e) {
+                Util.notifyError("Error while trying to parse order volume in Flip Helper", e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<OrderData> matchToWatchedOrder(LoreComponent lore) {
+        Optional<OrderPriceInfo> priceInfoOpt = getOrderPriceInfo(lore);
+        Optional<Integer> orderVolumeFilledOpt = getVolumeFilled(lore);
+
+        if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
+            OrderData tempOrder = new OrderData(null, orderVolumeFilledOpt.get(), priceInfoOpt.get());
+            return Optional.ofNullable(tempOrder.findOrderInList(BUConfig.get().watchedOrders));
+        }
+        return Optional.empty();
+    }
+
+    private static boolean inCorrectScreen(){
+        return GUIUtils.inFlipGui() && !inCancelOrderScreen();
+    }
+
+    private static boolean inCancelOrderScreen() {
+        if (!(MinecraftClient.getInstance().currentScreen instanceof GenericContainerScreen inventory)) {
+            return false;
+        }
+
+        try {
+            return cantBeFlippedLineIsPresent(inventory, FLIP_ORDER_SLOT);
         } catch (Exception ex) {
-            Util.notifyError("Error while trying to find if in cancel screen", ex);
+            Util.notifyError("Error while checking if in cancel screen", ex);
             return false;
         }
     }
 
+    private static boolean cantBeFlippedLineIsPresent(GenericContainerScreen inventory, int slot){
+        ItemStack itemStack = inventory.getScreenHandler().getInventory().getStack(slot);
+        if (itemStack.isEmpty()) {
+            return false;
+        }
+
+        Text customName = itemStack.get(DataComponentTypes.CUSTOM_NAME);
+        if (customName == null || !customName.getString().contains(FLIP_ORDER_IDENTIFIER)) {
+            return false;
+        }
+
+        LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
+        if (lore == null || lore.lines().isEmpty()) {
+            return false;
+        }
+        return Util.findComponentWith(lore.lines(), CANNOT_CANCEL_IDENTIFIER) != null;
+    }
+
+    //an item to cancel the order being present means that the order has not been filled or is otherwise not ready to be flipped
+//    private static boolean isCancelItem(GenericContainerScreen inventory, int slot) {
+//        ItemStack itemStack = inventory.getScreenHandler().getInventory().getStack(slot);
+//        if (itemStack.isEmpty()) {
+//            return false;
+//        }
+//
+//        Text customName = itemStack.get(DataComponentTypes.CUSTOM_NAME);
+//        if (customName != null && customName.getString().contains(CANCEL_ORDER_IDENTIFIER)) {
+//            return true;
+//        }
+//
+//        LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
+//        if (lore != null) {
+//            return lore.lines().stream()
+//                    .noneMatch(line -> line.getString().contains(CANNOT_CANCEL_IDENTIFIER));
+//        }
+//
+//        return false;
+//    }
+
     public Option<Boolean> createOption() {
-        return super.createOption("Flip Helper", "Button in flip order menu to undercut market prices for items.", () -> isEnabled(), newVal -> setEnabled(newVal));
+        return super.createOption("Flip Helper",
+                "Button in flip order menu to undercut market prices for items.",
+                this::isEnabled,
+                this::setEnabled);
     }
 
     @Override
