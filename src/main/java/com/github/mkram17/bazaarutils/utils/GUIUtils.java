@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
@@ -29,9 +30,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO make inBazaar() work all the time
 public class GUIUtils implements BUListener {
     public static final GUIUtils INSTANCE = new GUIUtils();
-    public static boolean wasLastChestFlip(){
-        return inFlipGui;
-    }
 
     public static boolean inBuyOrderScreen(){
         if(getContainerName() == null) return false;
@@ -45,11 +43,26 @@ public class GUIUtils implements BUListener {
         if(getContainerName() == null) return false;
         return getContainerName().contains("Bazaar Orders");
     }
+    public static boolean inSellSetup(){
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("At what price are you selling?");
+    }
+    public static boolean inConfirmSellOffer(){
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("Confirm Sell Offer");
+    }
+
+    public static boolean inFlipGui() {
+        if (getContainerName() == null) {
+            return false;
+        }
+        return getContainerName().contains("Order options");
+    }
 
     public static boolean inBazaar(){
         if(getContainerName() == null)
             return false;
-        return inBuyOrderScreen() || inFlipGui || inInstaBuy() || getContainerName().contains("Bazaar") || inOrderScreen() || getContainerName().contains("➜");
+        return inBuyOrderScreen() || inFlipGui() || inInstaBuy() || getContainerName().contains("Bazaar") || inOrderScreen() || inSellSetup() || inConfirmSellOffer() || getContainerName().contains("➜");
     }
 
     //only for specific items
@@ -61,15 +74,18 @@ public class GUIUtils implements BUListener {
     }
     @Getter @Setter
     private static guiTypes guiType;
-    public static boolean inFlipGui;
     @Getter @Setter
     private static Inventory lowerChestInventory;
     @Getter @Setter
     private static Bookmark currentBookmark;
     @Getter @Setter
     private static Screen previousScreen;
-    @Getter @Setter
-    private static String previousScreenName;
+
+
+    @EventHandler
+    private void onScreenChange(ScreenChangeEvent e){
+        previousScreen = e.getOldScreen();
+    }
 
     @Override
     public void subscribe() {
@@ -90,12 +106,6 @@ public class GUIUtils implements BUListener {
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
-        });
-
-        ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
-            if(client.currentScreen != null)
-                previousScreen = client.currentScreen;
-            previousScreenName = getContainerName();
         });
     }
 
@@ -240,25 +250,8 @@ public class GUIUtils implements BUListener {
     @EventHandler(priority = EventPriority.HIGH)
     private void onLoad(ChestLoadedEvent e){
         lowerChestInventory = e.getLowerChestInventory();
-        updateFlipGui();
     }
 
-    public static boolean inFlipGui() {
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Order options");
-    }
-
-    public static void updateFlipGui(){
-        if(inFlipGui()) {
-            inFlipGui = true;
-            PlayerActionUtil.notifyAll("In flip gui", Util.notificationTypes.GUI);
-        }
-        else
-            inFlipGui = false;
-
-    }
     public static void clickSlot(int slotIndex, int button) {
         MinecraftClient client = MinecraftClient.getInstance();
         ClientPlayerInteractionManager interactionManager = client.interactionManager;

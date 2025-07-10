@@ -56,7 +56,7 @@ public class Bookmark extends CustomItemButton {
 
     public static boolean inItemScreen(){
         String screenName = GUIUtils.getContainerName();
-        return screenName != null && !screenName.contains("How many do you want?") && (GUIUtils.inBuyOrderScreen() || GUIUtils.inInstaBuy() || GUIUtils.inAnyItemScreen());
+        return screenName != null && !GUIUtils.inBuyOrderScreen() && (GUIUtils.inInstaBuy() || GUIUtils.inAnyItemScreen());
     }
 
     public Bookmark(String name, ItemStack bookmarkedItemStack) {
@@ -163,11 +163,7 @@ public class Bookmark extends CustomItemButton {
             for(ItemStack stack : e.getItemStacks()){
                 if(stack == null) continue;
                 if (!stack.isEmpty() && stack.getName().getString().startsWith(name)) {
-                    //? if >= 1.21.4 {
                     return stack.getCustomName().getString();
-                    //?} else {
-                    /*return stack.getComponentChanges().get(DataComponentTypes.CUSTOM_NAME).get().getString();
-                    *///?}
                 }
             }
         }
@@ -179,10 +175,6 @@ public class Bookmark extends CustomItemButton {
         assert containerName != null;
         if(GUIUtils.inInstaBuy()) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
-        }
-        if(GUIUtils.inBuyOrderScreen()){
-            containerName = GUIUtils.getPreviousScreenName();
-            return containerName.substring(containerName.indexOf("➜")+2);
         }
         if(GUIUtils.inAnyItemScreen())
             return containerName.substring(containerName.indexOf("➜")+2);
