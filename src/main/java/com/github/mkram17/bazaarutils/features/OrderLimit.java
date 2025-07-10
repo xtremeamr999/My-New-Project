@@ -9,16 +9,20 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.misc.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -81,33 +85,25 @@ public class OrderLimit implements BUListener {
         orderLimitEntries.add(new OrderLimitEntry(price, ZonedDateTime.now()));
     }
 
-    public static List<ItemSlotButtonWidget> getWidget() {
+    public static List<ClickableWidget> getWidget() {
         boolean isTargetScreen = GUIUtils.inBazaar();
         if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
+        String orderedCoinsFormatted = formatNumberWithPrefix(BUConfig.get().orderLimit.getTotalOrderedCoins());
+        Text message = Text.literal("Bazaar Order Limit: " + orderedCoinsFormatted + "/" + formatNumberWithPrefix(LIMIT_COINS));
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen,
                 screenTitle);
 
-        int buttonSize = 18;
-        int spacing = 4;
-        int buttonX = dimensions.x() - buttonSize - spacing;
-        int currentButtonY = dimensions.y() + spacing - 22;
-
-        String orderedCoinsFormatted = formatNumberWithPrefix(BUConfig.get().orderLimit.getTotalOrderedCoins());
-
-        ItemSlotButtonWidget button = new ItemSlotButtonWidget(
-                buttonX,
-                currentButtonY,
-                buttonSize, buttonSize,
-                SLOT_BUTTON_TEXTURES,
-                (btn) -> {
-                },
-                null,
-                Text.literal("Bazaar Order Limit: " + orderedCoinsFormatted + "/" + formatNumberWithPrefix(LIMIT_COINS)));
-        return Collections.singletonList(button);
+        int textSizeX = 60;
+        int textSizeY = 8;
+        int spacing = 5;
+        int buttonX = dimensions.x() + textSizeX;
+        int buttonY = dimensions.y() - spacing - textSizeY;
+        TextDisplayWidget widget = new TextDisplayWidget(buttonX, buttonY, textSizeX, textSizeY, message);
+        return Collections.singletonList(widget);
     }
 
     @Override

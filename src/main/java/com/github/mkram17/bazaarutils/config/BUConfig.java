@@ -6,7 +6,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
@@ -19,6 +19,7 @@ import lombok.Setter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -124,8 +125,8 @@ public class BUConfig {
 
      }
 
-     public static List<ItemSlotButtonWidget> getWidgets(){
-        List<ItemSlotButtonWidget> widgets = new ArrayList<>();
+     public static List<ClickableWidget> getWidgets(){
+        List<ClickableWidget> widgets = new ArrayList<>();
         widgets.addAll(Bookmark.getWidgets());
         widgets.addAll(BazaarSettingsButton.getWidget());
         widgets.addAll(OrderLimit.getWidget());
