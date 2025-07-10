@@ -7,6 +7,8 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.features.OrderLimit;
+
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -17,7 +19,7 @@ import java.util.List;
 
 public class ChatHandler implements BUListener{
     public static final ChatHandler INSTANCE = new ChatHandler();
-    public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED}
+    public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED, INSTASELL}
 
     public static Option<Boolean> createDisableOrderFilledSound() {
         return Option.<Boolean>createBuilder()
@@ -61,7 +63,7 @@ public class ChatHandler implements BUListener{
                 messageType = messageTypes.SELLORDER;
             if(siblings.size() >= 3 && siblings.get(2).getString().contains("Claimed")) messageType = messageTypes.CLAIMED;
 //            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
-
+            if (siblings.size() >= 3 && siblings.get(1).getString().contains("Sold")) messageType = messageTypes.INSTASELL;
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(getName(siblings));
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
@@ -75,6 +77,7 @@ public class ChatHandler implements BUListener{
                 }
 
                 OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
+                OrderLimit.addLimit(Double.parseDouble(totalPriceString));
                 OrderData itemToAdd = new OrderData(itemName, volume, priceInfo);
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
@@ -141,6 +144,12 @@ public class ChatHandler implements BUListener{
 
             if (messageType == messageTypes.CLAIMED) {
                 handleClaimed(siblings);
+            }
+            if (messageType == messageTypes.INSTASELL) {
+                String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
+                totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+                OrderLimit.addLimit(Double.parseDouble(totalPriceString));
+                System.out.println(totalPriceString);
             }
         });
     }

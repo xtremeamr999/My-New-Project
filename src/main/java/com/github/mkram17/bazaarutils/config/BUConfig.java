@@ -23,6 +23,12 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
+<<<<<<< HEAD
+=======
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+>>>>>>> 6e6df62 (initial implementation of limit tracker)
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -81,6 +87,10 @@ public class BUConfig {
     public boolean disableErrorNotifications = false;
     @SerialEntry @Getter @Setter
     public boolean orderFilledSound = true;
+    @SerialEntry @Getter @Setter
+    public long dailyLimit;
+    @SerialEntry @Getter @Setter
+    public String lastDay = "1970-01-01T00:00:00Z";
 
 
     public static void openGUI() {
@@ -126,6 +136,30 @@ public class BUConfig {
          widgets.addAll(BazaarSettingsButton.getWidget());
          return widgets;
      }
+        widgets.addAll(Bookmark.getWidgets());
+        widgets.addAll(BazaarSettingsButton.getWidget());
+        widgets.addAll(OrderLimit.getWidget());
+        return widgets;
+    }
+    private static ButtonOption createAmecsDownloadButton() {
+        return ButtonOption.createBuilder()
+                .name(Text.of("Download Amecs Reborn"))
+                .description(OptionDescription.of(Text.of("Amecs Reborn is needed for the Stash Helper feature. Download here.")))
+                .text(Text.of("(for Stash Helper)")) // optional
+                .action((yaclScreen, buttonOption) -> {
+                    MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
+                        if (confirmed) {
+                            try {
+                                net.minecraft.util.Util.getOperatingSystem().open(new URI("https://modrinth.com/mod/amecs-reborn"));
+                            } catch (URISyntaxException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        MinecraftClient.getInstance().setScreen(null);
+                    }, "https://modrinth.com/mod/amecs-reborn", true));
+                })
+                .build();
+    }
 
     public static class Developer {
         public boolean allMessages = false;

@@ -3,9 +3,11 @@ package com.github.mkram17.bazaarutils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
+import com.github.mkram17.bazaarutils.features.OrderLimit;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
+import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.mojang.serialization.Codec;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import lombok.Getter;
@@ -52,6 +54,8 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
         setDefaultValues();
+        OrderLimit.init();
+        TimeUtil.init();
     }
 
     //uses orbit for custom events
