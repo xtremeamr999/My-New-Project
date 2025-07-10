@@ -17,8 +17,9 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatHandler implements BUListener{
+public class ChatHandler implements BUListener {
     public static final ChatHandler INSTANCE = new ChatHandler();
+
     public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED, INSTASELL}
 
     public static Option<Boolean> createDisableOrderFilledSound() {
@@ -54,30 +55,36 @@ public class ChatHandler implements BUListener{
             double price;
             OrderData item;
             messageTypes messageType = null;
-            List<Text> messageSiblings = message.getSiblings();
 
             if (siblings.isEmpty() && message.getString().contains("was filled!")) messageType = messageTypes.FILLED;
-            if (siblings.size() >= 3 && siblings.get(2).getString().contains("Buy Order Setup!"))
-                messageType = messageTypes.BUYORDER;
-            if (siblings.size() >= 3 && siblings.get(2).getString().contains("Sell Offer Setup!"))
-                messageType = messageTypes.SELLORDER;
-            if(siblings.size() >= 3 && siblings.get(2).getString().contains("Claimed")) messageType = messageTypes.CLAIMED;
+
+            if(siblings.size() > 3) {
+                if (siblings.get(2).getString().contains("Buy Order Setup!"))
+                    messageType = messageTypes.BUYORDER;
+                if (siblings.get(2).getString().contains("Sell Offer Setup!"))
+                    messageType = messageTypes.SELLORDER;
+                if (siblings.get(2).getString().contains("Claimed"))
+                    messageType = messageTypes.CLAIMED;
 //            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
-            if (siblings.size() >= 3 && siblings.get(1).getString().contains("Sold")) messageType = messageTypes.INSTASELL;
+                if (siblings.get(1).getString().contains("Sold"))
+                    messageType = messageTypes.INSTASELL;
+            }
+
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
                 itemName = Util.removeFormatting(getName(siblings));
                 volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
 
-                String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "");
-                totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
-                price = Double.parseDouble(totalPriceString)/volume;
+                String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for") + 1).getString().replace(",", "");
+                totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+                price = Double.parseDouble(totalPriceString) / volume;
                 if (messageType == messageTypes.SELLORDER) {
                     //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
-                    price /= ((100 - BUConfig.get().bzTax)/100);
+                    price /= ((100 - BUConfig.get().bzTax) / 100);
                 }
 
                 OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
-                OrderLimit.addLimit(Double.parseDouble(totalPriceString));
+                BUConfig.get().orderLimit.addLimit(Double.parseDouble(totalPriceString));
+
                 OrderData itemToAdd = new OrderData(itemName, volume, priceInfo);
 
                 //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
@@ -126,7 +133,7 @@ public class ChatHandler implements BUListener{
                     return;
                 }
 
-                if(!BUConfig.get().isOrderFilledSound())
+                if (!BUConfig.get().isOrderFilledSound())
                     SoundUtil.notifyMultipleTimes(2);
 
                 OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
@@ -134,8 +141,8 @@ public class ChatHandler implements BUListener{
                 item = new OrderData(itemName, volume, itemPriceInfo);
 
                 item = item.findOrderInList(BUConfig.get().watchedOrders);
-                if(item == null)
-                    Util.notifyError("Could not find item to fill with info vol: "+ volume + " name: " + itemName, null);
+                if (item == null)
+                    Util.notifyError("Could not find item to fill with info vol: " + volume + " name: " + itemName, null);
                 else {
                     item.setFilled();
                     PlayerActionUtil.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
@@ -146,16 +153,16 @@ public class ChatHandler implements BUListener{
                 handleClaimed(siblings);
             }
             if (messageType == messageTypes.INSTASELL) {
-                String totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "");
-                totalPriceString = siblings.get(Util.findComponentIndex(siblings, "for")+1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
-                OrderLimit.addLimit(Double.parseDouble(totalPriceString));
-                System.out.println(totalPriceString);
+                String totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "");
+                totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+                BUConfig.get().orderLimit.addLimit(Double.parseDouble(totalPriceString));
+                PlayerActionUtil.notifyAll(totalPriceString, Util.notificationTypes.FEATURE);
             }
         });
     }
 
     private static String getName(List<Text> siblings) {
-        if (siblings.size() == 10){
+        if (siblings.size() == 10) {
             return Util.removeFormatting(siblings.get(6).getString());
         } else {
             return Util.removeFormatting(siblings.get(5).getString());
@@ -259,7 +266,7 @@ public class ChatHandler implements BUListener{
                 item = item.findOrderInList(BUConfig.get().watchedOrders);
             }
 
-//TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
+            //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
             if (item == null) {
                 PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
                 return;
@@ -267,15 +274,14 @@ public class ChatHandler implements BUListener{
             if (item.getVolume().equals(volumeClaimed)) {
                 PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ORDERDATA);
                 item.removeFromWatchedItems();
-            } else if(volumeClaimed != null){
+            } else if (volumeClaimed != null) {
                 item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
                 PlayerActionUtil.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ORDERDATA);
             }
         } catch (NumberFormatException e) {
             Util.notifyError("Failed to parse number in claimed order - Volume: " + volumeClaimed + ", Item: "
                     + itemName + ", Price: " + price, e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Util.notifyError("Error in order claim text: " + siblings, e);
         }
     }

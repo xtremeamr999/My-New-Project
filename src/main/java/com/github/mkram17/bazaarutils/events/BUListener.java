@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ItemUpdater;
+import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
 import java.util.ArrayList;
@@ -17,15 +18,16 @@ public interface BUListener {
 
     //if an instance of the class is not present as an object in BUConfig, it must be added here like the others
     static List<BUListener> getStaticEventListeners(){
-        List<BUListener> transientEventListeners = new ArrayList<>();
-        transientEventListeners.add(ChestLoadedEvent.INSTANCE);
-        transientEventListeners.add(ChatHandler.INSTANCE);
-        transientEventListeners.add(JoinMessages.INSTANCE);
-        transientEventListeners.add(GUIUtils.INSTANCE);
-        transientEventListeners.add(ItemUpdater.INSTANCE);
-        transientEventListeners.add(BazaarData.INSTANCE);
-        transientEventListeners.add(Util.INSTANCE);
-        return transientEventListeners;
+        List<BUListener> staticListeners = new ArrayList<>();
+        staticListeners.add(ChestLoadedEvent.INSTANCE);
+        staticListeners.add(ChatHandler.INSTANCE);
+        staticListeners.add(JoinMessages.INSTANCE);
+        staticListeners.add(GUIUtils.INSTANCE);
+        staticListeners.add(ItemUpdater.INSTANCE);
+        staticListeners.add(BazaarData.INSTANCE);
+        staticListeners.add(Util.INSTANCE);
+        staticListeners.add(TimeUtil.INSTANCE);
+        return staticListeners;
     }
 
     static List<BUListener> getEventListeners(){

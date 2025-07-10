@@ -4,9 +4,10 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.ItemStackCodecGsonAdapter;
+import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.*;
@@ -23,12 +24,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
-<<<<<<< HEAD
-=======
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
->>>>>>> 6e6df62 (initial implementation of limit tracker)
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +41,7 @@ public class BUConfig {
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("bazaarutils.json"))
                     .appendGsonBuilder(gsonBuilder -> gsonBuilder
                             .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())
+                            .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
                             .registerTypeAdapterFactory(customOrderAdapterFactory))
                     .build())
             .build();
@@ -87,10 +84,8 @@ public class BUConfig {
     public boolean disableErrorNotifications = false;
     @SerialEntry @Getter @Setter
     public boolean orderFilledSound = true;
-    @SerialEntry @Getter @Setter
-    public long dailyLimit;
-    @SerialEntry @Getter @Setter
-    public String lastDay = "1970-01-01T00:00:00Z";
+    @SerialEntry
+    public OrderLimit orderLimit = new OrderLimit(true);
 
 
     public static void openGUI() {
@@ -130,35 +125,11 @@ public class BUConfig {
      }
 
      public static List<ItemSlotButtonWidget> getWidgets(){
-         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
-
-         widgets.addAll(Bookmark.getWidgets());
-         widgets.addAll(BazaarSettingsButton.getWidget());
-         return widgets;
-     }
+        List<ItemSlotButtonWidget> widgets = new ArrayList<>();
         widgets.addAll(Bookmark.getWidgets());
         widgets.addAll(BazaarSettingsButton.getWidget());
         widgets.addAll(OrderLimit.getWidget());
         return widgets;
-    }
-    private static ButtonOption createAmecsDownloadButton() {
-        return ButtonOption.createBuilder()
-                .name(Text.of("Download Amecs Reborn"))
-                .description(OptionDescription.of(Text.of("Amecs Reborn is needed for the Stash Helper feature. Download here.")))
-                .text(Text.of("(for Stash Helper)")) // optional
-                .action((yaclScreen, buttonOption) -> {
-                    MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
-                        if (confirmed) {
-                            try {
-                                net.minecraft.util.Util.getOperatingSystem().open(new URI("https://modrinth.com/mod/amecs-reborn"));
-                            } catch (URISyntaxException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        MinecraftClient.getInstance().setScreen(null);
-                    }, "https://modrinth.com/mod/amecs-reborn", true));
-                })
-                .build();
     }
 
     public static class Developer {

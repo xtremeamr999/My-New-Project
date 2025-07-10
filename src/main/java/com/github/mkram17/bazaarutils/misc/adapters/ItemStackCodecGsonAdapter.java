@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc;
+package com.github.mkram17.bazaarutils.misc.adapters;
 
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.*;

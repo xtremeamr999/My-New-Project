@@ -52,7 +52,7 @@ public class OrderPriceInfo {
         this.price = newPrice;
     }
 
-    public String getPrettyString(double theDouble){
+    public static String getPrettyString(double theDouble){
         return String.format("$%,.1f", theDouble);
     }
 
