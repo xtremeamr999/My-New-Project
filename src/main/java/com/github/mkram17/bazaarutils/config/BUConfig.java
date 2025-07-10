@@ -86,7 +86,7 @@ public class BUConfig {
     @SerialEntry @Getter @Setter
     public boolean orderFilledSound = true;
     @SerialEntry
-    public OrderLimit orderLimit = new OrderLimit(true);
+    public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
 
 
     public static void openGUI() {

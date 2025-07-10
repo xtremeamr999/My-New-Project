@@ -47,6 +47,7 @@ public class BUConfigGui {
         }
 
         generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
+        generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
 
         builder.category(generalBuilder.build());
     }

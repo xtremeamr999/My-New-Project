@@ -7,7 +7,6 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.features.OrderLimit;
 
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -83,7 +82,7 @@ public class ChatHandler implements BUListener {
                 }
 
                 OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
-                BUConfig.get().orderLimit.addLimit(Double.parseDouble(totalPriceString));
+                BUConfig.get().orderLimit.addOrderToLimit(Double.parseDouble(totalPriceString));
 
                 OrderData itemToAdd = new OrderData(itemName, volume, priceInfo);
 
@@ -155,7 +154,7 @@ public class ChatHandler implements BUListener {
             if (messageType == messageTypes.INSTASELL) {
                 String totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "");
                 totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
-                BUConfig.get().orderLimit.addLimit(Double.parseDouble(totalPriceString));
+                BUConfig.get().orderLimit.addOrderToLimit(Double.parseDouble(totalPriceString));
                 PlayerActionUtil.notifyAll(totalPriceString, Util.notificationTypes.FEATURE);
             }
         });
