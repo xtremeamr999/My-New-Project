@@ -191,58 +191,46 @@ public class GUIUtils implements BUListener {
         }
     }
 
-
-
     public static void setSignText(String text, boolean closeAfter) {
-        final int MAX_ATTEMPTS = 5;
-        final long DELAY_MS = 200;
+        setSignTextInternal(text, closeAfter, 5);
+    }
 
-        CompletableFuture.runAsync(() -> {
-            for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-                MinecraftClient client = MinecraftClient.getInstance();
-                if (client != null && client.currentScreen instanceof SignEditScreen) {
-                    final SignEditScreen screen = (SignEditScreen) client.currentScreen;
-                    client.execute(() -> {
-                        try {
-                            AccessorSignEditScreen signScreen = (AccessorSignEditScreen) screen;
-                            String[] lines = text.split("\n", 4);
-                            int originalRow = signScreen.getCurrentRow();
+    private static void setSignTextInternal(String text, boolean closeAfter, int attemptsLeft) {
+        if (attemptsLeft <= 0) {
+            Util.notifyError("Failed to set sign text: Screen not available.", null);
+            return;
+        }
 
-                            for (int i = 0; i < 4; i++) {
-                                String line = i < lines.length ? lines[i] : "";
-                                signScreen.setCurrentRow(i);
-                                signScreen.callSetCurrentRowMessage(line);
-                            }
-                            signScreen.setCurrentRow(originalRow);
-                        } catch (Exception e) {
-                            Util.notifyError("Error executing sign text update: " + e.getMessage(), e);
-                            e.printStackTrace();
-                        }
-                    });
-                    if (closeAfter)
-                        closeSign();
-                    return;
-                } else {
-                    if (attempt < MAX_ATTEMPTS - 1) {
-                        try {
-                            Thread.sleep(DELAY_MS);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            MinecraftClient finalClient = MinecraftClient.getInstance();
-                            if (finalClient != null) {
-                                finalClient.execute(() -> Util.notifyError("Sign text setting interrupted", null));
-                            }
-                            return;
-                        }
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) {
+            Util.notifyError("Failed to set sign text: MinecraftClient is null.", null);
+            return;
+        }
+
+        client.execute(() -> {
+            if (client.currentScreen instanceof SignEditScreen screen) {
+                try {
+                    AccessorSignEditScreen signScreen = (AccessorSignEditScreen) screen;
+                    String[] lines = text.split("\n", 4);
+                    int originalRow = signScreen.getCurrentRow();
+
+                    for (int i = 0; i < 4; i++) {
+                        String line = i < lines.length ? lines[i] : "";
+                        signScreen.setCurrentRow(i);
+                        signScreen.callSetCurrentRowMessage(line);
                     }
-                }
-            }
+                    signScreen.setCurrentRow(originalRow);
 
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client != null) {
-                client.execute(() -> Util.notifyError("Error setting sign text: client was null or not in a sign after " + MAX_ATTEMPTS + " attempts", null));
+                    if (closeAfter) {
+                        closeSign();
+                    }
+                } catch (Exception e) {
+                    Util.notifyError("Error executing sign text update: " + e.getMessage(), e);
+                    e.printStackTrace();
+                }
             } else {
-                Util.notifyError("Error setting sign text: Failed after " + MAX_ATTEMPTS + " attempts, client was null.", null);
+                // Screen not open yet, schedule a retry
+                Util.tickExecuteLater(4, () -> setSignTextInternal(text, closeAfter, attemptsLeft - 1));
             }
         });
     }
