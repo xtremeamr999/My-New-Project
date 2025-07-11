@@ -37,21 +37,48 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (screen instanceof GenericContainerScreen genericContainerScreen) {
-                CompletableFuture.runAsync(() -> checkIfGuiLoaded(genericContainerScreen)).thenRun(() -> {
-//                    Util.notifyAll("Chest loaded event went off!", Util.notificationTypes.GUI);
+                class GuiLoadedChecker implements Runnable {
+                    private int attempts = 0;
+                    private final int MAX_ATTEMPTS = 100; // 2 seconds timeout (100 * 20ms)
+                    private final long DELAY_MS = 20;
 
-                    ChestLoadedEvent event = new ChestLoadedEvent();
-                    ScreenHandler handler = genericContainerScreen.getScreenHandler();
-                    if (handler instanceof GenericContainerScreenHandler containerHandler) {
-                        event.lowerChestInventory = containerHandler.getInventory();
-                        event.containerName = GUIUtils.getContainerName();
-                        event.itemStacks = getChestItemSlots(event.lowerChestInventory);
+                    @Override
+                    public void run() {
+                        // Ensure we are still on the same screen
+                        if (client.currentScreen != genericContainerScreen) {
+                            return;
+                        }
 
-                        // Post to custom event bus
-                        BazaarUtils.EVENT_BUS.post(event);
-//                        Util.notifyAll("Chest Loaded Event posted!");
+                        ScreenHandler handler = genericContainerScreen.getScreenHandler();
+                        if (handler instanceof GenericContainerScreenHandler containerHandler) {
+                            Inventory inv = containerHandler.getInventory();
+                            if (inv.size() > 0 && !inv.getStack(inv.size() - 1).isEmpty() && !isItemLoading(inv)) {
+                                // GUI is loaded, post the event
+                                ChestLoadedEvent event = new ChestLoadedEvent();
+                                event.lowerChestInventory = inv;
+                                event.containerName = GUIUtils.getContainerName();
+                                event.itemStacks = getChestItemSlots(inv);
+                                BazaarUtils.EVENT_BUS.post(event);
+                            } else {
+                                // GUI not loaded, retry
+                                attempts++;
+                                if (attempts < MAX_ATTEMPTS) {
+                                    // Schedule to run again after a delay
+                                    CompletableFuture.runAsync(() -> {
+                                        try {
+                                            Thread.sleep(DELAY_MS);
+                                            client.execute(this);
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                    });
+                                }
+                            }
+                        }
                     }
-                });
+                }
+                // Start the check on the client thread
+                client.execute(new GuiLoadedChecker());
             }
         });
     }
@@ -65,29 +92,6 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
             }
         }
         return stacks;
-    }
-
-    static void checkIfGuiLoaded(GenericContainerScreen screen) {
-        while (true) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-
-            ScreenHandler handler = screen.getScreenHandler();
-            if (handler instanceof GenericContainerScreenHandler containerHandler) {
-                Inventory inv = containerHandler.getInventory();
-                int size = inv.size();
-                if (size == 0) continue;
-
-                ItemStack bottomRightItem = inv.getStack(size - 1);
-                if (!bottomRightItem.isEmpty() && !isItemLoading(inv)) {
-                    break;
-                }
-            }
-        }
     }
 
     private static boolean isItemLoading(Inventory inventory) {
@@ -105,10 +109,6 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
             }
         }
         return false;
-    }
-
-    public boolean inFlipMenu() {
-        return containerName.contains("Order options");
     }
 
     @Override
