@@ -7,7 +7,7 @@ import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
-import com.github.mkram17.bazaarutils.misc.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
