@@ -114,20 +114,21 @@ public class OrderData implements BUListener {
     }
 
     public boolean equals(OrderData order, boolean isStrict) {
-        String name = order.getName();
-        Double price = order.getPriceInfo().getPrice();
-        Integer volume = order.getVolume();
+        String otherOrderName = order.getName();
+        Double otherOrderPrice = order.getPriceInfo().getPrice();
+        Integer otherOrderVolume = order.getVolume();
+        int otherOrderAmountUnclaimed = order.getAmountFilled()-order.getAmountClaimed();
         OrderPriceInfo.priceTypes priceType = order.getPriceInfo().getPriceType();
 
         if (isStrict) {
-            return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
-                    (cantCompare(this.getVolume(), volume) || this.getVolume().equals(volume)) &&
-                    (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+            return (cantCompare(this.getPriceInfo().getPrice(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
+                    (cantCompare(this.getVolume(), otherOrderVolume) || this.getVolume().equals(otherOrderVolume)) &&
+                    (cantCompare(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
                     (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
         }
-        return (cantCompare(this.getPriceInfo().getPrice(), price) || this.isSimilarPrice(price)) &&
-                (cantCompare(this.getVolume(), volume) || Math.abs(this.getVolume() - volume) <= (0.05 * volume)) &&
-                (cantCompare(this.getName(), name) || this.getName().equalsIgnoreCase(name)) &&
+        return (cantCompare(this.getPriceInfo().getPrice(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
+                (cantCompare(this.getVolume(), otherOrderVolume) || Math.abs(this.getVolume() - otherOrderVolume) <= (0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
+                (cantCompare(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
                 (cantCompare(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
     }
 

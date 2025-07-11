@@ -39,8 +39,8 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
             if (screen instanceof GenericContainerScreen genericContainerScreen) {
                 class GuiLoadedChecker implements Runnable {
                     private int attempts = 0;
-                    private final int MAX_ATTEMPTS = 100; // 2 seconds timeout (100 * 20ms)
-                    private final long DELAY_MS = 20;
+                    private final int MAX_ATTEMPTS = 50; // 2 seconds timeout (50 * 40ms)
+                    private final long DELAY_MS = 40;
 
                     @Override
                     public void run() {

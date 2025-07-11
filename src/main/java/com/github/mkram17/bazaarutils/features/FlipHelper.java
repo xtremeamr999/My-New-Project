@@ -21,6 +21,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -34,13 +35,11 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO switch to finding market price without finding the OrderData first. Then, ItemUpdater should handle fixing it. Or just do it that way for redundancy.
 public class FlipHelper extends CustomItemButton implements BUListener {
 
-    private static final int FLIP_HELPER_BUTTON_SLOT = 15;
-    private static final int FLIP_ORDER_SLOT = 13;
+    private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
     private static final String FLIP_ORDER_IDENTIFIER = "Flip Order";
-    private static final String CANCEL_ORDER_IDENTIFIER = "Cancel Order";
-    private static final String CANNOT_CANCEL_IDENTIFIER = "Cannot cancel";
+    private static final String CANNOT_CANCEL_IDENTIFIER = "can't be flipped";
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
@@ -49,13 +48,12 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     @Getter @Setter
     private boolean enabled;
     @Getter
-    private final Item buttonItem;
+    private static final Item BUTTON_ITEM = Items.CHERRY_SIGN;
     private OrderData order;
 
-    public FlipHelper(boolean enabled, int slotNumber, Item buttonItem) {
+    public FlipHelper(boolean enabled, int slotNumber) {
         this.enabled = enabled;
         this.slotNumber = slotNumber;
-        this.buttonItem = buttonItem;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -69,7 +67,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         }
 
         try {
-            ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElseThrow();
+            ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
             Optional<OrderData> orderOptional = matchToWatchedOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
             if (orderOptional.isEmpty()) {
                 return;
@@ -82,14 +80,13 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!enabled || event.slot.getIndex() != slotNumber || !inCorrectScreen()) {
+        if (!enabled || event.slot.getIndex() != slotNumber || !inCorrectScreen() || order == null) {
             return;
         }
 
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        GUIUtils.clickSlot(FLIP_HELPER_BUTTON_SLOT,0);
-        if (order != null)
-            shouldAddToSign = true;
+        GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
+        shouldAddToSign = true;
     }
 
     @EventHandler
@@ -101,10 +98,10 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || buttonItem == null)
+        if(!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || order == null)
             return;
 
-        ItemStack itemStack = new ItemStack(buttonItem, 1);
+        ItemStack itemStack = new ItemStack(BUTTON_ITEM, 1);
         itemStack.set(DataComponentTypes.CUSTOM_NAME, getButtonText());
         itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, getButtonStackSize());
         event.setReplacement(itemStack);
@@ -178,7 +175,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         return Optional.empty();
     }
 
-    private Optional<Integer> getVolumeFilled(LoreComponent lore) {
+    private Optional<Integer> getVolumeUnclaimed(LoreComponent lore) {
         if (lore.lines().size() <= LORE_LINE_VOLUME) return Optional.empty();
 
         String volumeLine = lore.lines().get(LORE_LINE_VOLUME).getString();
@@ -196,7 +193,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     private Optional<OrderData> matchToWatchedOrder(LoreComponent lore) {
         Optional<OrderPriceInfo> priceInfoOpt = getOrderPriceInfo(lore);
-        Optional<Integer> orderVolumeFilledOpt = getVolumeFilled(lore);
+        Optional<Integer> orderVolumeFilledOpt = getVolumeUnclaimed(lore);
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             OrderData tempOrder = new OrderData(null, orderVolumeFilledOpt.get(), priceInfoOpt.get());

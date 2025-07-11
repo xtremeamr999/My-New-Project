@@ -57,7 +57,7 @@ public class BUConfig {
     @SerialEntry
     public boolean firstLoad = true;
     @SerialEntry
-    public FlipHelper flipHelper = new FlipHelper(true, 17, Items.CHERRY_SIGN);
+    public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
     public ArrayList<OrderData> watchedOrders = new ArrayList<>();
     @SerialEntry

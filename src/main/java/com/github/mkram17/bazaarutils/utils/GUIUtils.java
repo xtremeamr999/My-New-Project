@@ -147,11 +147,7 @@ public class GUIUtils implements BUListener {
             if(!(client.currentScreen instanceof HandledScreen<?>))
                 return;
 
-
-            client.execute(() -> {
-                ClientPlayerEntity player = client.player;
-                customCloseHandledScreen();
-            });
+            client.execute(GUIUtils::customCloseHandledScreen);
         } catch (Exception e) {
             e.printStackTrace();
             Util.notifyError("Error closing gui", e);
@@ -225,7 +221,7 @@ public class GUIUtils implements BUListener {
                         closeSign();
                     }
                 } catch (Exception e) {
-                    Util.notifyError("Error executing sign text update: " + e.getMessage(), e);
+                    Util.notifyError("Error executing sign text update", e);
                     e.printStackTrace();
                 }
             } else {
