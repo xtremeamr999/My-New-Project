@@ -37,14 +37,14 @@ public class OrderStatusHighlight implements BUListener {
 
     private static List<OrderData> getHighlightedOrders() {
         return BUConfig.get().watchedOrders.stream()
-                .filter(order -> order.getItemInfo() != null
-                        && order.getItemInfo().getSlotIndex() != null)
+                .filter(order -> order.itemInfo != null
+                        && order.itemInfo.slotIndex() != null)
                 .toList();
     }
 
     public static OrderData getHighlightedOrder(int slotIndex) {
         return getHighlightedOrders().stream()
-                .filter(order -> order.getItemInfo().getSlotIndex() == slotIndex)
+                .filter(order -> order.itemInfo.slotIndex() == slotIndex)
                 .findFirst()
                 .orElse(null);
     }

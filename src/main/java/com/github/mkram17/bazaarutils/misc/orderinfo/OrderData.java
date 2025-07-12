@@ -62,8 +62,7 @@ public class OrderData implements BUListener {
     private double tolerance;
     @Getter
     private OrderPriceInfo priceInfo;
-    @Getter
-    private final OrderItemInfo itemInfo = new OrderItemInfo();
+    public OrderItemInfo itemInfo;
 
     //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
     public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {

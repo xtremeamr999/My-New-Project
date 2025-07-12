@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
@@ -106,8 +107,7 @@ public class ItemUpdater implements BUListener {
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderData orderData = new OrderData(name, totalVolume, priceInfo);
-        orderData.getItemInfo().setItemStack(stack);
-        orderData.getItemInfo().setSlotIndex(mapScreenIndexToInventoryIndex(orderData));
+        orderData.itemInfo = new OrderItemInfo(mapScreenIndexToInventoryIndex(orderData), stack);
         orderData.setTolerance(0.0);
 
         if (volumeFilled > -1) {
@@ -129,7 +129,7 @@ public class ItemUpdater implements BUListener {
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
             if (!inventoryStack.isEmpty()) {
-                if (inventoryStack.equals(item.getItemInfo().getItemStack())) {
+                if (inventoryStack.equals(item.itemInfo.itemStack())) {
                     return i;
                 }
             }
