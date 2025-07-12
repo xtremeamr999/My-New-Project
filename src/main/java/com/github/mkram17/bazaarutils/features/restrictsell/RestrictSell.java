@@ -27,10 +27,10 @@ public class RestrictSell implements BUListener {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
-    private int safetyClicksRequired;
+    private final int safetyClicksRequired;
     @Getter @Setter
     private ArrayList<RestrictSellControl> controls;
-    private static int SELL_ITEM_SLOT_ID = 47;
+    private static final int SELL_ITEM_SLOT_ID = 47;
     private boolean locked = false;
     @Getter
     private int safetyClicks = 0;
@@ -136,20 +136,26 @@ public class RestrictSell implements BUListener {
     }
 
     private boolean isInstaSellLocked(ArrayList<SellItem> items, double totalPrice){
+        return isSellingRestrictedIndividualItem(items) || isSellingRestrictedTotalPrice(totalPrice);
+    }
+
+    private boolean isSellingRestrictedTotalPrice(double totalPrice){
         for(RestrictSellControl control : controls){
             if(control.isEnabled()) {
                 if (control.getRule() == restrictBy.PRICE && totalPrice > control.getAmount())
                     return true;
             }
         }
+        return false;
+    }
+    private boolean isSellingRestrictedIndividualItem(ArrayList<SellItem> items){
         for(SellItem item : items){
-            if(isItemRestricted(item.getVolume(), item.getName()))
+            if(isSellingItemRestricted(item.volume(), item.name()))
                 return true;
         }
         return false;
     }
-
-    private boolean isItemRestricted(int volume, String name){
+    private boolean isSellingItemRestricted(int volume, String name){
         for(RestrictSellControl control : controls){
             if(control.isEnabled()) {
                 if (control.getRule() == restrictBy.VOLUME && volume > control.getAmount())

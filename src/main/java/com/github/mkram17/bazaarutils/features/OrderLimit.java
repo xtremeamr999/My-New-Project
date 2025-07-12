@@ -99,7 +99,7 @@ public class OrderLimit implements BUListener {
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
         String orderedCoinsFormatted = formatNumberWithPrefix(orderLimit.getTotalOrderedCoins());
 
-        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() > orderLimit.getCoinLimit() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
+        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= orderLimit.getCoinLimit() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
         Text limitText = Text.literal("/" + formatNumberWithPrefix(orderLimit.getCoinLimit())).formatted(Formatting.GOLD);
         Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
                 .append(orderedCoinsText)
