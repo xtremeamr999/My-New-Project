@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class OrderStatusHighlight implements BUListener {
     }
 
     private static List<OrderData> getHighlightedOrders() {
-        return BUConfig.get().watchedOrders.stream()
+        return new ArrayList<>(BUConfig.get().watchedOrders).stream()
                 .filter(order -> order.itemInfo != null
                         && order.itemInfo.slotIndex() != null)
                 .toList();
