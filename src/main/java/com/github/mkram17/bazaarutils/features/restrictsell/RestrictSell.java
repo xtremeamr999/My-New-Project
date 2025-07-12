@@ -69,6 +69,8 @@ public class RestrictSell implements BUListener {
             int numItems = findNumItems(changedComponents);
             ArrayList<SellItem> items = getItems(changedComponents, numItems);
             String coinsText = changedComponents.get(5 + numItems).getString();
+            if(!coinsText.contains("coins"))
+                return;
             double totalPrice = Double.parseDouble(coinsText.substring(coinsText.indexOf(": ") + 2, coinsText.indexOf(" coins")).replace(",", ""));
 
 
@@ -103,13 +105,17 @@ public class RestrictSell implements BUListener {
                 }
 
                 var components = changedComponents.get(i).getSiblings();
+                if(components.isEmpty())
+                    continue;
 
                 if (components.size() < 2) {
                     Util.notifyError("Not enough components to find item volume. Size: " + components.size() + " at index " + i, new Throwable("Restrict Sell Error"));
                     continue;
                 }
-
-                int volume = Integer.parseInt(components.get(1).getString().replace(",", ""));
+                int indexOfVolume = Util.componentIndexOf(components, "x")-1;
+                if(indexOfVolume < 0)
+                    continue;
+                int volume = Integer.parseInt(components.get(indexOfVolume).getString().replace(",", ""));
 
                 if (components.size() > 3) {
                     String name = components.get(3).getString().trim();

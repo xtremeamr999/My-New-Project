@@ -63,6 +63,7 @@ public class OrderLimit implements BUListener {
         //if the most recent order is before the last reset time, reset the limit
         if(orderLimitEntries.getLast().time().isBefore(TimeUtil.LAST_BAZAAR_LIMIT_RESET_TIME)) {
             resetLimit();
+            getTotalOrderedCoins();
         }
     }
 
@@ -90,12 +91,12 @@ public class OrderLimit implements BUListener {
     }
 
     public static List<ClickableWidget> getWidget() {
+        OrderLimit orderLimit = BUConfig.get().orderLimit;
         boolean isTargetScreen = GUIUtils.inBazaar();
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+        if (!orderLimit.isEnabled() || !isTargetScreen || !(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen))
             return Collections.emptyList();
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
-        OrderLimit orderLimit = BUConfig.get().orderLimit;
         String orderedCoinsFormatted = formatNumberWithPrefix(orderLimit.getTotalOrderedCoins());
 
         Text orderedCoinsText = orderLimit.getTotalOrderedCoins() > orderLimit.getCoinLimit() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
