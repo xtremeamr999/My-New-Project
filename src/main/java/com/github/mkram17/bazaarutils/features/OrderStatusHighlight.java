@@ -4,14 +4,13 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
@@ -20,9 +19,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 //drawing done in MixinHandledScreen
@@ -107,7 +103,7 @@ public class OrderStatusHighlight implements BUListener {
             switch (order.getOutdatedStatus()) {
                 case OUTDATED:
                     lines.add(1, Text.literal("OUTDATED").formatted(Formatting.RED, Formatting.BOLD));
-                    lines.add(2, Text.literal("Market Price: " + order.getPriceInfo().getPrettyString(order.getPriceInfo().getMarketPrice())).formatted(Formatting.RED));
+                    lines.add(2, Text.literal("Market Price: " + OrderPriceInfo.getPrettyString(order.getPriceInfo().getMarketPrice())).formatted(Formatting.RED));
                     break;
                 case COMPETITIVE:
                     lines.add(1, Text.literal("COMPETITIVE").formatted(Formatting.GREEN, Formatting.BOLD));

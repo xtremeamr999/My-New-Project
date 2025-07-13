@@ -65,6 +65,11 @@ public class OrderData implements BUListener {
         }
     }
 
+    public OrderData(String name, Integer volume, OrderPriceInfo priceInfo, OrderItemInfo itemInfo) {
+        this(name, volume, priceInfo);
+        this.itemInfo = itemInfo;
+    }
+
     private double calculateTolerance() {
         //default tolerance
         if (priceInfo.getPrice() == null || volume == null) {

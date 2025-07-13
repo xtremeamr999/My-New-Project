@@ -16,7 +16,6 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -106,8 +105,9 @@ public class ItemUpdater implements BUListener {
 
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
-        OrderData orderData = new OrderData(name, totalVolume, priceInfo);
-        orderData.setItemInfo(new OrderItemInfo(mapScreenIndexToInventoryIndex(orderData), stack));
+        OrderItemInfo itemInfo = findItemInfo(stack);
+        OrderData orderData = new OrderData(name, totalVolume, priceInfo, itemInfo);
+
         orderData.setTolerance(0.0);
 
         if (volumeFilled > -1) {
@@ -121,15 +121,20 @@ public class ItemUpdater implements BUListener {
         return Optional.of(orderData);
     }
 
+    private static OrderItemInfo findItemInfo(ItemStack itemStack) {
+        int inventoryIndex = mapScreenIndexToInventoryIndex(itemStack);
+        return new OrderItemInfo(inventoryIndex, itemStack);
+    }
+
     //TODO switch to using ItemStack instead of OrderData so it's faster
-    private static int mapScreenIndexToInventoryIndex(OrderData item) {
+    private static int mapScreenIndexToInventoryIndex(ItemStack itemStack) {
         if (lowerChestInventory == null)
             return -1;
 
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
             if (!inventoryStack.isEmpty()) {
-                if (inventoryStack.equals(item.getItemInfo().itemStack())) {
+                if (inventoryStack.equals(itemStack)) {
                     return i;
                 }
             }
