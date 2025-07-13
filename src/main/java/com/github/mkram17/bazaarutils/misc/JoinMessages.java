@@ -44,7 +44,7 @@ public class JoinMessages implements BUListener {
                     });
                 });
                 BUConfig.get().firstLoad = false;
-                BUConfig.HANDLER.save();
+                Util.scheduleConfigSave();
             } else if (BazaarUtils.updatedMajorVersion) {
                 Util.tickExecuteLater(40, () -> PlayerActionUtil.notifyAll(updateMessage));
                 Util.tickExecuteLater(41, () -> PlayerActionUtil.notifyAll(Util.CHANGELOG));

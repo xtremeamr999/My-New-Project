@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
+import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -127,7 +128,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     public void remove(){
         if (BUConfig.get().customOrders.contains(this)) {
             BUConfig.get().customOrders.remove(this);
-            BUConfig.HANDLER.save();
+            Util.scheduleConfigSave();
             EVENT_BUS.unsubscribe(this);
         }
     }

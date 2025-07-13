@@ -294,6 +294,6 @@ public class OrderData implements BUListener {
         if (!BUConfig.get().watchedOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
-        BUConfig.HANDLER.save();
+        Util.scheduleConfigSave();
     }
 }

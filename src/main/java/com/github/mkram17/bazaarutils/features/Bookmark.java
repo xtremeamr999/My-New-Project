@@ -94,7 +94,7 @@ public class Bookmark extends CustomItemButton {
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         switchBookmarked();
         bookmarkedItemStack = findItemStack(name);
-        BUConfig.HANDLER.save();
+        Util.scheduleConfigSave();
     }
 
     public OrderPriceInfo getPriceInfo() {
@@ -129,7 +129,7 @@ public class Bookmark extends CustomItemButton {
 
     public void onWidgetShiftClick(){
         BUConfig.get().bookmarks.remove(this);
-        BUConfig.HANDLER.save();
+        Util.scheduleConfigSave();
     }
 
     private void switchBookmarked(){
@@ -140,7 +140,7 @@ public class Bookmark extends CustomItemButton {
             changeVisuals(true);
             BUConfig.get().bookmarks.add(this);
         }
-        BUConfig.HANDLER.save();
+        Util.scheduleConfigSave();
     }
 
     private void changeVisuals(boolean bookmarked){

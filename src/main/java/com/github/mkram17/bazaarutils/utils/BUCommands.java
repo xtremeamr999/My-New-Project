@@ -99,7 +99,7 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
                     BUConfig.get().developerMode = !BUConfig.get().developerMode;
-                    HANDLER.save();
+                    Util.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
                     PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
@@ -136,7 +136,7 @@ public class BUCommands {
 
                                             BUConfig.get().customOrders.add(orderToAdd);
                                             PlayerActionUtil.notifyAll("Added order for " + orderToAdd.getOrderAmount() + " in slot number " + slotNumber);
-                                            HANDLER.save();
+                                            Util.scheduleConfigSave();
                                             return 1;
                                         })
                                 )
@@ -160,7 +160,7 @@ public class BUCommands {
                                         PlayerActionUtil.notifyAll("Cannot remove Max Buy Order.");
                                         return 0;
                                     }
-                                    HANDLER.save();
+                                    Util.scheduleConfigSave();
                                     return 1;
                                 })
                         )
@@ -174,7 +174,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.VOLUME, limit);
-                                            HANDLER.save();
+                                            Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
                                             return 1;
                                         })
@@ -186,7 +186,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.PRICE, limit);
-                                            HANDLER.save();
+                                            Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
                                             return 1;
                                         })
@@ -198,7 +198,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             String name = StringArgumentType.getString(context, "itemName");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.NAME, name);
-                                            HANDLER.save();
+                                            Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
                                             return 1;
                                         })
@@ -218,7 +218,7 @@ public class BUCommands {
                                         PlayerActionUtil.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
                                     }
                                     BUConfig.get().restrictSell.getControls().remove(restrictNum);
-                                    HANDLER.save();
+                                    Util.scheduleConfigSave();
                                     return 1;
                                 })
                         )

@@ -39,7 +39,7 @@ public class StashMessages implements BUListener {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if(message.getString().contains("You picked up") && message.getString().contains("from your material stash") && !stashPreviouslyClaimed) {
                 stashPreviouslyClaimed = true;
-                BUConfig.HANDLER.save();
+                Util.scheduleConfigSave();
                 Util.tickExecuteLater(2, () ->{
                     if(BUCompatibilityHelper.isAmecsReborn())
                         PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");

@@ -22,6 +22,7 @@ import java.util.List;
 //main utility class. More specific utility classes are in utils package
 public class Util implements BUListener {
     public static final Util INSTANCE = new Util();
+    private static boolean configSaveScheduled = false;
 
 
     @Override
@@ -131,7 +132,17 @@ public class Util implements BUListener {
         assert item.getProductID() != null;
         BUConfig.get().watchedOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ORDERDATA);
-        BUConfig.HANDLER.save();
+        scheduleConfigSave();
+    }
+
+    public static void scheduleConfigSave() {
+        if (!configSaveScheduled) {
+            configSaveScheduled = true;
+            tickExecuteLater(20, () -> { // 1 second
+                BUConfig.HANDLER.save();
+                configSaveScheduled = false;
+            });
+        }
     }
 
     public static void subscribeTicks() {

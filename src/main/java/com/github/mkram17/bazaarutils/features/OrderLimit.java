@@ -19,6 +19,7 @@ import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
+import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -124,7 +125,7 @@ public class OrderLimit implements BUListener {
             public OrderLimitEntry(double price, ZonedDateTime time) {
                 this.price = price;
                 this.time = time;
-                BUConfig.HANDLER.save();
+                Util.scheduleConfigSave();
             }
         }
 
