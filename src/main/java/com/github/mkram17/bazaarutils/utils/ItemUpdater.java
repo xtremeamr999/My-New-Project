@@ -30,7 +30,8 @@ public class ItemUpdater implements BUListener {
     private static final String TO_CLAIM_LORE = "to claim!";
     private static final String ITEMS_LORE = "items";
     private static final String COINS_LORE = " coins";
-    private static final String VOLUME_LORE = "Order amount: ";
+    private static final String ORDER_VOLUME_LORE = "Order amount: ";
+    private static final String OFFER_VOLUME_LORE = "Offer amount: ";
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e) {
@@ -77,7 +78,12 @@ public class ItemUpdater implements BUListener {
             return null;
         }
 
-        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(lore, PER_UNIT_LORE).getString(), "unit:"));
+        Text unitPriceText = Util.findComponentWith(lore, PER_UNIT_LORE);
+        if (unitPriceText == null) {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Could not find unit price in lore"));
+            return null;
+        }
+        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(unitPriceText.getString(), "unit:"));
         int volume;
         int amountFilled = -1;
         int amountClaimed = -1;
@@ -87,11 +93,16 @@ public class ItemUpdater implements BUListener {
             amountFilled = Util.parseNumber(amountFilledText.getString().substring(8, amountFilledText.getString().indexOf("/")));
         }
 
-        Text volumeText = Util.findComponentWith(lore, VOLUME_LORE);
+        Text volumeText = Util.findComponentWith(lore, ORDER_VOLUME_LORE);
+        if (volumeText == null) {
+            volumeText = Util.findComponentWith(lore, OFFER_VOLUME_LORE);
+        }
+
         if (volumeText != null) {
             var volumeTextSiblings = volumeText.getSiblings();
             volume = Util.parseNumber(volumeTextSiblings.get(1).getString());
         } else {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Could not find volume in lore"));
             volume = -1; // should never happen
         }
 
