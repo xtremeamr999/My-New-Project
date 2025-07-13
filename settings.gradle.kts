@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.6"
+    id("dev.kikugie.stonecutter") version "0.7"
 }
 
 stonecutter {
@@ -17,10 +17,6 @@ stonecutter {
         versions("1.21.5", "1.21.6")
         vcsVersion = "1.21.6"
     }
-
-//    shared {
-//
-//    }
 }
 
 rootProject.name = "Bazaar-Utils-Modern"
