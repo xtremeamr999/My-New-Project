@@ -30,6 +30,7 @@ public class ItemUpdater implements BUListener {
     private static final String TO_CLAIM_LORE = "to claim!";
     private static final String ITEMS_LORE = "items";
     private static final String COINS_LORE = " coins";
+    private static final String VOLUME_LORE = "Order amount: ";
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e) {
@@ -44,8 +45,6 @@ public class ItemUpdater implements BUListener {
     private static void updateWatchedItems(List<ItemStack> orderStacks) {
         List<OrderData> foundOrders = orderStacks.stream()
                 .map(ItemUpdater::parseOrderFromItemStack)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .toList();
 
         BUConfig.get().watchedOrders.clear();
@@ -55,11 +54,13 @@ public class ItemUpdater implements BUListener {
         BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
     }
 
-    private static Optional<OrderData> parseOrderFromItemStack(ItemStack stack) {
+    private static OrderData parseOrderFromItemStack(ItemStack stack) {
         String customName = stack.getName().getString();
         Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
-        if (loreComponent == null || loreComponent.isEmpty())
-            return Optional.empty();
+        if (loreComponent == null || loreComponent.isEmpty()) {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Lore component is null or empty"));
+            return null;
+        }
 
         List<Text> lore = loreComponent.get().styledLines();
         boolean isSellOrder;
@@ -72,53 +73,59 @@ public class ItemUpdater implements BUListener {
             name = customName.substring(SELL_ORDER_PREFIX.length() + 1);
             isSellOrder = true;
         } else {
-            return Optional.empty();
+            Util.notifyError("Error while parsing order from item stack", new Exception("Could not determine if order is buy or sell"));
+            return null;
         }
 
-        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(lore, PER_UNIT_LORE), "unit:"));
-        int totalVolume;
-        int volumeFilled = -1;
+        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(Util.findComponentWith(lore, PER_UNIT_LORE).getString(), "unit:"));
+        int volume;
+        int amountFilled = -1;
         int amountClaimed = -1;
 
-        String volumeFilledString = Util.findComponentWith(lore, FILLED_LORE);
-        if (volumeFilledString != null) {
-            volumeFilled = Util.parseNumber(volumeFilledString.substring(8, volumeFilledString.indexOf("/")));
-            totalVolume = Util.parseNumber(volumeFilledString.substring(volumeFilledString.indexOf("/") + 1, volumeFilledString.lastIndexOf(" ")));
-        } else {
-            totalVolume = Util.parseNumber(lore.get(2).getSiblings().get(1).getString());
+        Text amountFilledText = Util.findComponentWith(lore, FILLED_LORE);
+        if (amountFilledText != null) {
+            amountFilled = Util.parseNumber(amountFilledText.getString().substring(8, amountFilledText.getString().indexOf("/")));
         }
 
-        if (volumeFilled != -1) {
-            String amountUnclaimedString = Util.findComponentWith(lore, TO_CLAIM_LORE);
-            if (amountUnclaimedString != null) {
+        Text volumeText = Util.findComponentWith(lore, VOLUME_LORE);
+        if (volumeText != null) {
+            var volumeTextSiblings = volumeText.getSiblings();
+            volume = Util.parseNumber(volumeTextSiblings.get(1).getString());
+        } else {
+            volume = -1; // should never happen
+        }
+
+        if (amountFilled != -1) {
+            Text amountUnclaimedText = Util.findComponentWith(lore, TO_CLAIM_LORE);
+            if (amountUnclaimedText != null) {
                 int amountUnclaimed;
-                if (!amountUnclaimedString.contains(ITEMS_LORE)) {
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(COINS_LORE)));
+                if (!amountUnclaimedText.getString().contains(ITEMS_LORE)) {
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedText.getString().substring(9, amountUnclaimedText.getString().indexOf(COINS_LORE)));
                 } else {
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedString.substring(9, amountUnclaimedString.indexOf(ITEMS_LORE) - 1));
+                    amountUnclaimed = Util.parseNumber(amountUnclaimedText.getString().substring(9, amountUnclaimedText.getString().indexOf(ITEMS_LORE) - 1));
                 }
-                amountClaimed = volumeFilled - amountUnclaimed;
+                amountClaimed = amountFilled - amountUnclaimed;
             } else {
-                amountClaimed = volumeFilled;
+                amountClaimed = amountFilled;
             }
         }
 
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderItemInfo itemInfo = findItemInfo(stack);
-        OrderData orderData = new OrderData(name, totalVolume, priceInfo, itemInfo);
+        OrderData orderData = new OrderData(name, volume, priceInfo, itemInfo);
 
         orderData.setTolerance(0.0);
 
-        if (volumeFilled > -1) {
-            orderData.setAmountFilled(volumeFilled);
-            if (volumeFilled == totalVolume) orderData.setFilled();
+        if (amountFilled > -1) {
+            orderData.setAmountFilled(amountFilled);
+            if (amountFilled == volume) orderData.setFilled();
         }
         if (amountClaimed > -1) {
             orderData.setAmountClaimed(amountClaimed);
         }
 
-        return Optional.of(orderData);
+        return orderData;
     }
 
     private static OrderItemInfo findItemInfo(ItemStack itemStack) {

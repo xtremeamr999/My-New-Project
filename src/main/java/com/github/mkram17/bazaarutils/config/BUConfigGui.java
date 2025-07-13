@@ -36,7 +36,7 @@ public class BUConfigGui {
 
         generalBuilder.option(config.flipHelper.createOption());
         generalBuilder.options(config.outdatedOrderHandler.createOptions());
-        generalBuilder.option(ChatHandler.createDisableOrderFilledSound());
+        generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
         generalBuilder.option(config.stashMessages.createOption());
         generalBuilder.option(config.priceCharts.createOption());
         generalBuilder.option(config.orderStatusHighlight.createOption());

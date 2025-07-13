@@ -216,10 +216,10 @@ public class Util implements BUListener {
         }
         return -1;
     }
-    public static String findComponentWith(List<Text> components, String lookingFor){
+    public static Text findComponentWith(List<Text> components, String lookingFor){
         for(Text component : components){
             if(component.getString().contains(lookingFor))
-                return component.getString();
+                return component;
         }
             return null;
     }

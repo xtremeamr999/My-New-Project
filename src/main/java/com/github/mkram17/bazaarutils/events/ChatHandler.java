@@ -21,11 +21,11 @@ public class ChatHandler implements BUListener {
 
     public enum messageTypes {BUYORDER, SELLORDER, FILLED, CLAIMED, INSTASELL}
 
-    public static Option<Boolean> createDisableOrderFilledSound() {
+    public static Option<Boolean> createOrderFilledSoundOption() {
         return Option.<Boolean>createBuilder()
-                .name(Text.literal("Disable Order Filled Sound"))
+                .name(Text.literal("Sound on Order Filled"))
                 .description(OptionDescription.of(Text.literal("Plays two short notification sounds when your order is filled.")))
-                .binding(false,
+                .binding(true,
                         BUConfig.get()::isOrderFilledSound,
                         BUConfig.get()::setOrderFilledSound)
                 .controller(BUConfigGui::createBooleanController)
