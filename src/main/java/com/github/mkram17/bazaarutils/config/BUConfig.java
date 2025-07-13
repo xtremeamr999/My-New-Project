@@ -29,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BUConfig {
@@ -59,7 +60,7 @@ public class BUConfig {
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
-    public ArrayList<OrderData> watchedOrders = new ArrayList<>();
+    public List<OrderData> watchedOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry
