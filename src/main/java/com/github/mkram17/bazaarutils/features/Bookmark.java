@@ -219,7 +219,7 @@ public class Bookmark extends CustomItemButton {
     public static List<ItemSlotButtonWidget> getWidgets(){
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
-        boolean isTargetScreen = screenTitle.startsWith("Bazaar");
+        boolean isTargetScreen = GUIUtils.inBazaarMainPage();
 
         if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();

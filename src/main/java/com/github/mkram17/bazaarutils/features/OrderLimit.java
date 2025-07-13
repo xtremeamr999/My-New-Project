@@ -59,16 +59,12 @@ public class OrderLimit implements BUListener {
     @EventHandler
     public void onBazaarOpen(ChestLoadedEvent event) {
         if(!GUIUtils.inBazaar()) return;
-
-        //if the most recent order is before the last reset time, reset the limit
-        if(orderLimitEntries.getLast().time().isBefore(TimeUtil.LAST_BAZAAR_LIMIT_RESET_TIME)) {
-            resetLimit();
-            getTotalOrderedCoins();
-        }
+        removeOldEntries();
     }
 
-    public void resetLimit() {
-        orderLimitEntries.clear();
+    public void removeOldEntries() {
+        orderLimitEntries.stream().filter((entry) -> entry.time().isBefore(TimeUtil.LAST_BAZAAR_LIMIT_RESET_TIME)).toList()
+                .forEach(orderLimitEntries::remove);
     }
 
     public static String formatNumberWithPrefix(double number) {

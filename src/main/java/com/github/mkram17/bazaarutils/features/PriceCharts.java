@@ -104,7 +104,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     }
 
     private boolean shouldShow(){
-        return (GUIUtils.inBazaar() || showOutsideBazaar) && !GUIUtils.getContainerName().contains("Bazaar");
+        return (GUIUtils.inBazaar() || showOutsideBazaar) && !GUIUtils.inBazaarMainPage();
     }
 
     public Option<Boolean> createOption() {
