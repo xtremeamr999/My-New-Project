@@ -156,7 +156,7 @@ publishMods {
     changelog = rootProject.file("UPDATES.MD").readText()
     version = "v" + property("mod_version").toString()
     displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
-//    dryRun = true
+    dryRun = true
 
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
@@ -164,10 +164,8 @@ publishMods {
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
 
-        requires("fabric-api")
-        requires("yacl")
-        optional("modmenu")
-        optional("amecs-reborn")
+        requires("fabric-api", "yacl")
+        optional("modmenu", "amecs-reborn")
     }
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")

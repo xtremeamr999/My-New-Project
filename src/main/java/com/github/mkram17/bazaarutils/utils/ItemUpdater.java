@@ -107,7 +107,7 @@ public class ItemUpdater implements BUListener {
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
         OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderData orderData = new OrderData(name, totalVolume, priceInfo);
-        orderData.itemInfo = new OrderItemInfo(mapScreenIndexToInventoryIndex(orderData), stack);
+        orderData.setItemInfo(new OrderItemInfo(mapScreenIndexToInventoryIndex(orderData), stack));
         orderData.setTolerance(0.0);
 
         if (volumeFilled > -1) {
@@ -129,7 +129,7 @@ public class ItemUpdater implements BUListener {
         for (int i = 0; i < lowerChestInventory.size(); i++) {
             ItemStack inventoryStack = lowerChestInventory.getStack(i);
             if (!inventoryStack.isEmpty()) {
-                if (inventoryStack.equals(item.itemInfo.itemStack())) {
+                if (inventoryStack.equals(item.getItemInfo().itemStack())) {
                     return i;
                 }
             }
