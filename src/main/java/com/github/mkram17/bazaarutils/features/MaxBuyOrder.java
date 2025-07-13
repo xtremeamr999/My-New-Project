@@ -1,37 +1,26 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import meteordevelopment.orbit.EventHandler;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.scoreboard.*;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//thanks to skyblocker for purse and scoreboard code
 public class MaxBuyOrder extends CustomOrder {
-    /**
-     * @implNote The parent text will always be empty, the actual text content is inside the text's siblings.
-     */
-    public static final ObjectArrayList<Text> TEXT_SCOREBOARD = new ObjectArrayList<>();
-    public static final ObjectArrayList<String> STRING_SCOREBOARD = new ObjectArrayList<>();
-    private static final Pattern PURSE = Pattern.compile("(Purse|Piggy): (?<purse>[0-9,.]+)( \\((?<change>[+\\-][0-9,.]+)\\))?");
+    private static final Pattern PURSE_PATTERN = Pattern.compile("(Purse|Piggy): (?<purse>[0-9,.]+)");
     private static double purse;
 
     public MaxBuyOrder(boolean enabled) {
@@ -54,14 +43,13 @@ public class MaxBuyOrder extends CustomOrder {
                 return;
 
             MinecraftClient client = MinecraftClient.getInstance();
-            updateScoreboard(client);
+            updatePurse(client);
 
             String name = itemStack.getCustomName().getString();
             String productID = BazaarData.findProductId(name);
 
             if(productID == null)
                 return;
-
 
             double cost = BazaarData.findItemPrice(productID, OrderPriceInfo.priceTypes.INSTASELL) + .1;//.1 is for lowest competitive price
 
@@ -91,69 +79,44 @@ public class MaxBuyOrder extends CustomOrder {
         return itemStack;
     }
 
-//    private static int calculateMaximumCanBuy(){
-//        if(GUIUtils.inBuyOrderScreen()){
-//        }
-//    }
+    private static void updatePurse(MinecraftClient client) {
+        ClientPlayerEntity player = client.player;
+        if (player == null) return;
 
-    private static void updateScoreboard(MinecraftClient client) {
-        try {
-            TEXT_SCOREBOARD.clear();
-            STRING_SCOREBOARD.clear();
+        Scoreboard scoreboard = player.getScoreboard();
+        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
 
-            ClientPlayerEntity player = client.player;
-            if (player == null) return;
+        if (objective == null) return;
 
-            Scoreboard scoreboard = player.getScoreboard();
-            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-            ObjectArrayList<Text> textLines = new ObjectArrayList<>();
-            ObjectArrayList<String> stringLines = new ObjectArrayList<>();
-
-            for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
-                //Limit to just objectives displayed in the scoreboard (specifically sidebar objective)
-                if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
-                    Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
-
-                    if (team != null) {
-                        Text textLine = Text.empty().append(team.getPrefix().copy()).append(team.getSuffix().copy());
-                        String strLine = team.getPrefix().getString() + team.getSuffix().getString();
-
-                        if (!strLine.trim().isEmpty()) {
-                            String formatted = Formatting.strip(strLine);
-
-                            textLines.add(textLine);
-                            stringLines.add(formatted);
-                        }
+        ObjectArrayList<String> stringLines = new ObjectArrayList<>();
+        for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
+            if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
+                Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
+                if (team != null) {
+                    String line = team.getPrefix().getString() + team.getSuffix().getString();
+                    if (!line.trim().isEmpty()) {
+                        stringLines.add(Formatting.strip(line));
                     }
                 }
             }
-
-            if (objective != null) {
-                stringLines.add(objective.getDisplayName().getString());
-                textLines.add(Text.empty().append(objective.getDisplayName().copy()));
-
-                Collections.reverse(stringLines);
-                Collections.reverse(textLines);
-            }
-
-            TEXT_SCOREBOARD.addAll(textLines);
-            STRING_SCOREBOARD.addAll(stringLines);
-            updatePurse();
-        } catch (NullPointerException e) {
-            Util.notifyError("Could not update scoreboard.", e);
         }
+        purse = getPurse(stringLines);
     }
 
-    public static void updatePurse() {
-        STRING_SCOREBOARD.stream().filter(s -> s.contains("Piggy:") || s.contains("Purse:")).findFirst().ifPresent(purseString -> {
-            Matcher matcher = PURSE.matcher(purseString);
-            if (matcher.find()) {
-                double newPurse = Double.parseDouble(matcher.group("purse").replaceAll(",", ""));
-                double changeSinceLast = newPurse - purse;
-                if (changeSinceLast == 0) return;
-                purse = newPurse;
+    private static double getPurse(List<String> scoreboardLines) {
+        for (String line : scoreboardLines) {
+            if (line.contains("Purse:") || line.contains("Piggy:")) {
+                Matcher matcher = PURSE_PATTERN.matcher(line);
+                if (matcher.find()) {
+                    try {
+                        return Double.parseDouble(matcher.group("purse").replace(",", ""));
+                    } catch (NumberFormatException e) {
+                        Util.notifyError("Failed to parse purse from scoreboard", e);
+                    }
+                }
             }
-        });
+        }
+        return -1d;
     }
 
     @Override
@@ -166,4 +129,3 @@ public class MaxBuyOrder extends CustomOrder {
         );
     }
 }
-

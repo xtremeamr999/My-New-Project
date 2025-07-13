@@ -14,7 +14,7 @@
 		"Modrinth": "https://modrinth.com/project/bazaar-utils",
 		"Discord": "https://discord.gg/xDKjvm5hQd"
 	},
-	"license": "CC0-1.0",
+	"license": "CC-BY-NC-4.0",
 	"icon": "assets/bazaarutils/icon.png",
 	"environment": "client",
 	"entrypoints": {
