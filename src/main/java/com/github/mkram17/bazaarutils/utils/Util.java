@@ -197,7 +197,9 @@ public class Util implements BUListener {
         }
         return "UnknownClass";
     }
-
+    public static boolean genericIsSimilarValue(double value1, double value2, double tolerance) {
+        return Math.abs(value1 - value2) <= tolerance;
+    }
     //finds the first index that contains lookingFor, so there could be another later which would cause problems
     public static int componentIndexOf(List<Text> components, String lookingFor){
         int num = 0;

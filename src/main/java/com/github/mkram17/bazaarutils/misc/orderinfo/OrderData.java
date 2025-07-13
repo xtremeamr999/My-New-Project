@@ -111,9 +111,11 @@ public class OrderData implements BUListener {
     }
 
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
-    public boolean isSimilarPrice(double price) {
-        return Math.abs(priceInfo.getPrice() - price) <= tolerance;
+    private boolean isSimilarPrice(double price) {
+        return Util.genericIsSimilarValue(priceInfo.getPrice(), price, tolerance);
     }
+
+
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<OrderData, T> variable) {
@@ -144,7 +146,7 @@ public class OrderData implements BUListener {
 
     private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, OrderPriceInfo.priceTypes priceType) {
         return (areAnyNull(this.getPriceInfo().getPrice(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
-            (areAnyNull(this.getVolume(), otherOrderVolume) || Math.abs(this.getVolume() - otherOrderVolume) <= (0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
+            (areAnyNull(this.getVolume(), otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
             (areAnyNull(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
             (areAnyNull(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
     }

@@ -130,7 +130,9 @@ public class ItemUpdater implements BUListener {
 
         if (amountFilled > -1) {
             orderData.setAmountFilled(amountFilled);
-            if (amountFilled == volume) orderData.setFilled();
+            if (Util.genericIsSimilarValue(amountFilled, volume, volume*.05)) {
+                orderData.setFilled();
+            }
         }
         if (amountClaimed > -1) {
             orderData.setAmountClaimed(amountClaimed);
