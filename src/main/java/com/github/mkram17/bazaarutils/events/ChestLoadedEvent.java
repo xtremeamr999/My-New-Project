@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.events;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
@@ -56,7 +57,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
-                                event.containerName = GUIUtils.getContainerName();
+                                event.containerName = ScreenInfo.getCurrentScreenInfo().getContainerName();
                                 event.itemStacks = getChestItemSlots(inv);
                                 BazaarUtils.EVENT_BUS.post(event);
                             } else {

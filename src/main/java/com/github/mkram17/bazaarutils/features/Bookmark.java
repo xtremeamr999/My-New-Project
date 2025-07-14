@@ -11,10 +11,7 @@ import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.SoundUtil;
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -54,10 +51,7 @@ public class Bookmark extends CustomItemButton {
             BazaarUtils.EVENT_BUS.unsubscribe(this);
     }
 
-    public static boolean inItemScreen(){
-        String screenName = GUIUtils.getContainerName();
-        return screenName != null && !GUIUtils.inBuyOrderScreen() && (GUIUtils.inInstaBuy() || GUIUtils.inAnyItemScreen());
-    }
+
 
     public Bookmark(String name, ItemStack bookmarkedItemStack) {
         this.name = name;
@@ -73,9 +67,10 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
-            if (!inItemScreen() || !super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
+            if (!screenInfo.inAnyItemScreen() || !super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
                 return;
 
             if (replacementItem == null)
@@ -89,7 +84,8 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     private void onBookmarkClick(SlotClickEvent event){
-        if(!inItemScreen() || !super.shouldUseSlot(event))
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if(!screenInfo.inAnyItemScreen() || !super.shouldUseSlot(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         switchBookmarked();
@@ -157,7 +153,7 @@ public class Bookmark extends CustomItemButton {
     }
 
     public static String findName(ChestLoadedEvent e){
-        String containerName = GUIUtils.getContainerName();
+        String containerName = ScreenInfo.getCurrentScreenInfo().getContainerName();
         String name = findNameFromContainer();
         if(containerName.length() > 30){
             for(ItemStack stack : e.getItemStacks()){
@@ -171,12 +167,12 @@ public class Bookmark extends CustomItemButton {
     }
 
     private static String findNameFromContainer(){
-        String containerName = GUIUtils.getContainerName();
-        assert containerName != null;
-        if(GUIUtils.inInstaBuy()) {
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        String containerName = screenInfo.getContainerName();
+        if(screenInfo.inInstaBuy()) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         }
-        if(GUIUtils.inAnyItemScreen())
+        if(screenInfo.inAnyItemScreen())
             return containerName.substring(containerName.indexOf("➜")+2);
         return "?";
     }
@@ -218,15 +214,15 @@ public class Bookmark extends CustomItemButton {
 
     public static List<ItemSlotButtonWidget> getWidgets(){
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
-        String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
-        boolean isTargetScreen = GUIUtils.inBazaarMainPage();
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        boolean isTargetScreen = screenInfo.inBazaarMainPage();
 
         if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 
 
 
-        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getContainerName());
 
             int buttonSize = 18;
             int spacing = 4;

@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -203,7 +204,8 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private static boolean inCorrectScreen(){
-        return GUIUtils.inFlipGui() && !inCancelOrderScreen();
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        return screenInfo.inFlipGui() && !inCancelOrderScreen();
     }
 
     private static boolean inCancelOrderScreen() {
