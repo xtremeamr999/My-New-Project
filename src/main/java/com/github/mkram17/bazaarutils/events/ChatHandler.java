@@ -80,103 +80,114 @@ public class ChatHandler implements BUListener {
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
-            if (!(message.getString().contains("[Bazaar]"))) return;
-            if (!siblings.isEmpty()) {
-                if (siblings.get(1).getString().contains("escrow")
-                        || siblings.get(1).getString().contains("Submitting")
-                        || siblings.get(1).getString().contains("Executing")
-                        || siblings.get(1).getString().contains("Claiming") || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")))
-                    return;
+            if (!(message.getString().contains("[Bazaar]")) || siblings.isEmpty()) return;
+            if (siblings.get(1).getString().contains("escrow")
+                    || siblings.get(1).getString().contains("Submitting")
+                    || siblings.get(1).getString().contains("Executing")
+                    || siblings.get(1).getString().contains("Claiming") || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")))
+                return;
+
+            Optional<messageTypes> messageTypeOptional = getMessageTypes(message, siblings);
+            if (messageTypeOptional.isEmpty()) {
+                Util.notifyError("Unknown message type in bazaar chat: " + message.getString(), null);
+                return;
             }
-
-            String itemName;
-            int volume;
-            double price;
-            OrderData item;
-            messageTypes messageType = null;
-
-            if (siblings.isEmpty() && message.getString().contains("was filled!")) messageType = messageTypes.FILLED;
-
-            if(siblings.size() > 3) {
-                if (siblings.get(2).getString().contains("Buy Order Setup!"))
-                    messageType = messageTypes.BUYORDER;
-                if (siblings.get(2).getString().contains("Sell Offer Setup!"))
-                    messageType = messageTypes.SELLORDER;
-                if (siblings.get(2).getString().contains("Claimed"))
-                    messageType = messageTypes.CLAIMED;
-//            if(siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled")) messageType = messageTypes.CANCELLED;
-                if (siblings.get(1).getString().contains("Sold"))
-                    messageType = messageTypes.INSTASELL;
-            }
+            messageTypes messageType = messageTypeOptional.get();
 
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
-                handleBuyOrSellOrder(siblings, messageType);
+                handleOrderCreated(siblings, messageType);
             }
-
             if (messageType == messageTypes.FILLED) {
-                String messageText = Util.removeFormatting(message.getString());
-                try {
-                    int forIndex = messageText.indexOf("for");
-                    int xIndex = messageText.indexOf("x");
-
-                    if (forIndex == -1 || xIndex == -1 || forIndex >= xIndex) {
-                        Util.notifyError("Invalid FILLED message format - missing 'for' or 'x': " + messageText, null);
-                        return;
-                    }
-
-                    String volumeStr = messageText.substring(forIndex + 4, xIndex).trim().replace(",", "");
-                    if (volumeStr.isEmpty()) {
-                        Util.notifyError("Empty volume string in FILLED message: " + messageText, null);
-                        return;
-                    }
-
-                    try {
-                        volume = Integer.parseInt(volumeStr);
-                    } catch (NumberFormatException e) {
-                        Util.notifyError("Invalid volume format in FILLED message: " + volumeStr, e);
-                        return;
-                    }
-
-                    int wasIndex = messageText.indexOf("was", xIndex);
-                    if (wasIndex == -1 || wasIndex <= xIndex + 2) {
-                        Util.notifyError("Invalid FILLED message format - missing or misplaced 'was': " + messageText, null);
-                        return;
-                    }
-
-                    itemName = messageText.substring(xIndex + 2, wasIndex - 1).trim();
-                    if (itemName.isEmpty()) {
-                        Util.notifyError("Empty item name in FILLED message: " + messageText, null);
-                        return;
-                    }
-
-                } catch (Exception e) {
-                    Util.notifyError("Failed to parse FILLED message: " + messageText, e);
-                    return;
-                }
-
-                if (!BUConfig.get().isOrderFilledSound())
-                    SoundUtil.notifyMultipleTimes(2);
-
-                OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-                OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
-                item = new OrderData(itemName, volume, itemPriceInfo);
-                
-                EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_FILLED, item));
+                handleFilled(message);
             }
 
             if (messageType == messageTypes.CLAIMED) {
                 handleClaimed(siblings);
             }
             if (messageType == messageTypes.INSTASELL) {
-                String totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "");
-                totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
-                BUConfig.get().orderLimit.addOrderToLimit(Double.parseDouble(totalPriceString));
-                PlayerActionUtil.notifyAll(totalPriceString, Util.notificationTypes.FEATURE);
+                handleInstaSell(siblings);
             }
         });
     }
 
-    private static void handleBuyOrSellOrder(ArrayList<Text> siblings, messageTypes messageType) {
+    private static Optional<messageTypes> getMessageTypes(Text message, ArrayList<Text> siblings) {
+        if (siblings.isEmpty() && message.getString().contains("was filled!"))
+            return Optional.of(messageTypes.FILLED);
+
+        if(siblings.size() > 3) {
+            if (siblings.get(2).getString().contains("Buy Order Setup!"))
+                return Optional.of(messageTypes.BUYORDER);
+            if (siblings.get(2).getString().contains("Sell Offer Setup!"))
+                return Optional.of(messageTypes.SELLORDER);
+            if (siblings.get(2).getString().contains("Claimed"))
+                return Optional.of(messageTypes.CLAIMED);
+            if (siblings.get(1).getString().contains("Sold"))
+                return Optional.of(messageTypes.INSTASELL);
+        }
+        return Optional.empty();
+    }
+
+    public static void handleInstaSell(ArrayList<Text> siblings) {
+        String totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "");
+        totalPriceString = siblings.get(Util.componentIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
+        BUConfig.get().orderLimit.addOrderToLimit(Double.parseDouble(totalPriceString));
+        PlayerActionUtil.notifyAll(totalPriceString, Util.notificationTypes.FEATURE);
+    }
+
+    private static void handleFilled(Text message) {
+        String messageText = Util.removeFormatting(message.getString());
+        String itemName;
+        int volume;
+        try {
+            int forIndex = messageText.indexOf("for");
+            int xIndex = messageText.indexOf("x");
+
+            if (forIndex == -1 || xIndex == -1 || forIndex >= xIndex) {
+                Util.notifyError("Invalid FILLED message format - missing 'for' or 'x': " + messageText, null);
+                return;
+            }
+
+            String volumeStr = messageText.substring(forIndex + 4, xIndex).trim().replace(",", "");
+            if (volumeStr.isEmpty()) {
+                Util.notifyError("Empty volume string in FILLED message: " + messageText, null);
+                return;
+            }
+
+            try {
+                volume = Integer.parseInt(volumeStr);
+            } catch (NumberFormatException e) {
+                Util.notifyError("Invalid volume format in FILLED message: " + volumeStr, e);
+                return;
+            }
+
+            int wasIndex = messageText.indexOf("was", xIndex);
+            if (wasIndex == -1 || wasIndex <= xIndex + 2) {
+                Util.notifyError("Invalid FILLED message format - missing or misplaced 'was': " + messageText, null);
+                return;
+            }
+
+            itemName = messageText.substring(xIndex + 2, wasIndex - 1).trim();
+            if (itemName.isEmpty()) {
+                Util.notifyError("Empty item name in FILLED message: " + messageText, null);
+                return;
+            }
+
+        } catch (Exception e) {
+            Util.notifyError("Failed to parse FILLED message: " + messageText, e);
+            return;
+        }
+
+        if (!BUConfig.get().isOrderFilledSound())
+            SoundUtil.notifyMultipleTimes(2);
+
+        OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
+        OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
+        OrderData item = new OrderData(itemName, volume, itemPriceInfo);
+
+        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_FILLED, item));
+    }
+
+    private static void handleOrderCreated(ArrayList<Text> siblings, messageTypes messageType) {
         String itemName = Util.removeFormatting(getName(siblings));
         int volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
 
@@ -202,23 +213,32 @@ public class ChatHandler implements BUListener {
     }
 
     public static void handleClaimed(ArrayList<Text> siblings) {
+        Optional<OrderData> orderOptional;
         try {
             if (siblings.get(6).getString().contains("worth")) {
-                handleClaimedBuyOrder(siblings);
+                orderOptional = getClaimedBuyOrder(siblings);
             } else {
-                handleClaimedSellOrder(siblings);
+                orderOptional = getClaimedSellOrder(siblings);
             }
         } catch (Exception e) {
             Util.notifyError("Error in order claim text: " + siblings, e);
+            return;
         }
+        if (orderOptional.isEmpty()) {
+            Util.notifyError("Could not find claimed order in watched orders", new Exception("Order Claim Error"));
+            return;
+        }
+        OrderData order = orderOptional.get();
+        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
+        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
 
-    private static void handleClaimedBuyOrder(ArrayList<Text> siblings) throws Exception {
+    private static Optional<OrderData> getClaimedBuyOrder(ArrayList<Text> siblings){
         // Parse volume with validation
         String volumeStr = siblings.get(3).getString().replace(",", "").trim();
         if (volumeStr.isEmpty()) {
             Util.notifyError("Empty volume string in claimed order", null);
-            return;
+            return Optional.empty();
         }
 
         int volumeClaimed = Integer.parseInt(volumeStr);
@@ -226,7 +246,7 @@ public class ChatHandler implements BUListener {
         String itemName = siblings.get(5).getString().trim();
         if (itemName.isEmpty()) {
             Util.notifyError("Empty item name in claimed order", null);
-            return;
+            return Optional.empty();
         }
 
         String priceString = siblings.get(7).getString();
@@ -234,20 +254,20 @@ public class ChatHandler implements BUListener {
         int coinsIndex = priceString.indexOf(" coins");
         if (coinsIndex == -1) {
             Util.notifyError("Invalid price format - no 'coins' found in: " + priceString, null);
-            return;
+            return Optional.empty();
         }
 
         String priceStr = priceString.substring(0, coinsIndex).replace(",", "").trim();
         if (priceStr.isEmpty()) {
             Util.notifyError("Empty price string in claimed order", null);
-            return;
+            return Optional.empty();
         }
 
         double totalPrice = Double.parseDouble(priceStr);
 
         if (volumeClaimed == 0) {
             Util.notifyError("Cannot divide by zero volume in claimed order", null);
-            return;
+            return Optional.empty();
         }
 
         double price = totalPrice / volumeClaimed;
@@ -262,18 +282,16 @@ public class ChatHandler implements BUListener {
 
         Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().watchedOrders);
 
-        //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
-            return;
+            return Optional.empty();
         }
         OrderData order = orderOptional.get();
         order.setAmountClaimed(volumeClaimed);
-        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
-        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED, orderOptional.get()));
+        return orderOptional;
     }
 
-    private static void handleClaimedSellOrder(ArrayList<Text> siblings){
+    private static Optional<OrderData> getClaimedSellOrder(ArrayList<Text> siblings){
         // Util.notifyAll("claimed message, but not worth");
         // Sell order claimed messages sometimes include volume and sometimes don't
         // Example with volume: [Bazaar] Claimed 1x ENCHANTED_COAL for 1,234.5 coins!
@@ -294,14 +312,14 @@ public class ChatHandler implements BUListener {
         }
 
         if (itemName.isEmpty()) {
-            Util.notifyError("Empty item name in SELLORDER claimed order", null);
-            return;
+            Util.notifyError("Empty item name in SELLORDER claimed order", new Exception());
+            return Optional.empty();
         }
 
         String priceStr = priceString.trim().replace(",", "");
         if (priceStr.isEmpty()) {
-            Util.notifyError("Empty price string in SELLORDER claimed order", null);
-            return;
+            Util.notifyError("Empty price string in SELLORDER claimed order", new Exception());
+            return Optional.empty();
         }
 
         double price = Double.parseDouble(priceStr);
@@ -313,14 +331,14 @@ public class ChatHandler implements BUListener {
 
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
-            return;
+            return Optional.empty();
         }
         OrderData order = orderOptional.get();
         if (volumeClaimed != null) {
             order.setAmountClaimed(volumeClaimed);
             PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
         }
-        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED, orderOptional.get()));
+        return orderOptional;
     }
 
 }
