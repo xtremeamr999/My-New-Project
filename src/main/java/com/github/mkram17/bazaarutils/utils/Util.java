@@ -131,7 +131,7 @@ public class Util implements BUListener {
             return;
         assert item.getProductID() != null;
         BUConfig.get().watchedOrders.add(item);
-        PlayerActionUtil.notifyAll("Added item: § " + item.getGeneralInfo(), notificationTypes.ORDERDATA);
+        PlayerActionUtil.notifyAll("Added item: § " + item.toString(), notificationTypes.ORDERDATA);
         scheduleConfigSave();
     }
 

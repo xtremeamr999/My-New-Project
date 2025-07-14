@@ -2,15 +2,16 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.Getter;
-import lombok.Setter;
 
 //TODO use this instead of OutdatedOrderEvent
-public class BazaarOrderEvent {
+public class BazaarChatEvent {
     public enum BazaarEventTypes {
         ORDER_CREATED,
         ORDER_CANCELLED,
         ORDER_FILLED,
-        ORDER_CLAIMED
+        ORDER_CLAIMED,
+        INSTA_SELL,
+        INSTA_BUY
     }
 
     @Getter
@@ -18,7 +19,7 @@ public class BazaarOrderEvent {
     @Getter
     private final OrderData order;
 
-    public BazaarOrderEvent(BazaarEventTypes type, OrderData order) {
+    public BazaarChatEvent(BazaarEventTypes type, OrderData order) {
         this.type = type;
         this.order = order;
     }

@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
@@ -23,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.github.mkram17.bazaarutils.config.BUConfig.HANDLER;
 import static com.github.mkram17.bazaarutils.config.BUConfig.openGUI;
 
 public class BUCommands {
@@ -250,7 +248,7 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        String itemInfo = BUConfig.get().watchedOrders.get(index).getGeneralInfo();
+        String itemInfo = BUConfig.get().watchedOrders.get(index).toString();
         BUConfig.get().watchedOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
         PlayerActionUtil.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
         return 1;
@@ -258,7 +256,7 @@ public class BUCommands {
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        PlayerActionUtil.notifyAll(BUConfig.get().watchedOrders.get(index).getGeneralInfo());
+        PlayerActionUtil.notifyAll(BUConfig.get().watchedOrders.get(index).toString());
         return 1;
     }
 }

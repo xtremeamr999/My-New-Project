@@ -71,11 +71,20 @@ public class GUIUtils implements BUListener {
         }
         return getContainerName().contains("Bazaar") && getContainerName().contains("Settings");
     }
+//    public static boolean inItemGroupPage(){
+//        String previousContainerName = getPreviousScreen().getTitle().getString();
+//        if (getContainerName() == null || previousContainerName == null) {
+//            return false;
+//        }
+//        return previousContainerName.contains("Bazaar") && getContainerName().contains("➜");
+//    }
+
+
 
     public static boolean inBazaar(){
         if(getContainerName() == null)
             return false;
-        return inBuyOrderScreen() || inFlipGui() || inInstaBuy() || inBazaarMainPage() || inOrderScreen() || inSellSetup() || inConfirmSellOffer() || getContainerName().contains("➜");
+        return inBuyOrderScreen() || inFlipGui() || inInstaBuy() || inBazaarMainPage() || inOrderScreen() || inSellSetup() || inConfirmSellOffer();
     }
 
     //only for specific items

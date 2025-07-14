@@ -89,7 +89,8 @@ public class OrderData implements BUListener {
         return BUConfig.get().watchedOrders.indexOf(this);
     }
 
-    public String getGeneralInfo() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(name: ").append(name).append("[").append(getIndex()).append("]")
             .append(", price:").append(priceInfo.getPrice())
@@ -97,7 +98,7 @@ public class OrderData implements BUListener {
         if (amountClaimed != 0) {
             sb.append(", amount claimed: ").append(amountClaimed);
         }
-        sb.append(", type: ").append(priceInfo.getPriceType().getString()).append(" order");
+        sb.append(", type: ").append(priceInfo.getPriceType().getString());
         if (fillStatus == statuses.FILLED) {
             sb.append(", status: ").append(fillStatus);
         }

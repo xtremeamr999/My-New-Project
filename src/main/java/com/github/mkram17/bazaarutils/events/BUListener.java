@@ -2,6 +2,8 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.handlers.BazaarEventHandler;
+import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.misc.JoinMessages;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ItemUpdater;
@@ -27,6 +29,7 @@ public interface BUListener {
         staticListeners.add(BazaarData.INSTANCE);
         staticListeners.add(Util.INSTANCE);
         staticListeners.add(TimeUtil.INSTANCE);
+        staticListeners.add(BazaarEventHandler.INSTANCE);
         return staticListeners;
     }
 
