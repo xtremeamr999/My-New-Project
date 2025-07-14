@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -160,15 +161,15 @@ public class OrderData implements BUListener {
         return false;
     }
 
-    public OrderData findOrderInList(List<OrderData> list) {
+    public Optional<OrderData> findOrderInList(List<OrderData> list) {
         List<OrderData> itemList = findAllMatchesInList(list);
         if (itemList.size() > 1) {
-            return findBestMatch(itemList);
+            return Optional.of(findBestMatch(itemList));
         }
         if (itemList.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return itemList.get(0);
+        return Optional.of(itemList.getFirst());
     }
 
     public List<OrderData> findAllMatchesInList(List<OrderData> list) {
@@ -194,7 +195,7 @@ public class OrderData implements BUListener {
     private OrderData findBestMatch(List<OrderData> list) {
         return list.stream()
             .min(getVolumeThenPriceComparator())
-            .orElse(list.get(0));
+            .orElse(list.getFirst());
     }
 
     private Comparator<OrderData> getVolumeThenPriceComparator() {

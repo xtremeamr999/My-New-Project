@@ -10,11 +10,15 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
+import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class ChatHandler implements BUListener {
     public static final ChatHandler INSTANCE = new ChatHandler();
@@ -35,6 +39,42 @@ public class ChatHandler implements BUListener {
     @Override
     public void subscribe() {
         registerBazaarChat();
+        EVENT_BUS.subscribe(this);
+    }
+
+    @EventHandler
+    private void onOrderCreated(BazaarOrderEvent event) {
+        if(!(event.getType() == BazaarOrderEvent.BazaarEventTypes.ORDER_CREATED))
+            return;
+        OrderData order = event.getOrder();
+        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPrice());
+        Util.addWatchedOrder(order);
+        //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
+    }
+    
+    @EventHandler
+    private void onOrderFilled(BazaarOrderEvent event) {
+        if(!(event.getType() == BazaarOrderEvent.BazaarEventTypes.ORDER_FILLED))
+            return;
+        OrderData order = event.getOrder();
+        boolean foundOrderMatch = order.findOrderInList(BUConfig.get().watchedOrders).isPresent();
+        if (foundOrderMatch) {
+            order.setFilled();
+            PlayerActionUtil.notifyAll(order.getName() + "[" + order.getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
+        } else {
+            Util.notifyError("Could not find item to fill with info vol: " + order.getVolume() + " name: " + order.getName(), new Exception("Order Filled Event error"));
+        }
+    }
+    
+    @EventHandler
+    private void onOrderClaimed(BazaarOrderEvent event) {
+        if(!(event.getType() == BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED))
+            return;
+        OrderData order = event.getOrder();
+        if (order.getVolume() >= order.getAmountClaimed()) {
+            PlayerActionUtil.notifyAll(order.getGeneralInfo() + " was fully claimed and removed from watched orders", Util.notificationTypes.ORDERDATA);
+            order.removeFromWatchedItems();
+        }
     }
 
     public static void registerBazaarChat() {
@@ -70,25 +110,7 @@ public class ChatHandler implements BUListener {
             }
 
             if (messageType == messageTypes.BUYORDER || messageType == messageTypes.SELLORDER) {
-                itemName = Util.removeFormatting(getName(siblings));
-                volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
-
-                String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for") + 1).getString().replace(",", "");
-                totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for") + 1).getString().replace(",", "").substring(0, totalPriceString.indexOf(" "));
-                price = Double.parseDouble(totalPriceString) / volume;
-                if (messageType == messageTypes.SELLORDER) {
-                    //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
-                    price /= ((100 - BUConfig.get().bzTax) / 100);
-                }
-
-                OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
-                BUConfig.get().orderLimit.addOrderToLimit(Double.parseDouble(totalPriceString));
-
-                OrderData itemToAdd = new OrderData(itemName, volume, priceInfo);
-
-                //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
-                Util.addWatchedOrder(itemToAdd);
-                PlayerActionUtil.notifyAll(itemName + " was added with a price of " + itemToAdd.getPriceInfo().getPrice(), Util.notificationTypes.ORDERDATA);
+                handleBuyOrSellOrder(siblings, messageType);
             }
 
             if (messageType == messageTypes.FILLED) {
@@ -138,14 +160,8 @@ public class ChatHandler implements BUListener {
                 OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
                 OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
                 item = new OrderData(itemName, volume, itemPriceInfo);
-
-                item = item.findOrderInList(BUConfig.get().watchedOrders);
-                if (item == null)
-                    Util.notifyError("Could not find item to fill with info vol: " + volume + " name: " + itemName, null);
-                else {
-                    item.setFilled();
-                    PlayerActionUtil.notifyAll(item.getName() + "[" + item.getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
-                }
+                
+                EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_FILLED, item));
             }
 
             if (messageType == messageTypes.CLAIMED) {
@@ -160,6 +176,23 @@ public class ChatHandler implements BUListener {
         });
     }
 
+    private static void handleBuyOrSellOrder(ArrayList<Text> siblings, messageTypes messageType) {
+        String itemName = Util.removeFormatting(getName(siblings));
+        int volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
+
+        String totalPriceString = siblings.get(Util.componentLastIndexOf(siblings, "for") + 1).getString().replace(",", "");
+        totalPriceString = totalPriceString.substring(0, totalPriceString.indexOf(" "));
+        double price = Double.parseDouble(totalPriceString) / volume;
+        if (messageType == messageTypes.SELLORDER) {
+            //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
+            price /= ((100 - BUConfig.get().bzTax) / 100);
+        }
+
+        OrderPriceInfo priceInfo = new OrderPriceInfo(price, messageType == messageTypes.BUYORDER ? OrderPriceInfo.priceTypes.INSTASELL : OrderPriceInfo.priceTypes.INSTABUY);
+        OrderData orderToAdd = new OrderData(itemName, volume, priceInfo);
+        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
+    }
+
     private static String getName(List<Text> siblings) {
         if (siblings.size() == 10) {
             return Util.removeFormatting(siblings.get(6).getString());
@@ -169,120 +202,125 @@ public class ChatHandler implements BUListener {
     }
 
     public static void handleClaimed(ArrayList<Text> siblings) {
-        Integer volumeClaimed = null;
-        Double price = null;
-        String itemName = null;
-        OrderData item;
-        messageTypes orderType;
-
-        if (siblings.get(6).getString().contains("worth")) orderType = messageTypes.BUYORDER;
-        else orderType = messageTypes.SELLORDER;
-
         try {
-            if (orderType == messageTypes.BUYORDER) {
-                // Parse volume with validation
-                String volumeStr = siblings.get(3).getString().replace(",", "").trim();
-                if (volumeStr.isEmpty()) {
-                    Util.notifyError("Empty volume string in claimed order", null);
-                    return;
-                }
-
-                try {
-                    volumeClaimed = Integer.parseInt(volumeStr);
-                } catch (NumberFormatException e) {
-                    Util.notifyError("Invalid volume format in claimed order: " + volumeStr, e);
-                    return;
-                }
-
-                itemName = siblings.get(5).getString().trim();
-                if (itemName.isEmpty()) {
-                    Util.notifyError("Empty item name in claimed order", null);
-                    return;
-                }
-
-                String priceString = siblings.get(7).getString();
-
-                int coinsIndex = priceString.indexOf(" coins");
-                if (coinsIndex == -1) {
-                    Util.notifyError("Invalid price format - no 'coins' found in: " + priceString, null);
-                    return;
-                }
-
-                String priceStr = priceString.substring(0, coinsIndex).replace(",", "").trim();
-                if (priceStr.isEmpty()) {
-                    Util.notifyError("Empty price string in claimed order", null);
-                    return;
-                }
-
-                double totalPrice;
-                try {
-                    totalPrice = Double.parseDouble(priceStr);
-                } catch (NumberFormatException e) {
-                    Util.notifyError("Invalid price format in claimed order: " + priceStr, e);
-                    return;
-                }
-
-                if (volumeClaimed == 0) {
-                    Util.notifyError("Cannot divide by zero volume in claimed order", null);
-                    return;
-                }
-
-                price = totalPrice / volumeClaimed;
-
-                OrderPriceInfo itemPriceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTASELL);
-                if (OrderData.getVariables(OrderData::getVolume).contains(volumeClaimed)) {
-                    item = new OrderData(itemName, volumeClaimed, itemPriceInfo);
-                } else {
-                    item = new OrderData(itemName, null, itemPriceInfo);
-                }
-                item = item.findOrderInList(BUConfig.get().watchedOrders);
+            if (siblings.get(6).getString().contains("worth")) {
+                handleClaimedBuyOrder(siblings);
             } else {
-//                Util.notifyAll("claimed message, but not worth");
-                //TODO figure out when there is a volume included in message
-//                volumeClaimed = Integer.parseInt(siblings.get(5).getString().replace(",", ""));
-                itemName = siblings.get(7).getString().trim();
-                if (itemName.isEmpty()) {
-                    Util.notifyError("Empty item name in SELLORDER claimed order", null);
-                    return;
-                }
-
-                String priceString = siblings.get(9).getString();
-                String priceStr = priceString.trim().replace(",", "");
-                if (priceStr.isEmpty()) {
-                    Util.notifyError("Empty price string in SELLORDER claimed order", null);
-                    return;
-                }
-
-                try {
-                    price = Double.parseDouble(priceStr);
-                } catch (NumberFormatException e) {
-                    Util.notifyError("Invalid price format in SELLORDER claimed order: " + priceStr, e);
-                    return;
-                }
-
-                OrderPriceInfo priceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTABUY);
-                item = new OrderData(itemName, null, priceInfo);
-                item = item.findOrderInList(BUConfig.get().watchedOrders);
+                handleClaimedSellOrder(siblings);
             }
-
-            //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
-            if (item == null) {
-                PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
-                return;
-            }
-            if (item.getVolume().equals(volumeClaimed)) {
-                PlayerActionUtil.notifyAll(item.getGeneralInfo() + " was removed", Util.notificationTypes.ORDERDATA);
-                item.removeFromWatchedItems();
-            } else if (volumeClaimed != null) {
-                item.setAmountClaimed(item.getAmountClaimed() + volumeClaimed);
-                PlayerActionUtil.notifyAll(item.getName() + " has claimed " + item.getAmountClaimed() + " out of " + item.getVolume(), Util.notificationTypes.ORDERDATA);
-            }
-        } catch (NumberFormatException e) {
-            Util.notifyError("Failed to parse number in claimed order - Volume: " + volumeClaimed + ", Item: "
-                    + itemName + ", Price: " + price, e);
         } catch (Exception e) {
             Util.notifyError("Error in order claim text: " + siblings, e);
         }
+    }
+
+    private static void handleClaimedBuyOrder(ArrayList<Text> siblings) throws Exception {
+        // Parse volume with validation
+        String volumeStr = siblings.get(3).getString().replace(",", "").trim();
+        if (volumeStr.isEmpty()) {
+            Util.notifyError("Empty volume string in claimed order", null);
+            return;
+        }
+
+        int volumeClaimed = Integer.parseInt(volumeStr);
+
+        String itemName = siblings.get(5).getString().trim();
+        if (itemName.isEmpty()) {
+            Util.notifyError("Empty item name in claimed order", null);
+            return;
+        }
+
+        String priceString = siblings.get(7).getString();
+
+        int coinsIndex = priceString.indexOf(" coins");
+        if (coinsIndex == -1) {
+            Util.notifyError("Invalid price format - no 'coins' found in: " + priceString, null);
+            return;
+        }
+
+        String priceStr = priceString.substring(0, coinsIndex).replace(",", "").trim();
+        if (priceStr.isEmpty()) {
+            Util.notifyError("Empty price string in claimed order", null);
+            return;
+        }
+
+        double totalPrice = Double.parseDouble(priceStr);
+
+        if (volumeClaimed == 0) {
+            Util.notifyError("Cannot divide by zero volume in claimed order", null);
+            return;
+        }
+
+        double price = totalPrice / volumeClaimed;
+
+        OrderPriceInfo itemPriceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTASELL);
+        OrderData item;
+        if (OrderData.getVariables(OrderData::getVolume).contains(volumeClaimed)) {
+            item = new OrderData(itemName, volumeClaimed, itemPriceInfo);
+        } else {
+            item = new OrderData(itemName, null, itemPriceInfo);
+        }
+
+        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().watchedOrders);
+
+        //TODO fix finding if price is similar -- when it comes from chat message the price error can be greater than maximum rounding
+        if (orderOptional.isEmpty()) {
+            PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
+            return;
+        }
+        OrderData order = orderOptional.get();
+        order.setAmountClaimed(volumeClaimed);
+        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
+        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED, orderOptional.get()));
+    }
+
+    private static void handleClaimedSellOrder(ArrayList<Text> siblings){
+        // Util.notifyAll("claimed message, but not worth");
+        // Sell order claimed messages sometimes include volume and sometimes don't
+        // Example with volume: [Bazaar] Claimed 1x ENCHANTED_COAL for 1,234.5 coins!
+        // Example without volume: [Bazaar] Claimed ENCHANTED_COAL for 1,234.5 coins!
+        Integer volumeClaimed = null;
+        String itemName;
+        String priceString;
+
+        // Check if volume is present
+        if (siblings.get(4).getString().matches("\\d+x")) { // e.g., "1x"
+            String volumeStr = siblings.get(4).getString().replace("x", "").trim();
+            volumeClaimed = Integer.parseInt(volumeStr);
+            itemName = siblings.get(5).getString().trim();
+            priceString = siblings.get(7).getString();
+        } else {
+            itemName = siblings.get(4).getString().trim();
+            priceString = siblings.get(6).getString();
+        }
+
+        if (itemName.isEmpty()) {
+            Util.notifyError("Empty item name in SELLORDER claimed order", null);
+            return;
+        }
+
+        String priceStr = priceString.trim().replace(",", "");
+        if (priceStr.isEmpty()) {
+            Util.notifyError("Empty price string in SELLORDER claimed order", null);
+            return;
+        }
+
+        double price = Double.parseDouble(priceStr);
+
+        OrderPriceInfo priceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTABUY);
+        OrderData item = new OrderData(itemName, null, priceInfo);
+
+        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().watchedOrders);
+
+        if (orderOptional.isEmpty()) {
+            PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
+            return;
+        }
+        OrderData order = orderOptional.get();
+        if (volumeClaimed != null) {
+            order.setAmountClaimed(volumeClaimed);
+            PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
+        }
+        EVENT_BUS.post(new BazaarOrderEvent(BazaarOrderEvent.BazaarEventTypes.ORDER_CLAIMED, orderOptional.get()));
     }
 
 }
