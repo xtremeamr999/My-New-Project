@@ -25,7 +25,7 @@ public class ScreenInfo implements BUListener {
 
 
     public static void initializeScreenInfo(Screen screen){
-        ScreenInfo starterScreenInfo = new ScreenInfo(screen);
+        currentScreenInfo = new ScreenInfo(screen);
     }
 
     public ScreenInfo(Screen screen) {
