@@ -10,8 +10,9 @@ public class BazaarChatEvent {
         ORDER_CANCELLED,
         ORDER_FILLED,
         ORDER_CLAIMED,
+        ORDER_FLIPPED,
         INSTA_SELL,
-        INSTA_BUY
+        INSTA_BUY,
     }
 
     @Getter

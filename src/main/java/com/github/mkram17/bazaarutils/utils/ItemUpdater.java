@@ -102,7 +102,7 @@ public class ItemUpdater implements BUListener {
             var volumeTextSiblings = volumeText.getSiblings();
             volume = Util.parseNumber(volumeTextSiblings.get(1).getString());
         } else {
-            Util.notifyError("Error while parsing order from item stack", new Exception("Could not find volume in lore"));
+                Util.notifyError("Error while parsing order from item stack", new Exception("Could not find volume in lore"));
             volume = -1; // should never happen
         }
 

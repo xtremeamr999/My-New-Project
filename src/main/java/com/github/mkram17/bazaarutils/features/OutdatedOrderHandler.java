@@ -95,7 +95,7 @@ public class OutdatedOrderHandler implements BUListener {
                     .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
                     .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + order.getPriceInfo().getMarketPrice() + " Order Price: " + order.getPriceInfo().getPrice()));
+                message.append(Text.literal(". Market Price: " + order.getPriceInfo().getMarketPrice() + " Order Price: " + order.getPriceInfo().getPricePerItem()));
             }
             Util.tickExecuteLater(2, () -> {
                     PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");

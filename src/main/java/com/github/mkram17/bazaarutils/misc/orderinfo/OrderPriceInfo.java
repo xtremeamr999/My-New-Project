@@ -24,7 +24,7 @@ public class OrderPriceInfo {
     }
 
     @Setter @Getter
-    private Double price;
+    private Double pricePerItem;
     @Setter @Getter
     private priceTypes priceType;
     @Getter
@@ -37,9 +37,9 @@ public class OrderPriceInfo {
         this.priceType = priceType;
     }
 
-    public OrderPriceInfo(double price, priceTypes priceType) {
+    public OrderPriceInfo(double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
-        this.price = (double) Math.round(price * 100) / 100;
+        this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
     }
 
     public void updateMarketPrice(String productId) {
@@ -49,7 +49,7 @@ public class OrderPriceInfo {
 
     public void flipPrices(double newPrice){
         this.priceType = this.priceType.getOpposite();
-        this.price = newPrice;
+        this.pricePerItem = newPrice;
     }
 
     public static String getPrettyString(double theDouble){

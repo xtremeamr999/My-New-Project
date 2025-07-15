@@ -103,7 +103,7 @@ public class Bookmark extends CustomItemButton {
         OrderPriceInfo priceInfo = new OrderPriceInfo(0.0, OrderPriceInfo.priceTypes.INSTABUY);
 
         priceInfo.updateMarketPrice(BazaarData.findProductId(name));
-        if (priceInfo.getPrice() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
+        if (priceInfo.getPricePerItem() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
             PlayerActionUtil.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
             return null;
         }

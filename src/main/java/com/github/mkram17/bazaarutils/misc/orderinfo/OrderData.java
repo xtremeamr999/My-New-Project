@@ -46,8 +46,8 @@ public class OrderData implements BUListener {
     @Getter
     @Setter
     private double tolerance;
-    @Getter
-    private final OrderPriceInfo priceInfo;
+    @Getter @Setter
+    private OrderPriceInfo priceInfo;
     @Getter
     @Setter
     private OrderItemInfo itemInfo;
@@ -73,11 +73,11 @@ public class OrderData implements BUListener {
 
     private double calculateTolerance() {
         //default tolerance
-        if (priceInfo.getPrice() == null || volume == null) {
+        if (priceInfo.getPricePerItem() == null || volume == null) {
             return DEFAULT_TOLERANCE;
         }
         //doesnt round prices when total is over 10k
-        if (priceInfo.getPrice() * volume < TOTAL_PRICE_ROUNDING_THRESHOLD) {
+        if (priceInfo.getPricePerItem() * volume < TOTAL_PRICE_ROUNDING_THRESHOLD) {
             return 0;
         } else {
             double priceMaximumInaccuracy = DEFAULT_TOLERANCE / volume; //0.9 coins is the most that it can be off per unit and not show in places where it rounds
@@ -93,7 +93,7 @@ public class OrderData implements BUListener {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(name: ").append(name).append("[").append(getIndex()).append("]")
-            .append(", price:").append(priceInfo.getPrice())
+            .append(", price:").append(priceInfo.getPricePerItem())
             .append(", volume: ").append(volume);
         if (amountClaimed != 0) {
             sb.append(", amount claimed: ").append(amountClaimed);
@@ -114,7 +114,7 @@ public class OrderData implements BUListener {
 
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
     private boolean isSimilarPrice(double price) {
-        return Util.genericIsSimilarValue(priceInfo.getPrice(), price, tolerance);
+        return Util.genericIsSimilarValue(priceInfo.getPricePerItem(), price, tolerance);
     }
 
 
@@ -128,7 +128,7 @@ public class OrderData implements BUListener {
 
     public boolean isSimilarTo(OrderData other, boolean isStrict) {
         String otherOrderName = other.getName();
-        Double otherOrderPrice = other.getPriceInfo().getPrice();
+        Double otherOrderPrice = other.getPriceInfo().getPricePerItem();
         Integer otherOrderVolume = other.getVolume();
         int otherOrderAmountUnclaimed = other.getAmountFilled() - other.getAmountClaimed();
         OrderPriceInfo.priceTypes priceType = other.getPriceInfo().getPriceType();
@@ -140,14 +140,14 @@ public class OrderData implements BUListener {
     }
 
     private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, OrderPriceInfo.priceTypes priceType) {
-        return (areAnyNull(this.getPriceInfo().getPrice(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
+        return (areAnyNull(this.getPriceInfo().getPricePerItem(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
             (areAnyNull(this.getVolume(), otherOrderVolume) || this.getVolume().equals(otherOrderVolume)) &&
             (areAnyNull(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
             (areAnyNull(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
     }
 
     private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, OrderPriceInfo.priceTypes priceType) {
-        return (areAnyNull(this.getPriceInfo().getPrice(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
+        return (areAnyNull(this.getPriceInfo().getPricePerItem(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
             (areAnyNull(this.getVolume(), otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
             (areAnyNull(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
             (areAnyNull(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
@@ -208,10 +208,10 @@ public class OrderData implements BUListener {
         });
 
         Comparator<OrderData> priceComparator = Comparator.comparingDouble(order -> {
-            if (areAnyNull(this.getPriceInfo().getPrice(), order.getPriceInfo().getPrice())) {
+            if (areAnyNull(this.getPriceInfo().getPricePerItem(), order.getPriceInfo().getPricePerItem())) {
                 return Double.MAX_VALUE;
             }
-            return Math.abs(order.getPriceInfo().getPrice() - this.getPriceInfo().getPrice());
+            return Math.abs(order.getPriceInfo().getPricePerItem() - this.getPriceInfo().getPricePerItem());
         });
 
         return volumeComparator.thenComparing(priceComparator);
@@ -260,16 +260,16 @@ public class OrderData implements BUListener {
         if (fillStatus == statuses.FILLED) {
             return statuses.FILLED;
         }
-        if (priceInfo.getPrice().equals(priceInfo.getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPrice()) > 1) {
+        if (priceInfo.getPricePerItem().equals(priceInfo.getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPricePerItem()) > 1) {
             return statuses.MATCHED;
         }
 
         if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
-            if (priceInfo.getPrice() - tolerance > priceInfo.getMarketPrice()) {
+            if (priceInfo.getPricePerItem() - tolerance > priceInfo.getMarketPrice()) {
                 return statuses.OUTDATED;
             }
         } else if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTASELL) {
-            if (priceInfo.getPrice() + tolerance < priceInfo.getMarketPrice()) {
+            if (priceInfo.getPricePerItem() + tolerance < priceInfo.getMarketPrice()) {
                 return statuses.OUTDATED;
             }
         }

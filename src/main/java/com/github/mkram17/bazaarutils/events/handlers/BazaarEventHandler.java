@@ -17,7 +17,7 @@ public class BazaarEventHandler implements BUListener {
         if(!(event.getType() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED))
             return;
         OrderData order = event.getOrder();
-        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPrice());
+        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPricePerItem());
         Util.addWatchedOrder(order);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
@@ -26,7 +26,7 @@ public class BazaarEventHandler implements BUListener {
         if(!(event.getType() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
             return;
         OrderData order = event.getOrder();
-        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPrice());
+        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPricePerItem());
         PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
