@@ -21,7 +21,12 @@ public class ScreenInfo implements BUListener {
     @Getter
     private final Screen screen;
     @Getter
-    private static final List<ScreenInfo> previousScreenInfos = new ArrayList<>();;
+    private static final List<ScreenInfo> previousScreenInfos = new ArrayList<>();
+
+
+    public static void initializeScreenInfo(Screen screen){
+        ScreenInfo starterScreenInfo = new ScreenInfo(screen);
+    }
 
     public ScreenInfo(Screen screen) {
         this.screen = screen;
@@ -36,9 +41,10 @@ public class ScreenInfo implements BUListener {
         EVENT_BUS.unsubscribe(this);
 
         currentScreenInfo = new ScreenInfo(e.getNewScreen());
-        previousScreenInfos.add(this);
         if(e.getOldScreen() == null){
             previousScreenInfos.clear();
+        } else {
+            previousScreenInfos.add(this);
         }
     }
 

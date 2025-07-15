@@ -59,6 +59,8 @@ public class GUIUtils implements BUListener {
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
+            if(screen != null && ScreenInfo.getCurrentScreenInfo() == null)
+                ScreenInfo.initializeScreenInfo(screen);
         });
     }
 
