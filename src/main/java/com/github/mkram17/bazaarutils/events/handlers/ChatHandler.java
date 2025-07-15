@@ -43,15 +43,17 @@ public class ChatHandler implements BUListener {
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
-            if (!message.getString().contains("[Bazaar]") || siblings.isEmpty()) return;
+            if (!message.getString().contains("[Bazaar]")) return;
 
-            String firstSibling = siblings.get(1).getString();
-            if (firstSibling.contains("escrow")
-                    || firstSibling.contains("Submitting")
-                    || firstSibling.contains("Executing")
-                    || firstSibling.contains("Claiming")
-                    || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled"))) {
-                return;
+            if (!siblings.isEmpty()) {
+                String firstSibling = siblings.get(1).getString();
+                if (firstSibling.contains("escrow")
+                        || firstSibling.contains("Submitting")
+                        || firstSibling.contains("Executing")
+                        || firstSibling.contains("Claiming")
+                        || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled"))) {
+                    return;
+                }
             }
 
             getMessageType(message, siblings).ifPresent(messageType -> {
@@ -146,11 +148,11 @@ public class ChatHandler implements BUListener {
     }
 
     private static void handleFilled(Text message) {
-        String messageText = Util.removeFormatting(message.getString());
+        String messageString = Util.removeFormatting(message.getString());
         // Example: "Your Buy Order for 2,304x Mithril was filled!"
-        String[] parts = messageText.split(" for |x | was filled!");
-        if (parts.length < 4) {
-            Util.notifyError("Invalid FILLED message format: " + messageText, null);
+        String[] parts = messageString.split(" for |x | was filled!");
+        if (parts.length < 3) {
+            Util.notifyError("Invalid FILLED message format: " + messageString, null);
             return;
         }
 
@@ -158,19 +160,15 @@ public class ChatHandler implements BUListener {
             int volume = Integer.parseInt(parts[1].replace(",", ""));
             String itemName = parts[2].trim();
 
-            if (BUConfig.get().isOrderFilledSound()) {
-                SoundUtil.notifyMultipleTimes(2);
-            }
-
-            OrderPriceInfo.priceTypes priceType = messageText.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
+            OrderPriceInfo.priceTypes priceType = messageString.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
             OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
             OrderData item = new OrderData(itemName, volume, itemPriceInfo);
 
             EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
-            Util.notifyError("Invalid volume format in FILLED message: " + messageText, e);
+            Util.notifyError("Invalid volume format in FILLED message: " + messageString, e);
         } catch (Exception e) {
-            Util.notifyError("Failed to parse FILLED message: " + messageText, e);
+            Util.notifyError("Failed to parse FILLED message: " + messageString, e);
         }
     }
 
@@ -306,8 +304,6 @@ public class ChatHandler implements BUListener {
         }
         OrderData order = orderOptional.get();
         order.setAmountClaimed(volume);
-        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
-
         return orderOptional;
     }
 }

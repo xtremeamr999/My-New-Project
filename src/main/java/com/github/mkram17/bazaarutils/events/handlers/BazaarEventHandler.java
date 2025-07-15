@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import meteordevelopment.orbit.EventHandler;
 
@@ -12,20 +13,27 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class BazaarEventHandler implements BUListener {
     public static final BazaarEventHandler INSTANCE = new BazaarEventHandler();
+
+    @EventHandler
+    private void onAnyOrder(BazaarChatEvent event) {
+        SoundUtil.notifyMultipleTimes(4);
+        PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
+    }
+
     @EventHandler
     private void onOrderCreated(BazaarChatEvent event) {
-        if(!(event.getType() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED))
+        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED))
             return;
-        OrderData order = event.getOrder();
+        OrderData order = event.order();
         BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPricePerItem());
         Util.addWatchedOrder(order);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     @EventHandler
     private void onSellOrder(BazaarChatEvent event) {
-        if(!(event.getType() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
+        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
             return;
-        OrderData order = event.getOrder();
+        OrderData order = event.order();
         BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()*order.getPriceInfo().getPricePerItem());
         PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
@@ -33,9 +41,13 @@ public class BazaarEventHandler implements BUListener {
 
     @EventHandler
     private void onOrderFilled(BazaarChatEvent event) {
-        if(!(event.getType() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
+        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
             return;
-        OrderData order = event.getOrder();
+        if (BUConfig.get().isOrderFilledSound()) {
+            SoundUtil.notifyMultipleTimes(2);
+        }
+
+        OrderData order = event.order();
         boolean foundOrderMatch = order.findOrderInList(BUConfig.get().watchedOrders).isPresent();
         if (foundOrderMatch) {
             order.setFilled();
@@ -43,6 +55,7 @@ public class BazaarEventHandler implements BUListener {
         } else {
             Util.notifyError("Could not find item to fill with info vol: " + order.getVolume() + " name: " + order.getName(), new Exception("Order Filled Event error"));
         }
+
     }
 
     @Override
