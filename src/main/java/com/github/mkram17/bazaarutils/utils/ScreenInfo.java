@@ -101,7 +101,7 @@ public class ScreenInfo implements BUListener {
         if (getContainerName() == null) {
             return false;
         }
-        return getContainerName().contains("➜") && previousScreenHas(ScreenInfo::inBazaar);
+        return getContainerName().contains("➜") && previousScreenHas(ScreenInfo::inBazaarMainPage);
     }
 
     public boolean inBazaar(){
@@ -119,8 +119,8 @@ public class ScreenInfo implements BUListener {
     }
 
     public String getContainerName(){
-        if(screen != null)
-            return Util.removeFormatting(screen.getTitle().getString());
-        return null;
+        if(screen == null || screen.getTitle() == null)
+            return null;
+        return Util.removeFormatting(screen.getTitle().getString());
     }
 }
