@@ -58,6 +58,8 @@ public class BUConfig {
     @SerialEntry
     public boolean firstLoad = true;
     @SerialEntry
+    public String resourcesSha = "";
+    @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
     public List<OrderData> watchedOrders = new CopyOnWriteArrayList<>(); // the user's orders
