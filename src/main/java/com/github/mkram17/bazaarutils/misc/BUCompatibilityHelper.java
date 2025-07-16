@@ -147,12 +147,7 @@ public class BUCompatibilityHelper {
             PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, Util.notificationTypes.GUI);
 
             if (currentValue) {
-                //? if >= 1.21.5 {
                 SkyblockerConfigManager.update((config) -> config.uiAndVisuals.searchOverlay.enableBazaar = false);
-                //?} else {
-                /*SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.enableBazaar = false;
-                SkyblockerConfigManager.save();
-                *///?}
                 PlayerActionUtil.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", Util.notificationTypes.GUI);
 
                 PlayerActionUtil.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
@@ -172,12 +167,7 @@ public class BUCompatibilityHelper {
         try {
             if (!isSkyblockerBazaarOverlayEnabled()) {
                 Util.logMessage("Attempting to enable Skyblocker Bazaar Overlay...");
-                //? if >= 1.21.5 {
                 SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = true);
-                //?} else {
-                /*SkyblockerConfigManager.get().uiAndVisuals.searchOverlay.enableBazaar = true;
-                SkyblockerConfigManager.save();
-                *///?}
 
                 PlayerActionUtil.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
             } else {

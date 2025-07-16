@@ -51,13 +51,9 @@ public class PlayerActionUtil {
 
     public static void notifyChatCommand(MutableText message, String command){
         message.styled(style -> style
-                                    //? if > 1.21.4 {
                                     .withClickEvent(new ClickEvent.RunCommand("/" + command))
                                     .withHoverEvent(new HoverEvent.ShowText(Text.literal("Run /" + command))));
-                            //?} else {
-                                /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Run /" + command))));
-                        *///?}
+
         notifyAll(message);
     }
 }

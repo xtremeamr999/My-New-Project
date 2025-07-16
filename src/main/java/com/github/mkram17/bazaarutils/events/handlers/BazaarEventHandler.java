@@ -13,10 +13,12 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class BazaarEventHandler implements BUListener {
     public static final BazaarEventHandler INSTANCE = new BazaarEventHandler();
+    public static final int ORDER_FILLED_NOTIFICATIONS = 2; // number of notifications to send when an order becomes outdated
+
 
     @EventHandler
     private void onAnyOrder(BazaarChatEvent event) {
-        SoundUtil.notifyMultipleTimes(4);
+//        SoundUtil.notifyMultipleTimes(4);
         PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
     }
 
@@ -44,7 +46,7 @@ public class BazaarEventHandler implements BUListener {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
             return;
         if (BUConfig.get().isOrderFilledSound()) {
-            SoundUtil.notifyMultipleTimes(2);
+            SoundUtil.notifyMultipleTimes(ORDER_FILLED_NOTIFICATIONS);
         }
 
         OrderData order = event.order();

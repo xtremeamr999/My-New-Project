@@ -14,6 +14,8 @@ public class SoundUtil {
         var player = client.player;
 
         if (client.world == null || player == null || client.getSoundManager() == null) {
+            Util.logError("Failed to play sound due to null value", new Throwable());
+            Util.tickExecuteLater(20, () -> playSound(sound, volume));
             return;
         }
 
@@ -25,7 +27,9 @@ public class SoundUtil {
     public static void playSound(RegistryEntry<SoundEvent> soundEntry, float volume) {
         MinecraftClient client = MinecraftClient.getInstance();
 
-        if (client == null || client.getSoundManager() == null) {
+        if (client == null || client.getSoundManager() == null || client.world == null) {
+            Util.logError("Failed to play sound due to null value", new Throwable());
+            Util.tickExecuteLater(20, () -> playSound(soundEntry, volume));
             return;
         }
 

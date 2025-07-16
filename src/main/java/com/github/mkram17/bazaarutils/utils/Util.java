@@ -41,44 +41,27 @@ public class Util implements BUListener {
     public static final String DISCORD_LINK = "https://discord.gg/xDKjvm5hQd";
     public static final Text DISCORD_TEXT = Text.literal("Discord server")
             .styled(style -> {
-                        //? if > 1.21.4 {
-                        try {
-                            return style
-                                    .withBold(true)
-                                    .withClickEvent(new ClickEvent.OpenUrl(new URI(DISCORD_LINK)))
-                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    //?} else {
-                        /*return style
-                                .withBold(true)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord!")));
-                    });
-        *///?}
-        public static final Text CHANGELOG = Text.literal("Click To See Changelog")
+                try {
+                    return style
+                            .withBold(true)
+                            .withClickEvent(new ClickEvent.OpenUrl(new URI(DISCORD_LINK)))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to join the Discord!")));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+    public static final Text CHANGELOG = Text.literal("Click To See Changelog")
             .styled(style -> {
-                        //? if > 1.21.4 {
-                        try {
-                            return style
-                                    .withBold(true)
-                                    .withClickEvent(new ClickEvent.OpenUrl(new URI("https://modrinth.com/mod/bazaar-utils/changelog")))
-                                    .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to see the changelog")))
-                                    .withFormatting(Formatting.GREEN);
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    //?} else {
-                        /*return style
-                                .withBold(true)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/mod/bazaar-utils/changelog"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to see the changelog")))
-                                .withFormatting(Formatting.GREEN);
-                    });
-        *///?}
+                try {
+                    return style
+                            .withBold(true)
+                            .withClickEvent(new ClickEvent.OpenUrl(new URI("https://modrinth.com/mod/bazaar-utils/changelog")))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to see the changelog")))
+                            .withFormatting(Formatting.GREEN);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
     public static void logMessage(String message) {
         String callingName = getCallingClassName();
@@ -103,7 +86,6 @@ public class Util implements BUListener {
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         Text messageText = Text.literal("[Bazaar Utils Error]: " + message + ". Click here for support.")
                 .styled(style -> {
-                    //? if > 1.21.4 {
                     try {
                         return style.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent.OpenUrl(new URI("https://discord.gg/xDKjvm5hQd")))
@@ -112,12 +94,6 @@ public class Util implements BUListener {
                         throw new RuntimeException(uriSyntaxException);
                     }
                 });
-        //?} else {
-                        /*return style
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/xDKjvm5hQd"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to join the Discord for support")));
-                    });
-            *///?}
 
         if (!BUConfig.get().disableErrorNotifications)
             PlayerActionUtil.sendPlayerMessage(messageText);

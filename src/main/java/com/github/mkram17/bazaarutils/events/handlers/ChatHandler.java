@@ -46,11 +46,12 @@ public class ChatHandler implements BUListener {
             if (!message.getString().contains("[Bazaar]")) return;
 
             if (!siblings.isEmpty()) {
-                String firstSibling = siblings.get(1).getString();
-                if (firstSibling.contains("escrow")
-                        || firstSibling.contains("Submitting")
-                        || firstSibling.contains("Executing")
-                        || firstSibling.contains("Claiming")
+                String secondSibling = siblings.get(1).getString();
+                if (secondSibling.contains("escrow")
+                        || secondSibling.contains("Submitting")
+                        || secondSibling.contains("Executing")
+                        || secondSibling.contains("Claiming")
+                        || secondSibling.contains("Cancelling")
                         || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled"))) {
                     return;
                 }

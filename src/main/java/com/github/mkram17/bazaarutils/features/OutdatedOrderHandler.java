@@ -30,6 +30,8 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 public class OutdatedOrderHandler implements BUListener {
     public List<OrderData> outdatedOrders = new ArrayList<>(Collections.emptyList());
 
+    public static final int OUTDATED_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
+
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter
@@ -54,7 +56,7 @@ public class OutdatedOrderHandler implements BUListener {
                 continue;
             }
 
-            if (currentOrder.findOrderInList(previouslyOutdated) == null) {
+            if (currentOrder.findOrderInList(previouslyOutdated).isEmpty()) {
                 EVENT_BUS.post(new OutdatedOrderEvent(currentOrder, true));
             }
         }
@@ -65,7 +67,7 @@ public class OutdatedOrderHandler implements BUListener {
                 continue;
             }
 
-            if (previousOrder.findOrderInList(this.outdatedOrders) == null) {
+            if (previousOrder.findOrderInList(this.outdatedOrders).isEmpty()) {
                 if (previousOrder.getFillStatus() == OrderData.statuses.SET) {
                     EVENT_BUS.post(new OutdatedOrderEvent(previousOrder, false));
                 }
@@ -102,7 +104,7 @@ public class OutdatedOrderHandler implements BUListener {
             });
 
             if (notificationSound) {
-                SoundUtil.notifyMultipleTimes(3);
+                SoundUtil.notifyMultipleTimes(OUTDATED_ORDER_NOTIFICATIONS);
             }
         } else {
             MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
