@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -55,8 +56,9 @@ public class RestrictSell implements BUListener {
 
     @EventHandler
     private void onGUI(ReplaceItemEvent e){
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         try {
-            if (e.getSlotId() != SELL_ITEM_SLOT_ID || !GUIUtils.inBazaar())
+            if (e.getSlotId() != SELL_ITEM_SLOT_ID || !screenInfo.inBazaar())
                 return;
             if (e.getOriginal() == null || e.getOriginal().getComponentChanges().get(DataComponentTypes.LORE) == null)
                 return;
@@ -132,7 +134,8 @@ public class RestrictSell implements BUListener {
     }
 
     public boolean isSlotLocked(int slotId){
-        return GUIUtils.inBazaar() && slotId == SELL_ITEM_SLOT_ID && locked;
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        return screenInfo.inBazaar() && slotId == SELL_ITEM_SLOT_ID && locked;
     }
 
     private boolean isInstaSellLocked(ArrayList<SellItem> items, double totalPrice){

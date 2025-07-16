@@ -11,6 +11,7 @@ import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -107,7 +108,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
-		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !GUIUtils.inOrderScreen() || !slot.hasStack())
+		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inOrderScreen() || !slot.hasStack())
 			return;
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;

@@ -11,6 +11,4 @@ public class ScreenChangeEvent {
     private Screen oldScreen;
     @Getter @Setter
     private Screen newScreen;
-
-
 }

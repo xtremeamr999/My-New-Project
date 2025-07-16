@@ -34,6 +34,8 @@ public class MaxBuyOrder extends CustomOrder {
 
     @EventHandler
     public void onScreenChange(ScreenChangeEvent event){
+        if(event.getNewScreen() == null || event.getOldScreen() == null)
+            return;
         try {
             if(!inCorrectScreen(event)) {
                 return;

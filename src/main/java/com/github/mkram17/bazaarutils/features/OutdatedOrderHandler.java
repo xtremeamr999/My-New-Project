@@ -4,10 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.OutdatedOrderEvent;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.SoundUtil;
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -120,7 +117,8 @@ public class OutdatedOrderHandler implements BUListener {
 
     @EventHandler
     public void openBazaarOnOutdated(OutdatedOrderEvent e) {
-        if(GUIUtils.inBazaar() || !autoOpenEnabled)
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if(screenInfo.inBazaar() || !autoOpenEnabled)
             return;
         CompletableFuture.runAsync(() ->{
             for(int i = 3; i >= 1; i--) {

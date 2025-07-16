@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.text.Text;
@@ -21,7 +22,8 @@ public class BazaarSettingsButton {
             HOVER);
 
     public static List<ItemSlotButtonWidget> getWidget() {
-        boolean isTargetScreen = GUIUtils.inBazaar();
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        boolean isTargetScreen = screenInfo.inBazaar();
         if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 

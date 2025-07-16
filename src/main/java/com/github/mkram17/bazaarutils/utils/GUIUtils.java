@@ -30,70 +30,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO make inBazaar() work all the time
 public class GUIUtils implements BUListener {
     public static final GUIUtils INSTANCE = new GUIUtils();
-
-    public static boolean inBuyOrderScreen(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("How many do you want?");
-    }
-    public static boolean inInstaBuy(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("➜ Insta");
-    }
-    public static boolean inOrderScreen(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("Bazaar Orders");
-    }
-    public static boolean inSellSetup(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("At what price are you selling?");
-    }
-    public static boolean inConfirmSellOffer(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("Confirm Sell Offer");
-    }
-
-    public static boolean inFlipGui() {
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Order options");
-    }
-
-    public static boolean inBazaarMainPage(){
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Bazaar ➜ ") && !inBazaarSettingsPage();
-    }
-    public static boolean inBazaarSettingsPage(){
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Bazaar") && getContainerName().contains("Settings");
-    }
-//    public static boolean inItemGroupPage(){
-//        String previousContainerName = getPreviousScreen().getTitle().getString();
-//        if (getContainerName() == null || previousContainerName == null) {
-//            return false;
-//        }
-//        return previousContainerName.contains("Bazaar") && getContainerName().contains("➜");
-//    }
-
-
-
-    public static boolean inBazaar(){
-        if(getContainerName() == null)
-            return false;
-        return inBuyOrderScreen() || inFlipGui() || inInstaBuy() || inBazaarMainPage() || inOrderScreen() || inSellSetup() || inConfirmSellOffer();
-    }
-
-    //only for specific items
-    public static boolean inAnyItemScreen(){
-        if(getContainerName() == null || getContainerName().contains("Bazaar")) return false;
-        return getContainerName().contains("➜")
-                || inBuyOrderScreen()
-                || inInstaBuy();
-    }
     @Getter @Setter
     private static guiTypes guiType;
     @Getter @Setter
@@ -118,16 +54,13 @@ public class GUIUtils implements BUListener {
     public enum guiTypes {CHEST, SIGN}
 
 
-    public static String getContainerName(){
-        var screen = MinecraftClient.getInstance().currentScreen;
-        if(screen != null)
-            return Util.removeFormatting(screen.getTitle().getString());
-        return null;
-    }
+
 
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
+            if(screen != null && ScreenInfo.getCurrentScreenInfo() == null)
+                ScreenInfo.initializeScreenInfo(screen);
         });
     }
 
@@ -147,7 +80,7 @@ public class GUIUtils implements BUListener {
         guiType = guiType.CHEST;
 
         currentBookmark = null;
-        if(!Bookmark.inItemScreen())
+        if(!ScreenInfo.getCurrentScreenInfo().inAnyItemScreen())
             return;
         String name = Bookmark.findName(e);
         if (Bookmark.isBookmarked(name)) {

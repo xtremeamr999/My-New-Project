@@ -18,6 +18,7 @@ import com.github.mkram17.bazaarutils.misc.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -59,7 +60,8 @@ public class OrderLimit implements BUListener {
 
     @EventHandler
     public void onBazaarOpen(ChestLoadedEvent event) {
-        if(!GUIUtils.inBazaar()) return;
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if(!screenInfo.inBazaar()) return;
         removeOldEntries();
     }
 
@@ -89,7 +91,8 @@ public class OrderLimit implements BUListener {
 
     public static List<ClickableWidget> getWidget() {
         OrderLimit orderLimit = BUConfig.get().orderLimit;
-        boolean isTargetScreen = GUIUtils.inBazaar();
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        boolean isTargetScreen = screenInfo.inBazaar();
         if (!orderLimit.isEnabled() || !isTargetScreen || !(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen))
             return Collections.emptyList();
 

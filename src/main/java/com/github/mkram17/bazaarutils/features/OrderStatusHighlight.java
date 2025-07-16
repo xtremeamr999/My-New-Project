@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -67,7 +68,8 @@ public class OrderStatusHighlight implements BUListener {
     private void registerTooltipListener() {
         ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
             if (!enabled) return;
-            if (stack == null || stack.isEmpty() || stack.getItem().getName().getString().contains("GLASS_PANE") || !GUIUtils.inOrderScreen()) {
+            ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+            if (stack == null || stack.isEmpty() || stack.getItem().getName().getString().contains("GLASS_PANE") || !screenInfo.inOrderScreen()) {
                 return;
             }
 

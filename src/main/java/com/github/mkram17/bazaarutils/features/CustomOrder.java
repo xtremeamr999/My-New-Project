@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -69,7 +70,8 @@ public class CustomOrder extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if (!(GUIUtils.inBuyOrderScreen() || GUIUtils.inInstaBuy()) || !isEnabled())
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if (!(screenInfo.inBuyOrderScreen() || screenInfo.inInstaBuy()) || !isEnabled())
             return;
 
         if (event.getSlotId() != slotNumber)
@@ -84,7 +86,8 @@ public class CustomOrder extends CustomItemButton implements BUListener {
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!(GUIUtils.inBuyOrderScreen() || GUIUtils.inInstaBuy()) || !isEnabled())
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if (!(screenInfo.inBuyOrderScreen() || screenInfo.inInstaBuy()) || !isEnabled())
             return;
 
         if (event.slot.getIndex() != slotNumber)
