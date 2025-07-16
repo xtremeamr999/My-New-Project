@@ -149,7 +149,7 @@ public class OutdatedOrderHandler implements BUListener {
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Notify on Outdated Orders"))
+                .name(Text.literal("Chat Notification on Outdated Orders"))
                 .description(OptionDescription.of(Text.literal("Sends a message in chat when someone has undercut your order.")))
                 .binding(true,
                         this::isNotifyOutdated,
@@ -157,7 +157,7 @@ public class OutdatedOrderHandler implements BUListener {
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Sound for Outdated Orders"))
+                .name(Text.literal("Sound on Outdated Order"))
                 .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order becomes outdated.")))
                 .binding(true,
                         this::isNotificationSound,
