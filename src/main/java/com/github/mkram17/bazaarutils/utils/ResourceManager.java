@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
+//TODO move config to config/bazaarutils directory and rename to "config". See how REI does this.
 public class ResourceManager implements BUListener {
 
     public static final ResourceManager INSTANCE = new ResourceManager();
@@ -30,7 +31,7 @@ public class ResourceManager implements BUListener {
     private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID);
     private static final Path LOCAL_RESOURCES_PATH = MOD_CONFIG_DIR.resolve("bazaar-resources.json");
     private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MODID, "bazaar-resources.json");
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Bazaar-Utils/contents/src/main/resources/assets/bazaarutils/bazaar-resources.json?ref=modern";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Bazaar-Utils/contents/bazaar-resources.json?ref=resources";
 
 
 
@@ -77,7 +78,7 @@ public class ResourceManager implements BUListener {
 
                 if (connection.getResponseCode() != 200) {
                     if (manual)
-                        Util.notifyError("§cFailed to check for resource updates.", new Exception());
+                        Util.notifyError("Failed to check for resource updates.", new Exception());
                     Util.logError("GitHub API responded with code: " + connection.getResponseCode(), null);
                     return;
                 }
@@ -90,29 +91,37 @@ public class ResourceManager implements BUListener {
 
                     if (!latestSha.equals(BUConfig.get().resourcesSha)) {
                         if (manual)
-                            PlayerActionUtil.notifyAll("§aNew resources found, downloading...");
+                            PlayerActionUtil.notifyAll("New resources found, downloading...");
                         downloadLatestResources(downloadUrl, latestSha);
                     } else {
                         if (manual)
-                            PlayerActionUtil.notifyAll("§aResources are already up-to-date.");
+                            PlayerActionUtil.notifyAll("Resources are already up-to-date.");
                     }
                 }
             } catch (Exception e) {
                 if (manual)
-                    Util.notifyError("§cAn error occurred while checking for updates.", new Exception());
+                    Util.notifyError("An error occurred while checking for updates.", new Exception());
                 Util.notifyError("Failed to check for resource updates", e);
             }
         });
     }
 
     private static void downloadLatestResources(String downloadUrl, String latestSha) {
+        Path tempPath = LOCAL_RESOURCES_PATH.resolveSibling("bazaar-resources.json.tmp");
         try (InputStream in = new URI(downloadUrl).toURL().openStream()) {
-            Files.copy(in, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(tempPath, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+
             BUConfig.get().resourcesSha = latestSha;
             Util.scheduleConfigSave();
-            PlayerActionUtil.notifyAll("§aSuccessfully updated Bazaar resources!");
+            PlayerActionUtil.notifyAll("Successfully updated Bazaar resources!");
         } catch (Exception e) {
             Util.notifyError("Failed to download resources", e);
+            try {
+                Files.deleteIfExists(tempPath); // Clean up the temporary file on failure
+            } catch (IOException ex) {
+                Util.logError("Failed to delete temporary resource file", ex);
+            }
         }
     }
 
