@@ -43,10 +43,12 @@ jobs:
         run: npx ts-node scripts/ConversionGrabber.ts
         working-directory: ./conversionupdating
 
-      - name: Create Pull Request with Item Map
+      - name: Create Pull Request with Bazaar Conversions
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Only add and commit this specific file
+          add: conversionupdating/bazaar-conversions.json
           commit-message: "feat: update skyblock resource conversions"
           committer: "GitHub Actions <actions@github.com>"
           author: "GitHub Actions <actions@github.com>"
