@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Checkout the 'resources' branch where the script and package.json are located
+          ref: 'resources'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
