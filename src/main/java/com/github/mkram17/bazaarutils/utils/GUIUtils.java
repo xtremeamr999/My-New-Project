@@ -96,7 +96,7 @@ public class GUIUtils implements BUListener {
             PlayerActionUtil.notifyAll("Closing gui", Util.notificationTypes.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
             if (client == null) {
-                Util.notifyError("Client is null", null);
+                Util.notifyError("Client is null", new Throwable());
                 return;
             }
             if(!(client.currentScreen instanceof HandledScreen<?>))
@@ -114,7 +114,7 @@ public class GUIUtils implements BUListener {
             MinecraftClient client = MinecraftClient.getInstance();
             ClientPlayerEntity player = client.player;
             if (player == null) {
-                Util.notifyError("Player is null, cannot close screen", null);
+                Util.notifyError("Player is null, cannot close screen", new Throwable());
                 return;
             }
             player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(player.currentScreenHandler.syncId));
@@ -134,7 +134,7 @@ public class GUIUtils implements BUListener {
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);
             } else {
-                Util.notifyError("Error closing sign: client was null or not in a sign", null);
+                Util.notifyError("Error closing sign: client was null or not in a sign", new Throwable());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,13 +148,13 @@ public class GUIUtils implements BUListener {
 
     private static void setSignTextInternal(String text, boolean closeAfter, int attemptsLeft) {
         if (attemptsLeft <= 0) {
-            Util.notifyError("Failed to set sign text: Screen not available.", null);
+            Util.notifyError("Failed to set sign text: Screen not available.", new Throwable());
             return;
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null) {
-            Util.notifyError("Failed to set sign text: MinecraftClient is null.", null);
+            Util.notifyError("Failed to set sign text: MinecraftClient is null.", new Throwable());
             return;
         }
 

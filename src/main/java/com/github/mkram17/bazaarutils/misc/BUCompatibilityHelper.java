@@ -44,7 +44,7 @@ public class BUCompatibilityHelper {
         Path reiConfigFile = configDir.resolve(REI_CONFIG_FILENAME);
 
         if (!Files.exists(reiConfigFile)) {
-            Util.notifyError("Could not find REI config file at: " + reiConfigFile, null);
+            Util.notifyError("Could not find REI config file at: " + reiConfigFile, new Throwable());
             return;
         }
 
@@ -56,7 +56,7 @@ public class BUCompatibilityHelper {
             if (rootElement.isJsonObject()) {
                 rootObject = rootElement.getAsJsonObject();
             } else {
-                Util.notifyError("REI config root is not a JSON object: " + reiConfigFile, null);
+                Util.notifyError("REI config root is not a JSON object: " + reiConfigFile, new Throwable());
                 return;
             }
 
@@ -76,14 +76,14 @@ public class BUCompatibilityHelper {
                     JsonElement currentValue = appearanceObject.get(REI_CONFIG_FIELD);
                     Util.logMessage("Current REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "': " + currentValue);
                 } else {
-                    Util.notifyError("Key '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' not found in REI config.", null);
+                    Util.notifyError("Key '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' not found in REI config.", new Throwable());
                 }
 
                 appearanceObject.addProperty(REI_CONFIG_FIELD, HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE);
                 Util.logMessage("Set REI value for '" + REI_CONFIG_SECTION + "." + REI_CONFIG_FIELD + "' to: " + HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE);
 
             } else {
-                Util.notifyError("REI config structure unexpected. Missing '" + REI_CONFIG_SECTION + "' object.", null);
+                Util.notifyError("REI config structure unexpected. Missing '" + REI_CONFIG_SECTION + "' object.", new Throwable());
                 return;
             }
         } catch (Exception e) {
