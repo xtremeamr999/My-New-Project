@@ -39,22 +39,19 @@ public class ChatHandler implements BUListener {
         EVENT_BUS.subscribe(this);
     }
 
+    private static boolean shouldIgnoreMessage(Text message) {
+        String messageString = message.getString();
+        return !message.getString().contains("[Bazaar]") || message.getSiblings().isEmpty() ||
+                messageString.contains("[Bazaar]") || messageString.contains("escrow")
+                || messageString.contains("Submitting") || messageString.contains("Executing")
+                || messageString.contains("Claiming") || messageString.contains("Cancelled");
+    }
+
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
-            if (!message.getString().contains("[Bazaar]")) return;
-
-            if (!siblings.isEmpty()) {
-                String secondSibling = siblings.get(1).getString();
-                if (secondSibling.contains("escrow")
-                        || secondSibling.contains("Submitting")
-                        || secondSibling.contains("Executing")
-                        || secondSibling.contains("Claiming")
-                        || secondSibling.contains("Cancelling")
-                        || (siblings.size() >= 5 && siblings.get(2).getString().contains("Cancelled"))) {
-                    return;
-                }
-            }
+            if (shouldIgnoreMessage(message))
+                return;
 
             getMessageType(message, siblings).ifPresent(messageType -> {
                 switch (messageType) {
@@ -117,34 +114,36 @@ public class ChatHandler implements BUListener {
         }
     }
 
-    public static void handleFlip(ArrayList<Text> siblings) {
-        parseOrderData(siblings, 3, 4, 6).ifPresent(order -> {
-            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), OrderPriceInfo.priceTypes.INSTABUY));
-            EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, order));
+    private static void processOrderEvent(
+            ArrayList<Text> siblings,
+            BazaarChatEvent.BazaarEventTypes eventType,
+            OrderPriceInfo.priceTypes priceType,
+            int volumeIndex,
+            int nameIndex,
+            int priceIndex
+    ) {
+        parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
+            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), priceType));
+            EVENT_BUS.post(new BazaarChatEvent(eventType, order));
         });
+    }
+
+    public static void handleFlip(ArrayList<Text> siblings) {
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, OrderPriceInfo.priceTypes.INSTABUY, 3, 4, 6);
     }
 
     public static void handleCancelled(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        parseOrderData(siblings, 2, 4, priceIndex).ifPresent(order -> {
-            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), OrderPriceInfo.priceTypes.INSTASELL));
-            EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, order));
-        });
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, OrderPriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaSell(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        parseOrderData(siblings, 2, 4, priceIndex).ifPresent(order -> {
-            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), OrderPriceInfo.priceTypes.INSTASELL));
-            EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.INSTA_SELL, order));
-        });
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, OrderPriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaBuy(ArrayList<Text> siblings) {
-        parseOrderData(siblings, 2, 4, 6).ifPresent(order -> {
-            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), OrderPriceInfo.priceTypes.INSTABUY));
-            EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.INSTA_BUY, order));
-        });
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, OrderPriceInfo.priceTypes.INSTABUY, 2, 4, 6);
     }
 
     private static void handleFilled(Text message) {
