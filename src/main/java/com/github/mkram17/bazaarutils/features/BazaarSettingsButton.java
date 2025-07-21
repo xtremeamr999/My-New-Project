@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
@@ -15,16 +14,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class BazaarSettingsButton {
-    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_settings_base");
-    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_settings_hover");
+    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/settings_widget_base");
+    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/settings_widget_hover");
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
             HOVER);
 
     public static List<ItemSlotButtonWidget> getWidget() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        boolean isTargetScreen = screenInfo.inBazaar();
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar())
             return Collections.emptyList();
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
