@@ -113,11 +113,21 @@ dependencies {
 //    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
     //? }
 
-    // ClassGraph for runtime annotation scanning
-    implementation("io.github.classgraph:classgraph:4.8.172")
-    include("io.github.classgraph:classgraph:4.8.172")
 }
+
+val processInitAnnotationsTask = tasks.register<com.github.mkram17.bazaarutils.build.ProcessInitAnnotationsTask>("processInitAnnotations") {
+    group = "build"
+    description = "Scans for @RunOnInit annotations and injects method calls into the main class."
+    // This task should run after compileJava
+    dependsOn(tasks.compileJava)
+    // The input is the output directory of the compileJava task
+    classesDir.set(tasks.compileJava.get().destinationDirectory)
+}
+
 tasks {
+    classes {
+        dependsOn(processInitAnnotationsTask)
+    }
 
     processResources {
         inputs.property("version", project.version)

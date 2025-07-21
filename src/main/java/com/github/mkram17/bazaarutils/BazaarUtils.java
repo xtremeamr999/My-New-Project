@@ -5,7 +5,6 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.entrypoints.EntrypointManager;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.mojang.serialization.Codec;
@@ -59,7 +58,6 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
         setDefaultValues();
-        EntrypointManager.registerInitMethods();
     }
 
     private static void registerDataComponents() {
