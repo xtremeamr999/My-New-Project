@@ -15,25 +15,7 @@ public interface BUListener {
     //must add to getTransientEvents()
     void subscribe();
 
-    //if an instance of the class is not present as an object in BUConfig, it must be added here like the others
-    static List<BUListener> getStaticEventListeners(){
-        List<BUListener> staticListeners = new ArrayList<>();
-        staticListeners.add(ChestLoadedEvent.INSTANCE);
-        staticListeners.add(ChatHandler.INSTANCE);
-        staticListeners.add(JoinMessages.INSTANCE);
-        staticListeners.add(GUIUtils.INSTANCE);
-        staticListeners.add(ItemUpdater.INSTANCE);
-        staticListeners.add(BazaarData.INSTANCE);
-        staticListeners.add(Util.INSTANCE);
-        staticListeners.add(TimeUtil.INSTANCE);
-        staticListeners.add(BazaarEventHandler.INSTANCE);
-        staticListeners.add(ResourceManager.INSTANCE);
-        return staticListeners;
-    }
-
     static List<BUListener> getEventListeners(){
-        List<BUListener> listeners = getStaticEventListeners();
-        listeners.addAll(BUConfig.get().getSerializedEvents());
-        return listeners;
+        return BUConfig.get().getSerializedEvents();
     }
 }

@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -20,15 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 //main utility class. More specific utility classes are in utils package
-public class Util implements BUListener {
-    public static final Util INSTANCE = new Util();
+public class Util {
+
     private static boolean configSaveScheduled = false;
 
-
-    @Override
-    public void subscribe() {
-        subscribeTicks();
-    }
 
     public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA;
         public boolean isEnabled() {
@@ -121,6 +117,7 @@ public class Util implements BUListener {
         }
     }
 
+    @RunOnInit
     public static void subscribeTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             List<Runnable> actionsToRun = new LinkedList<>();

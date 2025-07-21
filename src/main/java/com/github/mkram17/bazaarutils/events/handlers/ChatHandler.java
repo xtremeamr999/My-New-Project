@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
+import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public class ChatHandler implements BUListener {
+public class ChatHandler {
     public static final ChatHandler INSTANCE = new ChatHandler();
 
     public static Option<Boolean> createOrderFilledSoundOption() {
@@ -33,12 +34,6 @@ public class ChatHandler implements BUListener {
                 .build();
     }
 
-    @Override
-    public void subscribe() {
-        registerBazaarChat();
-        EVENT_BUS.subscribe(this);
-    }
-
     private static boolean shouldIgnoreMessage(Text message) {
         String messageString = message.getString();
         return !message.getString().contains("[Bazaar]") || message.getSiblings().isEmpty() ||
@@ -47,6 +42,7 @@ public class ChatHandler implements BUListener {
                 || messageString.contains("Claiming") || messageString.contains("Cancelled");
     }
 
+    @RunOnInit
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());

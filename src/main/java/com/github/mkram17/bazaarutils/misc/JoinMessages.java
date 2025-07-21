@@ -4,32 +4,35 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class JoinMessages implements BUListener {
-    public static final JoinMessages INSTANCE = new JoinMessages();
+public class JoinMessages {
 
-    private static final Text welcomeMessage = Text.literal("Thanks for installing! Use /buconfig to configure the mod.")
-                    .formatted(Formatting.GREEN);
-    private static final Text discordMessage = Text.literal("For more help or to report a bug, join the ")
-                    .formatted(Formatting.GREEN)
-                    .append(Util.DISCORD_TEXT)
-                    .append(Text.literal("!")
-                            .formatted(Formatting.GREEN));
-    private static final Text updateMessage = (Text.literal(BazaarUtils.getUpdateNotes())
-                    .formatted(Formatting.DARK_GREEN));
+    private static Text welcomeMessage;
+    private static Text discordMessage;
+    private static Text updateMessage;
 
+    @RunOnInit(priority = RunOnInit.EVENT_PRIORITIES.HIGH)
+    public static void initializeFields(){
+        welcomeMessage = Text.literal("Thanks for installing! Use /buconfig to configure the mod.")
+                .formatted(Formatting.GREEN);
+        discordMessage = Text.literal("For more help or to report a bug, join the ")
+                .formatted(Formatting.GREEN)
+                .append(Util.DISCORD_TEXT)
+                .append(Text.literal("!")
+                        .formatted(Formatting.GREEN));
+        updateMessage = (Text.literal(BazaarUtils.getUpdateNotes())
+                .formatted(Formatting.DARK_GREEN));
 
-    @Override
-    public void subscribe(){
-        registerWelcomeMessageSender();
     }
 
-    private static void registerWelcomeMessageSender() {
+    @RunOnInit
+    public static void registerWelcomeMessageSender() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             var isFirstLoad = BUConfig.get().firstLoad;
             if (isFirstLoad) {

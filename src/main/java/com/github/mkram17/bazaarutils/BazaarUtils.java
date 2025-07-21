@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.entrypoints.EntrypointManager;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.mojang.serialization.Codec;
@@ -40,9 +41,14 @@ public class BazaarUtils implements ClientModInitializer {
     private static String updateNotes;
     public static ScheduledExecutorService BUExecutorService = Executors.newSingleThreadScheduledExecutor();
 
+    public static ComponentType<String> CUSTOM_SIZE_COMPONENT;
+    public static ComponentType<Boolean> CUSTOM_SHOWPRICECHART_COMPONENT;
+
 
     @Override
     public void onInitializeClient() {
+        registerDataComponents();
+
         BUConfig.HANDLER.load();
 
         BUCompatibilityHelper.initializePatches();
@@ -53,6 +59,20 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
         setDefaultValues();
+        EntrypointManager.registerInitMethods();
+    }
+
+    private static void registerDataComponents() {
+        CUSTOM_SIZE_COMPONENT = Registry.register(
+                Registries.DATA_COMPONENT_TYPE,
+                Identifier.of(BazaarUtils.MODID, "custom_size"),
+                ComponentType.<String>builder().codec(Codec.STRING).build()
+        );
+        CUSTOM_SHOWPRICECHART_COMPONENT = Registry.register(
+                Registries.DATA_COMPONENT_TYPE,
+                Identifier.of(BazaarUtils.MODID, "has_price_chart"),
+                ComponentType.<Boolean>builder().codec(Codec.BOOL).build()
+        );
     }
 
     //uses orbit for custom events
@@ -116,16 +136,4 @@ public class BazaarUtils implements ClientModInitializer {
                 updatedMajorVersion = true;
         });
     }
-
-
-    public static final ComponentType<String> CUSTOM_SIZE_COMPONENT = Registry.register(
-            Registries.DATA_COMPONENT_TYPE,
-            Identifier.of(BazaarUtils.MODID, "custom_size"),
-            ComponentType.<String>builder().codec(Codec.STRING).build()
-    );
-    public static final ComponentType<Boolean> CUSTOM_SHOWPRICECHART_COMPONENT = Registry.register(
-            Registries.DATA_COMPONENT_TYPE,
-            Identifier.of(BazaarUtils.MODID, "has_price_chart"),
-            ComponentType.<Boolean>builder().codec(Codec.BOOL).build()
-    );
 }

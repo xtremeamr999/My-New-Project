@@ -43,6 +43,9 @@
 		"modmenu": {
 			"links": {
 				"modmenu.discord": "https://discord.gg/xDKjvm5hQd"
+			},
+			"entrypoints": {
+				"bazaarutils_widgets": "com.github.mkram17.bazaarutils.init.WidgetRegistrar"
 			}
 		}
 	}

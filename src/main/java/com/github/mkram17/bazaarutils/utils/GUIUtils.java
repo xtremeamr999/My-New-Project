@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
+import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,8 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO make inBazaar() work all the time
-public class GUIUtils implements BUListener {
-    public static final GUIUtils INSTANCE = new GUIUtils();
+public class GUIUtils {
     @Getter @Setter
     private static guiTypes guiType;
     @Getter @Setter
@@ -45,17 +45,16 @@ public class GUIUtils implements BUListener {
         previousScreen = e.getOldScreen();
     }
 
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
-        registerScreenEvent();
+    @RunOnInit
+    public static void subscribe() {
+        EVENT_BUS.subscribe(GUIUtils.class);
     }
 
     public enum guiTypes {CHEST, SIGN}
 
 
 
-
+    @RunOnInit
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
@@ -88,6 +87,10 @@ public class GUIUtils implements BUListener {
             EVENT_BUS.subscribe(currentBookmark);
         } else
             currentBookmark = new Bookmark(name, null);
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    private void onLoad(ChestLoadedEvent e){
+        lowerChestInventory = e.getLowerChestInventory();
     }
 
     //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why
@@ -184,11 +187,6 @@ public class GUIUtils implements BUListener {
                 Util.tickExecuteLater(4, () -> setSignTextInternal(text, closeAfter, attemptsLeft - 1));
             }
         });
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    private void onLoad(ChestLoadedEvent e){
-        lowerChestInventory = e.getLowerChestInventory();
     }
 
     public static void clickSlot(int slotIndex, int button) {

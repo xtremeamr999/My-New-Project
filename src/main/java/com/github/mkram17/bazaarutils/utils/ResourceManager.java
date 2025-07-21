@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -24,9 +25,7 @@ import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 //TODO move config to config/bazaarutils directory and rename to "config". See how REI does this.
-public class ResourceManager implements BUListener {
-
-    public static final ResourceManager INSTANCE = new ResourceManager();
+public class ResourceManager {
 
     private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID);
     private static final Path LOCAL_RESOURCES_PATH = MOD_CONFIG_DIR.resolve("bazaar-resources.json");
@@ -147,14 +146,10 @@ public class ResourceManager implements BUListener {
         return new JsonObject(); //empty (shouldnt happen)
     }
 
-    private void onClientStart(){
+    @RunOnInit
+    public static void onClientStart(){
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             ResourceManager.initialize();
         });
-    }
-
-    @Override
-    public void subscribe() {
-        onClientStart();
     }
 }

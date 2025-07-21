@@ -13,7 +13,7 @@ version = property("mod_version") as String + "+mc" + property("deps.core.mcVers
 
 base { archivesName.set(property("mod.id").toString()) }
 repositories {
-    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+//    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
     maven {
         name = "meteor-maven"
         url = uri("https://maven.meteordev.org/releases")
@@ -76,7 +76,7 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+//    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     implementation("meteordevelopment:orbit:0.2.4")
     include("meteordevelopment:orbit:0.2.4")
@@ -113,6 +113,9 @@ dependencies {
 //    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
     //? }
 
+    // ClassGraph for runtime annotation scanning
+    implementation("io.github.classgraph:classgraph:4.8.172")
+    include("io.github.classgraph:classgraph:4.8.172")
 }
 tasks {
 
