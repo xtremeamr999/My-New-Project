@@ -36,14 +36,6 @@ public class GUIUtils implements BUListener {
     private static Inventory lowerChestInventory;
     @Getter @Setter
     private static Bookmark currentBookmark;
-    @Getter @Setter
-    private static Screen previousScreen;
-
-
-    @EventHandler
-    private void onScreenChange(ScreenChangeEvent e){
-        previousScreen = e.getOldScreen();
-    }
 
     @Override
     public void subscribe() {
@@ -52,8 +44,6 @@ public class GUIUtils implements BUListener {
     }
 
     public enum guiTypes {CHEST, SIGN}
-
-
 
 
     public static void registerScreenEvent(){

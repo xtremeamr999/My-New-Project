@@ -137,7 +137,8 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     private void handleFlip() {
         double flipPrice = order.getFlipPrice();
-        if(order != null && flipPrice != 0 && GUIUtils.getPreviousScreen().getTitle().getString().contains("Order options")) {
+        ScreenInfo previousScreen = ScreenInfo.getPreviousScreenInfos().getFirst();
+        if(order != null && flipPrice != 0 && previousScreen.getContainerName().contains("Order options")) {
             GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
             order.flipItem(flipPrice);
         }
