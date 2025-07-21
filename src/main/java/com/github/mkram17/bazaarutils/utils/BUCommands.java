@@ -222,6 +222,13 @@ public class BUCommands {
                         )
                 )
         );
+        bazaarutils.then(ClientCommandManager.literal("updateresources")
+                .executes(context -> {
+                    PlayerActionUtil.notifyAll("Checking for resource updates...");
+                    ResourceManager.checkForUpdates(true);
+                    return 1;
+                })
+        );
 
 
         if (BUConfig.get().developerMode) {

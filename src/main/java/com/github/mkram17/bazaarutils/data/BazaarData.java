@@ -5,26 +5,17 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
 public class BazaarData implements BUListener {
     public static final BazaarData INSTANCE = new BazaarData();
 
-    private static final String PRODUCT_NAME_RESOURCE = "bazaar-resources.json";
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;
     private static int exceptionCount = 0;
@@ -110,28 +101,6 @@ public class BazaarData implements BUListener {
         }
     }
 
-    public static JsonObject loadResourceJson(String resourcePath) {
-        ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
-        Identifier resourceId = Identifier.of(BazaarUtils.MODID, resourcePath);
-
-        try {
-            Optional<Resource> optionalResource = resourceManager.getResource(resourceId);
-            if (optionalResource.isPresent()) {
-                Resource resource = optionalResource.get();
-                try (InputStream inputStream = resource.getInputStream();
-                     InputStreamReader reader = new InputStreamReader(inputStream)) {
-                    return JsonParser.parseReader(reader).getAsJsonObject();
-                }
-            } else {
-                Util.notifyError("Could not find resource: " + resourcePath, new Throwable());
-                return new JsonObject();
-            }
-        } catch (IOException e) {
-            Util.notifyError("Error reading resource: " + resourcePath, e);
-            return new JsonObject();
-        }
-    }
-
     public static Double findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
         if (bazaarReply == null) {
             Util.notifyError("Bazaar data is null", new Throwable());
@@ -176,7 +145,7 @@ public class BazaarData implements BUListener {
         JsonObject bazaarConversions;
 
         try {
-            resources = loadResourceJson(PRODUCT_NAME_RESOURCE);
+            resources = ResourceManager.getResourceJson();
             bazaarConversions = resources.getAsJsonObject("bazaarConversions");
 
             for (String key : bazaarConversions.keySet()) {
