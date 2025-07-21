@@ -4,13 +4,12 @@ import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
@@ -21,7 +20,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
@@ -90,6 +88,8 @@ public class BUConfig {
     public boolean orderFilledSound = true;
     @SerialEntry
     public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
+    @SerialEntry
+    public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
 
 
     public static void openGUI() {
@@ -132,6 +132,7 @@ public class BUConfig {
         List<ClickableWidget> widgets = new ArrayList<>();
         widgets.addAll(Bookmark.getWidgets());
         widgets.addAll(BazaarSettingsButton.getWidget());
+        widgets.addAll(BazaarOpenOrdersButton.getWidget());
         widgets.addAll(OrderLimit.getWidget());
         return widgets;
     }

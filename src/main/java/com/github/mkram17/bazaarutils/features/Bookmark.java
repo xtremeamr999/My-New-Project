@@ -40,8 +40,8 @@ public class Bookmark extends CustomItemButton {
     public ItemStack bookmarkedItemStack;
     private static final int SIGN_SLOT_NUMBER = 45;
 
-    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_base");
-    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/widget_bookmark_hover");
+    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
+    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_hover");
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
             HOVER);

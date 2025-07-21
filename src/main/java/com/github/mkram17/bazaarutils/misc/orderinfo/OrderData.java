@@ -62,7 +62,7 @@ public class OrderData implements BUListener {
         this.tolerance = calculateTolerance();
 
         if (productID == null && name != null) {
-            Util.notifyError("Product ID for " + name + " is null. This may cause issues", null);
+            Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
         }
     }
 
@@ -231,7 +231,7 @@ public class OrderData implements BUListener {
         long CHECK_INTERVAL_SECONDS = 30;
         BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
                 if(!fixProductID()){
-                   Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", null);
+                   Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
                 }
         }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }

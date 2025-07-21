@@ -53,7 +53,7 @@ public class BazaarData implements BUListener {
                     }
                 } else {
                     if (reply == null) {
-                        Util.notifyError("Bazaar data is null", null);
+                        Util.notifyError("Bazaar data is null", new Throwable());
                         return;
                     }
                     bazaarReply = reply;
@@ -67,7 +67,7 @@ public class BazaarData implements BUListener {
 
     public static int getOrderCount(String productId, OrderPriceInfo.priceTypes priceType, double price) {
         if (bazaarReply == null) {
-            Util.notifyError("Bazaar data is null", null);
+            Util.notifyError("Bazaar data is null", new Throwable());
             return -1;
         }
         try {
@@ -103,7 +103,7 @@ public class BazaarData implements BUListener {
 
     public static Double findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
         if (bazaarReply == null) {
-            Util.notifyError("Bazaar data is null", null);
+            Util.notifyError("Bazaar data is null", new Throwable());
             return -1.0;
         }
         try {

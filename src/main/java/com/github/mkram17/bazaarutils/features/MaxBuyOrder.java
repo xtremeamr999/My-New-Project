@@ -75,7 +75,7 @@ public class MaxBuyOrder extends CustomOrder {
 
         ItemStack itemStack = containerScreen.getScreenHandler().getInventory().getStack(13);
         if (itemStack.isEmpty()) {
-            Util.notifyError("Could not find item in previous container.", null);
+            Util.notifyError("Could not find item in previous container.", new Throwable());
             return null;
         }
         return itemStack;
