@@ -64,8 +64,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
 		BazaarUtils.EVENT_BUS.post(event);
-//		Util.notifyAll("Mouse Click Posted");
-// Use the accessor to safely get the client instance
+		// Use the accessor to safely get the client instance
 		MinecraftClient client = ((AccessorScreen) screen).getClient();
 		if (event.isCancelled()) {
 			ci.cancel();
@@ -124,63 +123,30 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		}
 	}
 
-
-
-	//TODO make this method not repeat code so much
 	@Unique
 	protected void draw(DrawContext context, int x, int y, OrderData.statuses orderStatus) {
-		//? if > 1.21.5 {
-		/*if (orderStatus == OrderData.statuses.COMPETITIVE) {
-			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 0.0f, 1.0f, 0.0f)
-			);
-		} else if (orderStatus == OrderData.statuses.OUTDATED) {
-			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 0.0f, 0.0f)
-			);
-		} else {
-			context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
-			);
-		}
-		*///?} else {
+		final float r, g, b;
 		if (orderStatus == OrderData.statuses.COMPETITIVE) {
-			context.drawSpriteStretched(RenderLayer::getGuiTextured,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 0.0f, 1.0f, 0.0f)
-			);
-		} else if(orderStatus == OrderData.statuses.OUTDATED) {
-			context.drawSpriteStretched(RenderLayer::getGuiTextured,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 0.0f, 0.0f)
-			);
-		} else {
-			context.drawSpriteStretched(RenderLayer::getGuiTextured,
-					MinecraftClient.getInstance()
-							.getGuiAtlasManager()
-							.getSprite(OrderStatusHighlight.IDENTIFIER)
-					, x, y, 16, 16,
-					ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, 1.0f, 1.0f, 0.0f)
-			);
+			r = 0.0f; g = 1.0f; b = 0.0f; // Green
+		} else if (orderStatus == OrderData.statuses.OUTDATED) {
+			r = 1.0f; g = 0.0f; b = 0.0f; // Red
+		} else { // MATCHED
+			r = 1.0f; g = 1.0f; b = 0.0f; // Yellow
 		}
+
+		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
+		final var sprite = MinecraftClient.getInstance()
+				.getGuiAtlasManager()
+				.getSprite(OrderStatusHighlight.IDENTIFIER);
+
+		//? if > 1.21.5 {
+		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+				sprite, x, y, 16, 16, color
+		);
+		*///?} else {
+		context.drawSpriteStretched(RenderLayer::getGuiTextured,
+				sprite, x, y, 16, 16, color
+		);
 		//?}
 	}
 
