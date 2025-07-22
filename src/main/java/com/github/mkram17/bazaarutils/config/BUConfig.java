@@ -90,6 +90,8 @@ public class BUConfig {
     public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
+    @SerialEntry
+    public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
 
 
     public static void openGUI() {
