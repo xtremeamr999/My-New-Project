@@ -74,7 +74,7 @@ public class GUIUtils implements BUListener {
             return;
         String name = Bookmark.findName(e);
         if (Bookmark.isBookmarked(name)) {
-            currentBookmark = Bookmark.findMatchingBookmark(name);
+            currentBookmark = Bookmark.findMatchingBookmark(name).get();
             EVENT_BUS.subscribe(currentBookmark);
         } else
             currentBookmark = new Bookmark(name, null);
