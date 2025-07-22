@@ -1,20 +1,15 @@
 package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +48,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
                         ScreenHandler handler = genericContainerScreen.getScreenHandler();
                         if (handler instanceof GenericContainerScreenHandler containerHandler) {
                             Inventory inv = containerHandler.getInventory();
-                            if (inv.size() > 0 && !inv.getStack(inv.size() - 1).isEmpty() && !isItemLoading(inv)) {
+                            if (inv.size() > 0 && !inv.getStack(inv.size() - 1).isEmpty() && !areAnyItemsLoading(inv)) {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
@@ -95,21 +90,20 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
         return stacks;
     }
 
-    private static boolean isItemLoading(Inventory inventory) {
+    private static boolean areAnyItemsLoading(Inventory inventory) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack item = inventory.getStack(i);
-            if (item.isEmpty()) continue;
-
-            Text customName = item.get(DataComponentTypes.CUSTOM_NAME);
-            if (customName != null) {
-                String displayName = Util.removeFormatting(customName.getString());
-                if (displayName.contains("Loading")) {
-                    PlayerActionUtil.notifyAll("Loading item...", Util.notificationTypes.GUI);
-                    return true;
-                }
+            if (isItemLoading(item)) {
+                return true;
             }
         }
         return false;
+    }
+
+    private static boolean isItemLoading(ItemStack item) {
+        if(item.isEmpty())
+            return false;
+        return item.getComponents().stream().anyMatch(component -> component.toString().contains("Loading"));
     }
 
     @Override
