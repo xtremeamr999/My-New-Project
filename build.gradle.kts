@@ -5,15 +5,20 @@ plugins {
     `maven-publish`
     java
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
-
-//	id 'org.jetbrains.kotlin.jvm' version '2.0.0'
 }
+
 group = property("maven_group")!!
 version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
 
-base { archivesName.set(property("mod.id").toString()) }
+base {
+    archivesName.set(property("mod.id").toString())
+}
+
 repositories {
-    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+    maven {
+        name = "Dev Auth"
+        url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    }
     maven {
         name = "meteor-maven"
         url = uri("https://maven.meteordev.org/releases")
@@ -33,7 +38,6 @@ repositories {
     maven("https://moulberry.repo.ax/v1") {
         name = "Moulberry's Maven"
     }
-
 
     exclusiveContent {
         forRepository {
@@ -55,24 +59,19 @@ repositories {
             includeGroup("maven.modrinth")
         }
     }
-
     mavenCentral()
 }
 
 class ModDependencies {
     operator fun get(name: String) = property("deps.$name").toString()
 }
-//val env = Env()
 val deps = ModDependencies()
-//val modProperties = ModProperties()
 val mcVersion = stonecutter.current.version
 
 dependencies {
-    // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:${mcVersion}")
     mappings("net.fabricmc:yarn:${mcVersion}+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabricLoaderVersion"]}")
-//    modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
@@ -103,18 +102,25 @@ dependencies {
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
 
     //gson extras for easy type adapters
-//    implementation("com.google.code.gson:gson:2.13.1")
     implementation("org.danilopianini:gson-extras:3.3.0")
     include("org.danilopianini:gson-extras:3.3.0")
     // Skyblocker for compatibility
-    //? if <= 1.21.5 {
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
-    //? } else {
-//    modCompileOnly("maven.modrinth:skyblocker-liap:v5.2.0+1.21.5")
-    //? }
-
 }
+
+val processInitAnnotationsTask = tasks.register<com.github.mkram17.bazaarutils.build.ProcessInitAnnotationsTask>("processInitAnnotations") {
+    group = "build"
+    description = "Scans for @RunOnInit annotations and injects method calls into the main class."
+    // This task should run after compileJava
+    dependsOn(tasks.compileJava)
+    // The input is the output directory of the compileJava task
+    classesDir.set(tasks.compileJava.get().destinationDirectory)
+}
+
 tasks {
+    classes {
+        dependsOn(processInitAnnotationsTask)
+    }
 
     processResources {
         inputs.property("version", project.version)
