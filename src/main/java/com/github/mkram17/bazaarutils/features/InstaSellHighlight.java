@@ -70,8 +70,14 @@ public class InstaSellHighlight implements BUListener {
     private static List<Text> getItemLoreLines(List<Text> loreLines) {
         int firstItemIndex = Util.componentIndexOf(loreLines, "coins");
         int totalCoinIndex = Util.componentLastIndexOf(loreLines, "coins");
-        int lastItemIndex = Util.componentLastIndexOf(loreLines.subList(firstItemIndex, totalCoinIndex), "coins");
-        return  loreLines.subList(firstItemIndex, lastItemIndex+1);
+
+        if(firstItemIndex == -1 || totalCoinIndex == -1) {
+            return Collections.emptyList();
+        }
+
+        int lastItemIndex = Util.componentLastIndexOf(loreLines.subList(0, totalCoinIndex-1), "coins");
+
+        return loreLines.subList(firstItemIndex, lastItemIndex+1);
     }
 
     private static int getVolume(Text text){
