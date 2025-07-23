@@ -43,6 +43,7 @@ public class OrderPriceInfo {
     public OrderPriceInfo(double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
         this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
+        //TODO initialize market price updater here whenever object is created
     }
 
     private void schedulePriceUpdates() {
