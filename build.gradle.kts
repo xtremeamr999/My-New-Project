@@ -13,7 +13,7 @@ version = property("mod_version") as String + "+mc" + property("deps.core.mcVers
 
 base { archivesName.set(property("mod.id").toString()) }
 repositories {
-//    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
+    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") }
     maven {
         name = "meteor-maven"
         url = uri("https://maven.meteordev.org/releases")
@@ -76,7 +76,7 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
 
-//    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     implementation("meteordevelopment:orbit:0.2.4")
     include("meteordevelopment:orbit:0.2.4")
@@ -115,9 +115,9 @@ dependencies {
 
 }
 
-val processInitAnnotationsTask = tasks.register<com.github.mkram17.bazaarutils.build.ProcessInitAnnotationsTask>("processInitAnnotations") {
+val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
     group = "build"
-    description = "Scans for @RunOnInit annotations and injects method calls into the main class."
+    description = "Scans for @RunOnInit @RegisterWidget annotations and injects method calls into their respective methods."
     // This task should run after compileJava
     dependsOn(tasks.compileJava)
     // The input is the output directory of the compileJava task
@@ -126,7 +126,7 @@ val processInitAnnotationsTask = tasks.register<com.github.mkram17.bazaarutils.b
 
 tasks {
     classes {
-        dependsOn(processInitAnnotationsTask)
+        dependsOn(buildtimeInjectionTask)
     }
 
     processResources {

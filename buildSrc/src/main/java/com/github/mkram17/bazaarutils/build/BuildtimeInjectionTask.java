@@ -16,52 +16,73 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class ProcessInitAnnotationsTask extends DefaultTask {
+public abstract class BuildtimeInjectionTask extends DefaultTask {
 
     @InputDirectory
     public abstract DirectoryProperty getClassesDir();
 
     @TaskAction
     public void execute() {
-        getLogger().info("Starting injection of @RunOnInit methods.");
+        getLogger().info("Starting build-time bytecode injection.");
         long start = System.currentTimeMillis();
 
         File classesDir = getClassesDir().get().getAsFile();
-        Map<MethodReference, Integer> methodSignatures = new HashMap<>();
+        Map<MethodReference, Integer> initMethods = new HashMap<>();
+        List<MethodReference> widgetMethods = new ArrayList<>();
 
-        // 1. Find all methods with the @RunOnInit annotation
-        findInitMethods(classesDir, methodSignatures);
+        // 1. Find all annotated methods
+        findAnnotatedMethods(classesDir, initMethods, widgetMethods);
 
-        // 2. Sort the methods by their priority.
-        List<MethodReference> sortedMethodSignatures = methodSignatures.entrySet()
-                .stream()
-                .sorted(Map.Entry.<MethodReference, Integer>comparingByValue().thenComparing(entry -> entry.getKey().className()))
-                .map(Map.Entry::getKey)
-                .toList();
-        
-        getLogger().info("Found {} methods to inject.", sortedMethodSignatures.size());
+        // 2. Process @RunOnInit methods
+        processInitMethods(classesDir, initMethods);
 
-        // 3. Inject calls to the @RunOnInit annotated methods in the BazaarUtils class
-        injectInitCalls(classesDir, sortedMethodSignatures);
+        // 3. Process @RegisterWidget methods
+        processWidgetMethods(classesDir, widgetMethods);
 
-        getLogger().lifecycle("Injecting @RunOnInit methods took: {}ms", (System.currentTimeMillis() - start));
+        getLogger().lifecycle("Build-time injection took: {}ms", (System.currentTimeMillis() - start));
     }
 
-    private void findInitMethods(File classesDir, Map<MethodReference, Integer> methodSignatures) {
+    private void findAnnotatedMethods(File classesDir, Map<MethodReference, Integer> initMethods, List<MethodReference> widgetMethods) {
         forEachClass(classesDir, inputStream -> {
             try {
                 ClassReader classReader = new ClassReader(inputStream);
-                classReader.accept(new InitReadingClassVisitor(classReader, methodSignatures), ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+                classReader.accept(new AnnotationReadingClassVisitor(classReader, initMethods, widgetMethods), ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to read class for annotation processing", e);
             }
         });
+    }
+
+    private void processInitMethods(File classesDir, Map<MethodReference, Integer> initMethods) {
+        if (initMethods.isEmpty()) {
+            getLogger().info("No @RunOnInit methods found.");
+            return;
+        }
+
+        List<MethodReference> sortedInitMethods = initMethods.entrySet()
+                .stream()
+                .sorted(Map.Entry.<MethodReference, Integer>comparingByValue().thenComparing(entry -> entry.getKey().className()))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        getLogger().info("Found {} @RunOnInit methods to inject.", sortedInitMethods.size());
+        injectInitCalls(classesDir, sortedInitMethods);
+    }
+
+    private void processWidgetMethods(File classesDir, List<MethodReference> widgetMethods) {
+        if (widgetMethods.isEmpty()) {
+            getLogger().info("No @RegisterWidget methods found.");
+            return;
+        }
+        getLogger().info("Found {} @RegisterWidget methods to inject.", widgetMethods.size());
+        injectWidgetCalls(classesDir, widgetMethods);
     }
 
     private void injectInitCalls(File classesDir, List<MethodReference> methodSignatures) {
@@ -77,6 +98,22 @@ public abstract class ProcessInitAnnotationsTask extends DefaultTask {
             }
         } catch (Exception e) {
             getLogger().error("Failed to inject init calls into {}", mainClassFile, e);
+        }
+    }
+
+    private void injectWidgetCalls(File classesDir, List<MethodReference> methodSignatures) {
+        String configClassName = "com/github/mkram17/bazaarutils/config/BUConfig.class";
+        Path configClassFile = Objects.requireNonNull(findClass(classesDir, configClassName), "BUConfig class wasn't found").toPath();
+
+        try (InputStream inputStream = Files.newInputStream(configClassFile)) {
+            ClassReader classReader = new ClassReader(inputStream);
+            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            classReader.accept(new WidgetInjectingClassVisitor(classWriter, methodSignatures, "getWidgets", "()Ljava/util/List;"), 0);
+            try (OutputStream outputStream = Files.newOutputStream(configClassFile)) {
+                outputStream.write(classWriter.toByteArray());
+            }
+        } catch (Exception e) {
+            getLogger().error("Failed to inject widget calls into {}", configClassFile, e);
         }
     }
 
@@ -105,11 +142,5 @@ public abstract class ProcessInitAnnotationsTask extends DefaultTask {
         return Files.exists(classPath) ? classPath.toFile() : null;
     }
 
-    /**
-     * @param className  the class name (e.g. com/github/mkram17/bazaarutils/utils/GUIUtils)
-     * @param methodName the method's name (e.g. init)
-     * @param descriptor the method's descriptor (e.g. ()V)
-     * @param itf        whether the target class is an {@code interface} or not
-     */
-    public record MethodReference(String className, String methodName, String descriptor, boolean itf) {}
+    public record MethodReference(String className, String methodName, String descriptor) {}
 }

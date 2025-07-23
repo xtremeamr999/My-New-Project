@@ -1,12 +1,10 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import java.sql.Time;
 import java.time.*;
 
 import javax.swing.Timer;
 
-import com.github.mkram17.bazaarutils.events.BUListener;
-import com.github.mkram17.bazaarutils.misc.entrypoints.RunOnInit;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import lombok.Getter;
 
 public class TimeUtil {

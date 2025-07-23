@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.entrypoints;
+package com.github.mkram17.bazaarutils.misc.autoregistration;
 
 import lombok.Getter;
 

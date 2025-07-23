@@ -7,11 +7,11 @@ import org.objectweb.asm.Opcodes;
 import java.util.List;
 
 public class InitInjectingClassVisitor extends ClassVisitor {
-    private final List<ProcessInitAnnotationsTask.MethodReference> methodSignatures;
+    private final List<BuildtimeInjectionTask.MethodReference> methodSignatures;
     private final String targetMethodName;
     private final String targetMethodDesc;
 
-    public InitInjectingClassVisitor(ClassVisitor classVisitor, List<ProcessInitAnnotationsTask.MethodReference> methodSignatures, String targetMethodName, String targetMethodDesc) {
+    public InitInjectingClassVisitor(ClassVisitor classVisitor, List<BuildtimeInjectionTask.MethodReference> methodSignatures, String targetMethodName, String targetMethodDesc) {
         super(Opcodes.ASM9, classVisitor);
         this.methodSignatures = methodSignatures;
         this.targetMethodName = targetMethodName;
@@ -28,7 +28,7 @@ public class InitInjectingClassVisitor extends ClassVisitor {
                 public void visitInsn(int opcode) {
                     // Inject calls just before the method returns. For a void method, this is RETURN.
                     if (opcode == Opcodes.RETURN) {
-                        for (ProcessInitAnnotationsTask.MethodReference methodCall : methodSignatures) {
+                        for (BuildtimeInjectionTask.MethodReference methodCall : methodSignatures) {
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, methodCall.className(), methodCall.methodName(), methodCall.descriptor(), false);
                         }
                     }
