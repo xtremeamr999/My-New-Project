@@ -77,6 +77,15 @@ public class ScreenInfo implements BUListener {
         if(getContainerName() == null) return false;
         return getContainerName().contains("Confirm Sell Offer");
     }
+    public boolean inConfirmBuyOffer(){
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("Confirm Buy Order");
+    }
+    public boolean inOrderPrice(){
+        if(getContainerName() == null) return false;
+        return getContainerName().contains("How much do you want to pay?");
+    }
+
 
     public boolean inFlipGui() {
         if (getContainerName() == null) {
@@ -107,7 +116,11 @@ public class ScreenInfo implements BUListener {
     public boolean inBazaar(){
         if(getContainerName() == null)
             return false;
-        return inBuyOrderScreen() || inFlipGui() || inInstaBuy() || inBazaarMainPage() || inOrderScreen() || inSellSetup() || inConfirmSellOffer() || inItemGroupPage();
+        return inBuyOrderScreen() || inFlipGui()
+                || inInstaBuy() || inBazaarMainPage()
+                || inOrderScreen() || inSellSetup()
+                || inConfirmSellOffer() || inConfirmBuyOffer()
+                || inOrderPrice() || inItemGroupPage();
     }
 
     //only for specific items

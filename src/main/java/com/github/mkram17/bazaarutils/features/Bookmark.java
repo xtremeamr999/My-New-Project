@@ -33,6 +33,7 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Bookmark extends CustomItemButton {
     @Getter @Setter
@@ -156,7 +157,7 @@ public class Bookmark extends CustomItemButton {
     public static String findName(ChestLoadedEvent e){
         String containerName = ScreenInfo.getCurrentScreenInfo().getContainerName();
         String name = findNameFromContainer();
-        if(containerName.length() > 30){
+        if(containerName.length() >= 30){
             for(ItemStack stack : e.getItemStacks()){
                 if(stack == null) continue;
                 if (!stack.isEmpty() && stack.getName().getString().startsWith(name)) {
@@ -202,15 +203,15 @@ public class Bookmark extends CustomItemButton {
     }
 
     public static boolean isBookmarked(String name){
-        return findMatchingBookmark(name) != null;
+        return findMatchingBookmark(name).isPresent();
     }
 
-    public static Bookmark findMatchingBookmark(String name){
+    public static Optional<Bookmark> findMatchingBookmark(String name){
         for(Bookmark bookmark : BUConfig.get().bookmarks) {
             if(bookmark.getName().equalsIgnoreCase(name))
-                return bookmark;
+                return Optional.of(bookmark);
         }
-        return null;
+        return Optional.empty();
     }
 
     @RegisterWidget

@@ -33,14 +33,6 @@ public class GUIUtils {
     private static Inventory lowerChestInventory;
     @Getter @Setter
     private static Bookmark currentBookmark;
-    @Getter @Setter
-    private static Screen previousScreen;
-
-
-    @EventHandler
-    private void onScreenChange(ScreenChangeEvent e){
-        previousScreen = e.getOldScreen();
-    }
 
     @RunOnInit
     public static void subscribe() {
@@ -48,7 +40,6 @@ public class GUIUtils {
     }
 
     public enum guiTypes {CHEST, SIGN}
-
 
 
     @RunOnInit
@@ -80,7 +71,7 @@ public class GUIUtils {
             return;
         String name = Bookmark.findName(e);
         if (Bookmark.isBookmarked(name)) {
-            currentBookmark = Bookmark.findMatchingBookmark(name);
+            currentBookmark = Bookmark.findMatchingBookmark(name).get();
             EVENT_BUS.subscribe(currentBookmark);
         } else
             currentBookmark = new Bookmark(name, null);
