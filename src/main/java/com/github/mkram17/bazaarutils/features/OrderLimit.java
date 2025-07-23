@@ -13,6 +13,7 @@ import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -89,6 +90,7 @@ public class OrderLimit implements BUListener {
         orderLimitEntries.add(new OrderLimitEntry(price, ZonedDateTime.now()));
     }
 
+    @RegisterWidget
     public static List<ClickableWidget> getWidget() {
         OrderLimit orderLimit = BUConfig.get().orderLimit;
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();

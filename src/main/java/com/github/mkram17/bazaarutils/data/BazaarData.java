@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.data;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
@@ -13,8 +13,7 @@ import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 import java.util.concurrent.TimeUnit;
 
 //TODO more efficient timing of api requests
-public class BazaarData implements BUListener {
-    public static final BazaarData INSTANCE = new BazaarData();
+public class BazaarData{
 
     private static SkyBlockBazaarReply bazaarReply = null;
     private static int bazaarDataPeriod = 1;
@@ -23,11 +22,7 @@ public class BazaarData implements BUListener {
     private static boolean skipNextCall = false;
     private static final long bazaarDataDelay = 10L;
 
-    @Override
-    public void subscribe(){
-        scheduleBazaar();
-    }
-
+    @RunOnInit
     public static void scheduleBazaar() {
         BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
             if (!(bazaarCalls % bazaarDataPeriod == 0))
@@ -53,7 +48,7 @@ public class BazaarData implements BUListener {
                     }
                 } else {
                     if (reply == null) {
-                        Util.notifyError("Bazaar data is null", new Throwable());
+                        Util.notifyError("Bazaar data is null", null);
                         return;
                     }
                     bazaarReply = reply;

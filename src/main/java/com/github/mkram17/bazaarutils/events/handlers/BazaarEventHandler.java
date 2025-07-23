@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.events.handlers;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
@@ -11,8 +11,8 @@ import meteordevelopment.orbit.EventHandler;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public class BazaarEventHandler implements BUListener {
-    public static final BazaarEventHandler INSTANCE = new BazaarEventHandler();
+public class BazaarEventHandler {
+
     public static final int ORDER_FILLED_NOTIFICATIONS = 2; // number of notifications to send when an order becomes outdated
 
 
@@ -75,8 +75,8 @@ public class BazaarEventHandler implements BUListener {
 
     }
 
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
+    @RunOnInit
+    public static void subscribe() {
+        EVENT_BUS.subscribe(BazaarEventHandler.class);
     }
 }

@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class ChestLoadedEvent implements ICancellable, BUListener {
+public class ChestLoadedEvent implements ICancellable {
     @Getter
     private Inventory lowerChestInventory;
     @Getter
@@ -30,11 +30,7 @@ public class ChestLoadedEvent implements ICancellable, BUListener {
 
     public static final ChestLoadedEvent INSTANCE = new ChestLoadedEvent();
 
-    @Override
-    public void subscribe(){
-        registerScreenEvent();
-    }
-
+    @RunOnInit
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (screen instanceof GenericContainerScreen genericContainerScreen) {

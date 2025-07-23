@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
@@ -19,8 +19,7 @@ import java.util.*;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public class ItemUpdater implements BUListener {
-    public static final ItemUpdater INSTANCE = new ItemUpdater();
+public class ItemUpdater {
     private static Inventory lowerChestInventory;
 
     private static final String BUY_ORDER_PREFIX = "BUY";
@@ -179,8 +178,8 @@ public class ItemUpdater implements BUListener {
         return orderStacks;
     }
 
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
+    @RunOnInit
+    public static void subscribe() {
+        EVENT_BUS.subscribe(ItemUpdater.class);
     }
 }

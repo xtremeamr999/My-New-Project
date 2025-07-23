@@ -130,10 +130,7 @@ public class BUConfig {
 
      public static List<ClickableWidget> getWidgets(){
         List<ClickableWidget> widgets = new ArrayList<>();
-        widgets.addAll(Bookmark.getWidgets());
-        widgets.addAll(BazaarSettingsButton.getWidget());
-        widgets.addAll(BazaarOpenOrdersButton.getWidget());
-        widgets.addAll(OrderLimit.getWidget());
+        //automatically added using @RegisterWidget annotation
         return widgets;
     }
 
