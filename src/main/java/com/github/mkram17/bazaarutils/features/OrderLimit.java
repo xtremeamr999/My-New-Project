@@ -14,6 +14,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -31,6 +32,7 @@ import dev.isxander.yacl3.api.controller.SliderControllerBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
@@ -55,15 +57,15 @@ public class OrderLimit implements BUListener {
         this.orderLimitEntries = new ArrayList<>();
     }
 
-    public void init() {
-        BazaarUtils.EVENT_BUS.subscribe(this);
-    }
 
-    @EventHandler
-    public void onBazaarOpen(ChestLoadedEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(!screenInfo.inBazaar()) return;
-        removeOldEntries();
+    @RunOnInit
+    public static void registerBazaarOpen() {
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+            if(screenInfo == null || !screenInfo.inBazaar())
+                return;
+            BUConfig.get().orderLimit.removeOldEntries();
+        });
     }
 
     public void removeOldEntries() {
@@ -123,7 +125,7 @@ public class OrderLimit implements BUListener {
 
     @Override
     public void subscribe() {
-        init();
+        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     public record OrderLimitEntry(@Getter double price, @Getter ZonedDateTime time) {

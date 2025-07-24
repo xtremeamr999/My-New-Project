@@ -15,15 +15,14 @@ public class BazaarEventHandler {
 
     public static final int ORDER_FILLED_NOTIFICATIONS = 2; // number of notifications to send when an order becomes outdated
 
-
     @EventHandler
-    private void onAnyOrder(BazaarChatEvent event) {
+    private static void onAnyOrder(BazaarChatEvent event) {
 //        SoundUtil.notifyMultipleTimes(4);
         PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
     }
 
     @EventHandler
-    private void onOrderCreated(BazaarChatEvent event) {
+    private static void onOrderCreated(BazaarChatEvent event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED))
             return;
         OrderData order = event.order();
@@ -32,7 +31,7 @@ public class BazaarEventHandler {
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     @EventHandler
-    private void onInstaSell(BazaarChatEvent event) {
+    private static void onInstaSell(BazaarChatEvent event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
             return;
         OrderData order = event.order();
@@ -46,7 +45,7 @@ public class BazaarEventHandler {
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     @EventHandler
-    private void onInstaBuy(BazaarChatEvent event) {
+    private static void onInstaBuy(BazaarChatEvent event) {
         if (!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_BUY))
             return;
         OrderData order = event.order();
@@ -57,7 +56,7 @@ public class BazaarEventHandler {
     }
 
     @EventHandler
-    private void onOrderFilled(BazaarChatEvent event) {
+    private static void onOrderFilled(BazaarChatEvent event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
             return;
         if (BUConfig.get().isOrderFilledSound()) {

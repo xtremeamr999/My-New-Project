@@ -35,10 +35,10 @@ public class ChatHandler {
 
     private static boolean shouldIgnoreMessage(Text message) {
         String messageString = message.getString();
-        return !message.getString().contains("[Bazaar]") || message.getSiblings().isEmpty() ||
-                messageString.contains("[Bazaar]") || messageString.contains("escrow")
+        return !messageString.contains("[Bazaar]") || message.getSiblings().isEmpty()
                 || messageString.contains("Submitting") || messageString.contains("Executing")
-                || messageString.contains("Claiming") || messageString.contains("Cancelled");
+                || messageString.contains("Claiming") || messageString.contains("Cancelled")
+                || messageString.contains("escrow") || messageString.contains("Cancelling");
     }
 
     @RunOnInit
