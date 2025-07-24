@@ -8,7 +8,7 @@ plugins {
 }
 
 group = property("maven_group")!!
-version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
+version = "v" + property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
 
 base {
     archivesName.set(property("mod.id").toString())

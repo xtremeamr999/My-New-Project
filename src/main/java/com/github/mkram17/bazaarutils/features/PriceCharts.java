@@ -5,7 +5,6 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -106,7 +105,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
 
     private boolean shouldShow(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        return (screenInfo.inBazaar() || showOutsideBazaar) && !screenInfo.inBazaarMainPage();
+        return (screenInfo.inBazaar() || showOutsideBazaar) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
     }
 
     public Option<Boolean> createOption() {

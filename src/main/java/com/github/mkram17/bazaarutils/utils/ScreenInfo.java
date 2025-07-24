@@ -3,9 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import lombok.Getter;
-import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -23,9 +21,25 @@ public class ScreenInfo implements BUListener {
     @Getter
     private static final List<ScreenInfo> previousScreenInfos = new ArrayList<>();
 
+    public enum BazaarMenuType {
+        BUY_ORDER("How many do you want?"),
+        INSTA_BUY("➜ Insta"),
+        ORDER_SCREEN("Bazaar Orders"),
+        SELL_SETUP("At what price are you selling?"),
+        CONFIRM_SELL_OFFER("Confirm Sell Offer"),
+        CONFIRM_BUY_OFFER("Confirm Buy Order"),
+        ORDER_PRICE("How much do you want to pay?"),
+        FLIP_GUI("Order options"),
+        BAZAAR_MAIN_PAGE("Bazaar ➜ "),
+        BAZAAR_SETTINGS_PAGE("Settings"),
+        ITEM_GROUP_PAGE("➜");
 
-    public static void initializeScreenInfo(Screen screen){
-        currentScreenInfo = new ScreenInfo(screen);
+        @Getter
+        private final String titleString;
+
+        BazaarMenuType(String titleString) {
+            this.titleString = titleString;
+        }
     }
 
     public ScreenInfo(Screen screen) {
@@ -57,78 +71,30 @@ public class ScreenInfo implements BUListener {
         EVENT_BUS.subscribe(this);
     }
 
-    public boolean inBuyOrderScreen(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("How many do you want?");
-    }
-    public boolean inInstaBuy(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("➜ Insta");
-    }
-    public boolean inOrderScreen(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("Bazaar Orders");
-    }
-    public boolean inSellSetup(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("At what price are you selling?");
-    }
-    public boolean inConfirmSellOffer(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("Confirm Sell Offer");
-    }
-    public boolean inConfirmBuyOffer(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("Confirm Buy Order");
-    }
-    public boolean inOrderPrice(){
-        if(getContainerName() == null) return false;
-        return getContainerName().contains("How much do you want to pay?");
-    }
-
-
-    public boolean inFlipGui() {
-        if (getContainerName() == null) {
-            return false;
+    /*
+    * returns true if the user is in any of the specified types of bazaar menus
+    */
+    public boolean inMenu(BazaarMenuType... types) {
+        for (BazaarMenuType bazaarMenuType : types) {
+            if (getContainerName().contains(bazaarMenuType.getTitleString())) {
+                return true;
+            }
         }
-        return getContainerName().contains("Order options");
-    }
-
-    public boolean inBazaarMainPage(){
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Bazaar ➜ ") && !inBazaarSettingsPage();
-    }
-    public boolean inBazaarSettingsPage(){
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("Bazaar") && getContainerName().contains("Settings");
-    }
-    public boolean inItemGroupPage(){
-        if (getContainerName() == null) {
-            return false;
-        }
-        return getContainerName().contains("➜") && previousScreenHas(ScreenInfo::inBazaarMainPage);
+        return false;
     }
 
     public boolean inBazaar(){
-        if(getContainerName() == null)
-            return false;
-        return inBuyOrderScreen() || inFlipGui()
-                || inInstaBuy() || inBazaarMainPage()
-                || inOrderScreen() || inSellSetup()
-                || inConfirmSellOffer() || inConfirmBuyOffer()
-                || inOrderPrice() || inItemGroupPage();
+        return inMenu(BazaarMenuType.BUY_ORDER, BazaarMenuType.FLIP_GUI,
+                BazaarMenuType.INSTA_BUY, BazaarMenuType.BAZAAR_MAIN_PAGE,
+                BazaarMenuType.ORDER_SCREEN, BazaarMenuType.SELL_SETUP,
+                BazaarMenuType.CONFIRM_SELL_OFFER, BazaarMenuType.CONFIRM_BUY_OFFER,
+                BazaarMenuType.ORDER_PRICE, BazaarMenuType.ITEM_GROUP_PAGE);
     }
 
     //only for specific items
     public boolean inAnyItemScreen(){
-        if(getContainerName() == null || getContainerName().contains("Bazaar")) return false;
-        return inItemGroupPage()
-                || inBuyOrderScreen()
-                || inInstaBuy();
+        if(inMenu(BazaarMenuType.BAZAAR_MAIN_PAGE)) return false;
+        return inMenu(BazaarMenuType.ITEM_GROUP_PAGE, BazaarMenuType.BUY_ORDER, BazaarMenuType.INSTA_BUY);
     }
 
     public String getContainerName(){

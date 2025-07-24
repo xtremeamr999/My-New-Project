@@ -35,7 +35,7 @@ public class ItemUpdater {
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent e) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!screenInfo.inOrderScreen()) return;
+        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
 
         lowerChestInventory = e.getLowerChestInventory();
         List<ItemStack> orderScreen = e.getItemStacks();

@@ -71,7 +71,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!(screenInfo.inBuyOrderScreen() || screenInfo.inInstaBuy()) || !isEnabled())
+        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY) || !isEnabled())
             return;
 
         if (event.getSlotId() != slotNumber)
@@ -87,7 +87,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!(screenInfo.inBuyOrderScreen() || screenInfo.inInstaBuy()) || !isEnabled())
+        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY) || !isEnabled())
             return;
 
         if (event.slot.getIndex() != slotNumber)

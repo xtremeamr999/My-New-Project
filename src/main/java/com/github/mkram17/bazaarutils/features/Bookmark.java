@@ -171,7 +171,7 @@ public class Bookmark extends CustomItemButton {
     private static String findNameFromContainer(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         String containerName = screenInfo.getContainerName();
-        if(screenInfo.inInstaBuy()) {
+        if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         }
         if(screenInfo.inAnyItemScreen())
@@ -218,7 +218,7 @@ public class Bookmark extends CustomItemButton {
     public static List<ItemSlotButtonWidget> getWidgets(){
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        boolean isTargetScreen = screenInfo.inBazaarMainPage();
+        boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
 
         if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();

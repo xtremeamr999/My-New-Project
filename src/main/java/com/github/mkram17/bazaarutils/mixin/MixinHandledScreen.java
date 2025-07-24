@@ -108,7 +108,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inOrderScreen() || !slot.hasStack())
+		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN) || !slot.hasStack())
 			return;
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;

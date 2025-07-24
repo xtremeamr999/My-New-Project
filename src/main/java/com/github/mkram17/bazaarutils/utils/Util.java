@@ -75,7 +75,6 @@ public class Util {
         }
     }
 
-    //TODO switch from null throwables to creating a new one for better logging because it shows where it happened
     public static void notifyError(String message, Throwable e) {
         String callingName = getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);

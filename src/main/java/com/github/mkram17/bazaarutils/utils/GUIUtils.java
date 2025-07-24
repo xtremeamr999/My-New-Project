@@ -46,8 +46,9 @@ public class GUIUtils {
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
-            if(screen != null && ScreenInfo.getCurrentScreenInfo() == null)
-                ScreenInfo.initializeScreenInfo(screen);
+            ScreenInfo currentInfo = ScreenInfo.getCurrentScreenInfo();
+            if(screen != null && currentInfo == null)
+                currentInfo = new ScreenInfo(screen);
         });
     }
 

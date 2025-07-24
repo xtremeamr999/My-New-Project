@@ -11,16 +11,16 @@ import java.lang.annotation.Target;
  * Marks a static method to be called automatically during mod initialization.
  * The method must be public, static, and take no arguments.
  */
-@Retention(RetentionPolicy.RUNTIME) // Important: Must be available at RUNTIME for scanning
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface RunOnInit {
     @Getter
     public enum EVENT_PRIORITIES {
-        LOWEST(0),
-        LOW(1),
+        LOWEST(4),
+        LOW(3),
         NORMAL(2),
-        HIGH(3),
-        HIGHEST(4);
+        HIGH(1),
+        HIGHEST(0);
 
         private final int value;
 
