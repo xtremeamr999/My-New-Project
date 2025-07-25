@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;

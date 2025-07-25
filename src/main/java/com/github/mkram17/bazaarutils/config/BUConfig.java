@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
@@ -60,7 +60,7 @@ public class BUConfig {
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
-    public List<OrderData> watchedOrders = new CopyOnWriteArrayList<>(); // the user's orders
+    public List<OrderData> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry

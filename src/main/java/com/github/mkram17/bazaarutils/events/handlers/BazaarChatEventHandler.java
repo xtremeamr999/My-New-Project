@@ -11,7 +11,7 @@ import meteordevelopment.orbit.EventHandler;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public class BazaarEventHandler {
+public class BazaarChatEventHandler {
 
     public static final int ORDER_FILLED_NOTIFICATIONS = 2; // number of notifications to send when an order becomes outdated
 
@@ -42,7 +42,6 @@ public class BazaarEventHandler {
         //order limit does not count the tax
         BUConfig.get().orderLimit.addOrderToLimit(totalPriceBeforeTax);
         PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
-        //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     @EventHandler
     private static void onInstaBuy(BazaarChatEvent event) {
@@ -64,7 +63,7 @@ public class BazaarEventHandler {
         }
 
         OrderData order = event.order();
-        boolean foundOrderMatch = order.findOrderInList(BUConfig.get().watchedOrders).isPresent();
+        boolean foundOrderMatch = order.findOrderInList(BUConfig.get().userOrders).isPresent();
         if (foundOrderMatch) {
             order.setFilled();
             PlayerActionUtil.notifyAll(order.getName() + "[" + order.getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
@@ -76,6 +75,6 @@ public class BazaarEventHandler {
 
     @RunOnInit
     public static void subscribe() {
-        EVENT_BUS.subscribe(BazaarEventHandler.class);
+        EVENT_BUS.subscribe(BazaarChatEventHandler.class);
     }
 }

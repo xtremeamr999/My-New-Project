@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface RunOnInit {
     @Getter
-    public enum EVENT_PRIORITIES {
+    enum EVENT_PRIORITIES {
         LOWEST(4),
         LOW(3),
         NORMAL(2),
@@ -30,7 +30,7 @@ public @interface RunOnInit {
     }
     /**
      * The priority of the initialization method. Lower values run first.
-     * @return the priority, defaults to 0.
+     * @return the priority, defaults to 2.
      */
     EVENT_PRIORITIES priority() default EVENT_PRIORITIES.NORMAL;
 }

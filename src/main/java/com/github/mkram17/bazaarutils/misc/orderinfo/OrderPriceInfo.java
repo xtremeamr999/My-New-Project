@@ -1,9 +1,12 @@
 package com.github.mkram17.bazaarutils.misc.orderinfo;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.concurrent.TimeUnit;
 
 public class OrderPriceInfo {
     @Getter
@@ -40,6 +43,14 @@ public class OrderPriceInfo {
     public OrderPriceInfo(double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
         this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
+    }
+
+    private void schedulePriceUpdates() {
+        long START_DELAY_SECONDS = 0;
+        long CHECK_INTERVAL_SECONDS = 1;
+        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
+
+        }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
     public void updateMarketPrice(String productId) {

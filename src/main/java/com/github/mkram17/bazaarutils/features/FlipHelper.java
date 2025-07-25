@@ -4,6 +4,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
@@ -69,7 +70,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
         try {
             ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
-            Optional<OrderData> orderOptional = matchToWatchedOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
+            Optional<OrderData> orderOptional = matchToUserOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
             if (orderOptional.isEmpty()) {
                 return;
             }
@@ -193,13 +194,13 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         return Optional.empty();
     }
 
-    private Optional<OrderData> matchToWatchedOrder(LoreComponent lore) {
+    private Optional<OrderData> matchToUserOrder(LoreComponent lore) {
         Optional<OrderPriceInfo> priceInfoOpt = getOrderPriceInfo(lore);
         Optional<Integer> orderVolumeFilledOpt = getVolumeUnclaimed(lore);
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             OrderData tempOrder = new OrderData(null, orderVolumeFilledOpt.get(), priceInfoOpt.get());
-            return tempOrder.findOrderInList(BUConfig.get().watchedOrders);
+            return tempOrder.findOrderInList(BUConfig.get().userOrders);
         }
         return Optional.empty();
     }

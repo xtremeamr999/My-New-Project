@@ -100,7 +100,7 @@ public class Util {
         if(item == null)
             return;
         assert item.getProductID() != null;
-        BUConfig.get().watchedOrders.add(item);
+        BUConfig.get().userOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item.toString(), notificationTypes.ORDERDATA);
         scheduleConfigSave();
     }

@@ -262,7 +262,7 @@ public class ChatHandler {
             item = new OrderData(itemName, null, itemPriceInfo);
         }
 
-        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().watchedOrders);
+        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
@@ -290,7 +290,7 @@ public class ChatHandler {
         OrderPriceInfo priceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTABUY);
         OrderData item = new OrderData(name, volume, priceInfo);
 
-        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().watchedOrders);
+        Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + name, Util.notificationTypes.ORDERDATA);

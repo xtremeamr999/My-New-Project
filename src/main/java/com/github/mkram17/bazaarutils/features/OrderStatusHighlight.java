@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
-import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -34,7 +34,7 @@ public class OrderStatusHighlight implements BUListener {
     }
 
     private static List<OrderData> getHighlightedOrders() {
-        return BUConfig.get().watchedOrders.stream()
+        return BUConfig.get().userOrders.stream()
                 .filter(order -> order.getItemInfo() != null
                         && order.getItemInfo().slotIndex() != null)
                 .toList();

@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.events.BUListener;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
@@ -21,7 +20,7 @@ import java.util.function.Function;
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData implements BUListener {
+public class OrderData {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
@@ -64,12 +63,15 @@ public class OrderData implements BUListener {
         if (productID == null && name != null) {
             Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
         }
+        startActions();
     }
 
     public OrderData(String name, Integer volume, OrderPriceInfo priceInfo, OrderItemInfo itemInfo) {
         this(name, volume, priceInfo);
         this.itemInfo = itemInfo;
     }
+
+
 
     private double calculateTolerance() {
         //default tolerance
@@ -86,7 +88,7 @@ public class OrderData implements BUListener {
     }
 
     public int getIndex() {
-        return BUConfig.get().watchedOrders.indexOf(this);
+        return BUConfig.get().userOrders.indexOf(this);
     }
 
     @Override
@@ -118,10 +120,9 @@ public class OrderData implements BUListener {
     }
 
 
-
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<OrderData, T> variable) {
-        return BUConfig.get().watchedOrders.stream()
+        return BUConfig.get().userOrders.stream()
             .map(variable)
             .toList();
     }
@@ -221,11 +222,6 @@ public class OrderData implements BUListener {
         priceInfo.updateMarketPrice(productID);
     }
 
-    @Override
-    public void subscribe() {
-        scheduleHealthCheck();
-    }
-
     private void scheduleHealthCheck() {
         long START_DELAY_SECONDS = 60;
         long CHECK_INTERVAL_SECONDS = 30;
@@ -234,6 +230,11 @@ public class OrderData implements BUListener {
                    Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
                 }
         }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
+    }
+
+
+    public void startActions(){
+        scheduleHealthCheck();
     }
 
     //returns true if productID is safe/fixed after run, and false if it is not
@@ -295,7 +296,7 @@ public class OrderData implements BUListener {
     }
 
     public void removeFromWatchedItems() {
-        if (!BUConfig.get().watchedOrders.remove(this)) {
+        if (!BUConfig.get().userOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
         Util.scheduleConfigSave();

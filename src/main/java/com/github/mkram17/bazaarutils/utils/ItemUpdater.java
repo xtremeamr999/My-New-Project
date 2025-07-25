@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
@@ -48,11 +49,11 @@ public class ItemUpdater {
                 .map(ItemUpdater::parseOrderFromItemStack)
                 .toList();
 
-        BUConfig.get().watchedOrders.clear();
+        BUConfig.get().userOrders.clear();
         for (OrderData item : foundOrders) {
             Util.addWatchedOrder(item);
         }
-        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
+        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE));
     }
 
     private static OrderData parseOrderFromItemStack(ItemStack stack) {

@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.data;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -12,10 +13,12 @@ import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
 //TODO more efficient timing of api requests
 public class BazaarData{
 
-    private static SkyBlockBazaarReply bazaarReply = null;
+    private static SkyBlockBazaarReply bazaarReply;
     private static int bazaarDataPeriod = 1;
     private static int exceptionCount = 0;
     private static int bazaarCalls = 0;
@@ -52,9 +55,7 @@ public class BazaarData{
                         return;
                     }
                     bazaarReply = reply;
-                    if (!BUConfig.get().watchedOrders.isEmpty()) {
-                        BUConfig.get().outdatedOrderHandler.postOutdatedOrderEvents();
-                    }
+                    EVENT_BUS.post(new BazaarDataUpdateEvent(bazaarReply));
                 }
             });
         }, bazaarDataDelay, 1, TimeUnit.SECONDS);

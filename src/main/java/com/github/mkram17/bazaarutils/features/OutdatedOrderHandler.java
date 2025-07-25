@@ -1,8 +1,10 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
-import com.github.mkram17.bazaarutils.events.BUListener;
+import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.OutdatedOrderEvent;
+import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
+import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -17,15 +19,13 @@ import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
-public class OutdatedOrderHandler implements BUListener {
-    public List<OrderData> outdatedOrders = new ArrayList<>(Collections.emptyList());
+public class OutdatedOrderHandler {
 
     public static final int OUTDATED_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
 
@@ -36,46 +36,33 @@ public class OutdatedOrderHandler implements BUListener {
     @Getter @Setter
     private boolean notificationSound;
 
-
     public OutdatedOrderHandler(boolean autoOpenEnabled, boolean notifyOutdated) {
         this.autoOpenEnabled = autoOpenEnabled;
         this.notifyOutdated = notifyOutdated;
         this.notificationSound = true;
     }
 
-    public void postOutdatedOrderEvents() {
-        List<OrderData> previouslyOutdated = new ArrayList<>(this.outdatedOrders);
-        this.outdatedOrders = getOutdatedOrders();
-
-        // find newly outdated orders (in current list but not in previous)
-        for (OrderData currentOrder : this.outdatedOrders) {
-            if(!BUConfig.get().watchedOrders.contains(currentOrder)) {
-                continue;
-            }
-
-            if (currentOrder.findOrderInList(previouslyOutdated).isEmpty()) {
-                EVENT_BUS.post(new OutdatedOrderEvent(currentOrder, true));
-            }
-        }
-
-        // find orders that are no longer outdated (in previous list but not in current)
-        for (OrderData previousOrder : previouslyOutdated) {
-            if(!BUConfig.get().watchedOrders.contains(previousOrder)) {
-                continue;
-            }
-
-            if (previousOrder.findOrderInList(this.outdatedOrders).isEmpty()) {
-                if (previousOrder.getFillStatus() == OrderData.statuses.SET) {
-                    EVENT_BUS.post(new OutdatedOrderEvent(previousOrder, false));
-                }
-            }
-        }
+    @RunOnInit
+    public static void subscribe() {
+        EVENT_BUS.subscribe(OutdatedOrderHandler.class);
     }
 
-    private static List<OrderData> getOutdatedOrders() {
-        return BUConfig.get().watchedOrders.stream()
-                .filter(order -> order.getOutdatedStatus() == OrderData.statuses.OUTDATED)
-                .toList();
+    @EventHandler
+    private static void onBazaarDataUpdate(BazaarDataUpdateEvent e) {
+        if (BUConfig.get().userOrders.isEmpty()) {
+            return;
+        }
+
+        List<OrderData> outdatedOrders = getOutdatedOrders();
+        postOutdatedOrderEvents(outdatedOrders);
+    }
+
+    @EventHandler
+    private static void onUserOrderChange(UserOrdersChangeEvent e) {
+        if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE)
+            return;
+        List<OrderData> outdatedOrders = getOutdatedOrders();
+        postOutdatedOrderEvents(outdatedOrders);
     }
 
     @EventHandler
@@ -136,6 +123,25 @@ public class OutdatedOrderHandler implements BUListener {
             PlayerActionUtil.runCommand("managebazaarorders");
         });
     }
+
+    public static void postOutdatedOrderEvents(List<OrderData> currentOutdatedOrders) {
+        List<OrderData> previouslyOutdatedOrders = new ArrayList<>(currentOutdatedOrders);
+        // find newly outdated orders (in current list but not in previous)
+        currentOutdatedOrders.stream().filter(currentOutdatedOrder -> currentOutdatedOrder.findOrderInList(previouslyOutdatedOrders).isEmpty()).forEach(order -> {
+            EVENT_BUS.post(new OutdatedOrderEvent(order, true));
+        });
+        // find orders that are no longer outdated (in previous list but not in current)
+        previouslyOutdatedOrders.stream().filter(previouslyOutdatedOrder -> previouslyOutdatedOrder.findOrderInList(currentOutdatedOrders).isEmpty()).forEach(order -> {
+            EVENT_BUS.post(new OutdatedOrderEvent(order, false));
+        });
+    }
+
+    public static List<OrderData> getOutdatedOrders() {
+        return BUConfig.get().userOrders.stream()
+                .filter(order -> order.getOutdatedStatus() == OrderData.statuses.OUTDATED && order.getFillStatus() != OrderData.statuses.FILLED)
+                .toList();
+    }
+
     public Collection<Option<Boolean>> createOptions() {
         ArrayList<Option<Boolean>> options = new ArrayList<>();
         options.add(Option.<Boolean>createBuilder()
@@ -163,10 +169,5 @@ public class OutdatedOrderHandler implements BUListener {
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         return options;
-    }
-
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
     }
 }

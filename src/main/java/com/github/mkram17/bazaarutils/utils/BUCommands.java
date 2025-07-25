@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
+import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
@@ -38,7 +39,7 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
-                        for (OrderData item : BUConfig.get().outdatedOrderHandler.outdatedOrders) {
+                        for (OrderData item : OutdatedOrderHandler.getOutdatedOrders()) {
                             PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getPriceInfo().getMarketPrice() + " Order Price: " + item.getPriceInfo().getPricePerItem());
                         }
                         return 1;
@@ -255,15 +256,15 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        String itemInfo = BUConfig.get().watchedOrders.get(index).toString();
-        BUConfig.get().watchedOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
+        String itemInfo = BUConfig.get().userOrders.get(index).toString();
+        BUConfig.get().userOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
         PlayerActionUtil.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
         return 1;
     }
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        PlayerActionUtil.notifyAll(BUConfig.get().watchedOrders.get(index).toString());
+        PlayerActionUtil.notifyAll(BUConfig.get().userOrders.get(index).toString());
         return 1;
     }
 }
