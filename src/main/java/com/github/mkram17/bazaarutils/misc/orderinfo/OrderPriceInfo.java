@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class OrderPriceInfo {
@@ -54,9 +55,15 @@ public class OrderPriceInfo {
         }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
-    public void updateMarketPrice(String productId) {
-        marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
-        marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
+    public void updateMarketPrices(String productId) {
+        Optional<Double> priceOpt = BazaarData.findItemPrice(productId, priceType);
+        Optional<Double> oppositePriceOpt = BazaarData.findItemPrice(productId, priceType.getOpposite());
+        if (priceOpt.isEmpty() || oppositePriceOpt.isEmpty()) {
+            Util.notifyError("Could not find price for product: " + productId, new Throwable());
+            return;
+        }
+        marketPrice = Util.getPrettyNumber(priceOpt.get());
+        marketOppositePrice = Util.getPrettyNumber(oppositePriceOpt.get());
     }
 
     public void flipPrices(double newPrice){

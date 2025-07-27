@@ -6,10 +6,9 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
@@ -18,7 +17,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -50,7 +48,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (slot == null) return;
 
 		//for insta sell rules
-		RestrictSell sell = BUConfig.get().restrictSell;
+		InstaSellRestrictions sell = BUConfig.get().instaSellRestrictions;
 		if (sell.isSlotLocked(slotId)) {
 			if (sell.getSafetyClicks() < 3) {
 				sell.addSafetyClick();

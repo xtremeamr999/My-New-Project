@@ -16,6 +16,7 @@ import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +54,13 @@ public class MaxBuyOrder extends CustomOrder {
             if(productID == null)
                 return;
 
-            double cost = BazaarData.findItemPrice(productID, OrderPriceInfo.priceTypes.INSTASELL) + .1;//.1 is for lowest competitive price
+            Optional<Double> priceOpt = BazaarData.findItemPrice(productID, OrderPriceInfo.priceTypes.INSTASELL);
+            if(priceOpt.isEmpty()) {
+                Util.notifyError("Could not find price for item: " + name, new Throwable());
+                return;
+            }
+
+            double cost = priceOpt.get() + .1;//.1 is for lowest competitive price
 
             int amountCanBuy = (int) (Math.floor(purse / cost));
             super.setOrderAmount(Math.min(amountCanBuy, 71680));

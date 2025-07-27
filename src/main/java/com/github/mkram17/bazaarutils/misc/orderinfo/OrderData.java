@@ -219,7 +219,7 @@ public class OrderData {
     }
 
     public void updateMarketPrice() {
-        priceInfo.updateMarketPrice(productID);
+        priceInfo.updateMarketPrices(productID);
     }
 
     private void scheduleHealthCheck() {

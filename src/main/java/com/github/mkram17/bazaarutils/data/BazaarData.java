@@ -11,6 +11,7 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.JsonObject;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
@@ -97,16 +98,16 @@ public class BazaarData{
         }
     }
 
-    public static Double findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
+    public static Optional<Double> findItemPrice(String productId, OrderPriceInfo.priceTypes priceType) {
         if (bazaarReply == null) {
             Util.notifyError("Bazaar data is null", new Throwable());
-            return -1.0;
+            return Optional.empty();
         }
         try {
             SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
             if (product == null) {
                 Util.logError("Could not find item using product ID: " + productId, null);
-                return -1.0;
+                return Optional.empty();
             }
 
             var sell_order_summary = product.getBuySummary();
@@ -115,24 +116,24 @@ public class BazaarData{
             if (priceType == OrderPriceInfo.priceTypes.INSTABUY) {
                 if (sell_order_summary.isEmpty()) {
                     PlayerActionUtil.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
-                    return 0.0;
+                    return Optional.of(0.0);
                 }
                 double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
-                return sellOrderPrice;
+                return Optional.of(sellOrderPrice);
             } else if (priceType == OrderPriceInfo.priceTypes.INSTASELL) {
                 if (buy_order_summary.isEmpty()) {
                     PlayerActionUtil.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
-                    return 0.0;
+                    return Optional.of(0.0);
                 }
                 double buyOrderPrice = buy_order_summary.getFirst().getPricePerUnit();
-                return buyOrderPrice;
+                return Optional.of(buyOrderPrice);
             }
         } catch (Exception e) {
             Util.notifyError("There was an error fetching product data (probably caused by incorrect product ID [" + productId + "])", e);
-            return -1.0;
+            return Optional.empty();
         }
         // Should not be reached if priceType is INSTASELL or INSTABUY
-        return null;
+        return Optional.empty();
     }
 
     //returns null if it cant find anything, gets product id from natural name
