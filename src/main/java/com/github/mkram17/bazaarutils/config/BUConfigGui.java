@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.config;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -47,21 +47,21 @@ public class BUConfigGui {
             generalBuilder.option(createAmecsDownloadButton());
         }
 
-        generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
+        generalBuilder.group(buildRestrictSellGroup(config.instaSellRestrictions));
         generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
 
         builder.category(generalBuilder.build());
     }
 
-    private static OptionGroup buildRestrictSellGroup(RestrictSell restrictSell) {
+    private static OptionGroup buildRestrictSellGroup(InstaSellRestrictions instaSellRestrictions) {
         OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
                 .name(Text.literal("Sell rules"))
                 .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
 
-        if (restrictSell.getControls().isEmpty()) {
-            restrictSell.addRule(RestrictSell.restrictBy.PRICE, 1000000);
+        if (instaSellRestrictions.getControls().isEmpty()) {
+            instaSellRestrictions.addRule(InstaSellRestrictions.restrictBy.PRICE, 1000000);
         }
-        restrictSell.buildOptions(restrictSellGroupBuilder);
+        instaSellRestrictions.buildOptions(restrictSellGroupBuilder);
 
         return restrictSellGroupBuilder.build();
     }
