@@ -47,18 +47,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	private void onHandleMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
 		if (slot == null) return;
 
-		//for insta sell rules
-		InstaSellRestrictions sell = BUConfig.get().instaSellRestrictions;
-		if (sell.isSlotLocked(slotId)) {
-			if (sell.getSafetyClicks() < 3) {
-				sell.addSafetyClick();
-				PlayerActionUtil.notifyAll(sell.getMessage());
-				ci.cancel();
-			} else {
-				sell.resetSafetyClicks();
-			}
-		}
-
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
 		BazaarUtils.EVENT_BUS.post(event);

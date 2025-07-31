@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -12,13 +11,13 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
@@ -117,6 +116,21 @@ public class GUIUtils {
             Util.notifyError("Error encountered while closing screen with custom method", e);
             throw new RuntimeException(e);
         }
+    }
+    //TODO switch to using ItemStack instead of OrderData so it's faster
+    public static int getSlotFromItemStack(Inventory lowerChestInventory, ItemStack itemStack) {
+        if (lowerChestInventory == null)
+            return -1;
+
+        for (int i = 0; i < lowerChestInventory.size(); i++) {
+            ItemStack inventoryStack = lowerChestInventory.getStack(i);
+            if (!inventoryStack.isEmpty()) {
+                if (inventoryStack.equals(itemStack)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     public static void closeSign(){

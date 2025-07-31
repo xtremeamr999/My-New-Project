@@ -143,24 +143,8 @@ public class ItemUpdater {
     }
 
     private static OrderItemInfo findItemInfo(ItemStack itemStack) {
-        int inventoryIndex = mapScreenIndexToInventoryIndex(itemStack);
+        int inventoryIndex = GUIUtils.getSlotFromItemStack(lowerChestInventory, itemStack);
         return new OrderItemInfo(inventoryIndex, itemStack);
-    }
-
-    //TODO switch to using ItemStack instead of OrderData so it's faster
-    private static int mapScreenIndexToInventoryIndex(ItemStack itemStack) {
-        if (lowerChestInventory == null)
-            return -1;
-
-        for (int i = 0; i < lowerChestInventory.size(); i++) {
-            ItemStack inventoryStack = lowerChestInventory.getStack(i);
-            if (!inventoryStack.isEmpty()) {
-                if (inventoryStack.equals(itemStack)) {
-                    return i;
-                }
-            }
-        }
-        return -1;
     }
 
     private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks) {
