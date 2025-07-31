@@ -2,10 +2,11 @@ package com.github.mkram17.bazaarutils.features.restrictsell;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
-import com.github.mkram17.bazaarutils.utils.instasell.InstaSellItem;
-import com.github.mkram17.bazaarutils.utils.instasell.InstaSellUtil;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -18,7 +19,6 @@ import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -27,18 +27,12 @@ public class InstaSellRestrictions implements BUListener {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
-    private final int safetyClicksRequired;
+    private int safetyClicksRequired;
     @Getter @Setter
     private ArrayList<SellRestrictionControl> controls;
     @Getter
     private int safetyClicks = 0;
-
-    public void addSafetyClick(){
-        safetyClicks++;
-    }
-    public void resetSafetyClicks(){
-        safetyClicks = 0;
-    }
+    private boolean blockClicks;
 
     public InstaSellRestrictions(boolean enabled, int safetyClicksRequired, ArrayList<SellRestrictionControl> controls) {
         this.enabled = enabled;
@@ -48,6 +42,7 @@ public class InstaSellRestrictions implements BUListener {
     private void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             safetyClicks = 0;
+            blockClicks = true;
         });
     }
     @EventHandler
@@ -55,13 +50,26 @@ public class InstaSellRestrictions implements BUListener {
         if (!enabled || !ScreenInfo.getCurrentScreenInfo().inBazaar())
             return;
 
-        List<InstaSellItem> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        List<OrderData> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        blockClicks = shouldRestrictInstaSell(items);
     }
 
-    private boolean shouldRestrictInstaSell(List<InstaSellItem> items){
-        List<String> names = items.stream().map(InstaSellItem::name).toList();
-        List<Double> prices = items.stream().map(instaSellItem -> instaSellItem.priceInfo().getPricePerItem()).toList();
-        return isRestrictedByNames(names) || isRestrictedByPrices(prices);
+    @EventHandler
+    private void onClick(SlotClickEvent clickEvent){
+        if(!enabled || blockClicks)
+            return;
+        if (safetyClicks < safetyClicksRequired) {
+            safetyClicks++;
+            PlayerActionUtil.notifyAll(getMessage());
+            clickEvent.cancel();
+        }
+    }
+
+    private boolean shouldRestrictInstaSell(List<OrderData> items){
+        List<String> names = items.stream().map(OrderData::getName).toList();
+        List<Double> prices = items.stream().map(instaSellItem -> instaSellItem.getPriceInfo().getPricePerItem()).toList();
+        List<Integer> volumes = items.stream().map(OrderData::getVolume).toList();
+        return isRestrictedByNames(names) || isRestrictedByPrices(prices) || isRestrictedByVolume(volumes);
     }
 
     private boolean isRestrictedByNames(List<String> names){
@@ -80,6 +88,15 @@ public class InstaSellRestrictions implements BUListener {
                 .toList();
         return priceRestrictions.stream()
                 .anyMatch(prices::contains);
+    }
+    private boolean isRestrictedByVolume(List<Integer> volumes){
+        List<Double> volumeRestrictions = controls.stream()
+                .filter(sellRestrictionControl -> sellRestrictionControl.getRule() == restrictBy.VOLUME)
+                .map(SellRestrictionControl::getAmount)
+                .toList();
+        return volumeRestrictions.stream()
+                .map(Double::intValue)
+                .anyMatch(volumes::contains);
     }
 
     public void addRule(restrictBy newRule, double limit){
