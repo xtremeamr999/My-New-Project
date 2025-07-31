@@ -44,8 +44,8 @@ public class BazaarData{
                     skipNextCall = true;
                     exceptionCount++;
                     Util.notifyError("Exception thrown trying to get bazaar data", throwable);
-                    System.out.println("[Bazaar Utils] Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
-                    System.out.println("[Bazaar Utils] Status: " + APIUtils.API.getStatus(APIUtils.uuid));
+                    System.out.println(BazaarUtils.MOD_NAME + " Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
+                    System.out.println(BazaarUtils.MOD_NAME + " Status: " + APIUtils.API.getStatus(APIUtils.uuid));
                     if (exceptionCount % 5 == 0) {
                         bazaarDataPeriod++;
                     }

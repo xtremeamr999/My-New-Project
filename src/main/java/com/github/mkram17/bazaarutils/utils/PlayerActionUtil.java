@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
@@ -26,7 +27,7 @@ public class PlayerActionUtil {
     }
 
     public static void notifyAll(Text message) {
-        MutableText messageText = Text.literal("[Bazaar Utils] ").formatted(Formatting.GOLD);
+        MutableText messageText = Text.literal("[" + BazaarUtils.MOD_NAME + "]").formatted(Formatting.GOLD);
         messageText.append(message.copy());
 
         sendPlayerMessage(messageText);

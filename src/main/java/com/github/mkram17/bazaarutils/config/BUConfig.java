@@ -52,7 +52,7 @@ public class BUConfig {
 
 
     @SerialEntry
-    public String MODVERSION = "";
+    public String MOD_VERSION = "";
     @SerialEntry
     public boolean firstLoad = true;
     @SerialEntry
