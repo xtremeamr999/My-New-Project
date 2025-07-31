@@ -35,6 +35,7 @@ public class BazaarUtils implements ClientModInitializer {
     public static StashHelper stashHelper;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
+    public static final String MOD_NAME = "Bazaar Utils";
     public static boolean updatedMajorVersion = false;
     @Getter
     private static String updateNotes;
@@ -121,13 +122,13 @@ public class BazaarUtils implements ClientModInitializer {
             if (updateNotesValue != null)
                 updateNotes = updateNotesValue.getAsString();
 
-            var oldVersion = BUConfig.get().MODVERSION;
+            var oldVersion = BUConfig.get().MOD_VERSION;
             var currentVersion = metadata.getVersion().getFriendlyString();
 
             var oldVersionMajor = oldVersion.substring(oldVersion.indexOf(".")+1);
             var currentVersionMajor = currentVersion.substring(currentVersion.indexOf(".")+1);
 
-            BUConfig.get().MODVERSION = currentVersion;
+            BUConfig.get().MOD_VERSION = currentVersion;
             Util.scheduleConfigSave();
 
             if(!oldVersionMajor.equals(currentVersionMajor))

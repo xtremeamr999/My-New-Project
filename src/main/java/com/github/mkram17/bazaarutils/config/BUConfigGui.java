@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
@@ -17,7 +18,7 @@ import java.net.URISyntaxException;
 public class BUConfigGui {
     public static Screen create(Screen parent, BUConfig config) {
         return YetAnotherConfigLib.create(BUConfig.HANDLER, (defaults, cfg, builder) -> {
-            builder.title(Text.literal("Bazaar utils"));
+            builder.title(Text.literal(BazaarUtils.MOD_NAME));
 
             buildGeneralCategory(builder, config);
             buildCustomOrdersCategory(builder);
