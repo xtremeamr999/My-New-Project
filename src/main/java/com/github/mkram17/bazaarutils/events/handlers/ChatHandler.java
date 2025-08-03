@@ -101,8 +101,7 @@ public class ChatHandler {
 
             double pricePerUnit = totalPrice / volume;
 
-            OrderPriceInfo orderPriceInfo = new OrderPriceInfo(pricePerUnit, null);
-            return Optional.of(new OrderData(name, volume, orderPriceInfo));
+            return Optional.of(new OrderData(name, volume, pricePerUnit, null));
         } catch (Exception e) {
             Util.notifyError("Failed to parse order data from chat: " + siblings, e);
             return Optional.empty();
@@ -118,7 +117,7 @@ public class ChatHandler {
             int priceIndex
     ) {
         parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
-            order.setPriceInfo(new OrderPriceInfo(order.getPriceInfo().getPricePerItem(), priceType));
+            order.setPriceType(priceType);
             EVENT_BUS.post(new BazaarChatEvent(eventType, order));
         });
     }
@@ -155,8 +154,7 @@ public class ChatHandler {
             String itemName = parts[2].trim();
 
             OrderPriceInfo.priceTypes priceType = messageString.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-            OrderPriceInfo itemPriceInfo = new OrderPriceInfo(priceType);
-            OrderData item = new OrderData(itemName, volume, itemPriceInfo);
+            OrderData item = new OrderData(itemName, volume, priceType);
 
             EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -181,8 +179,7 @@ public class ChatHandler {
         }
 
         OrderPriceInfo.priceTypes priceType = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-        OrderPriceInfo priceInfo = new OrderPriceInfo(price, priceType);
-        OrderData orderToAdd = new OrderData(itemName, volume, priceInfo);
+        OrderData orderToAdd = new OrderData(itemName, volume, price, priceType);
         EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
 
@@ -254,12 +251,11 @@ public class ChatHandler {
 
         double price = totalPrice / volumeClaimed;
 
-        OrderPriceInfo itemPriceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTASELL);
         OrderData item;
         if (OrderData.getVariables(OrderData::getVolume).contains(volumeClaimed)) {
-            item = new OrderData(itemName, volumeClaimed, itemPriceInfo);
+            item = new OrderData(itemName, volumeClaimed, price, OrderPriceInfo.priceTypes.INSTASELL);
         } else {
-            item = new OrderData(itemName, null, itemPriceInfo);
+            item = new OrderData(itemName, null, price, OrderPriceInfo.priceTypes.INSTASELL);
         }
 
         Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
@@ -287,8 +283,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderPriceInfo priceInfo = new OrderPriceInfo(price, OrderPriceInfo.priceTypes.INSTABUY);
-        OrderData item = new OrderData(name, volume, priceInfo);
+        OrderData item = new OrderData(name, volume, price, OrderPriceInfo.priceTypes.INSTABUY);
 
         Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 

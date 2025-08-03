@@ -123,9 +123,8 @@ public class ItemUpdater {
         }
 
         OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-        OrderPriceInfo priceInfo = new OrderPriceInfo(unitPrice, type);
         OrderItemInfo itemInfo = findItemInfo(stack);
-        OrderData orderData = new OrderData(name, volume, priceInfo, itemInfo);
+        OrderData orderData = new OrderData(name, volume, unitPrice, type, itemInfo);
 
         orderData.setTolerance(0.0);
 

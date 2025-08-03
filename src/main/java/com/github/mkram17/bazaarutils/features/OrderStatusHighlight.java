@@ -105,7 +105,7 @@ public class OrderStatusHighlight implements BUListener {
             switch (order.getOutdatedStatus()) {
                 case OUTDATED:
                     lines.add(1, Text.literal("OUTDATED").formatted(Formatting.RED, Formatting.BOLD));
-                    lines.add(2, Text.literal("Market Price: " + OrderPriceInfo.getPrettyString(order.getPriceInfo().getMarketPrice())).formatted(Formatting.RED));
+                    lines.add(2, Text.literal("Market Price: " + OrderPriceInfo.getPrettyString(order.getMarketPrice())).formatted(Formatting.RED));
                     break;
                 case COMPETITIVE:
                     lines.add(1, Text.literal("COMPETITIVE").formatted(Formatting.GREEN, Formatting.BOLD));

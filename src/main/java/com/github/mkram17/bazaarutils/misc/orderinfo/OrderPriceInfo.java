@@ -27,9 +27,9 @@ public class OrderPriceInfo {
     }
 
     @Setter @Getter
-    private Double pricePerItem;
+    protected Double pricePerItem;
     @Setter @Getter
-    private priceTypes priceType;
+    protected priceTypes priceType;
     @Getter
     private Double marketPrice;
     //the price of the opposite type of order

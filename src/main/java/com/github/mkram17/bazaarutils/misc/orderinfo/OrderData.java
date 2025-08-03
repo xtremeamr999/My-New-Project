@@ -20,7 +20,7 @@ import java.util.function.Function;
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData {
+public class OrderData extends OrderPriceInfo {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
@@ -31,33 +31,25 @@ public class OrderData {
     private final String name; //name of the item in game
     @Getter
     private final String productID; //hypixel's code for the product
-    @Getter
-    @Setter
+    @Getter @Setter
     private statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
     @Getter
     private final Integer volume;
-    @Getter
-    @Setter
-    private int amountClaimed = 0;
-    @Getter
-    @Setter
-    private int amountFilled = 0;
-    @Getter
-    @Setter
-    private double tolerance;
     @Getter @Setter
-    private OrderPriceInfo priceInfo;
-    @Getter
-    @Setter
+    private int amountClaimed = 0;
+    @Getter @Setter
+    private int amountFilled = 0;
+    @Getter @Setter
+    private double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
+    @Getter @Setter
     private OrderItemInfo itemInfo;
 
-    //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
-    public OrderData(String name, Integer volume, OrderPriceInfo priceInfo) {
+    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType) {
+        super(pricePerItem, priceType);
         this.name = name;
         this.volume = volume;
         this.productID = BazaarData.findProductId(name);
         this.fillStatus = statuses.SET;
-        this.priceInfo = priceInfo;
         this.tolerance = calculateTolerance();
 
         if (productID == null && name != null) {
@@ -66,20 +58,38 @@ public class OrderData {
         startActions();
     }
 
-    public OrderData(String name, Integer volume, OrderPriceInfo priceInfo, OrderItemInfo itemInfo) {
-        this(name, volume, priceInfo);
+    public OrderData(String name, Integer volume, priceTypes priceType) {
+        super(priceType);
+        this.name = name;
+        this.volume = volume;
+        this.productID = BazaarData.findProductId(name);
+        this.fillStatus = statuses.SET;
+        this.tolerance = calculateTolerance();
+
+        if (productID == null && name != null) {
+            Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
+        }
+        startActions();
+    }
+
+    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType, OrderItemInfo itemInfo) {
+        this(name, volume, pricePerItem, priceType);
+        this.itemInfo = itemInfo;
+    }
+
+    public OrderData(String name, Integer volume, priceTypes priceType, OrderItemInfo itemInfo) {
+        this(name, volume, priceType);
         this.itemInfo = itemInfo;
     }
 
 
-
     private double calculateTolerance() {
         //default tolerance
-        if (priceInfo.getPricePerItem() == null || volume == null) {
+        if (pricePerItem == null || volume == null) {
             return DEFAULT_TOLERANCE;
         }
         //doesnt round prices when total is over 10k
-        if (priceInfo.getPricePerItem() * volume < TOTAL_PRICE_ROUNDING_THRESHOLD) {
+        if (pricePerItem * volume < TOTAL_PRICE_ROUNDING_THRESHOLD) {
             return 0;
         } else {
             double priceMaximumInaccuracy = DEFAULT_TOLERANCE / volume; //0.9 coins is the most that it can be off per unit and not show in places where it rounds
@@ -95,12 +105,12 @@ public class OrderData {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(name: ").append(name).append("[").append(getIndex()).append("]")
-            .append(", price:").append(priceInfo.getPricePerItem())
-            .append(", volume: ").append(volume);
+                .append(", price:").append(pricePerItem)
+                .append(", volume: ").append(volume);
         if (amountClaimed != 0) {
             sb.append(", amount claimed: ").append(amountClaimed);
         }
-        sb.append(", type: ").append(priceInfo.getPriceType().getString());
+        sb.append(", type: ").append(getPriceType().getString());
         if (fillStatus == statuses.FILLED) {
             sb.append(", status: ").append(fillStatus);
         }
@@ -109,30 +119,30 @@ public class OrderData {
     }
 
     public void flipItem(double newPrice) {
-        priceInfo.flipPrices(newPrice);
+        flipPrices(newPrice);
         this.amountFilled = 0;
         this.fillStatus = statuses.SET;
     }
 
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
     private boolean isSimilarPrice(double price) {
-        return Util.genericIsSimilarValue(priceInfo.getPricePerItem(), price, tolerance);
+        return Util.genericIsSimilarValue(pricePerItem, price, tolerance);
     }
 
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<OrderData, T> variable) {
         return BUConfig.get().userOrders.stream()
-            .map(variable)
-            .toList();
+                .map(variable)
+                .toList();
     }
 
     public boolean isSimilarTo(OrderData other, boolean isStrict) {
         String otherOrderName = other.getName();
-        Double otherOrderPrice = other.getPriceInfo().getPricePerItem();
+        Double otherOrderPrice = other.getPricePerItem();
         Integer otherOrderVolume = other.getVolume();
         int otherOrderAmountUnclaimed = other.getAmountFilled() - other.getAmountClaimed();
-        OrderPriceInfo.priceTypes priceType = other.getPriceInfo().getPriceType();
+        OrderPriceInfo.priceTypes priceType = other.getPriceType();
 
         if (isStrict) {
             return isStrictlySimilarTo(otherOrderName, otherOrderPrice, otherOrderVolume, priceType);
@@ -141,17 +151,17 @@ public class OrderData {
     }
 
     private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, OrderPriceInfo.priceTypes priceType) {
-        return (areAnyNull(this.getPriceInfo().getPricePerItem(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
-            (areAnyNull(this.getVolume(), otherOrderVolume) || this.getVolume().equals(otherOrderVolume)) &&
-            (areAnyNull(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
-            (areAnyNull(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+        return (areAnyNull(this.pricePerItem, otherOrderPrice) || isSimilarPrice(otherOrderPrice)) &&
+                (areAnyNull(this.volume, otherOrderVolume) || this.volume.equals(otherOrderVolume)) &&
+                (areAnyNull(this.name, otherOrderName) || this.name.equalsIgnoreCase(otherOrderName)) &&
+                (areAnyNull(this.priceType, priceType) || this.priceType == priceType);
     }
 
     private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, OrderPriceInfo.priceTypes priceType) {
-        return (areAnyNull(this.getPriceInfo().getPricePerItem(), otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
-            (areAnyNull(this.getVolume(), otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
-            (areAnyNull(this.getName(), otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
-            (areAnyNull(this.getPriceInfo().getPriceType(), priceType) || this.getPriceInfo().getPriceType() == priceType);
+        return (areAnyNull(this.pricePerItem, otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
+                (areAnyNull(this.volume, otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
+                (areAnyNull(this.name, otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
+                (areAnyNull(this.priceType, priceType) || this.getPriceType() == priceType);
     }
 
     private boolean areAnyNull(Object... objects) {
@@ -196,8 +206,8 @@ public class OrderData {
     */
     private OrderData findBestMatch(List<OrderData> list) {
         return list.stream()
-            .min(getVolumeThenPriceComparator())
-            .orElse(list.getFirst());
+                .min(getVolumeThenPriceComparator())
+                .orElse(list.getFirst());
     }
 
     private Comparator<OrderData> getVolumeThenPriceComparator() {
@@ -209,26 +219,26 @@ public class OrderData {
         });
 
         Comparator<OrderData> priceComparator = Comparator.comparingDouble(order -> {
-            if (areAnyNull(this.getPriceInfo().getPricePerItem(), order.getPriceInfo().getPricePerItem())) {
+            if (areAnyNull(this.pricePerItem, order.getPricePerItem())) {
                 return Double.MAX_VALUE;
             }
-            return Math.abs(order.getPriceInfo().getPricePerItem() - this.getPriceInfo().getPricePerItem());
+            return Math.abs(order.getPricePerItem() - this.pricePerItem);
         });
 
         return volumeComparator.thenComparing(priceComparator);
     }
 
     public void updateMarketPrice() {
-        priceInfo.updateMarketPrice(productID);
+        updateMarketPrice(productID);
     }
 
     private void scheduleHealthCheck() {
         long START_DELAY_SECONDS = 60;
         long CHECK_INTERVAL_SECONDS = 30;
         BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
-                if(!fixProductID()){
-                   Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
-                }
+            if(!fixProductID()){
+                Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
+            }
         }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -253,7 +263,7 @@ public class OrderData {
     }
 
     private boolean isProductIDHealthy() {
-        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, priceInfo.getPriceType()) == null);
+        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, getPriceType()) == null);
     }
 
     public statuses getOutdatedStatus() {
@@ -261,16 +271,16 @@ public class OrderData {
         if (fillStatus == statuses.FILLED) {
             return statuses.FILLED;
         }
-        if (priceInfo.getPricePerItem().equals(priceInfo.getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, priceInfo.getPriceType(), priceInfo.getPricePerItem()) > 1) {
+        if (pricePerItem.equals(getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, getPriceType(), getPricePerItem()) > 1) {
             return statuses.MATCHED;
         }
 
-        if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
-            if (priceInfo.getPricePerItem() - tolerance > priceInfo.getMarketPrice()) {
+        if (getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
+            if (pricePerItem - tolerance > getMarketPrice()) {
                 return statuses.OUTDATED;
             }
-        } else if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTASELL) {
-            if (priceInfo.getPricePerItem() + tolerance < priceInfo.getMarketPrice()) {
+        } else if (getPriceType() == OrderPriceInfo.priceTypes.INSTASELL) {
+            if (pricePerItem + tolerance < getMarketPrice()) {
                 return statuses.OUTDATED;
             }
         }
@@ -280,13 +290,13 @@ public class OrderData {
 
     public double getFlipPrice() {
         updateMarketPrice();
-        if (priceInfo.getMarketOppositePrice() == 0) {
+        if (getMarketOppositePrice() == 0) {
             return 0;
         }
-        if (priceInfo.getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
-            return (priceInfo.getMarketOppositePrice() + .1);
+        if (getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
+            return (getMarketOppositePrice() + .1);
         } else {
-            return (priceInfo.getMarketOppositePrice() - .1);
+            return (getMarketOppositePrice() - .1);
         }
     }
 

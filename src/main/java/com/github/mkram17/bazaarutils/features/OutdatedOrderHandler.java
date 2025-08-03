@@ -75,13 +75,13 @@ public class OutdatedOrderHandler {
         Text itemName = Text.literal(order.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
 
         if (e.isOutdated()) {
-            MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+            MutableText message = Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
                     .append(amount)
                     .append(itemName)
                     .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
                     .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + order.getPriceInfo().getMarketPrice() + " Order Price: " + order.getPriceInfo().getPricePerItem()));
+                message.append(Text.literal(". Market Price: " + order.getMarketPrice() + " Order Price: " + order.getPricePerItem()));
             }
             Util.tickExecuteLater(2, () -> {
                     PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
@@ -91,7 +91,7 @@ public class OutdatedOrderHandler {
                 SoundUtil.notifyMultipleTimes(OUTDATED_ORDER_NOTIFICATIONS);
             }
         } else {
-            MutableText message = Text.literal("Your " + order.getPriceInfo().getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+            MutableText message = Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
                     .append(amount)
                     .append(itemName)
                     .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
