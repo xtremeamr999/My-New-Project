@@ -12,6 +12,7 @@ import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,6 @@ import java.util.Optional;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class ChatHandler {
-    public static final ChatHandler INSTANCE = new ChatHandler();
-
     public static Option<Boolean> createOrderFilledSoundOption() {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal("Sound on Order Filled"))
@@ -45,9 +44,6 @@ public class ChatHandler {
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
-            if (shouldIgnoreMessage(message))
-                return;
-
             getMessageType(message, siblings).ifPresent(messageType -> {
                 switch (messageType) {
                     case ORDER_CREATED -> handleOrderCreated(siblings);
@@ -81,7 +77,6 @@ public class ChatHandler {
             if (identifier.contains("Bought")) return Optional.of(BazaarChatEvent.BazaarEventTypes.INSTA_BUY);
             if (identifier.contains("Cancelled")) return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED);
         }
-        Util.notifyError("Unknown message type in bazaar chat: " + message.getString(), new Throwable());
         return Optional.empty();
     }
 
@@ -258,15 +253,7 @@ public class ChatHandler {
             item = new BazaarOrder(itemName, null, price, PriceInfo.priceTypes.INSTASELL);
         }
 
-        Optional<BazaarOrder> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
-
-        if (orderOptional.isEmpty()) {
-            PlayerActionUtil.notifyAll("Could not find claimed item: " + itemName, Util.notificationTypes.ORDERDATA);
-            return Optional.empty();
-        }
-        BazaarOrder order = orderOptional.get();
-        order.setAmountClaimed(volumeClaimed);
-        return orderOptional;
+        return getBazaarOrder(item);
     }
 
     private static Optional<BazaarOrder> getClaimedSellOrder(ArrayList<Text> siblings) {
@@ -285,14 +272,18 @@ public class ChatHandler {
 
         BazaarOrder item = new BazaarOrder(name, volume, price, PriceInfo.priceTypes.INSTABUY);
 
+        return getBazaarOrder(item);
+    }
+
+    private static Optional<BazaarOrder> getBazaarOrder(BazaarOrder item) {
         Optional<BazaarOrder> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
         if (orderOptional.isEmpty()) {
-            PlayerActionUtil.notifyAll("Could not find claimed item: " + name, Util.notificationTypes.ORDERDATA);
+            PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), Util.notificationTypes.ORDERDATA);
             return Optional.empty();
         }
         BazaarOrder order = orderOptional.get();
-        order.setAmountClaimed(volume);
+        order.setAmountClaimed(item.getVolume());
         return orderOptional;
     }
 }
