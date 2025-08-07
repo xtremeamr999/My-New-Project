@@ -5,8 +5,8 @@ import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderItemInfo;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.ItemInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -122,8 +122,8 @@ public class ItemUpdater {
             }
         }
 
-        OrderPriceInfo.priceTypes type = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
-        OrderItemInfo itemInfo = findItemInfo(stack);
+        PriceInfo.priceTypes type = isSellOrder ? PriceInfo.priceTypes.INSTABUY : PriceInfo.priceTypes.INSTASELL;
+        ItemInfo itemInfo = findItemInfo(stack);
         OrderData orderData = new OrderData(name, volume, unitPrice, type, itemInfo);
 
         orderData.setTolerance(0.0);
@@ -141,9 +141,9 @@ public class ItemUpdater {
         return orderData;
     }
 
-    private static OrderItemInfo findItemInfo(ItemStack itemStack) {
+    private static ItemInfo findItemInfo(ItemStack itemStack) {
         int inventoryIndex = mapScreenIndexToInventoryIndex(itemStack);
-        return new OrderItemInfo(inventoryIndex, itemStack);
+        return new ItemInfo(inventoryIndex, itemStack);
     }
 
     //TODO switch to using ItemStack instead of OrderData so it's faster

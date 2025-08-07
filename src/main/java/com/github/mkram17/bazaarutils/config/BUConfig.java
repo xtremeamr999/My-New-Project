@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
 
 public class BUConfig {
     public static RuntimeTypeAdapterFactory<CustomOrder> customOrderAdapterFactory = RuntimeTypeAdapterFactory.of(CustomOrder.class)
@@ -111,8 +113,7 @@ public class BUConfig {
 
                  if (value instanceof BUListener) {
                      events.add((BUListener) value);
-                 }
-                 else if (value instanceof Collection) {
+                 } else if (value instanceof Collection) {
                      for (Object item : (Collection<?>) value) {
                          if (item instanceof BUListener) {
                              events.add((BUListener) item);
@@ -124,8 +125,6 @@ public class BUConfig {
              }
          }
          return events;
-
-
      }
 
      public static List<ClickableWidget> getWidgets(){

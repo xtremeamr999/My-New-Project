@@ -8,9 +8,10 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.*;
 import lombok.Getter;
@@ -95,12 +96,11 @@ public class Bookmark extends CustomItemButton {
         Util.scheduleConfigSave();
     }
 
-    public OrderPriceInfo getPriceInfo() {
+    public OrderInfo getPriceInfo() {
         if (name == null)
             return null;
-        OrderPriceInfo priceInfo = new OrderPriceInfo(0.0, OrderPriceInfo.priceTypes.INSTABUY);
+        OrderInfo priceInfo = new OrderInfo(name, 0.0, PriceInfo.priceTypes.INSTABUY);
 
-        priceInfo.updateMarketPrice(BazaarData.findProductId(name));
         if (priceInfo.getPricePerItem() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
             PlayerActionUtil.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
             return null;
@@ -241,7 +241,7 @@ public class Bookmark extends CustomItemButton {
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
                 MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
-                OrderPriceInfo priceInfo = bookmark.getPriceInfo();
+                OrderInfo priceInfo = bookmark.getPriceInfo();
 
                 if (priceInfo != null) {
                     Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);

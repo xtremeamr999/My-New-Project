@@ -20,17 +20,13 @@ import java.util.function.Function;
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData extends OrderPriceInfo {
+public class OrderData extends OrderInfo {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
 
     public enum statuses {SET, FILLED, OUTDATED, COMPETITIVE, MATCHED}
 
-    @Getter
-    private final String name; //name of the item in game
-    @Getter
-    private final String productID; //hypixel's code for the product
     @Getter @Setter
     private statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
     @Getter
@@ -40,49 +36,21 @@ public class OrderData extends OrderPriceInfo {
     @Getter @Setter
     private int amountFilled = 0;
     @Getter @Setter
-    private double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
+    private ItemInfo itemInfo;
     @Getter @Setter
-    private OrderItemInfo itemInfo;
+    private double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
 
     public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType) {
-        super(pricePerItem, priceType);
-        this.name = name;
+        super(name, pricePerItem, priceType);
         this.volume = volume;
-        this.productID = BazaarData.findProductId(name);
         this.fillStatus = statuses.SET;
         this.tolerance = calculateTolerance();
-
-        if (productID == null && name != null) {
-            Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
-        }
-        startActions();
     }
 
-    public OrderData(String name, Integer volume, priceTypes priceType) {
-        super(priceType);
-        this.name = name;
-        this.volume = volume;
-        this.productID = BazaarData.findProductId(name);
-        this.fillStatus = statuses.SET;
-        this.tolerance = calculateTolerance();
-
-        if (productID == null && name != null) {
-            Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
-        }
-        startActions();
-    }
-
-    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType, OrderItemInfo itemInfo) {
+    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
         this(name, volume, pricePerItem, priceType);
         this.itemInfo = itemInfo;
     }
-
-    public OrderData(String name, Integer volume, priceTypes priceType, OrderItemInfo itemInfo) {
-        this(name, volume, priceType);
-        this.itemInfo = itemInfo;
-    }
-
-
     private double calculateTolerance() {
         //default tolerance
         if (pricePerItem == null || volume == null) {
@@ -96,6 +64,7 @@ public class OrderData extends OrderPriceInfo {
             return (Math.round(priceMaximumInaccuracy * 10)) / 10.0;
         }
     }
+
 
     public int getIndex() {
         return BUConfig.get().userOrders.indexOf(this);
@@ -129,7 +98,6 @@ public class OrderData extends OrderPriceInfo {
         return Util.genericIsSimilarValue(pricePerItem, price, tolerance);
     }
 
-
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<OrderData, T> variable) {
         return BUConfig.get().userOrders.stream()
@@ -142,7 +110,7 @@ public class OrderData extends OrderPriceInfo {
         Double otherOrderPrice = other.getPricePerItem();
         Integer otherOrderVolume = other.getVolume();
         int otherOrderAmountUnclaimed = other.getAmountFilled() - other.getAmountClaimed();
-        OrderPriceInfo.priceTypes priceType = other.getPriceType();
+        PriceInfo.priceTypes priceType = other.getPriceType();
 
         if (isStrict) {
             return isStrictlySimilarTo(otherOrderName, otherOrderPrice, otherOrderVolume, priceType);
@@ -150,14 +118,14 @@ public class OrderData extends OrderPriceInfo {
         return isLooselySimilarTo(otherOrderName, otherOrderPrice, otherOrderVolume, otherOrderAmountUnclaimed, priceType);
     }
 
-    private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, OrderPriceInfo.priceTypes priceType) {
+    private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, PriceInfo.priceTypes priceType) {
         return (areAnyNull(this.pricePerItem, otherOrderPrice) || isSimilarPrice(otherOrderPrice)) &&
                 (areAnyNull(this.volume, otherOrderVolume) || this.volume.equals(otherOrderVolume)) &&
                 (areAnyNull(this.name, otherOrderName) || this.name.equalsIgnoreCase(otherOrderName)) &&
                 (areAnyNull(this.priceType, priceType) || this.priceType == priceType);
     }
 
-    private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, OrderPriceInfo.priceTypes priceType) {
+    private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, PriceInfo.priceTypes priceType) {
         return (areAnyNull(this.pricePerItem, otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
                 (areAnyNull(this.volume, otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
                 (areAnyNull(this.name, otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&
@@ -228,46 +196,8 @@ public class OrderData extends OrderPriceInfo {
         return volumeComparator.thenComparing(priceComparator);
     }
 
-    public void updateMarketPrice() {
-        updateMarketPrice(productID);
-    }
-
-    private void scheduleHealthCheck() {
-        long START_DELAY_SECONDS = 60;
-        long CHECK_INTERVAL_SECONDS = 30;
-        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
-            if(!fixProductID()){
-                Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
-            }
-        }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
-    }
-
-
-    public void startActions(){
-        scheduleHealthCheck();
-    }
-
-    //returns true if productID is safe/fixed after run, and false if it is not
-    private boolean fixProductID() {
-        if (isProductIDHealthy()) {
-            return true;
-        }
-        String newProductID = BazaarData.findProductId(name);
-        if (newProductID == null) {
-            Util.logError("While refinding product id, could not find product ID for " + name, null);
-            return false;
-        } else {
-            Util.logMessage("Successfully fixed product ID for " + name + ": " + newProductID);
-            return true;
-        }
-    }
-
-    private boolean isProductIDHealthy() {
-        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, getPriceType()) == null);
-    }
-
     public statuses getOutdatedStatus() {
-        updateMarketPrice();
+        updateMarketPrice(productID);
         if (fillStatus == statuses.FILLED) {
             return statuses.FILLED;
         }
@@ -275,11 +205,11 @@ public class OrderData extends OrderPriceInfo {
             return statuses.MATCHED;
         }
 
-        if (getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
+        if (getPriceType() == PriceInfo.priceTypes.INSTABUY) {
             if (pricePerItem - tolerance > getMarketPrice()) {
                 return statuses.OUTDATED;
             }
-        } else if (getPriceType() == OrderPriceInfo.priceTypes.INSTASELL) {
+        } else if (getPriceType() == PriceInfo.priceTypes.INSTASELL) {
             if (pricePerItem + tolerance < getMarketPrice()) {
                 return statuses.OUTDATED;
             }
@@ -289,11 +219,11 @@ public class OrderData extends OrderPriceInfo {
     }
 
     public double getFlipPrice() {
-        updateMarketPrice();
+        updateMarketPrice(productID);
         if (getMarketOppositePrice() == 0) {
             return 0;
         }
-        if (getPriceType() == OrderPriceInfo.priceTypes.INSTABUY) {
+        if (getPriceType() == PriceInfo.priceTypes.INSTABUY) {
             return (getMarketOppositePrice() + .1);
         } else {
             return (getMarketOppositePrice() - .1);

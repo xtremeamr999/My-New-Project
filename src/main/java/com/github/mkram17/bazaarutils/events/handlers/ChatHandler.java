@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -111,7 +111,7 @@ public class ChatHandler {
     private static void processOrderEvent(
             ArrayList<Text> siblings,
             BazaarChatEvent.BazaarEventTypes eventType,
-            OrderPriceInfo.priceTypes priceType,
+            PriceInfo.priceTypes priceType,
             int volumeIndex,
             int nameIndex,
             int priceIndex
@@ -123,21 +123,21 @@ public class ChatHandler {
     }
 
     public static void handleFlip(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, OrderPriceInfo.priceTypes.INSTABUY, 3, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, PriceInfo.priceTypes.INSTABUY, 3, 4, 6);
     }
 
     public static void handleCancelled(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, OrderPriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, PriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaSell(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, OrderPriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, PriceInfo.priceTypes.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaBuy(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, OrderPriceInfo.priceTypes.INSTABUY, 2, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, PriceInfo.priceTypes.INSTABUY, 2, 4, 6);
     }
 
     private static void handleFilled(Text message) {
@@ -153,7 +153,7 @@ public class ChatHandler {
             int volume = Integer.parseInt(parts[1].replace(",", ""));
             String itemName = parts[2].trim();
 
-            OrderPriceInfo.priceTypes priceType = messageString.contains("Sell Offer") ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
+            PriceInfo.priceTypes priceType = messageString.contains("Sell Offer") ? PriceInfo.priceTypes.INSTABUY : PriceInfo.priceTypes.INSTASELL;
             OrderData item = new OrderData(itemName, volume, priceType);
 
             EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
@@ -178,7 +178,7 @@ public class ChatHandler {
             price /= ((100 - BUConfig.get().bzTax) / 100);
         }
 
-        OrderPriceInfo.priceTypes priceType = isSellOrder ? OrderPriceInfo.priceTypes.INSTABUY : OrderPriceInfo.priceTypes.INSTASELL;
+        PriceInfo.priceTypes priceType = isSellOrder ? PriceInfo.priceTypes.INSTABUY : PriceInfo.priceTypes.INSTASELL;
         OrderData orderToAdd = new OrderData(itemName, volume, price, priceType);
         EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
@@ -253,9 +253,9 @@ public class ChatHandler {
 
         OrderData item;
         if (OrderData.getVariables(OrderData::getVolume).contains(volumeClaimed)) {
-            item = new OrderData(itemName, volumeClaimed, price, OrderPriceInfo.priceTypes.INSTASELL);
+            item = new OrderData(itemName, volumeClaimed, price, PriceInfo.priceTypes.INSTASELL);
         } else {
-            item = new OrderData(itemName, null, price, OrderPriceInfo.priceTypes.INSTASELL);
+            item = new OrderData(itemName, null, price, PriceInfo.priceTypes.INSTASELL);
         }
 
         Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
@@ -283,7 +283,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderData item = new OrderData(name, volume, price, OrderPriceInfo.priceTypes.INSTABUY);
+        OrderData item = new OrderData(name, volume, price, PriceInfo.priceTypes.INSTABUY);
 
         Optional<OrderData> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 

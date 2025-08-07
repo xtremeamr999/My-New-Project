@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.concurrent.TimeUnit;
 
-public class OrderPriceInfo {
+public class PriceInfo {
     @Getter
     public enum priceTypes{INSTASELL,INSTABUY;
         private priceTypes opposite;
@@ -36,24 +36,14 @@ public class OrderPriceInfo {
     @Getter @Setter
     private Double marketOppositePrice;
 
-    public OrderPriceInfo(priceTypes priceType) {
-        this.priceType = priceType;
-    }
-
-    public OrderPriceInfo(double pricePerItem, priceTypes priceType) {
+    public PriceInfo(double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
         this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
     }
 
-    private void schedulePriceUpdates() {
-        long START_DELAY_SECONDS = 0;
-        long CHECK_INTERVAL_SECONDS = 1;
-        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
 
-        }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
-    }
 
-    public void updateMarketPrice(String productId) {
+    protected void updateMarketPrice(String productId) {
         marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
         marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
     }
