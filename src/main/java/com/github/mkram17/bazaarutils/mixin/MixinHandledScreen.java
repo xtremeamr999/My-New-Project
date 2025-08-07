@@ -114,9 +114,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
 		if(order == null)
 			return;
-		BazaarOrder.statuses orderStatus = order.getOutdatedStatus();
+		BazaarOrder.statuses orderStatus = order.getOutbidStatus();
 
-		if (orderStatus == BazaarOrder.statuses.COMPETITIVE || orderStatus == BazaarOrder.statuses.OUTDATED || orderStatus == BazaarOrder.statuses.MATCHED) {
+		if (orderStatus == BazaarOrder.statuses.COMPETITIVE || orderStatus == BazaarOrder.statuses.OUTBID || orderStatus == BazaarOrder.statuses.MATCHED) {
 			draw(context, slot.x, slot.y, orderStatus);
 		}
 	}
@@ -126,7 +126,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		final float r, g, b;
 		if (orderStatus == BazaarOrder.statuses.COMPETITIVE) {
 			r = 0.0f; g = 1.0f; b = 0.0f; // Green
-		} else if (orderStatus == BazaarOrder.statuses.OUTDATED) {
+		} else if (orderStatus == BazaarOrder.statuses.OUTBID) {
 			r = 1.0f; g = 0.0f; b = 0.0f; // Red
 		} else { // MATCHED
 			r = 1.0f; g = 1.0f; b = 0.0f; // Yellow

@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
-import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
+import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -39,7 +39,7 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
-                        for (BazaarOrder item : OutdatedOrderHandler.getOutdatedOrders()) {
+                        for (BazaarOrder item : OutbidOrderHandler.getOutdatedOrders()) {
                             PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice() + " Order Price: " + item.getPricePerItem());
                         }
                         return 1;

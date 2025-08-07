@@ -23,7 +23,7 @@ public class BazaarOrder extends OrderInfo {
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
 
-    public enum statuses {SET, FILLED, OUTDATED, COMPETITIVE, MATCHED}
+    public enum statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
 
     @Getter @Setter
     private statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
@@ -194,7 +194,7 @@ public class BazaarOrder extends OrderInfo {
         return volumeComparator.thenComparing(priceComparator);
     }
 
-    public statuses getOutdatedStatus() {
+    public statuses getOutbidStatus() {
         updateMarketPrice(productID);
         if (fillStatus == statuses.FILLED) {
             return statuses.FILLED;
@@ -205,11 +205,11 @@ public class BazaarOrder extends OrderInfo {
 
         if (getPriceType() == PriceInfo.priceTypes.INSTABUY) {
             if (pricePerItem - tolerance > getMarketPrice()) {
-                return statuses.OUTDATED;
+                return statuses.OUTBID;
             }
         } else if (getPriceType() == PriceInfo.priceTypes.INSTASELL) {
             if (pricePerItem + tolerance < getMarketPrice()) {
-                return statuses.OUTDATED;
+                return statuses.OUTBID;
             }
         }
 

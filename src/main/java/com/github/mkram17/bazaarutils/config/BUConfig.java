@@ -68,7 +68,7 @@ public class BUConfig {
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
-    public OutdatedOrderHandler outdatedOrderHandler = new OutdatedOrderHandler(false, true);
+    public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
     public RestrictSell restrictSell = new RestrictSell(true, 3, new ArrayList<>(List.of(new RestrictSellControl(RestrictSell.restrictBy.PRICE, 1000000))));

@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
-import com.github.mkram17.bazaarutils.events.OutdatedOrderEvent;
+import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -25,26 +25,26 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
-public class OutdatedOrderHandler {
+public class OutbidOrderHandler {
 
-    public static final int OUTDATED_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
+    public static final int OUTBID_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
 
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter
-    private boolean notifyOutdated;
+    private boolean notifyOutbid;
     @Getter @Setter
     private boolean notificationSound;
 
-    public OutdatedOrderHandler(boolean autoOpenEnabled, boolean notifyOutdated) {
+    public OutbidOrderHandler(boolean autoOpenEnabled, boolean notifyOutbid) {
         this.autoOpenEnabled = autoOpenEnabled;
-        this.notifyOutdated = notifyOutdated;
+        this.notifyOutbid = notifyOutbid;
         this.notificationSound = true;
     }
 
     @RunOnInit
     public static void subscribe() {
-        EVENT_BUS.subscribe(OutdatedOrderHandler.class);
+        EVENT_BUS.subscribe(OutbidOrderHandler.class);
     }
 
     @EventHandler
@@ -66,15 +66,15 @@ public class OutdatedOrderHandler {
     }
 
     @EventHandler
-    public void onOutdated(OutdatedOrderEvent e){
+    public void onOutbid(OutbidOrderEvent e){
         BazaarOrder order = e.getOrder();
-        if(!notifyOutdated)
+        if(!notifyOutbid)
             return;
 
         Text amount = Text.literal(order.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
         Text itemName = Text.literal(order.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
 
-        if (e.isOutdated()) {
+        if (e.isOutbid()) {
             MutableText message = Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
                     .append(amount)
                     .append(itemName)
@@ -88,7 +88,7 @@ public class OutdatedOrderHandler {
             });
 
             if (notificationSound) {
-                SoundUtil.notifyMultipleTimes(OUTDATED_ORDER_NOTIFICATIONS);
+                SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
             }
         } else {
             MutableText message = Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
@@ -103,7 +103,7 @@ public class OutdatedOrderHandler {
     }
 
     @EventHandler
-    public void openBazaarOnOutdated(OutdatedOrderEvent e) {
+    public void openBazaarOnOutdated(OutbidOrderEvent e) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         if(screenInfo.inBazaar() || !autoOpenEnabled)
             return;
@@ -128,17 +128,17 @@ public class OutdatedOrderHandler {
         List<BazaarOrder> previouslyOutdatedOrders = new ArrayList<>(currentOutdatedOrders);
         // find newly outdated orders (in current list but not in previous)
         currentOutdatedOrders.stream().filter(currentOutdatedOrder -> currentOutdatedOrder.findOrderInList(previouslyOutdatedOrders).isEmpty()).forEach(order -> {
-            EVENT_BUS.post(new OutdatedOrderEvent(order, true));
+            EVENT_BUS.post(new OutbidOrderEvent(order, true));
         });
         // find orders that are no longer outdated (in previous list but not in current)
         previouslyOutdatedOrders.stream().filter(previouslyOutdatedOrder -> previouslyOutdatedOrder.findOrderInList(currentOutdatedOrders).isEmpty()).forEach(order -> {
-            EVENT_BUS.post(new OutdatedOrderEvent(order, false));
+            EVENT_BUS.post(new OutbidOrderEvent(order, false));
         });
     }
 
     public static List<BazaarOrder> getOutdatedOrders() {
         return BUConfig.get().userOrders.stream()
-                .filter(order -> order.getOutdatedStatus() == BazaarOrder.statuses.OUTDATED && order.getFillStatus() != BazaarOrder.statuses.FILLED)
+                .filter(order -> order.getOutbidStatus() == BazaarOrder.statuses.OUTBID && order.getFillStatus() != BazaarOrder.statuses.FILLED)
                 .toList();
     }
 
@@ -156,8 +156,8 @@ public class OutdatedOrderHandler {
                 .name(Text.literal("Chat Notification on Outdated Orders"))
                 .description(OptionDescription.of(Text.literal("Sends a message in chat when someone has undercut your order.")))
                 .binding(true,
-                        this::isNotifyOutdated,
-                        this::setNotifyOutdated)
+                        this::isNotifyOutbid,
+                        this::setNotifyOutbid)
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
