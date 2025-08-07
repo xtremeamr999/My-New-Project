@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutdatedOrderHandler;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -39,14 +39,14 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
-                        for (OrderData item : OutdatedOrderHandler.getOutdatedOrders()) {
+                        for (BazaarOrder item : OutdatedOrderHandler.getOutdatedOrders()) {
                             PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice() + " Order Price: " + item.getPricePerItem());
                         }
                         return 1;
                     }),
             ClientCommandManager.literal("list")
                     .executes(context -> {
-                                PlayerActionUtil.notifyAll(OrderData.getVariables(OrderData::getName).toString());
+                                PlayerActionUtil.notifyAll(BazaarOrder.getVariables(BazaarOrder::getName).toString());
                                 return 1;
                             }
                     )

@@ -6,7 +6,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.Option;
@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 
 public class BUConfig {
@@ -62,7 +60,7 @@ public class BUConfig {
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
-    public List<OrderData> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
+    public List<BazaarOrder> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry

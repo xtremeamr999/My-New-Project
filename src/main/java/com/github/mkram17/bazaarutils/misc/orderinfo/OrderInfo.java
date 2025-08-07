@@ -19,7 +19,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
     @Getter
     protected final String productID; //Hypixel's code for the product
 
-    public OrderInfo(String name, double pricePerItem, priceTypes priceType) {
+    public OrderInfo(String name, Double pricePerItem, priceTypes priceType) {
         super(pricePerItem, priceType);
         this.name = name;
         this.productID = BazaarData.findProductId(name);

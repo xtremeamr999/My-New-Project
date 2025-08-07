@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.OutdatedOrderEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
@@ -53,7 +53,7 @@ public class OutdatedOrderHandler {
             return;
         }
 
-        List<OrderData> outdatedOrders = getOutdatedOrders();
+        List<BazaarOrder> outdatedOrders = getOutdatedOrders();
         postOutdatedOrderEvents(outdatedOrders);
     }
 
@@ -61,13 +61,13 @@ public class OutdatedOrderHandler {
     private static void onUserOrderChange(UserOrdersChangeEvent e) {
         if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE)
             return;
-        List<OrderData> outdatedOrders = getOutdatedOrders();
+        List<BazaarOrder> outdatedOrders = getOutdatedOrders();
         postOutdatedOrderEvents(outdatedOrders);
     }
 
     @EventHandler
     public void onOutdated(OutdatedOrderEvent e){
-        OrderData order = e.getOrder();
+        BazaarOrder order = e.getOrder();
         if(!notifyOutdated)
             return;
 
@@ -124,8 +124,8 @@ public class OutdatedOrderHandler {
         });
     }
 
-    public static void postOutdatedOrderEvents(List<OrderData> currentOutdatedOrders) {
-        List<OrderData> previouslyOutdatedOrders = new ArrayList<>(currentOutdatedOrders);
+    public static void postOutdatedOrderEvents(List<BazaarOrder> currentOutdatedOrders) {
+        List<BazaarOrder> previouslyOutdatedOrders = new ArrayList<>(currentOutdatedOrders);
         // find newly outdated orders (in current list but not in previous)
         currentOutdatedOrders.stream().filter(currentOutdatedOrder -> currentOutdatedOrder.findOrderInList(previouslyOutdatedOrders).isEmpty()).forEach(order -> {
             EVENT_BUS.post(new OutdatedOrderEvent(order, true));
@@ -136,9 +136,9 @@ public class OutdatedOrderHandler {
         });
     }
 
-    public static List<OrderData> getOutdatedOrders() {
+    public static List<BazaarOrder> getOutdatedOrders() {
         return BUConfig.get().userOrders.stream()
-                .filter(order -> order.getOutdatedStatus() == OrderData.statuses.OUTDATED && order.getFillStatus() != OrderData.statuses.FILLED)
+                .filter(order -> order.getOutdatedStatus() == BazaarOrder.statuses.OUTDATED && order.getFillStatus() != BazaarOrder.statuses.FILLED)
                 .toList();
     }
 

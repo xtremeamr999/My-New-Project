@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.ItemInfo;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import meteordevelopment.orbit.EventHandler;
@@ -45,18 +45,18 @@ public class ItemUpdater {
     }
 
     private static void updateWatchedItems(List<ItemStack> orderStacks) {
-        List<OrderData> foundOrders = orderStacks.stream()
+        List<BazaarOrder> foundOrders = orderStacks.stream()
                 .map(ItemUpdater::parseOrderFromItemStack)
                 .toList();
 
         BUConfig.get().userOrders.clear();
-        for (OrderData item : foundOrders) {
+        for (BazaarOrder item : foundOrders) {
             Util.addWatchedOrder(item);
         }
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE));
     }
 
-    private static OrderData parseOrderFromItemStack(ItemStack stack) {
+    private static BazaarOrder parseOrderFromItemStack(ItemStack stack) {
         String customName = stack.getName().getString();
         Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
@@ -124,21 +124,21 @@ public class ItemUpdater {
 
         PriceInfo.priceTypes type = isSellOrder ? PriceInfo.priceTypes.INSTABUY : PriceInfo.priceTypes.INSTASELL;
         ItemInfo itemInfo = findItemInfo(stack);
-        OrderData orderData = new OrderData(name, volume, unitPrice, type, itemInfo);
+        BazaarOrder bazaarOrder = new BazaarOrder(name, volume, unitPrice, type, itemInfo);
 
-        orderData.setTolerance(0.0);
+        bazaarOrder.setTolerance(0.0);
 
         if (amountFilled > -1) {
-            orderData.setAmountFilled(amountFilled);
+            bazaarOrder.setAmountFilled(amountFilled);
             if (Util.genericIsSimilarValue(amountFilled, volume, volume*.05)) {
-                orderData.setFilled();
+                bazaarOrder.setFilled();
             }
         }
         if (amountClaimed > -1) {
-            orderData.setAmountClaimed(amountClaimed);
+            bazaarOrder.setAmountClaimed(amountClaimed);
         }
 
-        return orderData;
+        return bazaarOrder;
     }
 
     private static ItemInfo findItemInfo(ItemStack itemStack) {

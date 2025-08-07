@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import dev.isxander.yacl3.api.Option;
@@ -33,14 +33,14 @@ public class OrderStatusHighlight implements BUListener {
         this.enabled = enabled;
     }
 
-    private static List<OrderData> getHighlightedOrders() {
+    private static List<BazaarOrder> getHighlightedOrders() {
         return BUConfig.get().userOrders.stream()
                 .filter(order -> order.getItemInfo() != null
                         && order.getItemInfo().slotIndex() != null)
                 .toList();
     }
 
-    public static OrderData getHighlightedOrder(int slotIndex) {
+    public static BazaarOrder getHighlightedOrder(int slotIndex) {
         return getHighlightedOrders().stream()
                 .filter(order -> order.getItemInfo().slotIndex() == slotIndex)
                 .findFirst()
@@ -97,7 +97,7 @@ public class OrderStatusHighlight implements BUListener {
             if(index == -1)
                 return;
 
-            OrderData order = getHighlightedOrder(index);
+            BazaarOrder order = getHighlightedOrder(index);
             if (order == null) {
                 return;
             }

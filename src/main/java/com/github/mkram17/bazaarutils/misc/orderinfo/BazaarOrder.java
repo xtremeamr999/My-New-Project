@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.misc.orderinfo;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -13,14 +12,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 @Slf4j
-public class OrderData extends OrderInfo {
+public class BazaarOrder extends OrderInfo {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
@@ -40,14 +38,14 @@ public class OrderData extends OrderInfo {
     @Getter @Setter
     private double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
 
-    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType) {
+    public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType) {
         super(name, pricePerItem, priceType);
         this.volume = volume;
         this.fillStatus = statuses.SET;
         this.tolerance = calculateTolerance();
     }
 
-    public OrderData(String name, Integer volume, double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
+    public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
         this(name, volume, pricePerItem, priceType);
         this.itemInfo = itemInfo;
     }
@@ -99,13 +97,13 @@ public class OrderData extends OrderInfo {
     }
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
-    public static <T> List<T> getVariables(Function<OrderData, T> variable) {
+    public static <T> List<T> getVariables(Function<BazaarOrder, T> variable) {
         return BUConfig.get().userOrders.stream()
                 .map(variable)
                 .toList();
     }
 
-    public boolean isSimilarTo(OrderData other, boolean isStrict) {
+    public boolean isSimilarTo(BazaarOrder other, boolean isStrict) {
         String otherOrderName = other.getName();
         Double otherOrderPrice = other.getPricePerItem();
         Integer otherOrderVolume = other.getVolume();
@@ -141,8 +139,8 @@ public class OrderData extends OrderInfo {
         return false;
     }
 
-    public Optional<OrderData> findOrderInList(List<OrderData> list) {
-        List<OrderData> itemList = findAllMatchesInList(list);
+    public Optional<BazaarOrder> findOrderInList(List<BazaarOrder> list) {
+        List<BazaarOrder> itemList = findAllMatchesInList(list);
         if (itemList.size() > 1) {
             return Optional.of(findBestMatch(itemList));
         }
@@ -152,15 +150,15 @@ public class OrderData extends OrderInfo {
         return Optional.of(itemList.getFirst());
     }
 
-    public List<OrderData> findAllMatchesInList(List<OrderData> list) {
-        List<OrderData> itemList = new ArrayList<>();
-        for (OrderData item : list) {
+    public List<BazaarOrder> findAllMatchesInList(List<BazaarOrder> list) {
+        List<BazaarOrder> itemList = new ArrayList<>();
+        for (BazaarOrder item : list) {
             if (this.isSimilarTo(item, true)) {
                 itemList.add(item);
             }
         }
         if (itemList.isEmpty()) {
-            for (OrderData item : list) {
+            for (BazaarOrder item : list) {
                 if (this.isSimilarTo(item, false)) {
                     itemList.add(item);
                 }
@@ -172,21 +170,21 @@ public class OrderData extends OrderInfo {
     /* Used for when there are duplicate matches found and the best should be chosen to use.
     Typically, volume is the variable that is different, but it can also be price
     */
-    private OrderData findBestMatch(List<OrderData> list) {
+    private BazaarOrder findBestMatch(List<BazaarOrder> list) {
         return list.stream()
                 .min(getVolumeThenPriceComparator())
                 .orElse(list.getFirst());
     }
 
-    private Comparator<OrderData> getVolumeThenPriceComparator() {
-        Comparator<OrderData> volumeComparator = Comparator.comparingDouble(order -> {
+    private Comparator<BazaarOrder> getVolumeThenPriceComparator() {
+        Comparator<BazaarOrder> volumeComparator = Comparator.comparingDouble(order -> {
             if (areAnyNull(this.getVolume(), order.getVolume())) {
                 return Double.MAX_VALUE;
             }
             return Math.abs(order.getVolume() - this.getVolume());
         });
 
-        Comparator<OrderData> priceComparator = Comparator.comparingDouble(order -> {
+        Comparator<BazaarOrder> priceComparator = Comparator.comparingDouble(order -> {
             if (areAnyNull(this.pricePerItem, order.getPricePerItem())) {
                 return Double.MAX_VALUE;
             }
