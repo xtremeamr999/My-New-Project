@@ -81,7 +81,6 @@ public class GUIUtils {
         lowerChestInventory = e.getLowerChestInventory();
     }
 
-    //there's some fuck ass recursion happening here from player.closeHandledScreen() and idrk why
     public static void closeHandledScreen() {
         try {
             PlayerActionUtil.notifyAll("Closing gui", Util.notificationTypes.GUI);
@@ -95,7 +94,6 @@ public class GUIUtils {
 
             client.execute(GUIUtils::customCloseHandledScreen);
         } catch (Exception e) {
-            e.printStackTrace();
             Util.notifyError("Error closing gui", e);
         }
     }

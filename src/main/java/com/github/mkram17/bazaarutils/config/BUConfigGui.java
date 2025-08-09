@@ -36,7 +36,7 @@ public class BUConfigGui {
                 .name(Text.literal("General"));
 
         generalBuilder.option(config.flipHelper.createOption());
-        generalBuilder.options(config.outdatedOrderHandler.createOptions());
+        generalBuilder.options(config.outbidOrderHandler.createOptions());
         generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
         generalBuilder.option(config.stashMessages.createOption());
         generalBuilder.option(config.priceCharts.createOption());

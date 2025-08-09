@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import lombok.AllArgsConstructor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.text.ClickEvent;
@@ -97,7 +97,7 @@ public class Util {
     }
 
 
-    public static void addWatchedOrder(OrderData item){
+    public static void addWatchedOrder(BazaarOrder item){
         if(item == null)
             return;
         assert item.getProductID() != null;

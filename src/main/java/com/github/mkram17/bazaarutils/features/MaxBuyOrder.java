@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderPriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -54,7 +54,7 @@ public class MaxBuyOrder extends CustomOrder {
             if(productID == null)
                 return;
 
-            Optional<Double> priceOpt = BazaarData.findItemPrice(productID, OrderPriceInfo.priceTypes.INSTASELL);
+            Optional<Double> priceOpt = BazaarData.findItemPrice(productID, PriceInfo.priceTypes.INSTASELL);
             if(priceOpt.isEmpty()) {
                 Util.notifyError("Could not find price for item: " + name, new Throwable());
                 return;

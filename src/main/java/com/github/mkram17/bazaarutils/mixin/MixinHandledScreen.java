@@ -8,7 +8,7 @@ import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
@@ -99,22 +99,22 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		OrderData order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
+		BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
 		if(order == null)
 			return;
-		OrderData.statuses orderStatus = order.getOutdatedStatus();
+		BazaarOrder.statuses orderStatus = order.getOutbidStatus();
 
-		if (orderStatus == OrderData.statuses.COMPETITIVE || orderStatus == OrderData.statuses.OUTDATED || orderStatus == OrderData.statuses.MATCHED) {
+		if (orderStatus == BazaarOrder.statuses.COMPETITIVE || orderStatus == BazaarOrder.statuses.OUTBID || orderStatus == BazaarOrder.statuses.MATCHED) {
 			draw(context, slot.x, slot.y, orderStatus);
 		}
 	}
 
 	@Unique
-	protected void draw(DrawContext context, int x, int y, OrderData.statuses orderStatus) {
+	protected void draw(DrawContext context, int x, int y, BazaarOrder.statuses orderStatus) {
 		final float r, g, b;
-		if (orderStatus == OrderData.statuses.COMPETITIVE) {
+		if (orderStatus == BazaarOrder.statuses.COMPETITIVE) {
 			r = 0.0f; g = 1.0f; b = 0.0f; // Green
-		} else if (orderStatus == OrderData.statuses.OUTDATED) {
+		} else if (orderStatus == BazaarOrder.statuses.OUTBID) {
 			r = 1.0f; g = 0.0f; b = 0.0f; // Red
 		} else { // MATCHED
 			r = 1.0f; g = 1.0f; b = 0.0f; // Yellow

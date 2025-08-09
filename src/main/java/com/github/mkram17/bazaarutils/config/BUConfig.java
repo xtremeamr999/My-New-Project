@@ -6,7 +6,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestriction
 import com.github.mkram17.bazaarutils.features.restrictsell.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.Option;
@@ -60,7 +60,7 @@ public class BUConfig {
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, 17);
     @SerialEntry
-    public List<OrderData> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
+    public List<BazaarOrder> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry
@@ -68,7 +68,7 @@ public class BUConfig {
     @SerialEntry
     public boolean developerMode = false;
     @SerialEntry
-    public OutdatedOrderHandler outdatedOrderHandler = new OutdatedOrderHandler(false, true);
+    public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
     public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, 3, new ArrayList<>(List.of(new SellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000))));
@@ -113,8 +113,7 @@ public class BUConfig {
 
                  if (value instanceof BUListener) {
                      events.add((BUListener) value);
-                 }
-                 else if (value instanceof Collection) {
+                 } else if (value instanceof Collection) {
                      for (Object item : (Collection<?>) value) {
                          if (item instanceof BUListener) {
                              events.add((BUListener) item);
@@ -126,8 +125,6 @@ public class BUConfig {
              }
          }
          return events;
-
-
      }
 
      public static List<ClickableWidget> getWidgets(){
