@@ -18,7 +18,9 @@ jobs:
       issues: write
 
     env:
-      OUTPUT_FILE: conversionupdating/bazaar-conversions.json
+      OUTPUT_DIR: conversionupdating
+      OUTPUT_FILE: bazaar-conversions.json
+      OUTPUT_PATH: conversionupdating/bazaar-conversions.json
       SCRIPT_PATH: scripts/generate-bazaar-conversions.ts
       WORKDIR: conversionupdating
 
@@ -32,9 +34,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-            node-version: '20'
-            cache: 'npm'
-            cache-dependency-path: conversionupdating/package-lock.json
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: conversionupdating/package-lock.json
 
       - name: Install dependencies
         working-directory: ${{ env.WORKDIR }}
@@ -59,11 +61,15 @@ jobs:
           echo "File size / preview:"
           ls -lh "$OUTPUT_FILE"
           head -n 20 "$OUTPUT_FILE" || true
+        env:
+          SCRIPT_PATH: ${{ env.SCRIPT_PATH }}
 
       - name: Fail if file missing or empty
+        working-directory: ${{ env.WORKDIR }}
         run: |
           if [ ! -s "$OUTPUT_FILE" ]; then
-            echo "ERROR: $OUTPUT_FILE missing or empty"
+            echo "ERROR: $OUTPUT_FILE missing or empty (pwd=$(pwd))"
+            ls -al .
             exit 1
           fi
 
@@ -73,35 +79,38 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const file = process.env.OUTPUT_FILE;
-            const raw = fs.readFileSync(file, 'utf8');
+            const file = process.env.OUTPUT_PATH; // root-relative
+            if (!fs.existsSync(file)) {
+              core.setFailed(`Expected file not found: ${file}`);
+              return;
+            }
             let json;
             try {
-              json = JSON.parse(raw);
+              json = JSON.parse(fs.readFileSync(file, 'utf8'));
             } catch (e) {
               core.setFailed(`Failed to parse JSON in ${file}: ${e.message}`);
               return;
             }
             const count = Object.keys(json).length;
             core.setOutput('count', String(count));
-
             await core.summary
               .addHeading('Bazaar Conversions Update')
               .addTable([
                 ['Metric','Value'],
                 ['Product IDs', String(count)],
-                ['File', file]
+                ['File', file],
+                ['Branch Base','resources']
               ])
               .addLink('Workflow Run', `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`)
               .write();
 
       - name: Normalize line endings (ensure deterministic diffs)
-        run: sed -i 's/\r$//' "$OUTPUT_FILE"
+        run: sed -i 's/\r$//' "$OUTPUT_PATH"
 
       - name: Detect changes
         id: detect
         run: |
-          if git diff --quiet -- "$OUTPUT_FILE"; then
+          if git diff --quiet -- "$OUTPUT_PATH"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -113,20 +122,19 @@ jobs:
 
       - name: Stop if no changes
         if: steps.detect.outputs.changed == 'false'
-        run: echo "No changes in $OUTPUT_FILE. Exiting."
+        run: echo "No changes in $OUTPUT_PATH. Exiting."
 
       - name: Create Pull Request
         if: steps.detect.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          add: ${{ env.OUTPUT_FILE }}
+          add: ${{ env.OUTPUT_PATH }}
           commit-message: "feat: update bazaar conversions (${{ steps.date.outputs.date }}, ${{ steps.summary.outputs.count }} items)"
           committer: "GitHub Actions <actions@github.com>"
           author: "GitHub Actions <actions@github.com>"
           branch: "auto-update/bazaar-conversions"
           delete-branch: true
-            # Ensure PR targets the resources branch
           base: resources
           title: "feat: Update Bazaar Conversions (${{ steps.date.outputs.date }})"
           body: |
@@ -135,14 +143,14 @@ jobs:
             Details:
             - Product IDs (current Bazaar): **${{ steps.summary.outputs.count }}**
             - Generated at: ${{ steps.date.outputs.date }} (UTC)
-            - Branch base: resources
+            - Base branch: resources
 
-            This file now contains ONLY currently listed Bazaar product IDs.
+            This file contains ONLY currently listed Bazaar product IDs.
 
-            (If no changes occurred, no PR would be opened.)
+            (No PR is opened if there were no changes.)
           labels: "automated-update,data,skyblock"
 
       - name: Output summary
         if: steps.detect.outputs.changed == 'true'
         run: |
-          echo "Updated $OUTPUT_FILE with ${{ steps.summary.outputs.count }} product IDs and opened PR against resources."
+          echo "Updated $OUTPUT_PATH with ${{ steps.summary.outputs.count }} product IDs and opened PR against resources."
