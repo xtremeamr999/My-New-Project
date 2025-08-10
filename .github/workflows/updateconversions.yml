@@ -1,62 +1,148 @@
-# This workflow updates the SkyBlock item product id to name conversions using a TypeScript script.
-
 name: Update Bazaar Conversions
 
 on:
   workflow_dispatch:
   schedule:
-    # Runs daily at 2 AM UTC
     - cron: '0 2 * * *'
 
+concurrency:
+  group: bazaar-conversions-update
+  cancel-in-progress: true
+
 jobs:
-  update-item-map:
+  update-bazaar-conversions:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
-      # Add this line to allow the action to create and apply labels
       issues: write
 
+    env:
+      OUTPUT_FILE: conversionupdating/bazaar-conversions.json
+      SCRIPT_PATH: scripts/generate-bazaar-conversions.ts
+      WORKDIR: conversionupdating
+
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (resources branch)
         uses: actions/checkout@v4
         with:
-          # Checkout the 'resources' branch where the script and package.json are located
-          ref: 'resources'
+          ref: resources
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          # Cache npm packages for faster subsequent runs
-          cache: 'npm'
-          # Point cache to the correct package-lock.json
-          cache-dependency-path: conversionupdating/package-lock.json
+            node-version: '20'
+            cache: 'npm'
+            cache-dependency-path: conversionupdating/package-lock.json
 
       - name: Install dependencies
-        # Run npm install in the subdirectory
-        run: npm install
-        working-directory: ./conversionupdating
+        working-directory: ${{ env.WORKDIR }}
+        run: npm ci
 
-      - name: Fetch and Process Item Data
-        # Run the script from the subdirectory
-        run: npx ts-node scripts/ConversionGrabber.ts
-        working-directory: ./conversionupdating
+      - name: Generate filtered Bazaar conversions (with simple retry)
+        working-directory: ${{ env.WORKDIR }}
+        run: |
+          set -e
+          for i in 1 2 3; do
+            echo "Attempt $i..."
+            if npx ts-node $SCRIPT_PATH; then
+              break
+            fi
+            if [ $i -eq 3 ]; then
+              echo "All attempts failed."
+              exit 1
+            fi
+            echo "Sleeping before retry..."
+            sleep 10
+          done
+          echo "File size / preview:"
+          ls -lh "$OUTPUT_FILE"
+          head -n 20 "$OUTPUT_FILE" || true
 
-      - name: Create Pull Request with Bazaar Conversions
+      - name: Fail if file missing or empty
+        run: |
+          if [ ! -s "$OUTPUT_FILE" ]; then
+            echo "ERROR: $OUTPUT_FILE missing or empty"
+            exit 1
+          fi
+
+      - name: Compute product ID count & write job summary
+        id: summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const file = process.env.OUTPUT_FILE;
+            const raw = fs.readFileSync(file, 'utf8');
+            let json;
+            try {
+              json = JSON.parse(raw);
+            } catch (e) {
+              core.setFailed(`Failed to parse JSON in ${file}: ${e.message}`);
+              return;
+            }
+            const count = Object.keys(json).length;
+            core.setOutput('count', String(count));
+
+            await core.summary
+              .addHeading('Bazaar Conversions Update')
+              .addTable([
+                ['Metric','Value'],
+                ['Product IDs', String(count)],
+                ['File', file]
+              ])
+              .addLink('Workflow Run', `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`)
+              .write();
+
+      - name: Normalize line endings (ensure deterministic diffs)
+        run: sed -i 's/\r$//' "$OUTPUT_FILE"
+
+      - name: Detect changes
+        id: detect
+        run: |
+          if git diff --quiet -- "$OUTPUT_FILE"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get current UTC date
+        id: date
+        run: echo "date=$(date -u +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Stop if no changes
+        if: steps.detect.outputs.changed == 'false'
+        run: echo "No changes in $OUTPUT_FILE. Exiting."
+
+      - name: Create Pull Request
+        if: steps.detect.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Only add and commit this specific file
-          add: conversionupdating/bazaar-conversions.json
-          commit-message: "feat: update skyblock resource conversions"
+          add: ${{ env.OUTPUT_FILE }}
+          commit-message: "feat: update bazaar conversions (${{ steps.date.outputs.date }}, ${{ steps.summary.outputs.count }} items)"
           committer: "GitHub Actions <actions@github.com>"
           author: "GitHub Actions <actions@github.com>"
-          branch: "auto-update/skyblock-items"
+          branch: "auto-update/bazaar-conversions"
           delete-branch: true
-          title: "feat: Update Skyblock Resource Conversions"
+            # Ensure PR targets the resources branch
+          base: resources
+          title: "feat: Update Bazaar Conversions (${{ steps.date.outputs.date }})"
           body: |
-            This PR updates the `bazaar-conversions.json` file with the latest item ID-to-name conversions from the Hypixel API.
+            Automated update of bazaar-conversions.json.
 
-            This was generated automatically by the workflow.
+            Details:
+            - Product IDs (current Bazaar): **${{ steps.summary.outputs.count }}**
+            - Generated at: ${{ steps.date.outputs.date }} (UTC)
+            - Branch base: resources
+
+            This file now contains ONLY currently listed Bazaar product IDs.
+
+            (If no changes occurred, no PR would be opened.)
           labels: "automated-update,data,skyblock"
+
+      - name: Output summary
+        if: steps.detect.outputs.changed == 'true'
+        run: |
+          echo "Updated $OUTPUT_FILE with ${{ steps.summary.outputs.count }} product IDs and opened PR against resources."
