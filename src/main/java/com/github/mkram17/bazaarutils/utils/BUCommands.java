@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
@@ -44,6 +45,22 @@ public class BUCommands {
                         }
                         return 1;
                     }),
+            ClientCommandManager.literal("convertname")
+                    .then((ClientCommandManager.argument("item name", StringArgumentType.string())
+                            .executes((context) -> {
+                                String name = StringArgumentType.getString(context, "item name")
+                                        .replaceAll("_", " ");
+                                String productID = BazaarData.findProductId(name);
+
+                                if(productID == null){
+                                    PlayerActionUtil.notifyAll("Could not find product ID for " + name);
+                                } else {
+                                    PlayerActionUtil.notifyAll(name + ": " + productID);
+                                }
+                                return 1;
+                            })
+                    )
+                    ),
             ClientCommandManager.literal("list")
                     .executes(context -> {
                                 PlayerActionUtil.notifyAll(BazaarOrder.getVariables(BazaarOrder::getName).toString());
