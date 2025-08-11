@@ -4,156 +4,268 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.google.gson.JsonObject;
+import lombok.Getter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 
+import java.lang.reflect.Field;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-//TODO more efficient timing of api requests
-public class BazaarData{
+public final class BazaarData {
 
-    private static SkyBlockBazaarReply bazaarReply;
-    private static int bazaarDataPeriod = 1;
-    private static int exceptionCount = 0;
-    private static int bazaarCalls = 0;
-    private static boolean skipNextCall = false;
-    private static final long bazaarDataDelay = 10L;
+    private static final long BASE_INTERVAL_MS = 20_000;
+    private static final long POST_OFFSET_MS = 60;
+    private static final long FAILURE_RETRY_MS = 500;
+    private static final int STALE_WARNING_THRESHOLD = 5;
+
+    @Getter
+    private static volatile SkyBlockBazaarReply currentReply;
+    @Getter
+    private static volatile long lastSnapshotTs = -1;
+    private static volatile long lastFetchWallClock = -1;
+
+    private static volatile ScheduledFuture<?> scheduledTask;
+    private static final Object SCHED_LOCK = new Object();
+
+    private static final AtomicInteger consecutiveIdenticalSnapshots = new AtomicInteger(0);
+    private static final AtomicInteger consecutiveFailures = new AtomicInteger(0);
+
+    /* Reflection fallback if mixin not applied */
+    private static Field reflectionLastUpdatedField;
+
+    /* Cached conversions: lowercase name -> productId */
+    private static volatile Map<String, String> nameToProductIdCache = Map.of();
+    private static volatile boolean conversionsLoaded = false;
+
+    private BazaarData() {}
 
     @RunOnInit
-    public static void scheduleBazaar() {
-        BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
-            if (!(bazaarCalls % bazaarDataPeriod == 0))
+    public static void init() {
+        scheduleFetch(0);
+        PlayerActionUtil.notifyAll("BazaarData initialized (simple fixed-interval poller). Base=" + BASE_INTERVAL_MS + "ms", Util.notificationTypes.BAZAARDATA);
+    }
+
+
+    private static void scheduleFetch(long delayMs) {
+        synchronized (SCHED_LOCK) {
+            if (scheduledTask != null && !scheduledTask.isDone()) {
+                scheduledTask.cancel(false);
+            }
+            scheduledTask = BazaarUtils.BUExecutorService.schedule(BazaarData::fetchOnceSafely, delayMs, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private static void fetchOnceSafely() {
+        try {
+            fetchOnce();
+        } catch (Throwable t) {
+            Util.notifyError("Unexpected error in BazaarData fetch loop", t);
+            scheduleFetch(FAILURE_RETRY_MS);
+        }
+    }
+
+    private static void fetchOnce() {
+        lastFetchWallClock = System.currentTimeMillis();
+        APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
+            if (throwable != null) {
+                consecutiveFailures.incrementAndGet();
+                PlayerActionUtil.notifyAll("Fetch failure (" + throwable.getClass().getSimpleName() + "). Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", Util.notificationTypes.BAZAARDATA);
+                scheduleFetch(FAILURE_RETRY_MS);
                 return;
-            if (skipNextCall) {
-                skipNextCall = false;
+            }
+            if (reply == null || !reply.isSuccess()) {
+                consecutiveFailures.incrementAndGet();
+                PlayerActionUtil.notifyAll("Null/unsuccessful reply. Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", Util.notificationTypes.BAZAARDATA);
+                scheduleFetch(FAILURE_RETRY_MS);
+                return;
+            }
+            consecutiveFailures.set(0);
+
+            long snapshotTs = extractLastUpdated(reply);
+            if (snapshotTs <= 0) {
+                PlayerActionUtil.notifyAll("Invalid lastUpdated <= 0. Retry in " + FAILURE_RETRY_MS + "ms", Util.notificationTypes.BAZAARDATA);
+                scheduleFetch(FAILURE_RETRY_MS);
                 return;
             }
 
-            APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
-                bazaarCalls++;
-                if (bazaarCalls % 10 == 0 || bazaarCalls < 5)
-                    skipNextCall = true;
+            if (snapshotTs != lastSnapshotTs) {
+                long previous = lastSnapshotTs;
+                lastSnapshotTs = snapshotTs;
+                currentReply = reply;
+                consecutiveIdenticalSnapshots.set(0);
 
-                if (throwable != null) {
-                    skipNextCall = true;
-                    exceptionCount++;
-                    Util.notifyError("Exception thrown trying to get bazaar data", throwable);
-                    System.out.println(BazaarUtils.MOD_NAME + " Error info: period-" + bazaarDataPeriod + ", exceptionCount-" + exceptionCount);
-                    System.out.println(BazaarUtils.MOD_NAME + " Status: " + APIUtils.API.getStatus(APIUtils.uuid));
-                    if (exceptionCount % 5 == 0) {
-                        bazaarDataPeriod++;
-                    }
+                EVENT_BUS.post(new BazaarDataUpdateEvent(reply));
+
+                if (previous != -1) {
+                    PlayerActionUtil.notifyAll("New snapshot " + snapshotTs + " (Δ " + (snapshotTs - previous) + " ms). Scheduling next predicted fetch.", Util.notificationTypes.BAZAARDATA);
                 } else {
-                    if (reply == null) {
-                        Util.notifyError("Bazaar data is null", null);
-                        return;
-                    }
-                    bazaarReply = reply;
-                    EVENT_BUS.post(new BazaarDataUpdateEvent(bazaarReply));
+                    PlayerActionUtil.notifyAll("First snapshot " + snapshotTs + " received.", Util.notificationTypes.BAZAARDATA);
                 }
-            });
-        }, bazaarDataDelay, 1, TimeUnit.SECONDS);
+
+                scheduleNextFromSnapshot(snapshotTs);
+            } else {
+                int identical = consecutiveIdenticalSnapshots.incrementAndGet();
+                PlayerActionUtil.notifyAll("Snapshot unchanged (" + snapshotTs + ") x" + identical, Util.notificationTypes.BAZAARDATA);
+                if (identical == STALE_WARNING_THRESHOLD) {
+                    PlayerActionUtil.notifyAll("WARNING: " + identical + " identical snapshots in a row. Server might be lagging or BASE_INTERVAL_MS too short.", Util.notificationTypes.BAZAARDATA);
+                }
+                scheduleNextFromSnapshot(snapshotTs);
+            }
+        });
     }
 
-    public static int getOrderCount(String productId, PriceInfo.priceTypes priceType, double price) {
-        if (bazaarReply == null) {
-            Util.notifyError("Bazaar data is null", new Throwable());
-            return -1;
-        }
+    private static void scheduleNextFromSnapshot(long snapshotTs) {
+        long now = System.currentTimeMillis();
+        long target = snapshotTs + BASE_INTERVAL_MS + POST_OFFSET_MS;
+        long delay = Math.max(5, target - now);
+        scheduleFetch(delay);
+    }
+
+    private static long extractLastUpdated(SkyBlockBazaarReply reply) {
         try {
-            SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
-            if (product == null) {
-                Util.logError("Could not find item using product ID: " + productId, null);
+            return ((AccessorSkyBlockBazaarReply) (Object) reply).bazaarutils$getLastUpdated();
+        } catch (ClassCastException ignored) {
+            try {
+                if (reflectionLastUpdatedField == null) {
+                    reflectionLastUpdatedField = SkyBlockBazaarReply.class.getDeclaredField("lastUpdated");
+                    reflectionLastUpdatedField.setAccessible(true);
+                }
+                return reflectionLastUpdatedField.getLong(reply);
+            } catch (Exception e) {
+                Util.notifyError("Failed to access lastUpdated (mixin+reflection failed)", e);
                 return -1;
             }
-
-            java.util.List<SkyBlockBazaarReply.Product.Summary> summaryList;
-            if (priceType == PriceInfo.priceTypes.INSTABUY) {
-                summaryList = product.getBuySummary();
-            } else if (priceType == PriceInfo.priceTypes.INSTASELL) {
-                summaryList = product.getSellSummary();
-            } else {
-                return -1; // invalid price type
-            }
-
-            int numOrders =0;
-
-            for( SkyBlockBazaarReply.Product.Summary summary : summaryList) {
-                if (summary.getPricePerUnit() == price) {
-                    return (int) summary.getOrders();
-                }
-            }
-
-            return numOrders;
-        } catch (Exception e) {
-            Util.notifyError("There was an error fetching order count (probably caused by incorrect product ID [" + productId + "])", e);
-            return -1;
         }
     }
 
+
+    /**
+     * Get the number of orders at an exact price for a product & price type.
+     * @return OptionalInt empty if reply / product / priceType invalid or not found.
+     */
+    public static OptionalInt getOrderCountOptional(String productId, PriceInfo.priceTypes priceType, double price) {
+        SkyBlockBazaarReply reply = currentReply;
+        if (reply == null || productId == null || priceType == null) return OptionalInt.empty();
+
+        try {
+            SkyBlockBazaarReply.Product product = reply.getProduct(productId);
+            if (product == null) return OptionalInt.empty();
+
+            List<SkyBlockBazaarReply.Product.Summary> list = switch (priceType) {
+                case INSTABUY -> product.getBuySummary();
+                case INSTASELL -> product.getSellSummary();
+            };
+
+            if (list == null) return OptionalInt.empty();
+            for (SkyBlockBazaarReply.Product.Summary s : list) {
+                if (Double.compare(s.getPricePerUnit(), price) == 0) {
+                    return OptionalInt.of((int) s.getOrders());
+                }
+            }
+            return OptionalInt.of(0);
+        } catch (Exception e) {
+            Util.notifyError("Error in getOrderCountOptional for productId=" + productId, e);
+            return OptionalInt.empty();
+        }
+    }
+
+    /**
+     * Preferred new method: obtain the best matching instantaneous price.
+     * INSTABUY -> top of buySummary (people selling). INSTASELL -> top of sellSummary (people buying).
+     */
+    public static OptionalDouble findItemPriceOptional(String productId, PriceInfo.priceTypes priceType) {
+        SkyBlockBazaarReply reply = currentReply;
+        if (reply == null || productId == null || priceType == null) return OptionalDouble.empty();
+
+        try {
+            SkyBlockBazaarReply.Product product = reply.getProduct(productId);
+            if (product == null) return OptionalDouble.empty();
+
+            return switch (priceType) {
+                case INSTABUY -> {
+                    List<SkyBlockBazaarReply.Product.Summary> buySummary = product.getBuySummary();
+                    if (buySummary == null || buySummary.isEmpty()) yield OptionalDouble.empty();
+                    yield OptionalDouble.of(buySummary.getFirst().getPricePerUnit());
+                }
+                case INSTASELL -> {
+                    List<SkyBlockBazaarReply.Product.Summary> sellSummary = product.getSellSummary();
+                    if (sellSummary == null || sellSummary.isEmpty()) yield OptionalDouble.empty();
+                    yield OptionalDouble.of(sellSummary.getFirst().getPricePerUnit());
+                }
+            };
+        } catch (Exception e) {
+            Util.notifyError("Error in findItemPriceOptional for productId=" + productId, e);
+            return OptionalDouble.empty();
+        }
+    }
+
+    public static Optional<String> findProductIdOptional(String naturalName) {
+        if (naturalName == null || naturalName.isBlank()) return Optional.empty();
+        ensureConversionsLoaded();
+        return Optional.ofNullable(nameToProductIdCache.get(naturalName.toLowerCase(Locale.ROOT)));
+    }
+
+    /**
+     * Cached conversion load. Thread-safe (single pass).
+     */
+    private static void ensureConversionsLoaded() {
+        if (conversionsLoaded) return;
+        synchronized (BazaarData.class) {
+            if (conversionsLoaded) return;
+            try {
+                Map<String, String> mutable = new HashMap<>();
+                var resources = ResourceManager.getResourceJson();
+                var conversions = resources.getAsJsonObject("bazaarConversions");
+                for (String key : conversions.keySet()) {
+                    String value = conversions.get(key).getAsString();
+                    if (value != null) {
+                        mutable.put(value.toLowerCase(Locale.ROOT), key);
+                    }
+                }
+                nameToProductIdCache = Collections.unmodifiableMap(mutable);
+                conversionsLoaded = true;
+                PlayerActionUtil.notifyAll("Loaded bazaarConversions cache: " + nameToProductIdCache.size() + " entries.", Util.notificationTypes.BAZAARDATA);
+            } catch (Exception e) {
+                Util.notifyError("Failed loading bazaarConversions cache", e);
+                nameToProductIdCache = Map.of();
+                conversionsLoaded = true;
+            }
+        }
+    }
+
+    @Deprecated
     public static Double findItemPrice(String productId, PriceInfo.priceTypes priceType) {
-        if (bazaarReply == null) {
-            Util.notifyError("Bazaar data is null", new Throwable());
-            return -1.0;
-        }
-        try {
-            SkyBlockBazaarReply.Product product = bazaarReply.getProduct(productId);
-            if (product == null) {
-                Util.logError("Could not find item using product ID: " + productId, null);
-                return -1.0;
-            }
-
-            var sell_order_summary = product.getBuySummary();
-            var buy_order_summary = product.getSellSummary();
-
-            if (priceType == PriceInfo.priceTypes.INSTABUY) {
-                if (sell_order_summary.isEmpty()) {
-                    PlayerActionUtil.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
-                    return 0.0;
-                }
-                double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
-                return sellOrderPrice;
-            } else if (priceType == PriceInfo.priceTypes.INSTASELL) {
-                if (buy_order_summary.isEmpty()) {
-                    PlayerActionUtil.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
-                    return 0.0;
-                }
-                double buyOrderPrice = buy_order_summary.getFirst().getPricePerUnit();
-                return buyOrderPrice;
-            }
-        } catch (Exception e) {
-            Util.notifyError("There was an error fetching product data (probably caused by incorrect product ID [" + productId + "])", e);
-            return -1.0;
-        }
-        // Should not be reached if priceType is INSTASELL or INSTABUY
-        return null;
+        return findItemPriceOptional(productId, priceType).orElse(-1.0);
     }
 
-    //returns null if it cant find anything, gets product id from natural name
+    @Deprecated
     public static String findProductId(String name) {
-        JsonObject resources;
-        JsonObject bazaarConversions;
-
-        try {
-            resources = ResourceManager.getResourceJson();
-            bazaarConversions = resources.getAsJsonObject("bazaarConversions");
-
-            for (String key : bazaarConversions.keySet()) {
-                if (bazaarConversions.get(key).getAsString().equalsIgnoreCase(name)) {
-                    return key;
-                }
-            }
-        } catch (Exception e) {
-            Util.notifyError("Exception caught while finding product ID from name: " + name + ". If this keeps happening, please report to the developer to fix. You can disable error notifications in settings", e);
-        }
-
-//        Util.logError("Couldn't find product id from name: " + name, null);
-        return null;
+        return findProductIdOptional(name).orElse(null);
     }
 
+    @Deprecated
+    public static int getOrderCount(String productId, PriceInfo.priceTypes priceType, double price) {
+        return getOrderCountOptional(productId, priceType, price).orElse(-1);
+    }
+
+    public static Optional<Duration> getCurrentSnapshotAge() {
+        long ts = lastSnapshotTs;
+        if (ts <= 0) return Optional.empty();
+        return Optional.of(Duration.ofMillis(System.currentTimeMillis() - ts));
+    }
+
+    public static Optional<Duration> getTimeSinceLastFetchAttempt() {
+        long f = lastFetchWallClock;
+        if (f <= 0) return Optional.empty();
+        return Optional.of(Duration.ofMillis(System.currentTimeMillis() - f));
+    }
 }
