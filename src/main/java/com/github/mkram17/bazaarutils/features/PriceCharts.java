@@ -3,8 +3,10 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
@@ -28,30 +30,18 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class PriceCharts implements ItemTooltipCallback, BUListener {
-    private static String productID;
     @Getter @Setter
     private boolean showOutsideBazaar = false;
 
-    @Override
-    public void getTooltip(ItemStack stack, Item.TooltipContext tooltip, TooltipType tooltipType, List<Text> lines) {
-        if (stack == null || stack.isEmpty() || !shouldShow() || stack.getItem().getName().getString().contains("GLASS_PANE"))
-            return;
-        productID = null;
-
-        String itemName = stack.getName().getString();
-
-        try {
-            if (itemName.contains("x") && itemName.indexOf("x") == itemName.length() - 2)
-                itemName = itemName.substring(0, itemName.indexOf("x") - 1);
-        } catch (Exception e) {
-            Util.notifyError("Failed to parse item name for price charts: " + itemName, e);
-            return;
-        }
-
-        productID = BazaarData.findProductId(itemName);
-        if(productID == null) {
-            stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, false);
-            //for checking items missing from bazaar-resources product id conversions
+    @EventHandler
+    public void onChestLoad(ChestLoadedEvent e){
+        for(ItemStack stack : e.getItemStacks()){
+            if(stack == null || stack.isEmpty())
+                continue;
+            String itemName = stack.getName().getString();
+            if(OrderInfo.isValidName(itemName)) {
+                stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, true);
+                //for checking items missing from bazaar-resources product id conversions
 //            if(stack.getComponentChanges() != null && stack.getComponentChanges().get(DataComponentTypes.CUSTOM_DATA) != null) {
 //                productID = stack.getComponentChanges().get(DataComponentTypes.CUSTOM_DATA).toString();
 //                productID = productID.substring(productID.indexOf("\"")+1, productID.lastIndexOf("\""));
@@ -61,9 +51,21 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
 //                    Util.notifyAll("New product id detected: " + productID + "name: " + itemName, Util.notificationTypes.BAZAARDATA);
 //                }
 //            }
-            return;
+            } else {
+                stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, false);
+            }
         }
-        stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, true);
+    }
+
+    @Override
+    public void getTooltip(ItemStack stack, Item.TooltipContext tooltip, TooltipType tooltipType, List<Text> lines) {
+        if (stack == null || stack.isEmpty() || !shouldShow() || stack.getItem().getName().getString().contains("GLASS_PANE"))
+            return;
+
+
+        if(Boolean.FALSE.equals(stack.get(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT)))
+            return;
+
         MutableText text = Text.literal("CTRL+SHIFT click for price charts & other info")
                 .formatted(Formatting.GOLD)
                 .formatted(Formatting.BOLD);
@@ -81,6 +83,11 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
         if(!shouldShow() || Boolean.FALSE.equals(e.slot.getStack().get(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT)) || e.isCancelled() ||  !(Screen.hasShiftDown() && Screen.hasControlDown()))
             return;
 
+        String itemName = e.slot.getStack().getName().getString();
+        if (itemName.contains("x") && itemName.indexOf("x") == itemName.length() - 2)
+            itemName = itemName.substring(0, itemName.indexOf("x") - 1);
+
+        String productID = BazaarData.findProductId(itemName);
         String link = "https://skyblock.finance/items/"+productID;
         MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
             if (confirmed) {
