@@ -17,9 +17,12 @@ import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+
+import java.util.function.Predicate;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -62,11 +65,9 @@ public class GUIUtils {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    private static void onChestLoaded(ChestLoadedEvent e){
-        guiType = guiType.CHEST;
-
+    private static void setUpBookmark(ChestLoadedEvent e){
         currentBookmark = null;
-        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY))
+        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY, ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
             return;
         String name = Bookmark.findItemName(e);
         if (Bookmark.isItemBookmarked(name)) {
@@ -75,8 +76,9 @@ public class GUIUtils {
         } else
             currentBookmark = new Bookmark(name);
     }
-    @EventHandler(priority = EventPriority.HIGH)
-    private void onLoad(ChestLoadedEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private static void onLoad(ChestLoadedEvent e){
+        guiType = guiType.CHEST;
         lowerChestInventory = e.getLowerChestInventory();
     }
 
@@ -193,5 +195,11 @@ public class GUIUtils {
             );
         });
     }
-
+    public static ItemStack getChestItem(int chestSlot) {
+        if (guiType != guiTypes.CHEST) return ItemStack.EMPTY;
+        if (lowerChestInventory == null) return ItemStack.EMPTY;
+        if (chestSlot < 0 || chestSlot >= lowerChestInventory.size()) return ItemStack.EMPTY;
+        ItemStack stack = lowerChestInventory.getStack(chestSlot);
+        return stack == null ? ItemStack.EMPTY : stack;
+    }
 }

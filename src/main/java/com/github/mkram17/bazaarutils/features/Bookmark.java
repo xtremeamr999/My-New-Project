@@ -72,7 +72,7 @@ public class Bookmark extends CustomItemButton {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
-            if (!screenInfo.inAnyItemScreen() || !super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
+            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
                 return;
 
             if (replacementItem == null)
@@ -87,7 +87,7 @@ public class Bookmark extends CustomItemButton {
     @EventHandler
     private void onBookmarkClick(SlotClickEvent event){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(!screenInfo.inAnyItemScreen() || !super.shouldUseSlot(event))
+        if(!super.shouldUseSlot(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         reverseBookmarkStatus();
@@ -163,10 +163,9 @@ public class Bookmark extends CustomItemButton {
         String containerName = screenInfo.getContainerName();
         if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
+        } else {
+            return containerName.substring(containerName.indexOf("➜") + 2);
         }
-        if(screenInfo.inAnyItemScreen())
-            return containerName.substring(containerName.indexOf("➜")+2);
-        return "?";
     }
 
 
