@@ -67,7 +67,7 @@ public class GUIUtils {
     @EventHandler(priority = EventPriority.HIGH)
     private static void setUpBookmark(ChestLoadedEvent e){
         currentBookmark = null;
-        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY, ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
+        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
             return;
         String name = Bookmark.findItemName(e);
         if (Bookmark.isItemBookmarked(name)) {

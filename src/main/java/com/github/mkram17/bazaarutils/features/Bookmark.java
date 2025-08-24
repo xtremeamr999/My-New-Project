@@ -196,11 +196,7 @@ public class Bookmark extends CustomItemButton {
     }
 
     public static Optional<Bookmark> findMatchingBookmark(String itemName){
-        for(Bookmark bookmark : BUConfig.get().bookmarks) {
-            if(bookmark.getName().equalsIgnoreCase(itemName))
-                return Optional.of(bookmark);
-        }
-        return Optional.empty();
+        return BUConfig.get().bookmarks.stream().filter(bookmark -> bookmark.getName().equalsIgnoreCase(itemName)).findAny();
     }
 
     @RegisterWidget
