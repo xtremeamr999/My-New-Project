@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -12,7 +11,6 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
@@ -68,14 +66,14 @@ public class GUIUtils {
         guiType = guiType.CHEST;
 
         currentBookmark = null;
-        if(!ScreenInfo.getCurrentScreenInfo().inAnyItemScreen())
+        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY))
             return;
-        String name = Bookmark.findName(e);
-        if (Bookmark.isBookmarked(name)) {
+        String name = Bookmark.findItemName(e);
+        if (Bookmark.isItemBookmarked(name)) {
             currentBookmark = Bookmark.findMatchingBookmark(name).get();
             EVENT_BUS.subscribe(currentBookmark);
         } else
-            currentBookmark = new Bookmark(name, null);
+            currentBookmark = new Bookmark(name);
     }
     @EventHandler(priority = EventPriority.HIGH)
     private void onLoad(ChestLoadedEvent e){

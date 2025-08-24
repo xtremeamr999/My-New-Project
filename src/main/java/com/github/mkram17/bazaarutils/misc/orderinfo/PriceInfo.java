@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.util.concurrent.TimeUnit;
 
+
+//Simply a container for information about price of an item. For actual orders, use OrderInfo or BazaarOrder instead
 public class PriceInfo {
     @Getter
     public enum priceTypes{INSTASELL,INSTABUY;

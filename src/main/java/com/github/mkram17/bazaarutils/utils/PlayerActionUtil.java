@@ -27,7 +27,7 @@ public class PlayerActionUtil {
     }
 
     public static void notifyAll(Text message) {
-        MutableText messageText = Text.literal("[" + BazaarUtils.MOD_NAME + "]").formatted(Formatting.GOLD);
+        MutableText messageText = Text.literal("[" + BazaarUtils.MOD_NAME + "] ").formatted(Formatting.GOLD);
         messageText.append(message.copy());
 
         sendPlayerMessage(messageText);

@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
@@ -37,10 +36,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class Bookmark extends CustomItemButton {
-    @Getter @Setter
-    public String name;
+
+    @Getter
+    public final String name;
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
+    @Getter
+    private OrderInfo orderInfo;
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
@@ -54,17 +56,14 @@ public class Bookmark extends CustomItemButton {
             BazaarUtils.EVENT_BUS.unsubscribe(this);
     }
 
-
-
-    public Bookmark(String name, ItemStack bookmarkedItemStack) {
+    public Bookmark(String name) {
         this.name = name;
         this.slotNumber = 0;
-        this.bookmarkedItemStack = bookmarkedItemStack;
-        changeVisuals(isBookmarked(this.name));
+        changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
-        if(bookmarkedItemStack == null) {
-            this.bookmarkedItemStack = findItemStack(name);
-        }
+        this.bookmarkedItemStack = findItemStack(name);
+        this.orderInfo = new OrderInfo(name, 0.0, PriceInfo.priceTypes.INSTABUY);
+
         BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
@@ -77,7 +76,7 @@ public class Bookmark extends CustomItemButton {
                 return;
 
             if (replacementItem == null)
-                changeVisuals(isBookmarked(name));
+                changeVisuals(isItemBookmarked(name));
 
             event.setReplacement(replacementItem);
         } catch (Exception e) {
@@ -91,22 +90,9 @@ public class Bookmark extends CustomItemButton {
         if(!screenInfo.inAnyItemScreen() || !super.shouldUseSlot(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        switchBookmarked();
+        reverseBookmarkStatus();
         bookmarkedItemStack = findItemStack(name);
         Util.scheduleConfigSave();
-    }
-
-    public OrderInfo getPriceInfo() {
-        if (name == null)
-            return null;
-        OrderInfo priceInfo = new OrderInfo(name, 0.0, PriceInfo.priceTypes.INSTABUY);
-
-        if (priceInfo.getPricePerItem() == 0.0 && priceInfo.getMarketPrice() == 0.0) {
-            PlayerActionUtil.notifyAll("Could not find prices for " + name + ", try to bookmark it again.", Util.notificationTypes.BAZAARDATA);
-            return null;
-        }
-
-        return priceInfo;
     }
 
     public void onWidgetLeftClick(){
@@ -130,8 +116,8 @@ public class Bookmark extends CustomItemButton {
         Util.scheduleConfigSave();
     }
 
-    private void switchBookmarked(){
-        if(isBookmarked(name)) {
+    private void reverseBookmarkStatus(){
+        if(isItemBookmarked(name)) {
             changeVisuals(false);
             BUConfig.get().bookmarks.remove(this);
         }else {
@@ -154,21 +140,25 @@ public class Bookmark extends CustomItemButton {
         }
     }
 
-    public static String findName(ChestLoadedEvent e){
-        String containerName = ScreenInfo.getCurrentScreenInfo().getContainerName();
-        String name = findNameFromContainer();
-        if(containerName.length() >= 30){
-            for(ItemStack stack : e.getItemStacks()){
-                if(stack == null) continue;
-                if (!stack.isEmpty() && stack.getName().getString().startsWith(name)) {
-                    return stack.getCustomName().getString();
-                }
-            }
+    public static String findItemName(ChestLoadedEvent e){
+        String nameFromContainer = findItemNameFromContainer();
+        if(!OrderInfo.isValidName(nameFromContainer)) {
+            return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
-        return name;
+        return nameFromContainer;
     }
 
-    private static String findNameFromContainer(){
+    private static String findNameFromItemStacks(List<ItemStack> itemStacks, String nameFromContainer){
+        for(ItemStack stack : itemStacks){
+            if(stack == null) continue;
+            if (!stack.isEmpty() && stack.getName().getString().startsWith(nameFromContainer)) {
+                return stack.getCustomName().getString();
+            }
+        }
+        return "???";
+    }
+
+    private static String findItemNameFromContainer(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         String containerName = screenInfo.getContainerName();
         if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
@@ -199,16 +189,16 @@ public class Bookmark extends CustomItemButton {
                 return itemStack;
             }
         }
-        return null;
+        return Items.DIAMOND.getDefaultStack();
     }
 
-    public static boolean isBookmarked(String name){
-        return findMatchingBookmark(name).isPresent();
+    public static boolean isItemBookmarked(String itemName){
+        return findMatchingBookmark(itemName).isPresent();
     }
 
-    public static Optional<Bookmark> findMatchingBookmark(String name){
+    public static Optional<Bookmark> findMatchingBookmark(String itemName){
         for(Bookmark bookmark : BUConfig.get().bookmarks) {
-            if(bookmark.getName().equalsIgnoreCase(name))
+            if(bookmark.getName().equalsIgnoreCase(itemName))
                 return Optional.of(bookmark);
         }
         return Optional.empty();
@@ -241,7 +231,7 @@ public class Bookmark extends CustomItemButton {
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
                 MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
-                OrderInfo priceInfo = bookmark.getPriceInfo();
+                OrderInfo priceInfo = bookmark.getOrderInfo();
 
                 if (priceInfo != null) {
                     Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);

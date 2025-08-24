@@ -109,7 +109,7 @@ public class BazaarUtils implements ClientModInitializer {
     private void setDefaultValues(){
         //causes errors if done as default in config bc constructor uses other config info which isnt loaded yet
         if(BUConfig.get().bookmarks.isEmpty()) {
-            BUConfig.get().bookmarks.add(new Bookmark("Diamond", Items.DIAMOND.getDefaultStack()));
+            BUConfig.get().bookmarks.add(new Bookmark("Diamond"));
         }
 
 

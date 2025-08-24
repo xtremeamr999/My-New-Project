@@ -29,13 +29,19 @@ public class OrderInfo extends PriceInfo implements BUListener {
         updateMarketPrice();
     }
 
+    public static boolean isValidName(String itemName){
+        return itemName != null && itemName.length() > 30 && BazaarData.findProductId(itemName) != null;
+    }
+
     public void updateMarketPrice(){
         updateMarketPrice(productID);
     }
 
     private void validateProduct(){
         if (productID == null && name != null) {
-            Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
+            if(!fixProductID()){
+                Util.notifyError("Product ID for " + name + " is null. This may cause issues", new Throwable());
+                }
         }
     }
 

@@ -141,7 +141,7 @@ public class BazaarData{
 
         try {
             resources = ResourceManager.getResourceJson();
-            bazaarConversions = resources.getAsJsonObject("bazaarConversions");
+            bazaarConversions = resources.getAsJsonObject();
 
             for (String key : bazaarConversions.keySet()) {
                 if (bazaarConversions.get(key).getAsString().equalsIgnoreCase(name)) {
@@ -155,5 +155,6 @@ public class BazaarData{
 //        Util.logError("Couldn't find product id from name: " + name, null);
         return null;
     }
+
 
 }
