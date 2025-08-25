@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.moulberry.mixinconstraints.annotations.IfModLoaded;
@@ -112,21 +113,19 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 			return;
 
 		BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
-		if(order == null)
+		if(order == null || order.getFillStatus() == OrderInfo.Statuses.FILLED)
 			return;
-		BazaarOrder.statuses orderStatus = order.getOutbidStatus();
 
-		if (orderStatus == BazaarOrder.statuses.COMPETITIVE || orderStatus == BazaarOrder.statuses.OUTBID || orderStatus == BazaarOrder.statuses.MATCHED) {
-			draw(context, slot.x, slot.y, orderStatus);
-		}
+		draw(context, slot.x, slot.y, order.getOutbidStatus());
+
 	}
 
 	@Unique
-	protected void draw(DrawContext context, int x, int y, BazaarOrder.statuses orderStatus) {
+	protected void draw(DrawContext context, int x, int y, OrderInfo.Statuses orderStatus) {
 		final float r, g, b;
-		if (orderStatus == BazaarOrder.statuses.COMPETITIVE) {
+		if (orderStatus == OrderInfo.Statuses.COMPETITIVE) {
 			r = 0.0f; g = 1.0f; b = 0.0f; // Green
-		} else if (orderStatus == BazaarOrder.statuses.OUTBID) {
+		} else if (orderStatus == OrderInfo.Statuses.OUTBID) {
 			r = 1.0f; g = 0.0f; b = 0.0f; // Red
 		} else { // MATCHED
 			r = 1.0f; g = 1.0f; b = 0.0f; // Yellow

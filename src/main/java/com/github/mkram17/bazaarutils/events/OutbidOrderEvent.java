@@ -1,15 +1,16 @@
 package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 
 public class OutbidOrderEvent implements ICancellable {
     @Getter
-    private final BazaarOrder order;
+    private final OrderInfo order;
     @Getter
-    private boolean isOutbid;
-    public OutbidOrderEvent(BazaarOrder order, boolean isOutbid) {
+    private final boolean isOutbid;
+    public OutbidOrderEvent(OrderInfo order, boolean isOutbid) {
         this.order = order;
         this.isOutbid = isOutbid;
     }

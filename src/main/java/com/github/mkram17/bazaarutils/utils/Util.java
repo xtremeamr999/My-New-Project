@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //main utility class. More specific utility classes are in utils package
 public class Util {
@@ -102,7 +105,8 @@ public class Util {
             return;
         assert item.getProductID() != null;
         BUConfig.get().userOrders.add(item);
-        PlayerActionUtil.notifyAll("Added item: § " + item.toString(), notificationTypes.ORDERDATA);
+        PlayerActionUtil.notifyAll("Added item: § " + item, notificationTypes.ORDERDATA);
+        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.ADD, item));
         scheduleConfigSave();
     }
 

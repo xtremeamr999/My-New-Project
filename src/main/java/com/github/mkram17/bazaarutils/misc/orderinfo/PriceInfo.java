@@ -38,12 +38,12 @@ public class PriceInfo {
     @Getter @Setter
     private Double marketOppositePrice;
 
-    public PriceInfo(double pricePerItem, priceTypes priceType) {
+    public PriceInfo(Double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
-        this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
+        if(pricePerItem != null){
+            this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
+        }
     }
-
-
 
     protected void updateMarketPrice(String productId) {
         marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));

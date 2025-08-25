@@ -53,14 +53,14 @@ public class ItemUpdater {
         for (BazaarOrder item : foundOrders) {
             Util.addWatchedOrder(item);
         }
-        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE));
+        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE, null));
     }
 
     private static BazaarOrder parseOrderFromItemStack(ItemStack stack) {
         String customName = stack.getName().getString();
         Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
-            Util.notifyError("Error while parsing order from item stack", new Exception("Lore component is null or empty"));
+//            Util.notifyError("Error while parsing order from item stack", new Exception("Lore component is null or empty"));
             return null;
         }
 

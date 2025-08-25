@@ -3,21 +3,28 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
+import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
+import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
-import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //Can be used when you need to store info about an item with automatic price updates and health checks. Actual orders should use OrderData instead.
 public class OrderInfo extends PriceInfo implements BUListener {
 
+    public enum Statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
     @Getter
     protected final String name; //name of the item in game
     @Getter
     protected final String productID; //Hypixel's code for the product
+    @Getter
+    protected Statuses outbidStatus = Statuses.SET;
 
     public OrderInfo(String name, Double pricePerItem, priceTypes priceType) {
         super(pricePerItem, priceType);
@@ -25,8 +32,9 @@ public class OrderInfo extends PriceInfo implements BUListener {
         this.productID = BazaarData.findProductId(name);
         validateProduct();
         subscribe();
-        startActions();
+        scheduleHealthCheck();
         updateMarketPrice();
+        handleOutbidStatusChange();
     }
 
     public static boolean isValidName(String itemName){
@@ -56,10 +64,6 @@ public class OrderInfo extends PriceInfo implements BUListener {
     }
 
 
-    public void startActions(){
-        scheduleHealthCheck();
-    }
-
     //returns true if productID is safe/fixed after run, and false if it is not
     private boolean fixProductID() {
         if (isProductIDHealthy()) {
@@ -82,10 +86,46 @@ public class OrderInfo extends PriceInfo implements BUListener {
     @EventHandler
     private void onDataUpdate(BazaarDataUpdateEvent e){
         updateMarketPrice();
+        handleOutbidStatusChange();
+    }
+
+    @EventHandler
+    private void onUserOrderChange(UserOrdersChangeEvent e) {
+        if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this)
+            return;
+        updateMarketPrice();
+        handleOutbidStatusChange();
+    }
+
+    private void handleOutbidStatusChange(){
+        Optional<Statuses> outbidOptional = findOutbidStatus();
+        if(outbidOptional.isEmpty()) return;
+
+        Statuses newStatus = outbidOptional.get();
+        if(outbidStatus != newStatus){
+            outbidStatus = newStatus;
+            EVENT_BUS.post(new OutbidOrderEvent(this, newStatus == Statuses.OUTBID));
+        }
+    }
+
+    public Optional<Statuses> findOutbidStatus() {
+        if(pricePerItem == null || getMarketPrice() == null) return Optional.empty();
+
+        if (pricePerItem > getMarketPrice()) {
+            return Optional.of(Statuses.OUTBID);
+        } else if (pricePerItem < getMarketPrice()) {
+            return Optional.of(Statuses.OUTBID);
+        } else {
+            if (BazaarData.getOrderCount(productID, getPriceType(), getPricePerItem()) > 1) {
+                return Optional.of(Statuses.MATCHED);
+            }
+        }
+
+        return Optional.of(Statuses.COMPETITIVE);
     }
 
     @Override
     public void subscribe() {
-        BazaarUtils.EVENT_BUS.subscribe(this);
+        EVENT_BUS.subscribe(this);
     }
 }

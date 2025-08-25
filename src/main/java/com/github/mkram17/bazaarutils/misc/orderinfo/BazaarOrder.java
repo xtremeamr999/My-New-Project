@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.misc.orderinfo;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
 
 //TODO figure out how to handle rounding with price
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
@@ -23,10 +25,9 @@ public class BazaarOrder extends OrderInfo {
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
 
-    public enum statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
 
     @Getter @Setter
-    private statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
+    private Statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
     @Getter
     private final Integer volume;
     @Getter @Setter
@@ -41,7 +42,7 @@ public class BazaarOrder extends OrderInfo {
     public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType) {
         super(name, pricePerItem, priceType);
         this.volume = volume;
-        this.fillStatus = statuses.SET;
+        this.fillStatus = Statuses.SET;
         this.tolerance = calculateTolerance();
     }
 
@@ -49,6 +50,7 @@ public class BazaarOrder extends OrderInfo {
         this(name, volume, pricePerItem, priceType);
         this.itemInfo = itemInfo;
     }
+
     private double calculateTolerance() {
         //default tolerance
         if (pricePerItem == null || volume == null) {
@@ -78,7 +80,7 @@ public class BazaarOrder extends OrderInfo {
             sb.append(", amount claimed: ").append(amountClaimed);
         }
         sb.append(", type: ").append(getPriceType().getString());
-        if (fillStatus == statuses.FILLED) {
+        if (fillStatus == Statuses.FILLED) {
             sb.append(", status: ").append(fillStatus);
         }
         sb.append(")");
@@ -88,7 +90,7 @@ public class BazaarOrder extends OrderInfo {
     public void flipItem(double newPrice) {
         flipPrices(newPrice);
         this.amountFilled = 0;
-        this.fillStatus = statuses.SET;
+        this.fillStatus = Statuses.SET;
     }
 
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
@@ -194,34 +196,12 @@ public class BazaarOrder extends OrderInfo {
         return volumeComparator.thenComparing(priceComparator);
     }
 
-    public statuses getOutbidStatus() {
-        updateMarketPrice(productID);
-        if (fillStatus == statuses.FILLED) {
-            return statuses.FILLED;
-        }
-        if (pricePerItem.equals(getMarketPrice()) && tolerance == 0 && BazaarData.getOrderCount(productID, getPriceType(), getPricePerItem()) > 1) {
-            return statuses.MATCHED;
-        }
-
-        if (getPriceType() == PriceInfo.priceTypes.INSTABUY) {
-            if (pricePerItem - tolerance > getMarketPrice()) {
-                return statuses.OUTBID;
-            }
-        } else if (getPriceType() == PriceInfo.priceTypes.INSTASELL) {
-            if (pricePerItem + tolerance < getMarketPrice()) {
-                return statuses.OUTBID;
-            }
-        }
-
-        return statuses.COMPETITIVE;
-    }
-
     public double getFlipPrice() {
         updateMarketPrice(productID);
         if (getMarketOppositePrice() == 0) {
             return 0;
         }
-        if (getPriceType() == PriceInfo.priceTypes.INSTABUY) {
+        if (getPriceType() == com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo.priceTypes.INSTABUY) {
             return (getMarketOppositePrice() + .1);
         } else {
             return (getMarketOppositePrice() - .1);
@@ -230,13 +210,14 @@ public class BazaarOrder extends OrderInfo {
 
     public void setFilled() {
         amountFilled = volume;
-        fillStatus = statuses.FILLED;
+        fillStatus = Statuses.FILLED;
     }
 
     public void removeFromWatchedItems() {
         if (!BUConfig.get().userOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
+        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.REMOVE, this));
         Util.scheduleConfigSave();
     }
 }

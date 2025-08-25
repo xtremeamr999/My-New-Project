@@ -273,9 +273,9 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        String itemInfo = BUConfig.get().userOrders.get(index).toString();
-        BUConfig.get().userOrders.remove(index);  // Changed to directly use config.watchedItems.remove()
-        PlayerActionUtil.notifyAll("Removed " + itemInfo, Util.notificationTypes.COMMAND);
+        BazaarOrder bazaarOrder = BUConfig.get().userOrders.get(index);
+        bazaarOrder.removeFromWatchedItems();
+        PlayerActionUtil.notifyAll("Removed " + bazaarOrder, Util.notificationTypes.COMMAND);
         return 1;
     }
 

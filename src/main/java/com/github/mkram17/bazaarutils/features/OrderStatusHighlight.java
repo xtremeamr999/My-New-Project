@@ -36,7 +36,8 @@ public class OrderStatusHighlight implements BUListener {
     private static List<BazaarOrder> getHighlightedOrders() {
         return BUConfig.get().userOrders.stream()
                 .filter(order -> order.getItemInfo() != null
-                        && order.getItemInfo().slotIndex() != null)
+                        && order.getItemInfo().slotIndex() != null
+                        && order.getFillStatus() == BazaarOrder.Statuses.SET)
                 .toList();
     }
 

@@ -43,6 +43,8 @@ public class ChatHandler {
     @RunOnInit
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+            if(message.getString().contains("Error")) return;
+
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
             getMessageType(message, siblings).ifPresent(messageType -> {
                 switch (messageType) {
