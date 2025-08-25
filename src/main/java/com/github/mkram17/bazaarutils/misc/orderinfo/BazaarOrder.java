@@ -1,12 +1,15 @@
 package com.github.mkram17.bazaarutils.misc.orderinfo;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
+import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import meteordevelopment.orbit.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,11 +47,36 @@ public class BazaarOrder extends OrderInfo {
         this.volume = volume;
         this.fillStatus = Statuses.SET;
         this.tolerance = calculateTolerance();
+        handleOutbidStatusChange();
     }
 
     public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
         this(name, volume, pricePerItem, priceType);
         this.itemInfo = itemInfo;
+    }
+    @EventHandler
+    private void onDataUpdate(BazaarDataUpdateEvent e){
+        updateMarketPrice();
+        handleOutbidStatusChange();
+    }
+
+    @EventHandler
+    private void onUserOrderChange(UserOrdersChangeEvent e) {
+        if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this)
+            return;
+        updateMarketPrice();
+        handleOutbidStatusChange();
+    }
+
+    private void handleOutbidStatusChange(){
+        Optional<Statuses> outbidOptional = findOutbidStatus();
+        if(outbidOptional.isEmpty()) return;
+
+        Statuses newStatus = outbidOptional.get();
+        if(outbidStatus != newStatus){
+            outbidStatus = newStatus;
+            EVENT_BUS.post(new OutbidOrderEvent(this, newStatus == Statuses.OUTBID));
+        }
     }
 
     private double calculateTolerance() {
@@ -56,7 +84,7 @@ public class BazaarOrder extends OrderInfo {
         if (pricePerItem == null || volume == null) {
             return DEFAULT_TOLERANCE;
         }
-        //doesnt round prices when total is over 10k
+        //doesn't round prices when the total is over 10k
         if (pricePerItem * volume < TOTAL_PRICE_ROUNDING_THRESHOLD) {
             return 0;
         } else {

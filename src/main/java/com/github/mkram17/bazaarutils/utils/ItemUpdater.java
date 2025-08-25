@@ -53,7 +53,6 @@ public class ItemUpdater {
         for (BazaarOrder item : foundOrders) {
             Util.addWatchedOrder(item);
         }
-        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE, null));
     }
 
     private static BazaarOrder parseOrderFromItemStack(ItemStack stack) {

@@ -7,10 +7,10 @@ import meteordevelopment.orbit.ICancellable;
 
 public class OutbidOrderEvent implements ICancellable {
     @Getter
-    private final OrderInfo order;
+    private final BazaarOrder order;
     @Getter
     private final boolean isOutbid;
-    public OutbidOrderEvent(OrderInfo order, boolean isOutbid) {
+    public OutbidOrderEvent(BazaarOrder order, boolean isOutbid) {
         this.order = order;
         this.isOutbid = isOutbid;
     }

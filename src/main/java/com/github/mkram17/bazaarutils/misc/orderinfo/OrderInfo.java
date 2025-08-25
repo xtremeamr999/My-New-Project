@@ -34,7 +34,6 @@ public class OrderInfo extends PriceInfo implements BUListener {
         subscribe();
         scheduleHealthCheck();
         updateMarketPrice();
-        handleOutbidStatusChange();
     }
 
     public static boolean isValidName(String itemName){
@@ -81,31 +80,6 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
     private boolean isProductIDHealthy() {
         return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, getPriceType()) == null);
-    }
-
-    @EventHandler
-    private void onDataUpdate(BazaarDataUpdateEvent e){
-        updateMarketPrice();
-        handleOutbidStatusChange();
-    }
-
-    @EventHandler
-    private void onUserOrderChange(UserOrdersChangeEvent e) {
-        if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this)
-            return;
-        updateMarketPrice();
-        handleOutbidStatusChange();
-    }
-
-    private void handleOutbidStatusChange(){
-        Optional<Statuses> outbidOptional = findOutbidStatus();
-        if(outbidOptional.isEmpty()) return;
-
-        Statuses newStatus = outbidOptional.get();
-        if(outbidStatus != newStatus){
-            outbidStatus = newStatus;
-            EVENT_BUS.post(new OutbidOrderEvent(this, newStatus == Statuses.OUTBID));
-        }
     }
 
     public Optional<Statuses> findOutbidStatus() {
