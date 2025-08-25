@@ -4,8 +4,8 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -28,48 +28,29 @@ import net.minecraft.util.Formatting;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PriceCharts implements ItemTooltipCallback, BUListener {
     @Getter @Setter
     private boolean showOutsideBazaar = false;
 
-    @EventHandler
-    public void onChestLoad(ChestLoadedEvent e){
-        for(ItemStack stack : e.getItemStacks()){
-            if(stack == null || stack.isEmpty())
-                continue;
-            String itemName = stack.getName().getString();
-            if(OrderInfo.isValidName(itemName)) {
-                stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, true);
-                //for checking items missing from bazaar-resources product id conversions
-//            if(stack.getComponentChanges() != null && stack.getComponentChanges().get(DataComponentTypes.CUSTOM_DATA) != null) {
-//                productID = stack.getComponentChanges().get(DataComponentTypes.CUSTOM_DATA).toString();
-//                productID = productID.substring(productID.indexOf("\"")+1, productID.lastIndexOf("\""));
-//                if(productID.contains(itemName.toUpperCase()) ||
-//                        (itemName.contains(" ") && productID.contains(itemName.substring(0, itemName.indexOf(" ")).toUpperCase())) ||
-//                        (itemName.contains("-") && productID.contains(itemName.substring(0, itemName.indexOf("-")).toUpperCase()))) {
-//                    Util.notifyAll("New product id detected: " + productID + "name: " + itemName, Util.notificationTypes.BAZAARDATA);
-//                }
-//            }
-            } else {
-                stack.set(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT, false);
-            }
-        }
-    }
+    // Cache: sanitized item name -> should show tooltip
+    private static final Map<String, Boolean> SHOW_CACHE = new ConcurrentHashMap<>();
 
     @Override
-    public void getTooltip(ItemStack stack, Item.TooltipContext tooltip, TooltipType tooltipType, List<Text> lines) {
-        if (stack == null || stack.isEmpty() || !shouldShow() || stack.getItem().getName().getString().contains("GLASS_PANE"))
-            return;
+    public void getTooltip(ItemStack stack, Item.TooltipContext ctx, TooltipType type, List<Text> lines) {
+        if (stack == null || stack.isEmpty() || !shouldShow()) return;
+        if (stack.getItem().getName().getString().contains("GLASS_PANE")) return;
 
+        String key = sanitizeName(stack.getName().getString());
 
-        if(Boolean.FALSE.equals(stack.get(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT)))
+        // Lazily populate cache if a synced/replaced stack appears later
+        if (!SHOW_CACHE.computeIfAbsent(key, OrderInfo::isValidName))
             return;
 
         MutableText text = Text.literal("CTRL+SHIFT click for price charts & other info")
-                .formatted(Formatting.GOLD)
-                .formatted(Formatting.BOLD);
-
+                .formatted(Formatting.GOLD, Formatting.BOLD);
         MutableText poweredBy = Text.literal("Powered by skyblock.finance")
                 .formatted(Formatting.GRAY);
 
@@ -80,23 +61,20 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
 
     @EventHandler
     private void onClick(SlotClickEvent e){
-        if(!shouldShow() || Boolean.FALSE.equals(e.slot.getStack().get(BazaarUtils.CUSTOM_SHOWPRICECHART_COMPONENT)) || e.isCancelled() ||  !(Screen.hasShiftDown() && Screen.hasControlDown()))
+        if (!shouldShow() || e.isCancelled() || !(Screen.hasShiftDown() && Screen.hasControlDown()))
             return;
 
-        String itemName = e.slot.getStack().getName().getString();
-        if (itemName.contains("x") && itemName.indexOf("x") == itemName.length() - 2)
-            itemName = itemName.substring(0, itemName.indexOf("x") - 1);
+        String itemName = sanitizeName(e.slot.getStack().getName().getString());
+        if (!SHOW_CACHE.getOrDefault(itemName, false)) return;
 
         String productID = BazaarData.findProductId(itemName);
-        String link = "https://skyblock.finance/items/"+productID;
-        MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
+        String link = "https://skyblock.finance/items/" + productID;
+        MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen(confirmed -> {
             if (confirmed) {
                 try {
-                    //screen is closed after doing command, so must execute later
-                        net.minecraft.util.Util.getOperatingSystem().open(new URI(link));
-
-                } catch (URISyntaxException exception) {
-                    Util.notifyError("Failed to open skyblock.finance link.", exception);
+                    net.minecraft.util.Util.getOperatingSystem().open(new URI(link));
+                } catch (URISyntaxException ex) {
+                    Util.notifyError("Failed to open skyblock.finance link.", ex);
                 }
             }
             MinecraftClient.getInstance().setScreen(null);
@@ -108,11 +86,22 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     public void subscribe() {
         ItemTooltipCallback.EVENT.register(this);
         BazaarUtils.EVENT_BUS.subscribe(this);
+        // Clear cache when (re)subscribing to avoid stale bazaar state leakage
+        SHOW_CACHE.clear();
     }
 
     private boolean shouldShow(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         return (screenInfo.inBazaar() || showOutsideBazaar) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
+    }
+
+    private static String sanitizeName(String raw){
+        int len = raw.length();
+        if (len > 3 && raw.charAt(len - 2) == 'x' && Character.isDigit(raw.charAt(len - 1))) {
+            int idx = raw.lastIndexOf('x');
+            if (idx > 0) return raw.substring(0, idx - 1);
+        }
+        return raw;
     }
 
     public Option<Boolean> createOption() {

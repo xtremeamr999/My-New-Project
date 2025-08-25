@@ -142,7 +142,7 @@ public class Bookmark extends CustomItemButton {
 
     public static String findItemName(ChestLoadedEvent e){
         String nameFromContainer = findItemNameFromContainer();
-        if(!OrderInfo.isValidName(nameFromContainer)) {
+        if(!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
         return nameFromContainer;

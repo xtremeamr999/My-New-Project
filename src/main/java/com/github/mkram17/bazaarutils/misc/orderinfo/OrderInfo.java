@@ -30,7 +30,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
     }
 
     public static boolean isValidName(String itemName){
-        return itemName != null && itemName.length() > 30 && BazaarData.findProductId(itemName) != null;
+        return itemName != null && BazaarData.findProductId(itemName) != null;
     }
 
     public void updateMarketPrice(){
