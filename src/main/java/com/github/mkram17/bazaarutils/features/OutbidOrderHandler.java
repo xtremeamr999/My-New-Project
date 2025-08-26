@@ -3,9 +3,8 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
@@ -48,9 +47,9 @@ public class OutbidOrderHandler implements BUListener {
 
     @EventHandler
     public void onOutbid(OutbidOrderEvent e){
-        OrderInfo order = e.getOrder();
+        OrderInfoContainer order = e.getOrder();
         if(!notifyOutbid) return;
-        if(!(order instanceof BazaarOrder bazaarOrder) || bazaarOrder.getFillStatus() == OrderInfo.Statuses.FILLED) return;
+        if(!(order instanceof BazaarOrder bazaarOrder) || bazaarOrder.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
 
         Text amount = Text.literal(bazaarOrder.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
         Text itemName = Text.literal(bazaarOrder.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
@@ -107,7 +106,7 @@ public class OutbidOrderHandler implements BUListener {
 
     public static List<BazaarOrder> getOutdatedOrders() {
         return BUConfig.get().userOrders.stream()
-                .filter(order -> order.getOutbidStatus() == OrderInfo.Statuses.OUTBID && order.getFillStatus() != OrderInfo.Statuses.FILLED)
+                .filter(order -> order.getOutbidStatus() == OrderInfoContainer.Statuses.OUTBID && order.getFillStatus() != OrderInfoContainer.Statuses.FILLED)
                 .toList();
     }
 

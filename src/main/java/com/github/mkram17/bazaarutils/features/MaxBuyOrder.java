@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -53,7 +53,7 @@ public class MaxBuyOrder extends CustomOrder {
             if(productID == null)
                 return;
 
-            double cost = BazaarData.findItemPrice(productID, PriceInfo.priceTypes.INSTASELL) + .1;//.1 is for lowest competitive price
+            double cost = BazaarData.findItemPrice(productID, PriceInfoContainer.priceTypes.INSTASELL) + .1;//.1 is for lowest competitive price
 
             int amountCanBuy = (int) (Math.floor(purse / cost));
             super.setOrderAmount(Math.min(amountCanBuy, 71680));

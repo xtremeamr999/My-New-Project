@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -60,7 +60,7 @@ public class BazaarData{
         }, bazaarDataDelay, 1, TimeUnit.SECONDS);
     }
 
-    public static int getOrderCount(String productId, PriceInfo.priceTypes priceType, double price) {
+    public static int getOrderCount(String productId, PriceInfoContainer.priceTypes priceType, double price) {
         if (bazaarReply == null) {
             Util.notifyError("Bazaar data is null", new Throwable());
             return -1;
@@ -73,9 +73,9 @@ public class BazaarData{
             }
 
             java.util.List<SkyBlockBazaarReply.Product.Summary> summaryList;
-            if (priceType == PriceInfo.priceTypes.INSTABUY) {
+            if (priceType == PriceInfoContainer.priceTypes.INSTABUY) {
                 summaryList = product.getBuySummary();
-            } else if (priceType == PriceInfo.priceTypes.INSTASELL) {
+            } else if (priceType == PriceInfoContainer.priceTypes.INSTASELL) {
                 summaryList = product.getSellSummary();
             } else {
                 return -1; // invalid price type
@@ -96,7 +96,7 @@ public class BazaarData{
         }
     }
 
-    public static Double findItemPrice(String productId, PriceInfo.priceTypes priceType) {
+    public static Double findItemPrice(String productId, PriceInfoContainer.priceTypes priceType) {
         if (bazaarReply == null) {
             Util.notifyError("Bazaar data is null", new Throwable());
             return -1.0;
@@ -111,14 +111,14 @@ public class BazaarData{
             var sell_order_summary = product.getBuySummary();
             var buy_order_summary = product.getSellSummary();
 
-            if (priceType == PriceInfo.priceTypes.INSTABUY) {
+            if (priceType == PriceInfoContainer.priceTypes.INSTABUY) {
                 if (sell_order_summary.isEmpty()) {
                     PlayerActionUtil.notifyAll("Buy summary is empty for product ID: " + productId, Util.notificationTypes.BAZAARDATA);
                     return 0.0;
                 }
                 double sellOrderPrice = sell_order_summary.getFirst().getPricePerUnit();
                 return sellOrderPrice;
-            } else if (priceType == PriceInfo.priceTypes.INSTASELL) {
+            } else if (priceType == PriceInfoContainer.priceTypes.INSTASELL) {
                 if (buy_order_summary.isEmpty()) {
                     PlayerActionUtil.notifyAll("Sell summary is empty for product ID: " + productId + ", returning 0 for INSTABUY.", Util.notificationTypes.BAZAARDATA);
                     return 0.0;

@@ -1,10 +1,12 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import lombok.Getter;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 
 //TODO use this instead of OutdatedOrderEvent
-public record BazaarChatEvent(@Getter BazaarEventTypes type, @Getter BazaarOrder order) {
+public record BazaarChatEvent<T extends OrderInfoContainer>(
+        BazaarEventTypes type,
+        T order
+) {
     public enum BazaarEventTypes {
         ORDER_CREATED,
         ORDER_CANCELLED,

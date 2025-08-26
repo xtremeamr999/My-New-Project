@@ -7,10 +7,10 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.*;
 import lombok.Getter;
@@ -42,7 +42,7 @@ public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
     @Getter
-    private OrderInfo orderInfo;
+    private OrderInfoContainer orderInfo;
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
@@ -62,7 +62,7 @@ public class Bookmark extends CustomItemButton {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfo(name, 0.0, PriceInfo.priceTypes.INSTABUY);
+        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.priceTypes.INSTABUY);
 
         BazaarUtils.EVENT_BUS.subscribe(this);
     }
@@ -142,7 +142,7 @@ public class Bookmark extends CustomItemButton {
 
     public static String findItemName(ChestLoadedEvent e){
         String nameFromContainer = findItemNameFromContainer();
-        if(!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
+        if(!OrderInfoContainer.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
         return nameFromContainer;
@@ -226,7 +226,7 @@ public class Bookmark extends CustomItemButton {
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
                 MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
-                OrderInfo priceInfo = bookmark.getOrderInfo();
+                OrderInfoContainer priceInfo = bookmark.getOrderInfo();
 
                 if (priceInfo != null) {
                     Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);

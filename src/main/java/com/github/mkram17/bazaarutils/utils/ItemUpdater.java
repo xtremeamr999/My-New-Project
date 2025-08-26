@@ -2,11 +2,11 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.ItemInfo;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -16,169 +16,231 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public class ItemUpdater {
     private static Inventory lowerChestInventory;
 
-    private static final String BUY_ORDER_PREFIX = "BUY";
-    private static final String SELL_ORDER_PREFIX = "SELL";
-    private static final String FILLED_LORE = "Filled";
-    private static final String PER_UNIT_LORE = "per unit";
-    private static final String TO_CLAIM_LORE = "to claim!";
-    private static final String ITEMS_LORE = "items";
-    private static final String COINS_LORE = " coins";
-    private static final String ORDER_VOLUME_LORE = "Order amount: ";
-    private static final String OFFER_VOLUME_LORE = "Offer amount: ";
+    private static final String PREFIX_BUY = "BUY";
+    private static final String PREFIX_SELL = "SELL";
+
+    private static final String LORE_FILLED = "Filled";
+    private static final String LORE_PER_UNIT = "per unit";
+    private static final String LORE_TO_CLAIM = "to claim!";
+    private static final String LORE_ITEMS = "items";
+    private static final String LORE_COINS = " coins";
+    private static final String LORE_ORDER_AMOUNT = "Order amount: ";
+    private static final String LORE_OFFER_AMOUNT = "Offer amount: ";
+
+    private static final String WORD_UNIT = "unit:";
 
     @EventHandler(priority = EventPriority.HIGH)
-    public static void onGUI(ChestLoadedEvent e) {
+    public static void onGUI(ChestLoadedEvent event) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
 
-        lowerChestInventory = e.getLowerChestInventory();
-        List<ItemStack> orderScreen = e.getItemStacks();
-        List<ItemStack> orderStacks = findOrders(orderScreen);
-        updateWatchedItems(orderStacks);
+        lowerChestInventory = event.getLowerChestInventory();
+        List<ItemStack> rawStacks = event.getItemStacks();
+        List<ItemStack> orderStacks = extractOrderStacks(rawStacks);
+        updateWatchedOrders(orderStacks);
     }
 
-    private static void updateWatchedItems(List<ItemStack> orderStacks) {
-        List<BazaarOrder> foundOrders = orderStacks.stream()
+    private static void updateWatchedOrders(List<ItemStack> orderStacks) {
+        List<OrderInfoContainer> parsedOrders = orderStacks.stream()
                 .map(ItemUpdater::parseOrderFromItemStack)
                 .toList();
+        updateOrders(parsedOrders);
+    }
 
-        BUConfig.get().userOrders.clear();
-        for (BazaarOrder item : foundOrders) {
-            Util.addWatchedOrder(item);
+    private static void updateOrders(List<OrderInfoContainer> parsedOrders) {
+        List<BazaarOrder> userOrdersCopy = new ArrayList<>(BUConfig.get().userOrders);
+
+        parsedOrders.iterator().forEachRemaining(order -> {
+            Optional<BazaarOrder> matchedOrder = order.findOrderInList(userOrdersCopy);
+
+            //if we find a match, update its values that can be found only in the orders menu
+            matchedOrder.ifPresent(matched -> {
+                updateInfo(matched);
+                userOrdersCopy.remove(matched);
+            });
+
+            //if we can't find a match, this is an order that isn't being tracked, so we add it (shouldn't happen)
+            if(matchedOrder.isEmpty()){
+                Util.addWatchedOrder((BazaarOrder) order);
+            }
+        });
+
+        //any orders left in userOrdersCopy are old orders that should be removed
+        if(!userOrdersCopy.isEmpty()){
+            userOrdersCopy.forEach(BazaarOrder::removeFromWatchedItems);
         }
     }
 
-    private static BazaarOrder parseOrderFromItemStack(ItemStack stack) {
-        String customName = stack.getName().getString();
+    private static void updateInfo(BazaarOrder order) {
+        Optional<? extends LoreComponent> loreComponent = order.getItemInfo().itemStack().getComponentChanges().get(DataComponentTypes.LORE);
+        if (loreComponent == null || loreComponent.isEmpty()) {
+            return;
+        }
+
+        List<Text> loreLines = loreComponent.get().styledLines();
+
+
+        int amountFilled = parseAmountFilled(loreLines);
+        int amountClaimed = parseAmountClaimed(loreLines, amountFilled);
+        if (amountFilled >= 0) {
+            order.setAmountFilled(amountFilled);
+//            if (Util.genericIsSimilarValue(amountFilled, volume, volume * FILL_TOLERANCE_RATIO)) {
+//                order.setFilled();
+//            }
+        }
+        if (amountClaimed >= 0) {
+            order.setAmountClaimed(amountClaimed);
+        }
+        order.setTolerance(0.0);
+
+    }
+
+    private static OrderInfoContainer parseOrderFromItemStack(ItemStack stack) {
+        String title = stack.getName().getString();
+        ItemInfo itemInfo = new ItemInfo(mapScreenIndexToInventoryIndex(stack), stack);
+
         Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
-//            Util.notifyError("Error while parsing order from item stack", new Exception("Lore component is null or empty"));
+            return null;
+        }
+        List<Text> loreLines = loreComponent.get().styledLines();
+
+        OrderType orderType = detectOrderType(title);
+        if (orderType == null) {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Could not determine order side"));
             return null;
         }
 
-        List<Text> lore = loreComponent.get().styledLines();
-        boolean isSellOrder;
-        String name;
-
-        if (customName.contains(BUY_ORDER_PREFIX)) {
-            name = customName.substring(BUY_ORDER_PREFIX.length() + 1);
-            isSellOrder = false;
-        } else if (customName.contains(SELL_ORDER_PREFIX)) {
-            name = customName.substring(SELL_ORDER_PREFIX.length() + 1);
-            isSellOrder = true;
-        } else {
-            Util.notifyError("Error while parsing order from item stack", new Exception("Could not determine if order is buy or sell"));
+        double unitPrice = parseUnitPrice(loreLines);
+        if (Double.isNaN(unitPrice)) {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Missing unit price"));
             return null;
         }
 
-        Text unitPriceText = Util.findComponentWith(lore, PER_UNIT_LORE);
-        if (unitPriceText == null) {
-            Util.notifyError("Error while parsing order from item stack", new Exception("Could not find unit price in lore"));
+        int volume = parseVolume(loreLines);
+        if (volume == -1) {
+            Util.notifyError("Error while parsing order from item stack", new Exception("Missing volume"));
             return null;
         }
-        double unitPrice = Double.parseDouble(Util.extractTextAfterWord(unitPriceText.getString(), "unit:"));
-        int volume;
-        int amountFilled = -1;
-        int amountClaimed = -1;
 
-        Text amountFilledText = Util.findComponentWith(lore, FILLED_LORE);
-        if (amountFilledText != null) {
-            amountFilled = Util.parseNumber(amountFilledText.getString().substring(8, amountFilledText.getString().indexOf("/")));
-        }
+        String cleanName = stripPrefix(title, orderType);
 
-        Text volumeText = Util.findComponentWith(lore, ORDER_VOLUME_LORE);
-        if (volumeText == null) {
-            volumeText = Util.findComponentWith(lore, OFFER_VOLUME_LORE);
-        }
+        PriceInfoContainer.priceTypes priceType = orderType == OrderType.SELL
+                ? PriceInfoContainer.priceTypes.INSTABUY
+                : PriceInfoContainer.priceTypes.INSTASELL;
 
-        if (volumeText != null) {
-            var volumeTextSiblings = volumeText.getSiblings();
-            volume = Util.parseNumber(volumeTextSiblings.get(1).getString());
-        } else {
-                Util.notifyError("Error while parsing order from item stack", new Exception("Could not find volume in lore"));
-            volume = -1; // should never happen
-        }
-
-        if (amountFilled != -1) {
-            Text amountUnclaimedText = Util.findComponentWith(lore, TO_CLAIM_LORE);
-            if (amountUnclaimedText != null) {
-                int amountUnclaimed;
-                if (!amountUnclaimedText.getString().contains(ITEMS_LORE)) {
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedText.getString().substring(9, amountUnclaimedText.getString().indexOf(COINS_LORE)));
-                } else {
-                    amountUnclaimed = Util.parseNumber(amountUnclaimedText.getString().substring(9, amountUnclaimedText.getString().indexOf(ITEMS_LORE) - 1));
-                }
-                amountClaimed = amountFilled - amountUnclaimed;
-            } else {
-                amountClaimed = amountFilled;
-            }
-        }
-
-        PriceInfo.priceTypes type = isSellOrder ? PriceInfo.priceTypes.INSTABUY : PriceInfo.priceTypes.INSTASELL;
-        ItemInfo itemInfo = findItemInfo(stack);
-        BazaarOrder bazaarOrder = new BazaarOrder(name, volume, unitPrice, type, itemInfo);
-
-        bazaarOrder.setTolerance(0.0);
-
-        if (amountFilled > -1) {
-            bazaarOrder.setAmountFilled(amountFilled);
-            if (Util.genericIsSimilarValue(amountFilled, volume, volume*.05)) {
-                bazaarOrder.setFilled();
-            }
-        }
-        if (amountClaimed > -1) {
-            bazaarOrder.setAmountClaimed(amountClaimed);
-        }
-
-        return bazaarOrder;
+        return new OrderInfoContainer(cleanName, volume, unitPrice, priceType, itemInfo);
     }
 
-    private static ItemInfo findItemInfo(ItemStack itemStack) {
-        int inventoryIndex = mapScreenIndexToInventoryIndex(itemStack);
-        return new ItemInfo(inventoryIndex, itemStack);
+    private static OrderType detectOrderType(String title) {
+        if (title.contains(PREFIX_BUY)) return OrderType.BUY;
+        if (title.contains(PREFIX_SELL)) return OrderType.SELL;
+        return null;
     }
 
-    //TODO switch to using ItemStack instead of OrderData so it's faster
-    private static int mapScreenIndexToInventoryIndex(ItemStack itemStack) {
-        if (lowerChestInventory == null)
+    private static String stripPrefix(String title, OrderType type) {
+        String prefix = (type == OrderType.BUY ? PREFIX_BUY : PREFIX_SELL) + " ";
+        return title.startsWith(prefix) ? title.substring(prefix.length()) : title;
+    }
+
+    private static double parseUnitPrice(List<Text> lore) {
+        Text line = Util.findComponentWith(lore, LORE_PER_UNIT);
+        if (line == null) return Double.NaN;
+        String raw = line.getString();
+        try {
+            return Double.parseDouble(Util.extractTextAfterWord(raw, WORD_UNIT));
+        } catch (Exception ignored) {
+            return Double.NaN;
+        }
+    }
+
+    private static int parseVolume(List<Text> lore) {
+        Text line = Util.findComponentWith(lore, LORE_ORDER_AMOUNT);
+        if (line == null) {
+            line = Util.findComponentWith(lore, LORE_OFFER_AMOUNT);
+        }
+        if (line == null) return -1;
+        try {
+            // Original logic used sibling index 1
+            return Util.parseNumber(line.getSiblings().get(1).getString());
+        } catch (Exception e) {
             return -1;
+        }
+    }
 
+    private static int parseAmountFilled(List<Text> lore) {
+        Text filledLine = Util.findComponentWith(lore, LORE_FILLED);
+        if (filledLine == null) return -1;
+        String s = filledLine.getString();
+        int slash = s.indexOf('/');
+        if (slash == -1) return -1;
+        try {
+            // Original substring(8, indexOf("/")) behavior retained
+            return Util.parseNumber(s.substring(8, slash));
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private static int parseAmountClaimed(List<Text> lore, int amountFilled) {
+        if (amountFilled < 0) return -1;
+        Text unclaimedLine = Util.findComponentWith(lore, LORE_TO_CLAIM);
+        if (unclaimedLine == null) {
+            return amountFilled; // fully claimed
+        }
+        String raw = unclaimedLine.getString();
+        int start = 9; // preserve original logic substring(9, ...)
+        int end;
+        if (!raw.contains(LORE_ITEMS)) {
+            end = raw.indexOf(LORE_COINS);
+        } else {
+            end = raw.indexOf(LORE_ITEMS) - 1;
+        }
+        if (end <= start) return -1;
+        try {
+            int unclaimed = Util.parseNumber(raw.substring(start, end));
+            return amountFilled - unclaimed;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private static List<ItemStack> extractOrderStacks(List<ItemStack> screenStacks) {
+        List<ItemStack> result = new ArrayList<>();
+        for (ItemStack stack : screenStacks) {
+            if (stack.isOf(Items.BLACK_STAINED_GLASS_PANE)) continue;
+            if (stack.isOf(Items.ARROW)) break; // stop at navigation arrow
+            result.add(stack);
+        }
+        return result;
+    }
+
+    private static int mapScreenIndexToInventoryIndex(ItemStack target) {
+        if (lowerChestInventory == null) return -1;
         for (int i = 0; i < lowerChestInventory.size(); i++) {
-            ItemStack inventoryStack = lowerChestInventory.getStack(i);
-            if (!inventoryStack.isEmpty()) {
-                if (inventoryStack.equals(itemStack)) {
-                    return i;
-                }
+            ItemStack current = lowerChestInventory.getStack(i);
+            if (!current.isEmpty() && current.equals(target)) {
+                return i;
             }
         }
         return -1;
     }
 
-    private static ArrayList<ItemStack> findOrders(List<ItemStack> orderScreenStacks) {
-        ArrayList<ItemStack> orderStacks = new ArrayList<>();
-
-        for (ItemStack orderScreenStack : orderScreenStacks) {
-            if (orderScreenStack.isOf(Items.BLACK_STAINED_GLASS_PANE)) {
-                continue;
-            }
-            if (orderScreenStack.isOf(Items.ARROW)) {
-                break; // the back arrow will be the first item that isnt a glass pane, so we know to stop adding items to the orders when we get here
-            }
-            orderStacks.add(orderScreenStack);
-        }
-
-        return orderStacks;
-    }
-
     @RunOnInit
     public static void subscribe() {
         EVENT_BUS.subscribe(ItemUpdater.class);
+    }
+
+    private enum OrderType {
+        BUY, SELL
     }
 }

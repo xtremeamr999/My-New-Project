@@ -1,16 +1,13 @@
 package com.github.mkram17.bazaarutils.misc.orderinfo;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.concurrent.TimeUnit;
 
-
-//Simply a container for information about price of an item. For actual orders, use OrderInfo or BazaarOrder instead
-public class PriceInfo {
+//Simply a container for information about price of an item. For actual orders, use OrderInfoContainer or BazaarOrder instead
+public class PriceInfoContainer {
     @Getter
     public enum priceTypes{INSTASELL,INSTABUY;
         private priceTypes opposite;
@@ -38,7 +35,7 @@ public class PriceInfo {
     @Getter @Setter
     private Double marketOppositePrice;
 
-    public PriceInfo(Double pricePerItem, priceTypes priceType) {
+    public PriceInfoContainer(Double pricePerItem, priceTypes priceType) {
         this.priceType = priceType;
         if(pricePerItem != null){
             this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
