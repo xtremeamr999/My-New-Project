@@ -12,6 +12,7 @@ import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -66,8 +67,9 @@ public class OutbidOrderHandler implements BUListener {
             Util.tickExecuteLater(2, () -> {
                     PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
             });
-
-            if (notificationSound) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            var player = client.player;
+            if (notificationSound && player != null) {
                 SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
             }
         } else {

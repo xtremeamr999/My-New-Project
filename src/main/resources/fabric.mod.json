@@ -32,7 +32,8 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "${mcVersion}",
 		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"yacl": ">=3.6.2"
 	},
 	"suggests": {
 		"amecsreborn": ">=2.02",
