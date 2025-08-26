@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfo;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
@@ -11,7 +11,6 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 
-import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
@@ -38,9 +37,6 @@ public final class BazaarData {
 
     private static final AtomicInteger consecutiveIdenticalSnapshots = new AtomicInteger(0);
     private static final AtomicInteger consecutiveFailures = new AtomicInteger(0);
-
-    /* Reflection fallback if mixin not applied */
-    private static Field reflectionLastUpdatedField;
 
     /* Cached conversions: lowercase name -> productId */
     private static volatile Map<String, String> nameToProductIdCache = Map.of();
@@ -132,18 +128,11 @@ public final class BazaarData {
 
     private static long extractLastUpdated(SkyBlockBazaarReply reply) {
         try {
-            return ((AccessorSkyBlockBazaarReply) (Object) reply).bazaarutils$getLastUpdated();
-        } catch (ClassCastException ignored) {
-            try {
-                if (reflectionLastUpdatedField == null) {
-                    reflectionLastUpdatedField = SkyBlockBazaarReply.class.getDeclaredField("lastUpdated");
-                    reflectionLastUpdatedField.setAccessible(true);
-                }
-                return reflectionLastUpdatedField.getLong(reply);
-            } catch (Exception e) {
-                Util.notifyError("Failed to access lastUpdated (mixin+reflection failed)", e);
-                return -1;
-            }
+            return ((AccessorSkyBlockBazaarReply) reply).bazaarutils$getLastUpdated();
+        } catch (Exception e) {
+            Util.notifyError("Failed to access lastUpdated (mixin+reflection failed)", e);
+            return -1;
+
         }
     }
 
@@ -152,7 +141,7 @@ public final class BazaarData {
      * Get the number of orders at an exact price for a product & price type.
      * @return OptionalInt empty if reply / product / priceType invalid or not found.
      */
-    public static OptionalInt getOrderCountOptional(String productId, PriceInfo.priceTypes priceType, double price) {
+    public static OptionalInt getOrderCountOptional(String productId, PriceInfoContainer.priceTypes priceType, double price) {
         SkyBlockBazaarReply reply = currentReply;
         if (reply == null || productId == null || priceType == null) return OptionalInt.empty();
 
@@ -182,7 +171,7 @@ public final class BazaarData {
      * Preferred new method: obtain the best matching instantaneous price.
      * INSTABUY -> top of buySummary (people selling). INSTASELL -> top of sellSummary (people buying).
      */
-    public static OptionalDouble findItemPriceOptional(String productId, PriceInfo.priceTypes priceType) {
+    public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.priceTypes priceType) {
         SkyBlockBazaarReply reply = currentReply;
         if (reply == null || productId == null || priceType == null) return OptionalDouble.empty();
 
@@ -243,7 +232,7 @@ public final class BazaarData {
     }
 
     @Deprecated
-    public static Double findItemPrice(String productId, PriceInfo.priceTypes priceType) {
+    public static Double findItemPrice(String productId, PriceInfoContainer.priceTypes priceType) {
         return findItemPriceOptional(productId, priceType).orElse(-1.0);
     }
 
@@ -253,7 +242,7 @@ public final class BazaarData {
     }
 
     @Deprecated
-    public static int getOrderCount(String productId, PriceInfo.priceTypes priceType, double price) {
+    public static int getOrderCount(String productId, PriceInfoContainer.priceTypes priceType, double price) {
         return getOrderCountOptional(productId, priceType, price).orElse(-1);
     }
 
