@@ -33,11 +33,11 @@
 		"minecraft": "${mcVersion}",
 		"java": ">=21",
 		"fabric-api": "*",
-		"yacl": ">=3.6.2"
+		"yet_another_config_lib_v3": "*"
 	},
 	"suggests": {
 		"amecsreborn": ">=2.02",
-		"modmenu": "13.0.1"
+		"modmenu": ">=13.0.1"
 	},
 	"custom": {
 		"latestMajorUpdateNotes": "${major_update_notes}",
