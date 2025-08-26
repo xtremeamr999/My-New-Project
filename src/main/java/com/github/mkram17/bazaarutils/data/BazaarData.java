@@ -213,7 +213,7 @@ public final class BazaarData {
             try {
                 Map<String, String> mutable = new HashMap<>();
                 var resources = ResourceManager.getResourceJson();
-                var conversions = resources.getAsJsonObject("bazaarConversions");
+                var conversions = resources.getAsJsonObject();
                 for (String key : conversions.keySet()) {
                     String value = conversions.get(key).getAsString();
                     if (value != null) {
