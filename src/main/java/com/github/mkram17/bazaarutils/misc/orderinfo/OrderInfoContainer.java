@@ -27,23 +27,25 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     @Getter
     protected final Integer volume;
     @Getter
-    protected final String productID; //Hypixel's code for the product
+    protected String productID; //Hypixel's code for the product
     @Getter
-    protected Statuses outbidStatus = Statuses.SET;
+    protected Statuses outbidStatus;
     @Getter @Setter
     protected double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
     @Getter @Setter
     private ItemInfo itemInfo;
 
-    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, priceTypes priceType) {
+    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, PriceType priceType) {
         super(pricePerItem, priceType);
         this.volume = volume;
         this.name = name;
-        this.productID = BazaarData.findProductId(name);
         this.tolerance = calculateTolerance();
+        BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
+        findOutbidStatus().ifPresent(status -> this.outbidStatus = status);
+
         validateProduct();
     }
-    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
+    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
         this(name, volume, pricePerItem, priceType);
         this.itemInfo = itemInfo;
     }
@@ -92,27 +94,34 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         if (isProductIDHealthy()) {
             return true;
         }
-        String newProductID = BazaarData.findProductId(name);
-        if (newProductID == null) {
-            Util.logError("While refinding product id, could not find product ID for " + name, null);
-            return false;
-        } else {
+        Optional<String> newProductID = BazaarData.findProductIdOptional(name);
+        if (newProductID.isPresent()) {
             Util.logMessage("Successfully fixed product ID for " + name + ": " + newProductID);
             return true;
+        } else {
+            Util.logError("While refinding product id, could not find product ID for " + name, null);
+            return false;
         }
     }
 
     private boolean isProductIDHealthy() {
-        return !(productID == null || productID.isEmpty() || BazaarData.findItemPrice(productID, getPriceType()) == null);
+        return !(productID == null || productID.isEmpty() || BazaarData.findItemPriceOptional(productID, getPriceType()).isEmpty());
     }
 
     public Optional<Statuses> findOutbidStatus() {
-        if(pricePerItem == null || getMarketPrice() == null) return Optional.empty();
+        updateMarketPrice();
+        if(pricePerItem == null || getInstaSellPrice() == null) return Optional.empty();
 
-        if (pricePerItem > getMarketPrice()) {
-            return Optional.of(Statuses.OUTBID);
-        } else if (pricePerItem < getMarketPrice()) {
-            return Optional.of(Statuses.OUTBID);
+        if (pricePerItem > getInstaSellPrice()) {
+            if(priceType == PriceType.INSTASELL)
+                return Optional.of(Statuses.COMPETITIVE);
+            else
+                return Optional.of(Statuses.OUTBID);
+        } else if (pricePerItem < getInstaSellPrice()) {
+            if(priceType == PriceType.INSTASELL)
+                return Optional.of(Statuses.COMPETITIVE);
+            else
+                return Optional.of(Statuses.OUTBID);
         } else {
             if (BazaarData.getOrderCount(productID, getPriceType(), getPricePerItem()) > 1) {
                 return Optional.of(Statuses.MATCHED);
@@ -131,7 +140,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         Double otherOrderPrice = other.getPricePerItem();
         Integer otherOrderVolume = other.getVolume();
         int otherOrderAmountUnclaimed = other.getAmountFilled() - other.getAmountClaimed();
-        PriceInfoContainer.priceTypes priceType = other.getPriceType();
+        PriceType priceType = other.getPriceType();
 
         if (isStrict) {
             return isStrictlySimilarTo(otherOrderName, otherOrderPrice, otherOrderVolume, priceType);
@@ -139,14 +148,14 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         return isLooselySimilarTo(otherOrderName, otherOrderPrice, otherOrderVolume, otherOrderAmountUnclaimed, priceType);
     }
 
-    private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, PriceInfoContainer.priceTypes priceType) {
+    private boolean isStrictlySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, PriceType priceType) {
         return (areAnyNull(this.pricePerItem, otherOrderPrice) || isSimilarPrice(otherOrderPrice)) &&
                 (areAnyNull(this.volume, otherOrderVolume) || this.volume.equals(otherOrderVolume)) &&
                 (areAnyNull(this.name, otherOrderName) || this.name.equalsIgnoreCase(otherOrderName)) &&
                 (areAnyNull(this.priceType, priceType) || this.priceType == priceType);
     }
 
-    private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, PriceInfoContainer.priceTypes priceType) {
+    private boolean isLooselySimilarTo(String otherOrderName, Double otherOrderPrice, Integer otherOrderVolume, int otherOrderAmountUnclaimed, PriceType priceType) {
         return (areAnyNull(this.pricePerItem, otherOrderPrice) || this.isSimilarPrice(otherOrderPrice)) &&
                 (areAnyNull(this.volume, otherOrderVolume) || Util.genericIsSimilarValue(this.getVolume(), otherOrderVolume, 0.05 * otherOrderVolume) || this.getVolume().equals(otherOrderAmountUnclaimed)) && // sometimes the only volume that can be found is the amount that is unclaimed, like in FlipHelper
                 (areAnyNull(this.name, otherOrderName) || this.getName().equalsIgnoreCase(otherOrderName)) &&

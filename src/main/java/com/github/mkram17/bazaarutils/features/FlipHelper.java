@@ -170,7 +170,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         if (matcher.find()) {
             try {
                 double orderPrice = Double.parseDouble(matcher.group(1).replace(",", ""));
-                return Optional.of(new PriceInfoContainer(orderPrice, PriceInfoContainer.priceTypes.INSTASELL));
+                return Optional.of(new PriceInfoContainer(orderPrice, PriceInfoContainer.PriceType.INSTASELL));
             } catch (NumberFormatException e) {
                 Util.notifyError("Error while trying to parse order price in Flip Helper", e);
             }

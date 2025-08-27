@@ -11,11 +11,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import meteordevelopment.orbit.EventHandler;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -34,13 +30,13 @@ public class BazaarOrder extends OrderInfoContainer {
     private int amountFilled = 0;
 
 
-    public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType) {
+    public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType) {
         super(name, volume, pricePerItem, priceType);
         this.fillStatus = Statuses.SET;
         startTracking();
     }
 
-    public BazaarOrder(String name, Integer volume, Double pricePerItem, priceTypes priceType, ItemInfo itemInfo) {
+    public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
         super(name, volume, pricePerItem, priceType, itemInfo);
         this.fillStatus = Statuses.SET;
         startTracking();
@@ -105,14 +101,16 @@ public class BazaarOrder extends OrderInfoContainer {
     }
 
     public double getFlipPrice() {
-        updateMarketPrice(productID);
-        if (getMarketOppositePrice() == 0) {
+        updateMarketPrice();
+        Double marketPrice = getMarketPrice(priceType);
+        Double marketOppositePrice = getMarketPrice(priceType.getOpposite());
+        if (marketPrice == 0) {
             return 0;
         }
-        if (getPriceType() == PriceInfoContainer.priceTypes.INSTABUY) {
-            return (getMarketOppositePrice() + .1);
+        if (getPriceType() == PriceType.INSTABUY) {
+            return (marketOppositePrice + .1);
         } else {
-            return (getMarketOppositePrice() - .1);
+            return (marketOppositePrice - .1);
         }
     }
 

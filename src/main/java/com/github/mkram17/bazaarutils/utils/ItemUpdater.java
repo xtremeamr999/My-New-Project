@@ -81,6 +81,10 @@ public class ItemUpdater {
     }
 
     private static void updateInfo(BazaarOrder order) {
+        if (order.getItemInfo() == null){
+            Util.notifyError("Error while updating order info", new Throwable("ItemInfo is null"));
+            return;
+        }
         Optional<? extends LoreComponent> loreComponent = order.getItemInfo().itemStack().getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
             return;
@@ -134,9 +138,9 @@ public class ItemUpdater {
 
         String cleanName = stripPrefix(title, orderType);
 
-        PriceInfoContainer.priceTypes priceType = orderType == OrderType.SELL
-                ? PriceInfoContainer.priceTypes.INSTABUY
-                : PriceInfoContainer.priceTypes.INSTASELL;
+        PriceInfoContainer.PriceType priceType = orderType == OrderType.SELL
+                ? PriceInfoContainer.PriceType.INSTABUY
+                : PriceInfoContainer.PriceType.INSTASELL;
 
         return new OrderInfoContainer(cleanName, volume, unitPrice, priceType, itemInfo);
     }

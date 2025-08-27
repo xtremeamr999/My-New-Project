@@ -101,7 +101,7 @@ public class ChatHandler {
     private static void processOrderEvent(
             ArrayList<Text> siblings,
             BazaarChatEvent.BazaarEventTypes eventType,
-            PriceInfoContainer.priceTypes priceType,
+            PriceInfoContainer.PriceType priceType,
             int volumeIndex,
             int nameIndex,
             int priceIndex
@@ -113,21 +113,21 @@ public class ChatHandler {
     }
 
     public static void handleFlip(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, PriceInfoContainer.priceTypes.INSTABUY, 3, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, PriceInfoContainer.PriceType.INSTABUY, 3, 4, 6);
     }
 
     public static void handleCancelled(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, PriceInfoContainer.priceTypes.INSTASELL, 2, 4, priceIndex);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaSell(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, PriceInfoContainer.priceTypes.INSTASELL, 2, 4, priceIndex);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
     }
 
     public static void handleInstaBuy(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, PriceInfoContainer.priceTypes.INSTABUY, 2, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, PriceInfoContainer.PriceType.INSTABUY, 2, 4, 6);
     }
 
     private static void handleFilled(Text message) {
@@ -143,7 +143,7 @@ public class ChatHandler {
             int volume = Integer.parseInt(parts[1].replace(",", ""));
             String itemName = parts[2].trim();
 
-            PriceInfoContainer.priceTypes priceType = messageString.contains("Sell Offer") ? PriceInfoContainer.priceTypes.INSTABUY : PriceInfoContainer.priceTypes.INSTASELL;
+            PriceInfoContainer.PriceType priceType = messageString.contains("Sell Offer") ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
             OrderInfoContainer item = new OrderInfoContainer(itemName, volume, null, priceType);
 
             EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
@@ -168,7 +168,7 @@ public class ChatHandler {
             price /= ((100 - BUConfig.get().bzTax) / 100);
         }
 
-        PriceInfoContainer.priceTypes priceType = isSellOrder ? PriceInfoContainer.priceTypes.INSTABUY : PriceInfoContainer.priceTypes.INSTASELL;
+        PriceInfoContainer.PriceType priceType = isSellOrder ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
         BazaarOrder orderToAdd = new BazaarOrder(itemName, volume, price, priceType);
         EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
@@ -243,9 +243,9 @@ public class ChatHandler {
 
         OrderInfoContainer item;
         if (OrderInfoContainer.getVariables(OrderInfoContainer::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfoContainer(itemName, volumeClaimed, price, PriceInfoContainer.priceTypes.INSTASELL);
+            item = new OrderInfoContainer(itemName, volumeClaimed, price, PriceInfoContainer.PriceType.INSTASELL);
         } else {
-            item = new OrderInfoContainer(itemName, null, price, PriceInfoContainer.priceTypes.INSTASELL);
+            item = new OrderInfoContainer(itemName, null, price, PriceInfoContainer.PriceType.INSTASELL);
         }
 
         return getOrderInfo(item);
@@ -265,7 +265,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfoContainer item = new OrderInfoContainer(name, volume, price, PriceInfoContainer.priceTypes.INSTABUY);
+        OrderInfoContainer item = new OrderInfoContainer(name, volume, price, PriceInfoContainer.PriceType.INSTABUY);
 
         return getOrderInfo(item);
     }

@@ -141,7 +141,7 @@ public final class BazaarData {
      * Get the number of orders at an exact price for a product & price type.
      * @return OptionalInt empty if reply / product / priceType invalid or not found.
      */
-    public static OptionalInt getOrderCountOptional(String productId, PriceInfoContainer.priceTypes priceType, double price) {
+    public static OptionalInt getOrderCountOptional(String productId, PriceInfoContainer.PriceType priceType, double price) {
         SkyBlockBazaarReply reply = currentReply;
         if (reply == null || productId == null || priceType == null) return OptionalInt.empty();
 
@@ -171,7 +171,7 @@ public final class BazaarData {
      * Preferred new method: obtain the best matching instantaneous price.
      * INSTABUY -> top of buySummary (people selling). INSTASELL -> top of sellSummary (people buying).
      */
-    public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.priceTypes priceType) {
+    public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.PriceType priceType) {
         SkyBlockBazaarReply reply = currentReply;
         if (reply == null || productId == null || priceType == null) return OptionalDouble.empty();
 
@@ -232,7 +232,7 @@ public final class BazaarData {
     }
 
     @Deprecated
-    public static Double findItemPrice(String productId, PriceInfoContainer.priceTypes priceType) {
+    public static Double findItemPrice(String productId, PriceInfoContainer.PriceType priceType) {
         return findItemPriceOptional(productId, priceType).orElse(-1.0);
     }
 
@@ -242,7 +242,7 @@ public final class BazaarData {
     }
 
     @Deprecated
-    public static int getOrderCount(String productId, PriceInfoContainer.priceTypes priceType, double price) {
+    public static int getOrderCount(String productId, PriceInfoContainer.PriceType priceType, double price) {
         return getOrderCountOptional(productId, priceType, price).orElse(-1);
     }
 

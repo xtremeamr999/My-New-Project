@@ -62,7 +62,7 @@ public class Bookmark extends CustomItemButton {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.priceTypes.INSTABUY);
+        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY);
 
         BazaarUtils.EVENT_BUS.subscribe(this);
     }
@@ -230,8 +230,8 @@ public class Bookmark extends CustomItemButton {
 
                 if (priceInfo != null) {
                     Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-                    text.append(Text.literal("\n"+priceInfo.getMarketPriceString()).setStyle(style));
-                    text.append(Text.literal("\n"+priceInfo.getOppositeMarketPriceString()).setStyle(style));
+                    text.append(Text.literal("\n"+priceInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)).setStyle(style));
+                    text.append(Text.literal("\n"+priceInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)).setStyle(style));
                 } else {
                     text.append(Text.literal("\nPrice not available").formatted(Formatting.GRAY));
                 }

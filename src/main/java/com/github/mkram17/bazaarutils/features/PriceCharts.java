@@ -66,7 +66,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
         String itemName = sanitizeName(e.slot.getStack().getName().getString());
         if (!SHOW_CACHE.getOrDefault(itemName, false)) return;
 
-        String productID = BazaarData.findProductId(itemName);
+        String productID = BazaarData.findProductIdOptional(itemName).get(); // All cached items are safe
         String link = "https://skyblock.finance/items/" + productID;
         MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen(confirmed -> {
             if (confirmed) {

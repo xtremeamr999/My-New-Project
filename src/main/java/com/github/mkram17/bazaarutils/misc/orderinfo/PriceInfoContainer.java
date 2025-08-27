@@ -9,8 +9,8 @@ import lombok.Setter;
 //Simply a container for information about price of an item. For actual orders, use OrderInfoContainer or BazaarOrder instead
 public class PriceInfoContainer {
     @Getter
-    public enum priceTypes{INSTASELL,INSTABUY;
-        private priceTypes opposite;
+    public enum PriceType {INSTASELL,INSTABUY;
+        private PriceType opposite;
 
         static {
             INSTASELL.opposite = INSTABUY;
@@ -21,6 +21,7 @@ public class PriceInfoContainer {
             return switch (this) {
                 case INSTASELL -> "Buy";
                 case INSTABUY -> "Sell";
+                default -> "Undefined";
             };
         }
     }
@@ -28,23 +29,37 @@ public class PriceInfoContainer {
     @Setter @Getter
     protected Double pricePerItem;
     @Setter @Getter
-    protected priceTypes priceType;
+    protected PriceType priceType;
     @Getter
-    private Double marketPrice;
+    private Double instaSellPrice;
     //the price of the opposite type of order
     @Getter @Setter
-    private Double marketOppositePrice;
+    private Double instaBuyPrice;
 
-    public PriceInfoContainer(Double pricePerItem, priceTypes priceType) {
+    public PriceInfoContainer(Double pricePerItem, PriceType priceType) {
         this.priceType = priceType;
         if(pricePerItem != null){
             this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
         }
+        if(priceType == null){
+            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value of buy order
+            this.priceType = PriceType.INSTASELL;
+        }
+    }
+
+    public Double getMarketPrice(PriceType priceType){
+        return switch (priceType) {
+            case INSTASELL -> instaSellPrice;
+            case INSTABUY -> instaBuyPrice;
+        };
     }
 
     protected void updateMarketPrice(String productId) {
-        marketPrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType));
-        marketOppositePrice = Util.getPrettyNumber(BazaarData.findItemPrice(productId, priceType.getOpposite()));
+        var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
+        var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
+
+        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.getPrettyNumber(price));
+        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.getPrettyNumber(price));
     }
 
     public void flipPrices(double newPrice){
@@ -54,12 +69,5 @@ public class PriceInfoContainer {
 
     public static String getPrettyString(double theDouble){
         return String.format("$%,.1f", theDouble);
-    }
-
-    public String getMarketPriceString() {
-        return priceType.getString() + " " + getPrettyString(marketPrice);
-    }
-    public String getOppositeMarketPriceString() {
-        return priceType.getOpposite().getString() + " " +  getPrettyString(marketOppositePrice);
     }
 }
