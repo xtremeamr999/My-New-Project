@@ -64,7 +64,7 @@ public class ItemUpdater {
 
             //if we find a match, update its values that can be found only in the orders menu
             matchedOrder.ifPresent(matched -> {
-                updateInfo(matched);
+                updateInfo(matched, order.getItemInfo());
                 userOrdersCopy.remove(matched);
             });
 
@@ -80,11 +80,13 @@ public class ItemUpdater {
         }
     }
 
-    private static void updateInfo(BazaarOrder order) {
-        if (order.getItemInfo() == null){
+    private static void updateInfo(BazaarOrder order, ItemInfo parsedItemInfo) {
+        if (parsedItemInfo == null){
             Util.notifyError("Error while updating order info", new Throwable("ItemInfo is null"));
             return;
         }
+        order.setItemInfo(parsedItemInfo);
+
         Optional<? extends LoreComponent> loreComponent = order.getItemInfo().itemStack().getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
             return;

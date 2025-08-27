@@ -110,21 +110,32 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
 
     public Optional<Statuses> findOutbidStatus() {
         updateMarketPrice();
-        if(pricePerItem == null || getInstaSellPrice() == null) return Optional.empty();
+        double marketPrice = getMarketPrice(getPriceType());
+        if(pricePerItem == null) return Optional.empty();
 
-        if (pricePerItem > getInstaSellPrice()) {
-            if(priceType == PriceType.INSTASELL)
+        var orderCountOpt = BazaarData.getOrderCountOptional(productID, getPriceType(), getPricePerItem());
+        if(orderCountOpt.isEmpty()) return Optional.empty();
+        int orderCount = orderCountOpt.getAsInt();
+
+        if(priceType == PriceType.INSTASELL){
+            if(pricePerItem > marketPrice){
                 return Optional.of(Statuses.COMPETITIVE);
-            else
+            } else if(pricePerItem < marketPrice){
                 return Optional.of(Statuses.OUTBID);
-        } else if (pricePerItem < getInstaSellPrice()) {
-            if(priceType == PriceType.INSTASELL)
-                return Optional.of(Statuses.COMPETITIVE);
-            else
-                return Optional.of(Statuses.OUTBID);
+            } else {
+                if (orderCount > 1) {
+                    return Optional.of(Statuses.MATCHED);
+                }
+            }
         } else {
-            if (BazaarData.getOrderCount(productID, getPriceType(), getPricePerItem()) > 1) {
-                return Optional.of(Statuses.MATCHED);
+            if(pricePerItem < marketPrice){
+                return Optional.of(Statuses.COMPETITIVE);
+            } else if(pricePerItem > marketPrice){
+                return Optional.of(Statuses.OUTBID);
+            } else {
+                if (orderCount > 1) {
+                    return Optional.of(Statuses.MATCHED);
+                }
             }
         }
 
