@@ -6,7 +6,9 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,6 +20,7 @@ import java.util.function.Function;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //Can be used when you need to store info about an item with automatic price updates and health checks. Actual orders should use OrderData instead.
+//TODO turn into builder class
 public class OrderInfoContainer extends PriceInfoContainer implements BUListener {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
@@ -35,20 +38,18 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     @Getter @Setter
     private ItemInfo itemInfo;
 
-    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, PriceType priceType) {
+    public OrderInfoContainer(@NonNull String name, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable PriceType priceType, @Nullable ItemInfo itemInfo) {
         super(pricePerItem, priceType);
         this.volume = volume;
         this.name = name;
         this.tolerance = calculateTolerance();
+        this.itemInfo = itemInfo;
         BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
         findOutbidStatus().ifPresent(status -> this.outbidStatus = status);
 
         validateProduct();
     }
-    public OrderInfoContainer(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
-        this(name, volume, pricePerItem, priceType);
-        this.itemInfo = itemInfo;
-    }
+
     private double calculateTolerance() {
         //default tolerance
         if (pricePerItem == null || volume == null) {
@@ -253,5 +254,9 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
                 ", price:" + pricePerItem +
                 ", volume: " + volume +
                 ")";
+    }
+
+    public BazaarOrder downcast(){
+        return new BazaarOrder(name, volume, pricePerItem, priceType, null);
     }
 }

@@ -91,7 +91,7 @@ public class ChatHandler {
 
             double pricePerUnit = totalPrice / volume;
 
-            return Optional.of(new OrderInfoContainer(name, volume, pricePerUnit, null));
+            return Optional.of(new OrderInfoContainer(name, volume, pricePerUnit, null, null));
         } catch (Exception e) {
             Util.notifyError("Failed to parse order data from chat: " + siblings, e);
             return Optional.empty();
@@ -144,7 +144,7 @@ public class ChatHandler {
             String itemName = parts[2].trim();
 
             PriceInfoContainer.PriceType priceType = messageString.contains("Sell Offer") ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
-            OrderInfoContainer item = new OrderInfoContainer(itemName, volume, null, priceType);
+            OrderInfoContainer item = new OrderInfoContainer(itemName, volume, null, priceType, null);
 
             EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -243,9 +243,9 @@ public class ChatHandler {
 
         OrderInfoContainer item;
         if (OrderInfoContainer.getVariables(OrderInfoContainer::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfoContainer(itemName, volumeClaimed, price, PriceInfoContainer.PriceType.INSTASELL);
+            item = new OrderInfoContainer(itemName, volumeClaimed, price, PriceInfoContainer.PriceType.INSTASELL, null);
         } else {
-            item = new OrderInfoContainer(itemName, null, price, PriceInfoContainer.PriceType.INSTASELL);
+            item = new OrderInfoContainer(itemName, null, price, PriceInfoContainer.PriceType.INSTASELL, null);
         }
 
         return getOrderInfo(item);
@@ -265,7 +265,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfoContainer item = new OrderInfoContainer(name, volume, price, PriceInfoContainer.PriceType.INSTABUY);
+        OrderInfoContainer item = new OrderInfoContainer(name, volume, price, PriceInfoContainer.PriceType.INSTABUY, null);
 
         return getOrderInfo(item);
     }

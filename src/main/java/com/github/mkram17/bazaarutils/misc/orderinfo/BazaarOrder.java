@@ -31,9 +31,7 @@ public class BazaarOrder extends OrderInfoContainer {
 
 
     public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType) {
-        super(name, volume, pricePerItem, priceType);
-        this.fillStatus = Statuses.SET;
-        startTracking();
+        this(name, volume, pricePerItem, priceType, null);
     }
 
     public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {

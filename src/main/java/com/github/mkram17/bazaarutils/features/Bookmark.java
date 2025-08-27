@@ -62,7 +62,7 @@ public class Bookmark extends CustomItemButton {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY);
+        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
 
         BazaarUtils.EVENT_BUS.subscribe(this);
     }
