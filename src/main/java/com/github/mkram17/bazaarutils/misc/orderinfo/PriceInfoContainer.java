@@ -58,16 +58,12 @@ public class PriceInfoContainer {
         var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
         var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
 
-        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.getPrettyNumber(price));
-        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.getPrettyNumber(price));
+        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.truncateNum(price));
+        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.truncateNum(price));
     }
 
     public void flipPrices(double newPrice){
         this.priceType = this.priceType.getOpposite();
         this.pricePerItem = newPrice;
-    }
-
-    public static String getPrettyString(double theDouble){
-        return String.format("$%,.1f", theDouble);
     }
 }

@@ -108,7 +108,7 @@ public class ChatHandler {
     ) {
         parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
             order.setPriceType(priceType);
-            EVENT_BUS.post(new BazaarChatEvent(eventType, order));
+            EVENT_BUS.post(new BazaarChatEvent<>(eventType, order));
         });
     }
 
@@ -146,7 +146,7 @@ public class ChatHandler {
             PriceInfoContainer.PriceType priceType = messageString.contains("Sell Offer") ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
             OrderInfoContainer item = new OrderInfoContainer(itemName, volume, null, priceType, null);
 
-            EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
+            EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
             Util.notifyError("Invalid volume format in FILLED message: " + messageString, e);
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class ChatHandler {
 
         PriceInfoContainer.PriceType priceType = isSellOrder ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
         BazaarOrder orderToAdd = new BazaarOrder(itemName, volume, price, priceType);
-        EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
+        EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
 
     private static String getName(List<Text> siblings) {
@@ -199,7 +199,7 @@ public class ChatHandler {
         }
         BazaarOrder order = orderOptional.get();
         PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
-        EVENT_BUS.post(new BazaarChatEvent(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
+        EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
 
     private static Optional<BazaarOrder> getClaimedBuyOrder(ArrayList<Text> siblings) {
@@ -277,7 +277,6 @@ public class ChatHandler {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), Util.notificationTypes.ORDERDATA);
             return Optional.empty();
         }
-        OrderInfoContainer order = orderOptional.get();
         return orderOptional;
     }
 }

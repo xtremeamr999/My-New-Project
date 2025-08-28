@@ -22,7 +22,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 public final class BazaarData {
 
     private static final long BASE_INTERVAL_MS = 20_000;
-    private static final long POST_OFFSET_MS = 60;
+    private static final long POST_OFFSET_MS = 100;
     private static final long FAILURE_RETRY_MS = 500;
     private static final int STALE_WARNING_THRESHOLD = 5;
 

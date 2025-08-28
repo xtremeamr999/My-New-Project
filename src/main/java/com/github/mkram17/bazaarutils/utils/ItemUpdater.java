@@ -44,8 +44,8 @@ public class ItemUpdater {
         if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
 
         lowerChestInventory = event.getLowerChestInventory();
-        List<ItemStack> rawStacks = event.getItemStacks();
-        List<ItemStack> orderStacks = extractOrderStacks(rawStacks);
+        List<ItemStack> allInventoryStacks = event.getItemStacks();
+        List<ItemStack> orderStacks = extractOrderStacks(allInventoryStacks);
         updateWatchedOrders(orderStacks);
     }
 
@@ -64,7 +64,7 @@ public class ItemUpdater {
 
             //if we find a match, update its values that can be found only in the orders menu
             matchedOrder.ifPresent(matched -> {
-                updateInfo(matched, order.getItemInfo());
+                updateBazaarOrder(matched, order.getItemInfo());
                 userOrdersCopy.remove(matched);
             });
 
@@ -72,7 +72,8 @@ public class ItemUpdater {
             if(matchedOrder.isEmpty()){
                 BazaarOrder newOrder =  order.downcast();
                 Util.addWatchedOrder(newOrder);
-                updateInfo(newOrder, order.getItemInfo());
+                //add item info, amount filled, amount claimed
+                updateBazaarOrder(newOrder, order.getItemInfo());
             }
         });
 
@@ -82,7 +83,7 @@ public class ItemUpdater {
         }
     }
 
-    private static void updateInfo(BazaarOrder order, ItemInfo parsedItemInfo) {
+    private static void updateBazaarOrder(BazaarOrder order, ItemInfo parsedItemInfo) {
         if (parsedItemInfo == null){
             Util.notifyError("Error while updating order info", new Throwable("ItemInfo is null"));
             return;
@@ -99,6 +100,7 @@ public class ItemUpdater {
 
         int amountFilled = parseAmountFilled(loreLines);
         int amountClaimed = parseAmountClaimed(loreLines, amountFilled);
+        double pricePerItem = parseUnitPrice(loreLines);
         if (amountFilled >= 0) {
             order.setAmountFilled(amountFilled);
 //            if (Util.genericIsSimilarValue(amountFilled, volume, volume * FILL_TOLERANCE_RATIO)) {
@@ -108,6 +110,7 @@ public class ItemUpdater {
         if (amountClaimed >= 0) {
             order.setAmountClaimed(amountClaimed);
         }
+        order.setPricePerItem(pricePerItem);
         order.setTolerance(0.0);
 
     }

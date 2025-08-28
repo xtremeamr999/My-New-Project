@@ -13,6 +13,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -258,16 +260,13 @@ public class Util {
 
         return removeFormatting(text.substring(startIndex, endIndex));
     }
-    public static double removeTrailingZeroes(double value) {
-        return Double.parseDouble(String.valueOf(value).replaceAll("\\.0$", "").replaceAll("(\\.\\d*?)0+$", "$1"));
+
+    public static String getPrettyString(double num) {
+        return String.format("$%,.1f", num);
     }
 
-    public static double truncateNumber(double number) {
-        return Math.round(number * 100) / 100.0;
-    }
-
-    public static double getPrettyNumber(double num) {
-        return truncateNumber(removeTrailingZeroes(num));
+    public static double truncateNum(double num) {
+        return Math.round(num * 10.0) / 10.0;
     }
 
 }

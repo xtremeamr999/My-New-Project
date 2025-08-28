@@ -38,16 +38,16 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     @Getter @Setter
     private ItemInfo itemInfo;
 
-    public OrderInfoContainer(@NonNull String name, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable PriceType priceType, @Nullable ItemInfo itemInfo) {
+    public OrderInfoContainer(@Nullable String name, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable PriceType priceType, @Nullable ItemInfo itemInfo) {
         super(pricePerItem, priceType);
         this.volume = volume;
         this.name = name;
         this.tolerance = calculateTolerance();
         this.itemInfo = itemInfo;
-        BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
-        findOutbidStatus().ifPresent(status -> this.outbidStatus = status);
 
         validateProduct();
+        BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
+        findOutbidStatus().ifPresent(status -> this.outbidStatus = status);
     }
 
     private double calculateTolerance() {
@@ -110,9 +110,9 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     }
 
     public Optional<Statuses> findOutbidStatus() {
+        if(pricePerItem == null || !isProductIDHealthy()) return Optional.empty();
         updateMarketPrice();
         double marketPrice = getMarketPrice(getPriceType());
-        if(pricePerItem == null) return Optional.empty();
 
         var orderCountOpt = BazaarData.getOrderCountOptional(productID, getPriceType(), getPricePerItem());
         if(orderCountOpt.isEmpty()) return Optional.empty();

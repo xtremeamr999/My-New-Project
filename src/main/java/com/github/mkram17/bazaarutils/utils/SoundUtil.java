@@ -14,8 +14,8 @@ public class SoundUtil {
         var player = client.player;
 
         if (client.world == null || player == null || client.getSoundManager() == null) {
-            Util.logError("Failed to play sound due to null value", new Throwable());
-//            Util.tickExecuteLater(40, () -> playSound(sound, volume));
+//            Util.logError("Failed to play sound due to null value", new Throwable());
+            Util.tickExecuteLater(20, () -> playSound(sound, volume));
             return;
         }
 

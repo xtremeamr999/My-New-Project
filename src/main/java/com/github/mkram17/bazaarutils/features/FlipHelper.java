@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -116,7 +117,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         } else if (order == null) {
             return Text.literal("Could not find order").formatted(Formatting.DARK_PURPLE);
         } else {
-            return Text.literal("Flip order for " + Util.getPrettyNumber(flipPrice) + " coins").formatted(Formatting.DARK_PURPLE);
+            return Text.literal("Flip order for " + Util.getPrettyString(flipPrice) + " coins").formatted(Formatting.DARK_PURPLE);
         }
     }
 
@@ -127,7 +128,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         } else if (order == null) {
             return "???";
         } else {
-            return String.valueOf(Util.getPrettyNumber(flipPrice));
+            return String.valueOf(Util.truncateNum(flipPrice));
         }
     }
 
@@ -140,7 +141,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         double flipPrice = order.getFlipPrice();
         ScreenInfo previousScreen = ScreenInfo.getPreviousScreenInfos().getLast();
         if(order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
-            GUIUtils.setSignText(Double.toString(Util.getPrettyNumber(flipPrice)), true);
+            GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
             order.flipItem(flipPrice);
         }
     }
@@ -200,7 +201,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             PriceInfoContainer priceInfoContainer = priceInfoOpt.get();
-            BazaarOrder tempOrder = new BazaarOrder(null, orderVolumeFilledOpt.get(), priceInfoContainer.getPricePerItem(), priceInfoContainer.getPriceType());
+            OrderInfoContainer tempOrder = new OrderInfoContainer(null, orderVolumeFilledOpt.get(), priceInfoContainer.getPricePerItem(), priceInfoContainer.getPriceType(), null);
             return tempOrder.findOrderInList(BUConfig.get().userOrders);
         }
         return Optional.empty();

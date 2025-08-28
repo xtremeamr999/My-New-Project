@@ -94,8 +94,10 @@ public class BazaarOrder extends OrderInfoContainer {
 
     public void flipItem(double newPrice) {
         flipPrices(newPrice);
+        updateMarketPrice();
         this.amountFilled = 0;
         this.fillStatus = Statuses.SET;
+        EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE, this));
     }
 
     public double getFlipPrice() {

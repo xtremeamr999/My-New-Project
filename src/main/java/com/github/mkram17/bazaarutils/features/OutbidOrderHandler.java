@@ -49,7 +49,7 @@ public class OutbidOrderHandler implements BUListener {
     @EventHandler
     public void onOutbid(OutbidOrderEvent e){
         OrderInfoContainer order = e.getOrder();
-        if(!notifyOutbid) return;
+        if(!notifyOutbid || !BUConfig.get().userOrders.contains(order)) return;
         if(!(order instanceof BazaarOrder bazaarOrder) || bazaarOrder.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
 
         Text amount = Text.literal(bazaarOrder.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
@@ -62,11 +62,9 @@ public class OutbidOrderHandler implements BUListener {
                     .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
                     .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + bazaarOrder.getInstaSellPrice() + " Order Price: " + bazaarOrder.getPricePerItem()));
+                message.append(Text.literal(". Market Price: " + bazaarOrder.getMarketPrice(bazaarOrder.getPriceType()) + " Order Price: " + bazaarOrder.getPricePerItem()));
             }
-            Util.tickExecuteLater(2, () -> {
-                    PlayerActionUtil.notifyChatCommand(message, "managebazaarorders");
-            });
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyChatCommand(message, "managebazaarorders"));
             MinecraftClient client = MinecraftClient.getInstance();
             var player = client.player;
             if (notificationSound && player != null) {
@@ -77,9 +75,7 @@ public class OutbidOrderHandler implements BUListener {
                     .append(amount)
                     .append(itemName)
                     .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
-            Util.tickExecuteLater(2, () -> {
-                PlayerActionUtil.notifyAll(message);
-            });
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
         }
 
     }
