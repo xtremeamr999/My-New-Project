@@ -70,11 +70,17 @@ public class OutbidOrderHandler implements BUListener {
             if (notificationSound && player != null) {
                 SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
             }
-        } else {
+        } else if(e.getOrder().getOutbidStatus() == OrderInfoContainer.Statuses.COMPETITIVE) {
             MutableText message = Text.literal("Your " + bazaarOrder.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
                     .append(amount)
                     .append(itemName)
                     .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
+        } else {
+            MutableText message = Text.literal("Your " + bazaarOrder.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+                    .append(amount)
+                    .append(itemName)
+                    .append(Text.literal(" has been matched.").formatted(Formatting.YELLOW));
             Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
         }
 
