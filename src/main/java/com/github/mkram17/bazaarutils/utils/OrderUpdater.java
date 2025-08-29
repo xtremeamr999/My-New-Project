@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public class ItemUpdater {
+public class OrderUpdater {
     private static Inventory lowerChestInventory;
 
     private static final String PREFIX_BUY = "BUY";
@@ -35,8 +35,8 @@ public class ItemUpdater {
     private static final String LORE_COINS = " coins";
     private static final String LORE_ORDER_AMOUNT = "Order amount: ";
     private static final String LORE_OFFER_AMOUNT = "Offer amount: ";
-
     private static final String WORD_UNIT = "unit:";
+    private static final double FILL_TOLERANCE_RATIO = 0.05; //5%
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent event) {
@@ -51,7 +51,7 @@ public class ItemUpdater {
 
     private static void updateWatchedOrders(List<ItemStack> orderStacks) {
         List<OrderInfoContainer> parsedOrders = orderStacks.stream()
-                .map(ItemUpdater::parseOrderFromItemStack)
+                .map(OrderUpdater::parseOrderFromItemStack)
                 .toList();
         updateOrders(parsedOrders);
     }
@@ -101,12 +101,13 @@ public class ItemUpdater {
         int amountFilled = parseAmountFilled(loreLines);
         int amountClaimed = parseAmountClaimed(loreLines, amountFilled);
         double pricePerItem = parseUnitPrice(loreLines);
-        if (amountFilled >= 0) {
-            order.setAmountFilled(amountFilled);
-//            if (Util.genericIsSimilarValue(amountFilled, volume, volume * FILL_TOLERANCE_RATIO)) {
-//                order.setFilled();
-//            }
+
+        int volume = order.getVolume();
+        order.setAmountFilled(amountFilled);
+        if (Util.genericIsSimilarValue(amountFilled, volume, volume * FILL_TOLERANCE_RATIO)) {
+            order.setFilled();
         }
+
         if (amountClaimed >= 0) {
             order.setAmountClaimed(amountClaimed);
         }
@@ -248,7 +249,7 @@ public class ItemUpdater {
 
     @RunOnInit
     public static void subscribe() {
-        EVENT_BUS.subscribe(ItemUpdater.class);
+        EVENT_BUS.subscribe(OrderUpdater.class);
     }
 
     private enum OrderType {
