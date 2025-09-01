@@ -25,6 +25,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 
 //TODO figure out how to handle rounding with price
+//TODO sometimes a BazaarOrder is created that is for the same order as one in userOrders, but not the same object. This causes problems sometimes, and should be fixed.
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 //An eventful OrderInfoContainer, also tracks info only needed for actual user orders
 @Slf4j

@@ -39,6 +39,7 @@ public class PriceInfoContainer {
     public PriceInfoContainer(Double pricePerItem, PriceType priceType) {
         this.priceType = priceType;
         if(pricePerItem != null){
+            //TODO figure out best rounding. Eg to the tenth, hundredth or thousandth
             this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
         }
         if(priceType == null){

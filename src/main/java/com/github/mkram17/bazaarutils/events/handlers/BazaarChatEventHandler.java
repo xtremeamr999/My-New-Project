@@ -19,20 +19,20 @@ public class BazaarChatEventHandler {
     public static final int ORDER_FILLED_NOTIFICATIONS = 2; // number of notifications to send when an order becomes outdated
 
     @EventHandler
-    private static void onAnyOrder(BazaarChatEvent event) {
+    private static void onAnyOrder(BazaarChatEvent<? extends OrderInfoContainer> event) {
 //        SoundUtil.notifyMultipleTimes(4);
         PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
     }
 
     @EventHandler
-    private static void onOrderCreated(BazaarChatEvent event) {
+    private static void onOrderCreated(BazaarChatEvent<? extends OrderInfoContainer> event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED) || !(event.order() instanceof BazaarOrder bazaarOrder)) return;
         BUConfig.get().orderLimit.addOrderToLimit(bazaarOrder.getVolume()*bazaarOrder.getPricePerItem());
         Util.addWatchedOrder(bazaarOrder);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     @EventHandler
-    private static void onInstaSell(BazaarChatEvent event) {
+    private static void onInstaSell(BazaarChatEvent<? extends OrderInfoContainer> event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
             return;
         OrderInfoContainer order = event.order();
@@ -45,7 +45,7 @@ public class BazaarChatEventHandler {
         PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
     }
     @EventHandler
-    private static void onInstaBuy(BazaarChatEvent event) {
+    private static void onInstaBuy(BazaarChatEvent<? extends OrderInfoContainer> event) {
         if (!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_BUY))
             return;
         OrderInfoContainer order = event.order();
@@ -56,7 +56,7 @@ public class BazaarChatEventHandler {
     }
 
     @EventHandler
-    private static void onOrderFilled(BazaarChatEvent event) {
+    private static void onOrderFilled(BazaarChatEvent<? extends OrderInfoContainer> event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
             return;
         if (BUConfig.get().isOrderFilledSound()) {

@@ -42,7 +42,7 @@ public class Bookmark extends CustomItemButton {
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
     @Getter
-    private OrderInfoContainer orderInfo;
+    private final OrderInfoContainer orderInfo;
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
@@ -226,15 +226,13 @@ public class Bookmark extends CustomItemButton {
                 final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
                 final Bookmark bookmark = bookmarks.get(buttonIndex);
                 MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
-                OrderInfoContainer priceInfo = bookmark.getOrderInfo();
 
-                if (priceInfo != null) {
-                    Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-                    text.append(Text.literal("\n"+priceInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)).setStyle(style));
-                    text.append(Text.literal("\n"+priceInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)).setStyle(style));
-                } else {
-                    text.append(Text.literal("\nPrice not available").formatted(Formatting.GRAY));
-                }
+                OrderInfoContainer orderInfo = bookmark.getOrderInfo();
+                orderInfo.updateMarketPrice();
+
+                Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
+                text.append(Text.literal("\nBuy: " + orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL) + " coins").setStyle(style));
+                text.append(Text.literal("\nSell: " + orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY) + " coins").setStyle(style));
 
                 ItemSlotButtonWidget button = new ItemSlotButtonWidget(
                         buttonX,
