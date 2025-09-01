@@ -25,9 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
-public class OutbidOrderHandler implements BUListener {
-
-    public static final int OUTBID_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
+public class OutbidOrderHandler {
 
     @Getter @Setter
     private boolean autoOpenEnabled;
@@ -42,70 +40,23 @@ public class OutbidOrderHandler implements BUListener {
         this.notificationSound = true;
     }
 
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
+    public static MutableText getOutbidMessage(BazaarOrder order) {
+        return createYourOrderForText(order)
+                .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
+                .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
     }
-
-    @EventHandler
-    public void onOutbid(OutbidOrderEvent e){
-        OrderInfoContainer order = e.getOrder();
-        if(!notifyOutbid || !BUConfig.get().userOrders.contains(order)) return;
-        if(!(order instanceof BazaarOrder bazaarOrder) || bazaarOrder.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
-
-        Text amount = Text.literal(bazaarOrder.getVolume() + "x ").formatted(Formatting.BOLD).formatted(Formatting.DARK_PURPLE);
-        Text itemName = Text.literal(bazaarOrder.getName().formatted(Formatting.BOLD).formatted(Formatting.GOLD));
-
-        if (e.isOutbid()) {
-            MutableText message = Text.literal("Your " + bazaarOrder.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
-                    .append(amount)
-                    .append(itemName)
-                    .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
-                    .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
-            if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + bazaarOrder.getMarketPrice(bazaarOrder.getPriceType()) + " Order Price: " + bazaarOrder.getPricePerItem()));
-            }
-            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyChatCommand(message, "managebazaarorders"));
-            MinecraftClient client = MinecraftClient.getInstance();
-            var player = client.player;
-            if (notificationSound && player != null) {
-                SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
-            }
-        } else if(e.getOrder().getOutbidStatus() == OrderInfoContainer.Statuses.COMPETITIVE) {
-            MutableText message = Text.literal("Your " + bazaarOrder.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
-                    .append(amount)
-                    .append(itemName)
-                    .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
-            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
-        } else {
-            MutableText message = Text.literal("Your " + bazaarOrder.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
-                    .append(amount)
-                    .append(itemName)
-                    .append(Text.literal(" has been matched.").formatted(Formatting.YELLOW));
-            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
-        }
-
+    public static MutableText getCompetitiveMessage(BazaarOrder order) {
+        return createYourOrderForText(order)
+                .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
     }
-
-    @EventHandler
-    public void openBazaarOnOutdated(OutbidOrderEvent e) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(screenInfo.inBazaar() || !autoOpenEnabled)
-            return;
-        CompletableFuture.runAsync(() ->{
-            for(int i = 3; i >= 1; i--) {
-                try {
-                    if(i == 3)
-                        PlayerActionUtil.notifyAll("Opening bazaar in 3");
-                    else
-                        PlayerActionUtil.notifyAll(String.valueOf(i));
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-
-            PlayerActionUtil.runCommand("managebazaarorders");
-        });
+    public static MutableText getMatchedMessage(BazaarOrder order) {
+        return createYourOrderForText(order)
+                .append(Text.literal(" has been matched.").formatted(Formatting.YELLOW));
+    }
+    private static MutableText createYourOrderForText(BazaarOrder order){
+        return Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+                .append(order.getVolume().toString())
+                .append(order.getName());
     }
 
     public static List<BazaarOrder> getOutdatedOrders() {

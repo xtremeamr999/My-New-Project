@@ -4,14 +4,22 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
+import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -21,6 +29,8 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //An eventful OrderInfoContainer, also tracks info only needed for actual user orders
 @Slf4j
 public class BazaarOrder extends OrderInfoContainer {
+
+    public static final int OUTBID_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
 
     @Getter @Setter
     private Statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
@@ -68,8 +78,60 @@ public class BazaarOrder extends OrderInfoContainer {
         Statuses newStatus = outbidOptional.get();
         if(outbidStatus != newStatus){
             outbidStatus = newStatus;
-            EVENT_BUS.post(new OutbidOrderEvent(this, newStatus == Statuses.OUTBID));
+            onOutbid(newStatus == Statuses.OUTBID);
         }
+    }
+
+    private void onOutbid(boolean isOutbid){
+        boolean shouldNotifyUser = BUConfig.get().outbidOrderHandler.isNotifyOutbid();
+        boolean shouldPlayNotificationSound = BUConfig.get().outbidOrderHandler.isNotificationSound();
+        boolean shouldAutoOpenBazaar = BUConfig.get().outbidOrderHandler.isAutoOpenEnabled();
+
+        if(!shouldNotifyUser || !BUConfig.get().userOrders.contains(this)) return;
+        if(this.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
+
+        if (isOutbid) {
+            MutableText message = OutbidOrderHandler.getOutbidMessage(this);
+            if (BUConfig.get().developerMode) {
+                message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getPriceType()) + " Order Price: " + this.getPricePerItem()));
+            }
+            if(shouldAutoOpenBazaar){
+                openBazaar();
+            }
+            MinecraftClient client = MinecraftClient.getInstance();
+            var player = client.player;
+            if (shouldPlayNotificationSound && player != null) {
+                SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
+            }
+        } else if(this.getOutbidStatus() == OrderInfoContainer.Statuses.COMPETITIVE) {
+            MutableText message = OutbidOrderHandler.getCompetitiveMessage(this);
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
+        } else {
+            MutableText message = OutbidOrderHandler.getMatchedMessage(this);
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
+        }
+
+    }
+
+    public void openBazaar() {
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if(screenInfo.inBazaar() )
+            return;
+        CompletableFuture.runAsync(() ->{
+            for(int i = 3; i >= 1; i--) {
+                try {
+                    if(i == 3)
+                        PlayerActionUtil.notifyAll("Opening bazaar in 3");
+                    else
+                        PlayerActionUtil.notifyAll(String.valueOf(i));
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            PlayerActionUtil.runCommand("managebazaarorders");
+        });
     }
 
 
