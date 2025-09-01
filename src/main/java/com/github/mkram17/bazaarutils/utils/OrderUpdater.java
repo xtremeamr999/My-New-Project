@@ -70,7 +70,7 @@ public class OrderUpdater {
 
             //if we can't find a match, this is an order that isn't being tracked, so we add it (shouldn't happen)
             if(matchedOrder.isEmpty()){
-                BazaarOrder newOrder =  order.downcast();
+                BazaarOrder newOrder =  order.toBazaarOrder();
                 Util.addWatchedOrder(newOrder);
                 //add item info, amount filled, amount claimed
                 updateBazaarOrder(newOrder, order.getItemInfo());

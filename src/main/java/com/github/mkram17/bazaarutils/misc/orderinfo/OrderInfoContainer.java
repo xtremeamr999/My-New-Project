@@ -6,7 +6,6 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
@@ -256,7 +255,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
                 ")";
     }
 
-    public BazaarOrder downcast(){
+    public BazaarOrder toBazaarOrder(){
         return new BazaarOrder(name, volume, pricePerItem, priceType, null);
     }
 }
