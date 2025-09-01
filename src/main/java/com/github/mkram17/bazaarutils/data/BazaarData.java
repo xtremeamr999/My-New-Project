@@ -23,6 +23,7 @@ public final class BazaarData {
 
     private static final long BASE_INTERVAL_MS = 20_000;
     private static final long POST_OFFSET_MS = 500;
+    private static final long STALE_BACKOFF_MS = 300;
     private static final long FAILURE_RETRY_MS = 500;
     private static final int STALE_WARNING_THRESHOLD = 5;
 
@@ -122,7 +123,15 @@ public final class BazaarData {
     private static void scheduleNextFromSnapshot(long snapshotTs) {
         long now = System.currentTimeMillis();
         long target = snapshotTs + BASE_INTERVAL_MS + POST_OFFSET_MS;
-        long delay = Math.max(5, target - now);
+
+        long delay;
+        if (now >= target) {
+            // Past the ideal fetch time; server hasn’t advanced snapshot yet. Don’t spam: back off.
+            delay = STALE_BACKOFF_MS;
+        } else {
+            var typicalDelay = target - now;
+            delay = Math.max(typicalDelay, STALE_BACKOFF_MS);
+        }
         scheduleFetch(delay);
     }
 
