@@ -172,7 +172,7 @@ public class Bookmark extends CustomItemButton {
     private static ItemStack findItemStack(String name){
         ScreenHandler handler = GUIUtils.getHandledScreen();
 
-        assert handler != null;
+        if(handler == null) return null;
         for(Slot slot : handler.slots){
             ItemStack itemStack = slot.getStack();
             if(itemStack == null) continue;
