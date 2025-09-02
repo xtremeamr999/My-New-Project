@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'
+  push:
+    branches:
+      - resources
+    paths:
+      - scripts/generate-bazaar-conversions.ts
 
 concurrency:
   group: bazaar-conversions-update
