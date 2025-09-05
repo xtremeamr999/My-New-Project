@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -104,7 +105,10 @@ public class OrderStatusHighlight implements BUListener {
                 return;
             }
 
-            switch (order.getOutbidStatus()) {
+            OrderInfoContainer.Statuses orderStatus = order.getOutbidStatus();
+            if(orderStatus == null) return;
+
+            switch (orderStatus) {
                 case OUTBID:
                     lines.add(1, Text.literal("OUTBID").formatted(Formatting.RED, Formatting.BOLD));
                     lines.add(2, Text.literal("Market Price: " + Util.getPrettyString(order.getMarketPrice(order.getPriceType()))).formatted(Formatting.RED));
