@@ -1,18 +1,13 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
-import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
-import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -20,9 +15,6 @@ import net.minecraft.util.Formatting;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO change the message number instead of sending more
 public class OutbidOrderHandler {
@@ -59,7 +51,7 @@ public class OutbidOrderHandler {
                 .append(order.getName());
     }
 
-    public static List<BazaarOrder> getOutdatedOrders() {
+    public static List<BazaarOrder> getOutbidOrders() {
         return BUConfig.get().userOrders.stream()
                 .filter(order -> order.getOutbidStatus() == OrderInfoContainer.Statuses.OUTBID && order.getFillStatus() != OrderInfoContainer.Statuses.FILLED)
                 .toList();
@@ -68,7 +60,7 @@ public class OutbidOrderHandler {
     public Collection<Option<Boolean>> createOptions() {
         ArrayList<Option<Boolean>> options = new ArrayList<>();
         options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Open Bazaar on Outdated Orders"))
+                .name(Text.literal("Open Bazaar on Outbid Orders"))
                 .description(OptionDescription.of(Text.literal("Automatically open the bazaar after a delay when an order becomes outdated.")))
                 .binding(false,
                         this::isAutoOpenEnabled,
@@ -76,7 +68,7 @@ public class OutbidOrderHandler {
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Chat Notification on Outdated Orders"))
+                .name(Text.literal("Chat Notification on Outbid Orders"))
                 .description(OptionDescription.of(Text.literal("Sends a message in chat when someone has undercut your order.")))
                 .binding(true,
                         this::isNotifyOutbid,
@@ -84,7 +76,7 @@ public class OutbidOrderHandler {
                 .controller(BUConfigGui::createBooleanController)
                 .build());
         options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Sound on Outdated Order"))
+                .name(Text.literal("Sound on Outbid Order"))
                 .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order becomes outdated.")))
                 .binding(true,
                         this::isNotificationSound,

@@ -58,7 +58,7 @@ public class OrderStatusHighlight implements BUListener {
     public Option<Boolean> createOption() {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal("Order Status Highlight"))
-                .description(OptionDescription.of(Text.literal("Adds a colored background and tooltip for orders that are competitive, matched or outdated in the orders gui inside the bazaar. For outdated orders, also adds the market price in the tooltip.")))
+                .description(OptionDescription.of(Text.literal("Adds a colored background and tooltip for orders that are competitive, matched or outbid in the orders gui inside the bazaar. For outdated orders, also adds the market price in the tooltip.")))
                 .binding(false,
                         this::isEnabled,
                         this::setEnabled)
@@ -82,7 +82,7 @@ public class OrderStatusHighlight implements BUListener {
 
             for (Text line : lines) {
                 String lineText = line.getString();
-                if (lineText.contains("FILLED") || lineText.contains("OUTDATED") ||
+                if (lineText.contains("FILLED") || lineText.contains("OUTBID") ||
                         lineText.contains("COMPETITIVE") || lineText.contains("MATCHED")) {
                     // the tooltip is already present, skip processing
                     return;
@@ -106,7 +106,7 @@ public class OrderStatusHighlight implements BUListener {
 
             switch (order.getOutbidStatus()) {
                 case OUTBID:
-                    lines.add(1, Text.literal("OUTDATED").formatted(Formatting.RED, Formatting.BOLD));
+                    lines.add(1, Text.literal("OUTBID").formatted(Formatting.RED, Formatting.BOLD));
                     lines.add(2, Text.literal("Market Price: " + Util.getPrettyString(order.getMarketPrice(order.getPriceType()))).formatted(Formatting.RED));
                     break;
                 case COMPETITIVE:
