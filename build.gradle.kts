@@ -157,12 +157,12 @@ publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = "Changelog"
-    type = BETA
+    type = ALPHA
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
     version = "v" + property("mod_version").toString()
     displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
-    dryRun = true
+//    dryRun = true
 
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")

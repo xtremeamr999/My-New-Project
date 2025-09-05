@@ -8,4 +8,5 @@ This is **by far the biggest update yet** (in terms of the work put into it and 
  - Bazaar prices are now fetched as soon as they are updated and only then. This **greatly improves network usage** and makes the prices update quicker.
  - Fixed many bugs
 
-PS: This is an alpha release, so there may still be bugs (please report any in the discord server!) and the sell rules feature is not working. It will be added back in the full release. Bookmarks will be cleared and must be re-added.
+PS: This is an alpha release, so there may still be bugs (please report any in the discord server!) and the sell rules feature is not working. It will be added back in the full release.
+Bookmarks will be cleared and must be re-added. Additionally, you may notice errors on your first load of this version -- these will go away after the first load.
