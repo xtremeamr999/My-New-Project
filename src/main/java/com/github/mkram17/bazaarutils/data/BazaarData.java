@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
+import lombok.Setter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
 
 import java.time.Duration;
@@ -41,6 +42,7 @@ public final class BazaarData {
 
     /* Cached conversions: lowercase name -> productId */
     private static volatile Map<String, String> nameToProductIdCache = Map.of();
+    @Setter
     private static volatile boolean conversionsLoaded = false;
 
     private BazaarData() {}
