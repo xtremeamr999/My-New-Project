@@ -6,7 +6,6 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
@@ -47,18 +46,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	@Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
 	private void onHandleMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
 		if (slot == null) return;
-
-		//for insta sell rules
-		RestrictSell sell = BUConfig.get().restrictSell;
-		if (sell.isSlotLocked(slotId)) {
-			if (sell.getSafetyClicks() < 3) {
-				sell.addSafetyClick();
-				PlayerActionUtil.notifyAll(sell.getMessage());
-				ci.cancel();
-			} else {
-				sell.resetSafetyClicks();
-			}
-		}
 
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);

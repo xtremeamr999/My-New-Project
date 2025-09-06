@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.config;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.SellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;

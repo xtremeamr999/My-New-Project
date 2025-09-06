@@ -4,8 +4,6 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -189,7 +187,7 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.VOLUME, limit);
+                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.VOLUME, limit);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
                                             return 1;
@@ -201,7 +199,7 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.PRICE, limit);
+                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.PRICE, limit);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
                                             return 1;
@@ -213,7 +211,7 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("itemName", StringArgumentType.string())
                                         .executes(context -> {
                                             String name = StringArgumentType.getString(context, "itemName");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.NAME, name);
+                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.NAME, name);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
                                             return 1;

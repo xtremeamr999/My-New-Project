@@ -4,7 +4,11 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderData;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -50,7 +54,7 @@ public class InstaSellRestrictions implements BUListener {
         if (!enabled || !ScreenInfo.getCurrentScreenInfo().inBazaar())
             return;
 
-        List<OrderData> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        List<OrderInfoContainer> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
         blockClicks = shouldRestrictInstaSell(items);
     }
 
@@ -65,45 +69,19 @@ public class InstaSellRestrictions implements BUListener {
         }
     }
 
-    private boolean shouldRestrictInstaSell(List<OrderData> items){
-        List<String> names = items.stream().map(OrderData::getName).toList();
-        List<Double> prices = items.stream().map(instaSellItem -> instaSellItem.getPriceInfo().getPricePerItem()).toList();
-        List<Integer> volumes = items.stream().map(OrderData::getVolume).toList();
-        return isRestrictedByNames(names) || isRestrictedByPrices(prices) || isRestrictedByVolume(volumes);
+    private boolean shouldRestrictInstaSell(List<OrderInfoContainer> items){
+        return items.stream().anyMatch(this::isItemRestricted);
     }
 
-    private boolean isRestrictedByNames(List<String> names){
-        List<String> nameRestrctions = controls.stream()
-                .filter(sellRestrictionControl -> sellRestrictionControl.getRule() == restrictBy.NAME)
-                .map(SellRestrictionControl::getName)
-                .toList();
-        return names.stream()
-                .anyMatch(nameRestrctions::contains);
-    }
-
-    private boolean isRestrictedByPrices(List<Double> prices){
-        List<Double> priceRestrictions = controls.stream()
-                .filter(sellRestrictionControl -> sellRestrictionControl.getRule() == restrictBy.PRICE)
-                .map(SellRestrictionControl::getAmount)
-                .toList();
-        return priceRestrictions.stream()
-                .anyMatch(prices::contains);
-    }
-    private boolean isRestrictedByVolume(List<Integer> volumes){
-        List<Double> volumeRestrictions = controls.stream()
-                .filter(sellRestrictionControl -> sellRestrictionControl.getRule() == restrictBy.VOLUME)
-                .map(SellRestrictionControl::getAmount)
-                .toList();
-        return volumeRestrictions.stream()
-                .map(Double::intValue)
-                .anyMatch(volumes::contains);
-    }
-
-    public void addRule(restrictBy newRule, double limit){
-        controls.add(new SellRestrictionControl(newRule, limit));
-    }
-    public void addRule(restrictBy newRule, String name){
-        controls.add(new SellRestrictionControl(newRule, name));
+    private boolean isItemRestricted(OrderInfoContainer item) {
+        for(SellRestrictionControl control : controls) {
+            if(!control.isEnabled())
+                continue;
+            if (control.shouldRestrict(item)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getMessage(){
@@ -111,16 +89,17 @@ public class InstaSellRestrictions implements BUListener {
         for(SellRestrictionControl control : controls) {
             if(!control.isEnabled())
                 continue;
-            if (control.getRule() == restrictBy.PRICE)
-                message.append(" PRICE: ");
-            else if(control.getRule() == restrictBy.VOLUME)
-                message.append(" VOLUME: ");
-            else {
+            if(control instanceof DoubleSellRestrictionControl doubleControl) {
+                if (control.getRule() == restrictBy.PRICE)
+                    message.append(" PRICE: ");
+                else if (control.getRule() == restrictBy.VOLUME)
+                    message.append(" VOLUME: ");
+                message.append(doubleControl.getAmount());
+            } else {
+                StringSellRestrictionControl stringControl = (StringSellRestrictionControl) control;
                 message.append(" NAME: ");
-                message.append(control.getName());
-                continue;
+                message.append(stringControl.getName());
             }
-            message.append(control.getAmount());
         }
         message.append(" (Safety Clicks Left: ").append(3 - safetyClicks).append(")");
         return message.toString();
@@ -131,18 +110,21 @@ public class InstaSellRestrictions implements BUListener {
         Text nameText;
         Text descriptionText;
 
-        if (control.getRule() == restrictBy.NAME) {
-            String itemName = control.getName(); // Assuming getName() exists for NAME rules
+        if (control instanceof StringSellRestrictionControl stringControl) {
+            String itemName = stringControl.getName(); // Assuming getName() exists for NAME rules
             nameText = Text.literal("Item: " + itemName);
             descriptionText = Text.literal("Block insta-sell for item: " + itemName);
-        } else {
-            double amount = control.getAmount();
+        } else if (control instanceof DoubleSellRestrictionControl doubleControl){
+            double amount = doubleControl.getAmount();
             String typeText = control.getRule() == restrictBy.VOLUME ? "Volume < " : "Price < ";
             nameText = Text.literal(typeText + amount);
             String desc = control.getRule() == restrictBy.PRICE ?
                     "Block insta-sell if price exceeds " + amount :
                     "Block insta-sell if volume exceeds " + amount;
             descriptionText = Text.literal(desc);
+        } else {
+            nameText = Text.literal("Unknown Rule");
+            descriptionText = Text.literal("This rule is of an unknown type.");
         }
 
         return Option.<Boolean>createBuilder()
