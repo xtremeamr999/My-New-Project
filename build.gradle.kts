@@ -180,4 +180,8 @@ publishMods {
         type = STABLE
 
     }
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        projectId = "1342860"
+    }
 }
