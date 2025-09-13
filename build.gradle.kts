@@ -67,6 +67,7 @@ class ModDependencies {
 }
 val deps = ModDependencies()
 val mcVersion = stonecutter.current.version
+val maxMcVersion = deps["core.maxMcVersion"]
 
 dependencies {
     minecraft("com.mojang:minecraft:${mcVersion}")
@@ -132,6 +133,7 @@ tasks {
                 "version" to project.version,
                 "mod_version" to rootProject.property("mod_version"),
                 "mcVersion" to mcVersion,
+                "maxMcVersion" to maxMcVersion,
                 "major_update_notes" to rootProject.property("major_update_notes")
             ))
         }

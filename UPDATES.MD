@@ -1,1 +1,4 @@
-Internal change: switch resources to new repo
+ - Fixed chat notifications for outbid orders
+ - Fixed issue when placing sell order for Dwarven O's Ore Oats
+
+This will probably be the last alpha update before the beta release.
