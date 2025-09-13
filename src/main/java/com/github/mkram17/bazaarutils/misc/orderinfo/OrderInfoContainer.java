@@ -211,7 +211,8 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     }
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
     private boolean isSimilarPrice(double price) {
-        return Util.genericIsSimilarValue(pricePerItem, price, price * .05);
+        //tolerance + 1% of price to account for rounding errors (1% is just in case, but shouldnt matter)
+        return Util.genericIsSimilarValue(pricePerItem, price, tolerance + price * .01);
     }
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);

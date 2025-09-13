@@ -261,7 +261,7 @@ public class ChatHandler {
         Text nameComponent = siblings.get(Util.componentIndexOf(siblings, "x") + 1);
         String name = nameComponent.getString().trim();
 
-        Text priceComponent = siblings.get(Util.componentIndexOf(siblings, "at") + 1);
+        Text priceComponent = siblings.get(Util.componentLastIndexOf(siblings, "at") + 1);
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 

@@ -184,21 +184,23 @@ public final class BazaarData {
      */
     public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.PriceType priceType) {
         SkyBlockBazaarReply reply = currentReply;
-        if (reply == null || productId == null || priceType == null) return OptionalDouble.empty();
+        if (reply == null || productId == null || priceType == null)
+            return OptionalDouble.empty();
 
         try {
             SkyBlockBazaarReply.Product product = reply.getProduct(productId);
-            if (product == null) return OptionalDouble.empty();
+            if (product == null)
+                return OptionalDouble.empty();
 
             return switch (priceType) {
                 case INSTABUY -> {
                     List<SkyBlockBazaarReply.Product.Summary> buySummary = product.getBuySummary();
-                    if (buySummary == null || buySummary.isEmpty()) yield OptionalDouble.empty();
+                    if (buySummary == null || buySummary.isEmpty()) yield OptionalDouble.of(0.0);
                     yield OptionalDouble.of(buySummary.getFirst().getPricePerUnit());
                 }
                 case INSTASELL -> {
                     List<SkyBlockBazaarReply.Product.Summary> sellSummary = product.getSellSummary();
-                    if (sellSummary == null || sellSummary.isEmpty()) yield OptionalDouble.empty();
+                    if (sellSummary == null || sellSummary.isEmpty()) yield OptionalDouble.of(0.0);
                     yield OptionalDouble.of(sellSummary.getFirst().getPricePerUnit());
                 }
             };

@@ -47,8 +47,8 @@ public class OutbidOrderHandler {
     }
     private static MutableText createYourOrderForText(BazaarOrder order){
         return Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
-                .append(order.getVolume().toString())
-                .append(order.getName());
+                .append(Text.literal(order.getVolume().toString() + " ").formatted(Formatting.DARK_PURPLE))
+                .append(Text.literal(order.getName()).formatted(Formatting.GOLD));
     }
 
     public static List<BazaarOrder> getOutbidOrders() {
