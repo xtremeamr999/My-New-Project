@@ -107,7 +107,7 @@ public class Bookmark extends CustomItemButton {
         GUIUtils.setSignText(name, true);
 
         if(userHasSkyblockerBazaarOverlay) {
-            Util.tickExecuteLater(4, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
+            Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
         }
     }
 
@@ -231,8 +231,8 @@ public class Bookmark extends CustomItemButton {
                 orderInfo.updateMarketPrice();
 
                 Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-                text.append(Text.literal("\nBuy: " + orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL) + " coins").setStyle(style));
-                text.append(Text.literal("\nSell: " + orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY) + " coins").setStyle(style));
+                text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins").setStyle(style));
+                text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins").setStyle(style));
 
                 ItemSlotButtonWidget button = new ItemSlotButtonWidget(
                         buttonX,

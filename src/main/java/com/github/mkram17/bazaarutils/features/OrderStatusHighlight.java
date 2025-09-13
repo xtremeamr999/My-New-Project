@@ -120,6 +120,10 @@ public class OrderStatusHighlight implements BUListener {
                     lines.add(1, Text.literal("MATCHED").formatted(Formatting.YELLOW, Formatting.BOLD));
                     break;
             }
+            if(BUConfig.get().developerMode) {
+                lines.add(Text.literal("[BU] Buy: " + Util.getPrettyString(order.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins"));
+                lines.add(Text.literal("[BU] Sell: " + Util.getPrettyString(order.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins"));
+            }
         });
     }
 }

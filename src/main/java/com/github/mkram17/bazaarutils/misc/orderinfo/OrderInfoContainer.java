@@ -83,7 +83,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         long CHECK_INTERVAL_SECONDS = 30;
         BazaarUtils.BUExecutorService.scheduleAtFixedRate(() -> {
             if(!fixProductID()){
-                Util.notifyError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
+                Util.logError("Could not fix product ID for " + name + ". This may cause the mod to work improperly.", new Throwable());
             }
         }, START_DELAY_SECONDS, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
@@ -211,7 +211,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     }
     //TODO some error with maximum rounding or finding the price. either finding price can round down by .1 accidentally or maximum rounding calculation is wrong
     private boolean isSimilarPrice(double price) {
-        return Util.genericIsSimilarValue(pricePerItem, price, tolerance);
+        return Util.genericIsSimilarValue(pricePerItem, price, price * .05);
     }
 
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
