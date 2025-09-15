@@ -93,7 +93,7 @@ public class ChatHandler {
 
             return Optional.of(new OrderInfoContainer(name, volume, pricePerUnit, null, null));
         } catch (Exception e) {
-            Util.notifyError("Failed to parse order data from chat: " + siblings, e);
+            Util.notifyError("Failed to parse order data from chat: " + siblings.stream().map(Text::getString), e);
             return Optional.empty();
         }
     }
