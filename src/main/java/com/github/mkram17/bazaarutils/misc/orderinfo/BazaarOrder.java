@@ -91,8 +91,9 @@ public class BazaarOrder extends OrderInfoContainer {
         if(!shouldNotifyUser || !BUConfig.get().userOrders.contains(this)) return;
         if(this.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
 
+        MutableText message;
         if (isOutbid) {
-            MutableText message = OutbidOrderHandler.getOutbidMessage(this);
+            message = OutbidOrderHandler.getOutbidMessage(this);
             if (BUConfig.get().developerMode) {
                 message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getPriceType()) + " Order Price: " + this.getPricePerItem()));
             }
@@ -104,14 +105,14 @@ public class BazaarOrder extends OrderInfoContainer {
             if (shouldPlayNotificationSound && player != null) {
                 SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
             }
+            Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyChatCommand(message, "managebazaarorders"));
         } else if(this.getOutbidStatus() == OrderInfoContainer.Statuses.COMPETITIVE) {
-            MutableText message = OutbidOrderHandler.getCompetitiveMessage(this);
+            message = OutbidOrderHandler.getCompetitiveMessage(this);
             Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
         } else {
-            MutableText message = OutbidOrderHandler.getMatchedMessage(this);
+            message = OutbidOrderHandler.getMatchedMessage(this);
             Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
         }
-
     }
 
     public void openBazaar() {

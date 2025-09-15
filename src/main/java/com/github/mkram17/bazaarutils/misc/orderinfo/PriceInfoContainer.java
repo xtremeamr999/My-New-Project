@@ -40,7 +40,7 @@ public class PriceInfoContainer {
         this.priceType = priceType;
         if(pricePerItem != null){
             //TODO figure out best rounding. Eg to the tenth, hundredth or thousandth
-            this.pricePerItem = (double) Math.round(pricePerItem * 100) / 100;
+            this.pricePerItem = (double) Math.round(pricePerItem * 10) / 10;
         }
         if(priceType == null){
             //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value of buy order

@@ -93,7 +93,7 @@ public class ChatHandler {
 
             return Optional.of(new OrderInfoContainer(name, volume, pricePerUnit, null, null));
         } catch (Exception e) {
-            Util.notifyError("Failed to parse order data from chat: " + siblings, e);
+            Util.notifyError("Failed to parse order data from chat: " + siblings.stream().map(Text::getString), e);
             return Optional.empty();
         }
     }
@@ -261,7 +261,7 @@ public class ChatHandler {
         Text nameComponent = siblings.get(Util.componentIndexOf(siblings, "x") + 1);
         String name = nameComponent.getString().trim();
 
-        Text priceComponent = siblings.get(Util.componentIndexOf(siblings, "at") + 1);
+        Text priceComponent = siblings.get(Util.componentLastIndexOf(siblings, "at") + 1);
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 

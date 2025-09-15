@@ -262,7 +262,7 @@ public class Util {
     }
 
     public static String getPrettyString(double num) {
-        return String.format("$%,.1f", num);
+        return String.format("%,.1f", num);
     }
 
     public static double truncateNum(double num) {

@@ -30,7 +30,7 @@ public class ResourceManager {
     private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID);
     private static final Path LOCAL_RESOURCES_PATH = MOD_CONFIG_DIR.resolve("bazaar-resources.json");
     private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MODID, "bazaar-resources.json");
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Bazaar-Utils/contents/conversionupdating/bazaar-conversions.json?ref=resources";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Skyblock-Bazaar-Conversions/contents/conversionupdating/bazaar-conversions.json?ref=main";
 
 
     public static void initialize() {
