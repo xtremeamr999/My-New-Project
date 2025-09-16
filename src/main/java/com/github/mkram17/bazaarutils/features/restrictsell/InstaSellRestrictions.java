@@ -73,6 +73,10 @@ public class InstaSellRestrictions implements BUListener {
         return items.stream().anyMatch(this::isItemRestricted);
     }
 
+    public void addRule(SellRestrictionControl control){
+        controls.add(control);
+    }
+
     private boolean isItemRestricted(OrderInfoContainer item) {
         for(SellRestrictionControl control : controls) {
             if(!control.isEnabled())

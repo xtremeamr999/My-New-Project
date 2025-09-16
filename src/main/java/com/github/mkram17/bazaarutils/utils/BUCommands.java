@@ -4,6 +4,10 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -187,7 +191,8 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.VOLUME, limit);
+                                            DoubleSellRestrictionControl volumeControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.VOLUME, limit);
+                                            BUConfig.get().instaSellRestrictions.addRule(volumeControl);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
                                             return 1;
@@ -199,7 +204,8 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.PRICE, limit);
+                                            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.VOLUME, limit);
+                                            BUConfig.get().instaSellRestrictions.addRule(priceControl);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
                                             return 1;
@@ -211,7 +217,8 @@ public class BUCommands {
                                 .then(ClientCommandManager.argument("itemName", StringArgumentType.string())
                                         .executes(context -> {
                                             String name = StringArgumentType.getString(context, "itemName");
-                                            BUConfig.get().instaSellRestrictions.addRule(RestrictSell.restrictBy.NAME, name);
+                                            StringSellRestrictionControl nameControl = new StringSellRestrictionControl(InstaSellRestrictions.restrictBy.NAME, name);
+                                            BUConfig.get().instaSellRestrictions.addRule(nameControl);
                                             Util.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
                                             return 1;
@@ -225,13 +232,18 @@ public class BUCommands {
                         .then(ClientCommandManager.argument("rule number", IntegerArgumentType.integer(1))
                                 .executes(context -> {
                                     int restrictNum = IntegerArgumentType.getInteger(context, "rule number") - 1;
-                                    RestrictSellControl rule = BUConfig.get().restrictSell.getControls().get(restrictNum);
+                                    SellRestrictionControl rule = BUConfig.get().instaSellRestrictions.getControls().get(restrictNum);
                                     if (rule == null)
                                         context.getSource().sendError(Text.literal("Invalid rule number. Check the order in /bu"));
                                     if (rule.getRule() != null) {
-                                        PlayerActionUtil.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
+                                        if(rule instanceof DoubleSellRestrictionControl doubleControl) {
+                                            PlayerActionUtil.notifyAll("Removed rule: " + rule.getRule() + ": " + doubleControl.getAmount());
+                                        }
+                                        if(rule instanceof StringSellRestrictionControl stringControl) {
+                                            PlayerActionUtil.notifyAll("Removed rule: " + rule.getRule() + ": " + stringControl.getName());
+                                        }
                                     }
-                                    BUConfig.get().restrictSell.getControls().remove(restrictNum);
+                                    BUConfig.get().instaSellRestrictions.getControls().remove(restrictNum);
                                     Util.scheduleConfigSave();
                                     return 1;
                                 })

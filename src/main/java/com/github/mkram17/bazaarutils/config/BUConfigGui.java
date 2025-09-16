@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -59,7 +60,8 @@ public class BUConfigGui {
                 .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
 
         if (instaSellRestrictions.getControls().isEmpty()) {
-            instaSellRestrictions.addRule(InstaSellRestrictions.restrictBy.PRICE, 1000000);
+            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000);
+            instaSellRestrictions.addRule(priceControl);
         }
         instaSellRestrictions.buildOptions(restrictSellGroupBuilder);
 
