@@ -15,7 +15,6 @@ public class InstaSellUtil{
 
     public static List<OrderInfoContainer> getInstaSellOrders(List<ItemStack> itemStacks) {
         if (!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
-            Util.notifyError("Could not get insta-sell orders: not in Bazaar main page.", new Throwable());
             return Collections.emptyList();
         }
         Optional<ItemStack> instaSellItemStack = getInstaSellItemStack(itemStacks);

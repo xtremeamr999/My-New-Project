@@ -117,6 +117,8 @@ public class GUIUtils {
         }
     }
     //TODO switch to using ItemStack instead of OrderData so it's faster
+
+    // indexes are in order from top left to bottom right, except hotbar slots which go first
     public static int getSlotFromItemStack(Inventory lowerChestInventory, ItemStack itemStack) {
         if (lowerChestInventory == null)
             return -1;

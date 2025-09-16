@@ -38,6 +38,8 @@ public class InstaSellRestrictions implements BUListener {
     private int safetyClicks = 0;
     private boolean blockClicks;
 
+    private static final int INSTA_SELL_SLOT_INDEX = 47;
+
     public InstaSellRestrictions(boolean enabled, int safetyClicksRequired, ArrayList<SellRestrictionControl> controls) {
         this.enabled = enabled;
         this.safetyClicksRequired = safetyClicksRequired;
@@ -51,7 +53,7 @@ public class InstaSellRestrictions implements BUListener {
     }
     @EventHandler
     private void onChestLoaded(ChestLoadedEvent e) {
-        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inBazaar())
+        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
             return;
 
         List<OrderInfoContainer> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
@@ -60,7 +62,7 @@ public class InstaSellRestrictions implements BUListener {
 
     @EventHandler
     private void onClick(SlotClickEvent clickEvent){
-        if(!enabled || blockClicks)
+        if(!enabled || blockClicks || clickEvent.slot.getIndex() != INSTA_SELL_SLOT_INDEX)
             return;
         if (safetyClicks < safetyClicksRequired) {
             safetyClicks++;

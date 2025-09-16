@@ -21,8 +21,10 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 //drawing done in MixinHandledScreen
 public class OrderStatusHighlight implements BUListener {
@@ -130,5 +132,27 @@ public class OrderStatusHighlight implements BUListener {
                 lines.add(Text.literal("[BU] Sell: " + Util.getPrettyString(buyPrice) + " coins"));
             }
         });
+    }
+
+    public static OptionalInt getColor(int slotIndex) {
+        BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slotIndex);
+
+        if(order == null || order.getFillStatus() == OrderInfoContainer.Statuses.FILLED)
+            return OptionalInt.empty();
+
+        OrderInfoContainer.Statuses outbidStatus = order.getOutbidStatus();
+
+        final int color;
+        int a = 0xFF, r = 0x12, g = 0x34, b = 0x56;
+        int argb = ColorHelper.getArgb(a, r, g, b);
+
+        if (outbidStatus == OrderInfoContainer.Statuses.COMPETITIVE) {
+            color = ColorHelper.getGreen(argb);
+        } else if (outbidStatus == OrderInfoContainer.Statuses.OUTBID) {
+            color = ColorHelper.getRed(argb);
+        } else { // MATCHED
+            color = ColorHelper.getArgb(1,1, 0); // Yellow
+        }
+        return OptionalInt.of(color);
     }
 }

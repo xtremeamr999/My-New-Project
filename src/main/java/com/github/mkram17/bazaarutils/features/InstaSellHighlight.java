@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -14,6 +15,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
 
@@ -23,6 +25,7 @@ public class InstaSellHighlight implements BUListener {
 
     @Getter @Setter
     private boolean enabled;
+    List<Integer> highlightedSlotIndexes;
 
     public InstaSellHighlight(boolean enabled) {
         this.enabled = enabled;
@@ -30,6 +33,7 @@ public class InstaSellHighlight implements BUListener {
 
     @EventHandler
     private void onScreenLoad(ChestLoadedEvent e) {
+        highlightedSlotIndexes.clear();
         if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
             return;
 
@@ -46,7 +50,7 @@ public class InstaSellHighlight implements BUListener {
                 .distinct()
                 .toList();
         List<ItemStack> inventoryStacks = getInventoryStacks(names);
-        List<Integer> slotHighlightIndexes = inventoryStacks.stream()
+        highlightedSlotIndexes = inventoryStacks.stream()
                 .filter(itemStack -> !itemStack.isEmpty())
                 .map(itemStack -> GUIUtils.getSlotFromItemStack(inventory, itemStack))
                 .toList();
@@ -81,5 +85,12 @@ public class InstaSellHighlight implements BUListener {
     @Override
     public void subscribe() {
         EVENT_BUS.subscribe(this);
+    }
+    public OptionalInt getColor(int slotIndex) {
+        if(highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex)))
+            return OptionalInt.empty();
+
+        int argb = ColorHelper.getArgb(1,1, 0); // Yellow
+        return OptionalInt.of(argb);
     }
 }

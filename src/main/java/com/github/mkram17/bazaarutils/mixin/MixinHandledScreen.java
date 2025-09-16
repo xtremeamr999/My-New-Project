@@ -72,7 +72,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@IfModLoaded(BUCompatibilityHelper.AMECS_MODID)
 	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-	public void onkeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+	public void onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
 		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();
 		if (!keyBinding.isPressed() && keyBinding.getDefaultKey().getCode() == keyCode && keyBinding.getDefaultModifiers().getAlt()) {
 //			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
@@ -83,7 +83,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	}
 
 	@Inject(method = "init", at = @At("TAIL"))
-	private void bazaarutils$addConfiguredButtons(CallbackInfo ci) {
+	private void addConfiguredButtons(CallbackInfo ci) {
 		int buttonsAdded = 0;
 		for (ClickableWidget button : BUConfig.getWidgets()) {
 			this.addDrawableChild(button);
@@ -92,33 +92,27 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	}
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
-	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
+	private void drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
 		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN) || !slot.hasStack())
 			return;
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slot.getIndex());
-		if(order == null || order.getFillStatus() == OrderInfoContainer.Statuses.FILLED)
-			return;
-
-		draw(context, slot.x, slot.y, order.getOutbidStatus());
-
+		var orderHighlightColorOpt = OrderStatusHighlight.getColor(slot.getIndex());
+		var instaSellHighlightColorOpt = BUConfig.get().instaSellHighlight.getColor(slot.getIndex());
+		if(orderHighlightColorOpt.isPresent()){
+			draw(context, slot.x, slot.y, orderHighlightColorOpt.getAsInt());
+		} else if (instaSellHighlightColorOpt.isPresent()) {
+			draw(context, slot.x, slot.y, instaSellHighlightColorOpt.getAsInt());
+		}
 	}
 
 	@Unique
-	protected void draw(DrawContext context, int x, int y, OrderInfoContainer.Statuses orderStatus) {
-		final float r, g, b;
-		if (orderStatus == OrderInfoContainer.Statuses.COMPETITIVE) {
-			r = 0.0f; g = 1.0f; b = 0.0f; // Green
-		} else if (orderStatus == OrderInfoContainer.Statuses.OUTBID) {
-			r = 1.0f; g = 0.0f; b = 0.0f; // Red
-		} else { // MATCHED
-			r = 1.0f; g = 1.0f; b = 0.0f; // Yellow
-		}
+	protected void draw(DrawContext context, int x, int y, int argb) {
 
-		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
+
+
 		final var sprite = MinecraftClient.getInstance()
 				.getGuiAtlasManager()
 				.getSprite(OrderStatusHighlight.IDENTIFIER);
