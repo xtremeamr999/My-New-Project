@@ -25,7 +25,7 @@ public class InstaSellHighlight implements BUListener {
 
     @Getter @Setter
     private boolean enabled;
-    List<Integer> highlightedSlotIndexes;
+    transient List<Integer> highlightedSlotIndexes = new ArrayList<>();
 
     public InstaSellHighlight(boolean enabled) {
         this.enabled = enabled;

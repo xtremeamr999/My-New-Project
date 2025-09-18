@@ -110,16 +110,13 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Unique
 	protected void draw(DrawContext context, int x, int y, int argb) {
-
-
-
 		final var sprite = MinecraftClient.getInstance()
 				.getGuiAtlasManager()
 				.getSprite(OrderStatusHighlight.IDENTIFIER);
 
 		//? if > 1.21.5 {
 		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
-				sprite, x, y, 16, 16, color
+				sprite, x, y, 16, 16, argb
 		);
 		//?} else {
 		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
