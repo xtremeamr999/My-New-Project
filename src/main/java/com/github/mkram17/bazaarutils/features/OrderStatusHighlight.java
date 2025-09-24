@@ -1,10 +1,13 @@
 package com.github.mkram17.bazaarutils.features;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoUtil;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -37,25 +40,15 @@ public class OrderStatusHighlight implements BUListener {
         this.enabled = enabled;
     }
 
-    private static List<BazaarOrder> getHighlightedOrders() {
-        return BUConfig.get().userOrders.stream()
-                .filter(order -> order.getItemInfo() != null
-                        && order.getItemInfo().slotIndex() != null
-                        && order.getFillStatus() == BazaarOrder.Statuses.SET)
-                .toList();
-    }
-
     public static BazaarOrder getHighlightedOrder(int slotIndex) {
-        return getHighlightedOrders().stream()
-                .filter(order -> order.getItemInfo().slotIndex() == slotIndex)
-                .findFirst()
-                .orElse(null);
+        var order = OrderInfoUtil.getUserOrderFromIndex(slotIndex);
+        return order.filter(bazaarOrder -> bazaarOrder.getFillStatus() == BazaarOrder.Statuses.SET).orElse(null);
     }
 
     @Override
     public void subscribe() {
-//        registerScreenRenderEvents();
         registerTooltipListener();
+        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     public Option<Boolean> createOption() {
@@ -69,27 +62,12 @@ public class OrderStatusHighlight implements BUListener {
                 .build();
     }
 
-    //maybe could be split into separate methods, but this is fine for now
-    private void registerTooltipListener() {
-        ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
-            if (!enabled) return;
-            ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-            if (stack == null || stack.isEmpty() || stack.getItem().getName().getString().contains("GLASS_PANE") || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) {
-                return;
-            }
-
+    public void updateHighlightCache(List<ItemStack> itemStacks){
+        if (!enabled) return;
+        for(ItemStack stack : itemStacks) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player == null || !(client.currentScreen instanceof HandledScreen<?> handledScreen)) {
-                return;
-            }
-
-            for (Text line : lines) {
-                String lineText = line.getString();
-                if (lineText.contains("FILLED") || lineText.contains("OUTBID") ||
-                        lineText.contains("COMPETITIVE") || lineText.contains("MATCHED")) {
-                    // the tooltip is already present, skip processing
-                    return;
-                }
+                continue;
             }
 
             int index = -1;
@@ -99,8 +77,38 @@ public class OrderStatusHighlight implements BUListener {
                 index = slot.getIndex();
             }
 
-            if(index == -1)
+            if (index == -1)
+                continue;
+            SlotHighlightCache.orderStatusHighlightCache.computeIfAbsent(index, this::getHighlightColorFromIndex);
+        }
+    }
+
+    private Integer getHighlightColorFromIndex(int index){
+        BazaarOrder order = getHighlightedOrder(index);
+        if (order == null) {
+            return null;
+        }
+
+        OrderInfoContainer.Statuses orderStatus = order.getOutbidStatus();
+        if (orderStatus == null) return null;
+        return getArgbFromOutbidStatus(orderStatus);
+    }
+
+    //maybe could be split into separate methods, but this is fine for now
+    private void registerTooltipListener() {
+        ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
+            if (!enabled) return;
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (!(client.currentScreen instanceof HandledScreen<?> handledScreen)) {
                 return;
+            }
+
+            int index = -1;
+            for (Slot slot : handledScreen.getScreenHandler().slots) {
+                if (!slot.hasStack() || !(slot.getStack() == stack))
+                    continue;
+                index = slot.getIndex();
+            }
 
             BazaarOrder order = getHighlightedOrder(index);
             if (order == null) {
@@ -134,15 +142,8 @@ public class OrderStatusHighlight implements BUListener {
         });
     }
 
-    public static OptionalInt getColor(int slotIndex) {
-        BazaarOrder order = OrderStatusHighlight.getHighlightedOrder(slotIndex);
-
-        if(order == null || order.getFillStatus() == OrderInfoContainer.Statuses.FILLED)
-            return OptionalInt.empty();
-
-        OrderInfoContainer.Statuses outbidStatus = order.getOutbidStatus();
-
-        final int color;
+    private static int getArgbFromOutbidStatus(OrderInfoContainer.Statuses outbidStatus){
+        int color;
         int a = 0xFF, r = 0x12, g = 0x34, b = 0x56;
         int argb = ColorHelper.getArgb(a, r, g, b);
 
@@ -153,6 +154,6 @@ public class OrderStatusHighlight implements BUListener {
         } else { // MATCHED
             color = ColorHelper.getArgb(1,1, 0); // Yellow
         }
-        return OptionalInt.of(color);
+        return color;
     }
 }

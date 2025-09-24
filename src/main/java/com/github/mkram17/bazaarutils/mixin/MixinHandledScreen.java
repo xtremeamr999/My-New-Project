@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -99,10 +100,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		var orderHighlightColorOpt = OrderStatusHighlight.getColor(slot.getIndex());
 		var instaSellHighlightColorOpt = BUConfig.get().instaSellHighlight.getColor(slot.getIndex());
-		if(orderHighlightColorOpt.isPresent()){
-			draw(context, slot.x, slot.y, orderHighlightColorOpt.getAsInt());
+		if(SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
+			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
 		} else if (instaSellHighlightColorOpt.isPresent()) {
 			draw(context, slot.x, slot.y, instaSellHighlightColorOpt.getAsInt());
 		}
