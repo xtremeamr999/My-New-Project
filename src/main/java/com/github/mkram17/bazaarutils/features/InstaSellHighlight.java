@@ -8,7 +8,9 @@ import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.google.gson.annotations.Expose;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
@@ -18,14 +20,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
+@NoArgsConstructor
 public class InstaSellHighlight implements BUListener {
 
     @Getter @Setter
     private boolean enabled;
-    transient List<Integer> highlightedSlotIndexes = new ArrayList<>();
+    private transient final List<Integer> highlightedSlotIndexes = new ArrayList<>();
 
     public InstaSellHighlight(boolean enabled) {
         this.enabled = enabled;
@@ -34,11 +38,13 @@ public class InstaSellHighlight implements BUListener {
     @EventHandler
     private void onScreenLoad(ChestLoadedEvent e) {
         highlightedSlotIndexes.clear();
-        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
+
+        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
             return;
+        }
 
         Optional<PlayerInventory> optionalInventory = getInventory();
-        if(optionalInventory.isEmpty()) {
+        if (optionalInventory.isEmpty()) {
             Util.notifyError("Failed to get player inventory.", new Throwable());
             return;
         }
@@ -49,11 +55,15 @@ public class InstaSellHighlight implements BUListener {
                 .map(OrderInfoContainer::getName)
                 .distinct()
                 .toList();
+
         List<ItemStack> inventoryStacks = getInventoryStacks(names);
-        highlightedSlotIndexes = inventoryStacks.stream()
-                .filter(itemStack -> !itemStack.isEmpty())
-                .map(itemStack -> GUIUtils.getSlotFromItemStack(inventory, itemStack))
-                .toList();
+
+        highlightedSlotIndexes.addAll(
+                inventoryStacks.stream()
+                        .filter(itemStack -> !itemStack.isEmpty())
+                        .map(itemStack -> GUIUtils.getSlotFromItemStack(inventory, itemStack))
+                        .toList()
+        );
     }
 
     private Optional<PlayerInventory> getInventory(){
