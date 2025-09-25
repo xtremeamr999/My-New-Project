@@ -18,9 +18,6 @@ public class SlotHighlightCache {
     public static final Map<Integer, Integer> orderStatusHighlightCache = new ConcurrentHashMap<>();
     public static final Map<Integer, Integer> instaSellHighlightCache = new ConcurrentHashMap<>();
 
-    public SlotHighlightCache() {
-        subscribe();
-    }
     @RunOnInit
     public static void registerScreenEvent(){
         orderStatusHighlightCache.clear();
@@ -28,12 +25,16 @@ public class SlotHighlightCache {
     }
 
     @EventHandler
-    public void updateCaches(ChestLoadedEvent event) {
-     var config = BUConfig.get();
-     config.orderStatusHighlight.updateHighlightCache(event.getItemStacks());
+    public static void updateCaches(ChestLoadedEvent event) {
+        var screenInfo = ScreenInfo.getCurrentScreenInfo();
+        if(!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
+
+        var config = BUConfig.get();
+        config.orderStatusHighlight.updateHighlightCache(event.getItemStacks());
     }
 
-    private void subscribe(){
-        BazaarUtils.EVENT_BUS.subscribe(this);
+    @RunOnInit
+    public static void subscribe(){
+        BazaarUtils.EVENT_BUS.subscribe(SlotHighlightCache.class);
     }
 }

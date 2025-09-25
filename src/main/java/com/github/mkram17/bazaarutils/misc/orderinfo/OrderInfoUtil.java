@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrderInfoUtil {
-    private static List<BazaarOrder> getWatchedOrders() {
+    public static List<BazaarOrder> getUserOrders() {
         return BUConfig.get().userOrders;
     }
 
     public static Optional<BazaarOrder> getUserOrderFromIndex(int slotIndex) {
-        return getWatchedOrders().stream()
+        return getUserOrders().stream()
                 .filter(order ->
                         order.getItemInfo() != null
                         && order.getItemInfo().slotIndex().equals(slotIndex))

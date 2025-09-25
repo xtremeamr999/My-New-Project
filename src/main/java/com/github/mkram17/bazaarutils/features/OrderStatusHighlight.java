@@ -26,6 +26,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 
@@ -144,16 +145,16 @@ public class OrderStatusHighlight implements BUListener {
 
     private static int getArgbFromOutbidStatus(OrderInfoContainer.Statuses outbidStatus){
         int color;
-        int a = 0xFF, r = 0x12, g = 0x34, b = 0x56;
-        int argb = ColorHelper.getArgb(a, r, g, b);
+        final float r, g, b;
 
         if (outbidStatus == OrderInfoContainer.Statuses.COMPETITIVE) {
-            color = ColorHelper.getGreen(argb);
+            r = 0.0f; g = 1.0f; b = 0.0f; // Green
         } else if (outbidStatus == OrderInfoContainer.Statuses.OUTBID) {
-            color = ColorHelper.getRed(argb);
+            r = 1.0f; g = 0.0f; b = 0.0f; // Red
         } else { // MATCHED
-            color = ColorHelper.getArgb(1,1, 0); // Yellow
+            r = 1.0f; g = 1.0f; b = 0.0f; // Yellow
         }
+        color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
         return color;
     }
 }
