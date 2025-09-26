@@ -2,13 +2,12 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.google.gson.annotations.Expose;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -91,16 +89,23 @@ public class InstaSellHighlight implements BUListener {
         });
         return inventoryStacks;
     }
+    public void updateHighlightCache(){
+        if (!enabled) return;
+        for(Integer index : highlightedSlotIndexes) {
+            getColorFromIndex(index).ifPresent(instaSellHighlightColor -> SlotHighlightCache.instaSellHighlightCache.computeIfAbsent(index, (k) -> instaSellHighlightColor));
+        }
+    }
 
     @Override
     public void subscribe() {
         EVENT_BUS.subscribe(this);
     }
-    public OptionalInt getColor(int slotIndex) {
+    public OptionalInt getColorFromIndex(int slotIndex) {
         if(highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex)))
             return OptionalInt.empty();
 
-        int argb = ColorHelper.getArgb(1,1, 0); // Yellow
+        float transparency = 0.5f;
+        int argb = ColorHelper.fromFloats(transparency, 1f, 1f, 0f); // yellow
         return OptionalInt.of(argb);
     }
 }

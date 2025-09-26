@@ -27,10 +27,11 @@ public class SlotHighlightCache {
     @EventHandler
     public static void updateCaches(ChestLoadedEvent event) {
         var screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
+        if(!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN, ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) return;
 
         var config = BUConfig.get();
         config.orderStatusHighlight.updateHighlightCache(event.getItemStacks());
+        config.instaSellHighlight.updateHighlightCache();
     }
 
     @RunOnInit
