@@ -20,8 +20,10 @@ public class SlotHighlightCache {
 
     @RunOnInit
     public static void registerScreenEvent(){
-        orderStatusHighlightCache.clear();
-        instaSellHighlightCache.clear();
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            orderStatusHighlightCache.clear();
+            instaSellHighlightCache.clear();
+        });
     }
 
     @EventHandler

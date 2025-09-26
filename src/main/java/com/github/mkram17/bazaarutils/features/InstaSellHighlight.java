@@ -104,7 +104,7 @@ public class InstaSellHighlight implements BUListener {
         if(highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex)))
             return OptionalInt.empty();
 
-        float transparency = 0.5f;
+        float transparency = 0.7f;
         int argb = ColorHelper.fromFloats(transparency, 1f, 1f, 0f); // yellow
         return OptionalInt.of(argb);
     }

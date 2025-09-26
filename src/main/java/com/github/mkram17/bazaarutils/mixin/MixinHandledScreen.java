@@ -31,7 +31,7 @@ import net.minecraft.client.gl.RenderPipelines;
 /*import net.minecraft.client.render.RenderLayer;
 *///?}
 
-//used for SlotClickEvent, register keybinds in chests, block slot clicks
+//used for SlotClickEvent, register keybinds in chests, block slot clicks, highlighting slots
 @Mixin(value = HandledScreen.class, priority = 999)
 public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen {
 
