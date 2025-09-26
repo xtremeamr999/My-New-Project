@@ -111,6 +111,8 @@ public class OrderStatusHighlight implements BUListener {
                 index = slot.getIndex();
             }
 
+            if(!SlotHighlightCache.orderStatusHighlightCache.containsKey(index)) return;
+
             BazaarOrder order = getHighlightedOrder(index);
             if (order == null) {
                 return;
