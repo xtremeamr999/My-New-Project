@@ -30,10 +30,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? if > 1.21.5 {
-/*import net.minecraft.client.gl.RenderPipelines;
-*///?} else {
-import net.minecraft.client.render.RenderLayer;
-//?}
+import net.minecraft.client.gl.RenderPipelines;
+//?} else {
+/*import net.minecraft.client.render.RenderLayer;
+*///?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -137,14 +137,14 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 				.getSprite(OrderStatusHighlight.IDENTIFIER);
 
 		//? if > 1.21.5 {
-		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
 		);
-		*///?} else {
-		context.drawSpriteStretched(RenderLayer::getGuiTextured,
+		//?} else {
+		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
 				sprite, x, y, 16, 16, color
 		);
-		//?}
+		*///?}
 	}
 
 }

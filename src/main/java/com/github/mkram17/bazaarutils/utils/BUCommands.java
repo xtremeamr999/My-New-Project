@@ -2,8 +2,9 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.features.CustomOrder;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -182,6 +183,12 @@ public class BUCommands {
                         )
                 )
         );
+//        bazaarutils.then(ClientCommandManager.literal("customorders")
+//                .executes(context -> {
+//                    MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
+//                    return 1;
+//                })
+//        );
         bazaarutils.then(ClientCommandManager.literal("rule")
                 .then(ClientCommandManager.literal("add")
                         // Volume branch

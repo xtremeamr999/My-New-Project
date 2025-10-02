@@ -69,7 +69,7 @@ dependencies {
     mappings("net.fabricmc:yarn:${mcVersion}+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabricLoaderVersion"]}")
 
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${deps["fabric_api"]}")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
@@ -104,7 +104,9 @@ dependencies {
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
 
     // Owo Lib
-    modImplementation("io.wispforest:owo-lib:${property("owo_version")}")
+    modImplementation("io.wispforest:owo-lib:${property("owo_version")}+${mcVersion}")
+    //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
+    include("io.wispforest:owo-sentinel:${property("owo_version")}")
 
 }
 
@@ -171,7 +173,7 @@ publishMods {
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
 
-        requires("fabric-api", "yacl")
+        requires("fabric-api", "yacl", "owo-lib")
         optional("modmenu", "amecs-reborn")
     }
     github {

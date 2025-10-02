@@ -22,8 +22,6 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
-import java.util.function.Predicate;
-
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO make inBazaar() work all the time

@@ -2,6 +2,8 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
+import com.github.mkram17.bazaarutils.features.Bookmark;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
