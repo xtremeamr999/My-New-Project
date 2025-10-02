@@ -16,6 +16,7 @@ import com.github.mkram17.bazaarutils.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+//Object is created in GUIUtils when in an item's bazaar page
 public class Bookmark extends CustomItemButton {
 
     @Getter
@@ -51,9 +53,8 @@ public class Bookmark extends CustomItemButton {
             BASE,
             HOVER);
 
-    @EventHandler
-    protected void onGuiLoad(ChestLoadedEvent event) {
-            BazaarUtils.EVENT_BUS.unsubscribe(this);
+    protected void subscribeToEventBusUnsubscriber() {
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> BazaarUtils.EVENT_BUS.unsubscribe(this));
     }
 
     public Bookmark(String name) {
@@ -65,11 +66,11 @@ public class Bookmark extends CustomItemButton {
         this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
 
         BazaarUtils.EVENT_BUS.subscribe(this);
+        subscribeToEventBusUnsubscriber();
     }
 
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
             if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
@@ -86,8 +87,7 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     private void onBookmarkClick(SlotClickEvent event){
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(!super.shouldUseSlot(event))
+        if(!super.wasButtonSlotClicked(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         reverseBookmarkStatus();

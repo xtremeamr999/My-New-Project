@@ -33,7 +33,7 @@ public class CustomItemButton {
         return event.getSlotId() == slotNumber;
     }
 
-    protected boolean shouldUseSlot(SlotClickEvent event) {
+    protected boolean wasButtonSlotClicked(SlotClickEvent event) {
         return (event.slotId == slotNumber);
     }
 
