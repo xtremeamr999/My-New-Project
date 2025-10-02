@@ -200,61 +200,57 @@ public class Bookmark extends CustomItemButton {
     }
 
     @RegisterWidget
-    public static List<ItemSlotButtonWidget> getWidgets(){
+    public static List<ItemSlotButtonWidget> getWidgets() {
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
 
-        if(!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
-
-
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getContainerName());
 
-            int buttonSize = 18;
-            int spacing = 4;
-            int buttonX = dimensions.x() + dimensions.backgroundWidth() + spacing;
-            int currentButtonY = dimensions.y() + spacing;
+        int buttonSize = 18;
+        int spacing = 4;
+        int buttonX = dimensions.x() + dimensions.backgroundWidth() + spacing;
+        int currentButtonY = dimensions.y() + spacing;
 
-            List<Bookmark> bookmarks = BUConfig.get().bookmarks;
+        List<Bookmark> bookmarks = BUConfig.get().bookmarks;
 
-            for (int i = 0; i < bookmarks.size(); i++) {
-                ItemStack configuredItem = bookmarks.get(i).getBookmarkedItemStack();
+        for (Bookmark bookmark : bookmarks) {
+            ItemStack configuredItem = bookmark.getBookmarkedItemStack();
 
-                final int buttonIndex = i;
-                final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
-                final Bookmark bookmark = bookmarks.get(buttonIndex);
-                MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
+            final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
+            MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
 
-                OrderInfoContainer orderInfo = bookmark.getOrderInfo();
-                orderInfo.updateMarketPrice();
+            OrderInfoContainer orderInfo = bookmark.getOrderInfo();
+            orderInfo.updateMarketPrice();
 
-                Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-                text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins").setStyle(style));
-                text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins").setStyle(style));
+            Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
+            text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins").setStyle(style));
+            text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins").setStyle(style));
 
-                ItemSlotButtonWidget button = new ItemSlotButtonWidget(
-                        buttonX,
-                        currentButtonY,
-                        buttonSize, buttonSize,
-                        SLOT_BUTTON_TEXTURES,
-                        (btn) -> {
-                            if (Screen.hasShiftDown()) {
-                                PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
-                                bookmark.onWidgetShiftClick();
-                            } else {
-                                bookmark.onWidgetLeftClick();
-                            }
+            ItemSlotButtonWidget button = new ItemSlotButtonWidget(
+                    buttonX,
+                    currentButtonY,
+                    buttonSize, buttonSize,
+                    SLOT_BUTTON_TEXTURES,
+                    (btn) -> {
+                        if (Screen.hasShiftDown()) {
+                            PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
+                            bookmark.onWidgetShiftClick();
+                        } else {
+                            bookmark.onWidgetLeftClick();
+                        }
 
-                        },
-                        itemForButton,
-                        text
-                );
+                    },
+                    itemForButton,
+                    text
+            );
 
-                widgets.add(button);
-                currentButtonY += buttonSize + spacing;
-            }
+            widgets.add(button);
+            currentButtonY += buttonSize + spacing;
+        }
 
         return widgets;
     }

@@ -15,28 +15,23 @@ base {
 }
 
 repositories {
-    maven {
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") {
         name = "Dev Auth"
-        url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     }
-    maven {
+    maven("https://maven.meteordev.org/releases") {
         name = "meteor-maven"
-        url = uri("https://maven.meteordev.org/releases")
     }
-    maven {
+    maven("https://repo.hypixel.net/repository/Hypixel/") {
         name = "Hypixel"
-        url = uri("https://repo.hypixel.net/repository/Hypixel/")
     }
-    maven {
+    maven("https://maven.isxander.dev/releases") {
         name = "YACL"
-        url = uri("https://maven.isxander.dev/releases")
     }
-    maven {
+    maven("https://maven.terraformersmc.com/") {
         name = "Terraformers (for gui)"
-        url = uri("https://maven.terraformersmc.com/")
     }
-    maven("https://moulberry.repo.ax/v1") {
-        name = "Moulberry's Maven"
+    maven("https://maven.wispforest.io") {
+        name = "Owo Lib"
     }
 
     exclusiveContent {
@@ -107,6 +102,10 @@ dependencies {
     include("org.danilopianini:gson-extras:3.3.0")
     // Skyblocker for compatibility
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
+
+    // Owo Lib
+    modImplementation("io.wispforest:owo-lib:${property("owo_version")}")
+
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
