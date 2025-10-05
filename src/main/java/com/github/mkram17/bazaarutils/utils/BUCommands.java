@@ -145,8 +145,7 @@ public class BUCommands {
                                             CustomOrder orderToAdd = new CustomOrder(
                                                     true,
                                                     orderAmount,
-                                                    slotNumber - 1,
-                                                    CustomOrder.getNextColoredPane()
+                                                    slotNumber - 1
                                             );
 
                                             BUConfig.get().customOrders.add(orderToAdd);

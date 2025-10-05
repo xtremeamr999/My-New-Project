@@ -45,11 +45,11 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     @Getter
     private Item item;
 
-    public CustomOrder(boolean enabled, int orderAmount, int slotNumber, Item item) {
+    public CustomOrder(boolean enabled, int orderAmount, int slotNumber) {
         this.enabled = enabled;
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
-        this.item = item;
+        this.item = getNextColoredPane();
         EVENT_BUS.subscribe(this);
     }
     protected CustomOrder(boolean enabled) {
@@ -121,7 +121,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     public static void buildOptions(OptionGroup.Builder builder){
         List<CustomOrder> customOrders = BUConfig.get().customOrders;
         if(customOrders.isEmpty())
-            customOrders.add(new CustomOrder(true, 71680, 17, CustomOrder.COLORMAP.get(0)));
+            customOrders.add(new CustomOrder(true, 71680, 17));
 
         for (CustomOrder order : customOrders) {
             builder.option(order.createOption());
