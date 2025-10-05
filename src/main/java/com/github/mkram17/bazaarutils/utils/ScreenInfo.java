@@ -101,7 +101,7 @@ public class ScreenInfo implements BUListener {
     }
 
     /*
-     * returns true if the user is in any of the specified types of bazaar menus
+     * returns true if the user is in any of the specified types of bazaar management
      */
     public boolean inMenu(BazaarMenuType... types) {
         for (BazaarMenuType bazaarMenuType : types) {

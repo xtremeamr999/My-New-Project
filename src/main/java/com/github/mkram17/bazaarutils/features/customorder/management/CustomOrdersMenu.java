@@ -1,6 +1,7 @@
-package com.github.mkram17.bazaarutils.features.customorder;
+package com.github.mkram17.bazaarutils.features.customorder.management;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     private static final float BACKGROUND_BLUR_QUALITY = 10f;
     private static final float BACKGROUND_BLUR_SIZE = 10f;
+
+    public static OrderToAdd.OrderToAddBuilder orderToAddBuilder = OrderToAdd.builder();
 
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
@@ -90,9 +93,10 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
         return Components.textBox(Sizing.fixed(50));
     }
     private static Component chooseSlotButton() {
+        //TODO get orderAmount
         return Components.button(
                         Text.literal("Choose Slot"),
-                        button -> PlayerActionUtil.notifyAll("Choose Slot Button Click"));
+                        button -> MinecraftClient.getInstance().setScreen(new PickSlotMenu(-1, 5, (pickedSlot) -> orderToAddBuilder.slotNumber(pickedSlot))));
     }
 
     private static Component addOrderButton() {
