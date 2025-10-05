@@ -9,11 +9,15 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     private static final float BACKGROUND_BLUR_QUALITY = 10f;
     private static final float BACKGROUND_BLUR_SIZE = 10f;
+
+    //TODO make this work depending on screen size so it doesnt only work for me
+    private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -26,31 +30,33 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                 .verticalAlignment(VerticalAlignment.CENTER)
                 .horizontalAlignment(HorizontalAlignment.CENTER);
 
-        var stack = Containers.stack(Sizing.fill(100), Sizing.fill(100));
-
+        var grid = Containers.grid(Sizing.fill(100), Sizing.fill(100), 1, 3);
+        grid.horizontalAlignment(HorizontalAlignment.CENTER);
+        grid.padding(Insets.of(15));
         // Top-left: New Order (absolute)
-        stack.child(
+        grid.child(
                 generateNewOrderParent()
-                        .positioning(Positioning.absolute(8, 8))
+                        .verticalAlignment(VerticalAlignment.CENTER),
+                0,
+                0
         );
 
         // Center: Orders (wrap in full-size container that centers its child)
-        FlowLayout centered = Containers.verticalFlow(Sizing.fill(100), Sizing.fill(100));
+        FlowLayout centered = Containers.verticalFlow(Sizing.content(), Sizing.content());
         centered.horizontalAlignment(HorizontalAlignment.CENTER);
-        centered.verticalAlignment(VerticalAlignment.CENTER);
-        centered.child(generateOrdersParent());
+        centered.child(generateOrderButtonsParent());
 
-        stack.child(centered);
+        grid.child(centered, 0, 1);
 
-        rootComponent.child(stack);
+        rootComponent.child(grid);
     }
 
-    private static ParentComponent generateOrdersButtonsParent() {
+    private static ParentComponent generateOrderButtonsParent() {
         var customOrders = BUConfig.get().customOrders;
         ParentComponent parent;
-        if (customOrders.size() > 15)
+        if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
             parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateOrderButtonsContainer());
-        else {
+        } else {
             parent = generateOrderButtonsContainer();
         }
         return parent
@@ -69,7 +75,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     }
     private static ParentComponent generateNewOrderParent() {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
-        horizontalFlow.child(Components.label(Text.literal("New Order")).margins(Insets.of(10)));
+        horizontalFlow.child(Components.label(Text.literal("New Order").formatted(Formatting.BOLD)).margins(Insets.of(10)));
         horizontalFlow.child(Components.label(Text.literal("Amount:")));
         horizontalFlow.child(addOrderAmountTextBox());
         horizontalFlow.child(chooseSlotButton());
