@@ -1,44 +1,71 @@
 package com.github.mkram17.bazaarutils.features.customorder.management;
 
+import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.Arrays;
 import java.util.function.IntConsumer;
 
 public class PickSlotMenu extends Screen {
     private static final int COLUMNS = 9;
     private static final int SLOT_SIZE = 18;     // outer grid size (vanilla spacing)
-    private static final int SLOT_INNER = 16;    // inner square we draw/highlight
+    private static final int SLOT_INNER = 16;
+    private static final int BAZAAR_BUY_MENU_ROWS = 4;// inner square we draw/highlight
+    private static final Identifier SLOT_TEXTURE = Identifier.ofVanilla("container/slot");
+    private static final int TOTAL_SLOTS = BAZAAR_BUY_MENU_ROWS * COLUMNS;
 
-    private int rows = 4;                        // default to 4 rows (36 slots)
+    private final ItemStack[] slotItems = new ItemStack[TOTAL_SLOTS];
+
     private int panelWidth;
     private int panelHeight;
     private int left;
     private int top;
 
-    private int orderAmount = 1;
-    private IntConsumer onPick;
+    private final int orderAmount;
+    private final IntConsumer onPick;
 
-    public PickSlotMenu(int orderAmount, int rows, IntConsumer onPick) {
+    public PickSlotMenu(int orderAmount, IntConsumer onPick) {
         super(Text.literal("Pick a slot"));
         this.orderAmount = Math.max(1, orderAmount);
-        this.rows = Math.max(1, Math.min(6, rows)); // clamp 1..6
         this.onPick = onPick;
+        initializeSlots();
         recalcPanel();
+    }
+
+    private void initializeSlots(){
+        Arrays.fill(slotItems, ItemStack.EMPTY);
+
+        setSlotItem(10, Items.DIAMOND.getDefaultStack());
+        setSlotItem(12, Items.CHEST.getDefaultStack());
+        setSlotItem(14, Items.CHEST.getDefaultStack());
+        setSlotItem(16, Items.OAK_SIGN.getDefaultStack());
+        setSlotItem(31, Items.ARROW.getDefaultStack());
+
+        for(CustomOrder order : BUConfig.get().customOrders){
+            setSlotItem(order.getSlotNumber(), order.getItem().getDefaultStack());
+        }
+    }
+
+    public void setSlotItem(int index, ItemStack stack) {
+        if (index >= 0 && index < TOTAL_SLOTS){
+            this.slotItems[index] = stack == null ? ItemStack.EMPTY : stack;
+        }
     }
 
     private void recalcPanel() {
         // Simple panel sized to the grid with margins
         int margin = 8;
         this.panelWidth = margin + COLUMNS * SLOT_SIZE + margin;
-        this.panelHeight = margin + rows * SLOT_SIZE + margin + 14; // + title
+        this.panelHeight = margin + BAZAAR_BUY_MENU_ROWS * SLOT_SIZE + margin + 14; // + title
         if (this.width > 0 && this.height > 0) {
             this.left = (this.width - panelWidth) / 2;
             this.top = (this.height - panelHeight) / 2;
@@ -59,7 +86,7 @@ public class PickSlotMenu extends Screen {
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        renderBackground(ctx, mouseX, mouseY, delta);
+        super.render(ctx, mouseX, mouseY, delta);
 
         // Panel background
         int bg = 0xC0101010; // semi-transparent dark
@@ -77,27 +104,17 @@ public class PickSlotMenu extends Screen {
         int gridY = top + 8 + 14; // leave space for title
 
         // Draw grid
-        for (int r = 0; r < rows; r++) {
+        for (int r = 0; r < BAZAAR_BUY_MENU_ROWS; r++) {
             for (int c = 0; c < COLUMNS; c++) {
                 int x = gridX + c * SLOT_SIZE;
                 int y = gridY + r * SLOT_SIZE;
 
-                // inner slot box
-                int innerX = x;
-                int innerY = y;
-                int innerX2 = x + SLOT_INNER;
-                int innerY2 = y + SLOT_INNER;
+                ctx.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x, y, 18, 18);
 
-                // slot background and border
-                ctx.fill(innerX, innerY, innerX2, innerY2, 0xFF202020);
-                ctx.drawBorder(innerX, innerY, SLOT_INNER, SLOT_INNER, 0xFF505050);
-
-                // draw 1-based number centered
-                int slotIndex = r * COLUMNS + c;
-                String num = Integer.toString(slotIndex + 1);
-                int tx = innerX + (SLOT_INNER - textRenderer.getWidth(num)) / 2;
-                int ty = innerY + (SLOT_INNER - textRenderer.fontHeight) / 2;
-                ctx.drawText(textRenderer, num, tx, ty, 0xFFB0B0B0, false);
+                ItemStack stack = slotItems[r * COLUMNS + c];
+                if(!stack.isEmpty()){
+                    ctx.drawItem(stack, x + 1, y + 1);
+                }
             }
         }
 
@@ -114,7 +131,6 @@ public class PickSlotMenu extends Screen {
             ctx.drawTooltip(textRenderer, Text.literal("Slot #" + (hovered + 1)), mouseX, mouseY);
         }
 
-        super.render(ctx, mouseX, mouseY, delta);
     }
 
     @Override
@@ -150,7 +166,7 @@ public class PickSlotMenu extends Screen {
 
         int c = relX / SLOT_SIZE;
         int r = relY / SLOT_SIZE;
-        if (c < 0 || c >= COLUMNS || r < 0 || r >= rows) return -1;
+        if (c >= COLUMNS || r >= BAZAAR_BUY_MENU_ROWS) return -1;
 
         // Ensure inside inner 16x16 area (like vanilla slot visuals)
         int innerX = relX % SLOT_SIZE;
@@ -158,10 +174,5 @@ public class PickSlotMenu extends Screen {
         if (innerX >= SLOT_INNER || innerY >= SLOT_INNER) return -1;
 
         return r * COLUMNS + c;
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return true;
     }
 }

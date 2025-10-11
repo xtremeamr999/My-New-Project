@@ -96,7 +96,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
         //TODO get orderAmount
         return Components.button(
                         Text.literal("Choose Slot"),
-                        button -> MinecraftClient.getInstance().setScreen(new PickSlotMenu(-1, 5, (pickedSlot) -> orderToAddBuilder.slotNumber(pickedSlot))));
+                        button -> MinecraftClient.getInstance().setScreen(new PickSlotMenu(-1, (pickedSlot) -> orderToAddBuilder.slotNumber(pickedSlot))));
     }
 
     private static Component addOrderButton() {

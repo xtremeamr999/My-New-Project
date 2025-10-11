@@ -35,7 +35,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO find new name for this
 @NoArgsConstructor
 public class CustomOrder extends CustomItemButton implements BUListener {
-    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.BLACK_STAINED_GLASS_PANE));
+    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.RED_STAINED_GLASS_PANE));
     private boolean buySignClicked = false;
 
     @Getter @Setter

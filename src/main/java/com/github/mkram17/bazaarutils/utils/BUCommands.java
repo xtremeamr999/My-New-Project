@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.features.customorder.management.CustomOrdersMenu;
+import com.github.mkram17.bazaarutils.features.customorder.management.PickSlotMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -65,6 +66,12 @@ public class BUCommands {
             ClientCommandManager.literal("list")
                     .executes(context -> {
                                 PlayerActionUtil.notifyAll(BazaarOrder.getVariables(BazaarOrder::getName).toString());
+                                return 1;
+                            }
+                    ),
+            ClientCommandManager.literal("slotpicker")
+                    .executes(context -> {
+                                context.getSource().getClient().send(() -> context.getSource().getClient().setScreen(new PickSlotMenu(1000, (x) -> PlayerActionUtil.notifyAll("Test Click"))));
                                 return 1;
                             }
                     )
