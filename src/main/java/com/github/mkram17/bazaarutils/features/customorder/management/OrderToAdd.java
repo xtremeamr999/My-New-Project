@@ -2,14 +2,16 @@ package com.github.mkram17.bazaarutils.features.customorder.management;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
-@Builder
+@NoArgsConstructor
 public class OrderToAdd {
-    @Getter
+    @Getter @Setter
     private boolean enabled = true;
-    @Getter @Nullable
+    @Getter @Setter @Nullable
     private Integer slotNumber;
-    @Getter @Nullable
+    @Getter @Setter @Nullable
     private Integer orderAmount;
 }

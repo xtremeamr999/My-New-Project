@@ -2,9 +2,12 @@ package com.github.mkram17.bazaarutils.features.customorder.management;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.misc.ui.NumTextBox;
+import com.github.mkram17.bazaarutils.misc.ui.PickSlotMenu;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -17,7 +20,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     private static final float BACKGROUND_BLUR_QUALITY = 10f;
     private static final float BACKGROUND_BLUR_SIZE = 10f;
 
-    public static OrderToAdd.OrderToAddBuilder orderToAddBuilder = OrderToAdd.builder();
+    public OrderToAdd orderToAdd = new OrderToAdd();
 
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
@@ -54,7 +57,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
         rootComponent.child(grid);
     }
 
-    private static ParentComponent generateOrderButtonsParent() {
+    private ParentComponent generateOrderButtonsParent() {
         var customOrders = BUConfig.get().customOrders;
         ParentComponent parent;
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
@@ -67,7 +70,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                 .surface(Surface.DARK_PANEL);
     }
 
-    private static FlowLayout generateOrderButtonsContainer() {
+    private FlowLayout generateOrderButtonsContainer() {
         var customOrders = BUConfig.get().customOrders;
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
@@ -76,7 +79,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
         }
         return verticalFlow;
     }
-    private static ParentComponent generateNewOrderParent() {
+    private ParentComponent generateNewOrderParent() {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         horizontalFlow.child(Components.label(Text.literal("New Order").formatted(Formatting.BOLD)).margins(Insets.of(10)));
         horizontalFlow.child(Components.label(Text.literal("Amount:")));
@@ -89,25 +92,41 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                 .surface(Surface.DARK_PANEL);
     }
 
-    private static Component addOrderAmountTextBox() {
-        return Components.textBox(Sizing.fixed(50));
+    private Component addOrderAmountTextBox() {
+        var orderAmountBox = new NumTextBox(Sizing.fixed(50));
+        TextBoxComponent.OnChanged updateOrderAmount = orderAmount -> orderToAdd.setOrderAmount(orderAmount.isEmpty() ? null : Integer.parseInt(orderAmount));
+        orderAmountBox.onChanged().subscribe(updateOrderAmount);
+        return orderAmountBox;
     }
-    private static Component chooseSlotButton() {
+    private Component chooseSlotButton() {
         //TODO get orderAmount
         return Components.button(
                         Text.literal("Choose Slot"),
-                        button -> MinecraftClient.getInstance().setScreen(new PickSlotMenu(-1, (pickedSlot) -> orderToAddBuilder.slotNumber(pickedSlot))));
+                        button -> {
+                            if(orderToAdd.getOrderAmount() == null){
+                                PlayerActionUtil.notifyAll("Please enter a valid order amount first.");
+                                return;
+                            }
+                            var pickSlotMenu = new PickSlotMenu(this, orderToAdd.getOrderAmount(), (pickedSlot) -> orderToAdd.setSlotNumber(pickedSlot));
+                            MinecraftClient.getInstance().setScreen(pickSlotMenu);
+                        });
     }
 
-    private static Component addOrderButton() {
-        var customOrders = BUConfig.get().customOrders;
+    private Component addOrderButton() {
         return Components.button(
                 Text.literal("Add"),
-                button -> customOrders.add(new CustomOrder(true, 1, 1)))
+                button -> {
+                    if(orderToAdd.getOrderAmount() == null || orderToAdd.getSlotNumber() == null){
+                        PlayerActionUtil.notifyAll("Please enter a valid order amount and slot number.");
+                        return;
+                    }
+                    CustomOrder newOrder = new CustomOrder(orderToAdd.isEnabled(), orderToAdd.getOrderAmount(), orderToAdd.getSlotNumber());
+                    BUConfig.get().customOrders.add(newOrder);
+                })
                     .margins(Insets.of(3));
     }
 
-    private static FlowLayout generateOrderButton(CustomOrder order) {
+    private FlowLayout generateOrderButton(CustomOrder order) {
         var customOrders = BUConfig.get().customOrders;
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         horizontalFlow.child(

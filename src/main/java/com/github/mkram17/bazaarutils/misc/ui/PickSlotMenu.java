@@ -1,7 +1,8 @@
-package com.github.mkram17.bazaarutils.features.customorder.management;
+package com.github.mkram17.bazaarutils.misc.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -13,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.IntConsumer;
 
 public class PickSlotMenu extends Screen {
@@ -33,8 +35,11 @@ public class PickSlotMenu extends Screen {
     private final int orderAmount;
     private final IntConsumer onPick;
 
-    public PickSlotMenu(int orderAmount, IntConsumer onPick) {
+    private final Screen previousScreen;
+
+    public PickSlotMenu(Screen previousScreen, int orderAmount, IntConsumer onPick) {
         super(Text.literal("Pick a slot"));
+        this.previousScreen = previousScreen;
         this.orderAmount = Math.max(1, orderAmount);
         this.onPick = onPick;
         initializeSlots();
@@ -136,24 +141,26 @@ public class PickSlotMenu extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int slot = getSlotAt((int) mouseX, (int) mouseY);
-        if (slot >= 0) {
-            if (onPick != null) {
-                try {
-                    onPick.accept(slot); // 0-based
-                } catch (Exception e) {
-                    Util.notifyError("Error handling slot selection", e);
-                }
+
+        if (slot < 0){
+            MinecraftClient.getInstance().setScreen(previousScreen);
+            return true;
+        }
+        if (!slotItems[slot].isEmpty()) {
+            PlayerActionUtil.notifyAll("You can't pick a taken slot!");
+            return true;
+        }
+
+        if (onPick != null) {
+            try {
+                onPick.accept(slot); // 0-based
+            } catch (Exception e) {
+                Util.notifyError("Error handling slot selection", e);
             }
-            // Close back to previous screen (don’t send container packets)
-            MinecraftClient.getInstance().setScreen(null);
-            return true;
         }
-        // Clicking outside closes
-        if (button == 0) {
-            MinecraftClient.getInstance().setScreen(null);
-            return true;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
+
+        MinecraftClient.getInstance().setScreen(previousScreen);
+        return true;
     }
 
     private int getSlotAt(int mouseX, int mouseY) {
