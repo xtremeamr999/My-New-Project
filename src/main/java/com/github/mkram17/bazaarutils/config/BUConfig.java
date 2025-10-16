@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.utils.AutoUpdate;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.Option;
@@ -93,7 +94,7 @@ public class BUConfig {
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
     @Setter
-    public boolean autoUpdateEnabled = true;
+    public AutoUpdate autoUpdate = new AutoUpdate();
 
 
     public static void openGUI() {

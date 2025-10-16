@@ -2,13 +2,20 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.moulberry.mixinconstraints.annotations.IfDevEnvironment;
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import lombok.Getter;
+import lombok.Setter;
 import moe.nea.libautoupdate.*;
+import net.minecraft.text.Text;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class AutoUpdate {
+    @Getter @Setter
+    public boolean enabled = true;
+
     private static final UpdateContext updateContext = new UpdateContext(
             UpdateSource.githubUpdateSource("mkram17","Bazaar-Utils"),
             UpdateTarget.replaceJar(Main.class),
@@ -18,10 +25,11 @@ public class AutoUpdate {
 
     public static void checkForUpdates() {
         updateContext.cleanup();
-        updateContext.checkUpdate("pre").thenCompose(update -> {
+        String updateReleaseType = BazaarUtils.releaseType.equals("stable") ? "full" : "pre";
+        updateContext.checkUpdate(updateReleaseType).thenCompose(update -> {
             if (!update.isUpdateAvailable()) return CompletableFuture.completedFuture(null);
 
-            if (BUConfig.get().autoUpdateEnabled) {
+            if (BUConfig.get().autoUpdate.enabled) {
                 PlayerActionUtil.notifyAll("Successfully updated. Restart for changes to take effect.");
                 return update.launchUpdate();
             } else {
@@ -29,5 +37,16 @@ public class AutoUpdate {
                 return CompletableFuture.completedFuture(null);
             }
         });
+    }
+
+    public Option<Boolean> createOption() {
+        return Option.<Boolean>createBuilder()
+                .name(Text.literal("Auto Update"))
+                .description(OptionDescription.of(Text.literal("If enabled, automatically downloads and installs the latest version when available. Only updates to the release type you are on, e.g. beta -> newer beta version.")))
+                .binding(false,
+                        this::isEnabled,
+                        this::setEnabled)
+                .controller(BUConfigGui::createBooleanController)
+                .build();
     }
 }

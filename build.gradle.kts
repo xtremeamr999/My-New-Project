@@ -1,3 +1,4 @@
+import me.modmuss50.mpp.ReleaseType
 
 plugins {
     id("fabric-loom")
@@ -9,7 +10,12 @@ plugins {
 }
 
 group = property("maven_group")!!
-version = "v" + property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
+
+var releaseType = property("release_type").toString()
+var plainVersion = property("mod_version").toString()
+if(releaseType != "stable") plainVersion += releaseType
+
+project.version = "v$plainVersion+mc" + property("deps.core.mcVersion") as String
 
 base {
     archivesName.set(property("mod.id").toString())
@@ -140,6 +146,7 @@ tasks {
             expand(mapOf(
                 "version" to project.version,
                 "mod_version" to rootProject.property("mod_version"),
+                "version_type" to releaseType,
                 "mcVersion" to mcVersion,
                 "maxMcVersion" to maxMcVersion,
                 "major_update_notes" to rootProject.property("major_update_notes")
@@ -174,11 +181,11 @@ publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = "Changelog"
-    type = ALPHA
+    type = ReleaseType.of(releaseType.uppercase())
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
-    version = "v" + property("mod_version").toString()
-    displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
+    version = "v$plainVersion"
+    displayName = "Bazaar Utils v$plainVersion for $mcVersion"
 //    dryRun = true
 
     modrinth {

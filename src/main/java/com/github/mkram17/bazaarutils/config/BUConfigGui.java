@@ -41,6 +41,7 @@ public class BUConfigGui {
         generalBuilder.option(config.stashMessages.createOption());
         generalBuilder.option(config.priceCharts.createOption());
         generalBuilder.option(config.orderStatusHighlight.createOption());
+        generalBuilder.option(config.autoUpdate.createOption());
         generalBuilder.option(createDisableErrorNotifsOption(config));
 
         if (!BUCompatibilityHelper.isAmecsReborn()) {

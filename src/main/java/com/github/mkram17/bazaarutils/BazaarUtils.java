@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.utils.AutoUpdate;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.mojang.serialization.Codec;
@@ -29,8 +30,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.github.mkram17.bazaarutils.utils.AutoUpdate.checkForUpdates;
-
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus EVENT_BUS = new EventBus();
     public static StashHelper stashHelper;
@@ -39,6 +38,7 @@ public class BazaarUtils implements ClientModInitializer {
     public static final String MOD_NAME = "Bazaar Utils";
     public static boolean updatedMajorVersion = false;
     public static String currentVersion;
+    public static String releaseType;
     @Getter
     private static String updateNotes;
     public static ScheduledExecutorService BUExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -61,7 +61,7 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
         setDefaultValues();
-        checkForUpdates();
+        AutoUpdate.checkForUpdates();
     }
 
     private static void registerDataComponents() {
@@ -121,6 +121,7 @@ public class BazaarUtils implements ClientModInitializer {
         FabricLoader.getInstance().getModContainer(MODID).ifPresent(modContainer -> {
             ModMetadata metadata = modContainer.getMetadata();
             currentVersion = metadata.getVersion().getFriendlyString();
+            releaseType = metadata.getCustomValue("releaseType").getAsString();
 
             CustomValue updateNotesValue = metadata.getCustomValue("latestMajorUpdateNotes");
             if (updateNotesValue != null)

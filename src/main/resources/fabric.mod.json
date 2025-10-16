@@ -42,6 +42,7 @@
 	},
 	"custom": {
 		"latestMajorUpdateNotes": "${major_update_notes}",
+		"releaseType": "${version_type}",
 		"modmenu": {
 			"links": {
 				"modmenu.discord": "https://discord.gg/xDKjvm5hQd"
