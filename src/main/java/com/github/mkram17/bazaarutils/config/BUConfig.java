@@ -92,6 +92,8 @@ public class BUConfig {
     public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
+    @Setter
+    public boolean autoUpdateEnabled = true;
 
 
     public static void openGUI() {

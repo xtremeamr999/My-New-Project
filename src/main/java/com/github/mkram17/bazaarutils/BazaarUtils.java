@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static com.github.mkram17.bazaarutils.utils.AutoUpdate.checkForUpdates;
+
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus EVENT_BUS = new EventBus();
     public static StashHelper stashHelper;
@@ -36,6 +38,7 @@ public class BazaarUtils implements ClientModInitializer {
     public static final String MODID = "bazaarutils";
     public static final String MOD_NAME = "Bazaar Utils";
     public static boolean updatedMajorVersion = false;
+    public static String currentVersion;
     @Getter
     private static String updateNotes;
     public static ScheduledExecutorService BUExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -58,6 +61,7 @@ public class BazaarUtils implements ClientModInitializer {
         registerCommands();
         registerKeybinds();
         setDefaultValues();
+        checkForUpdates();
     }
 
     private static void registerDataComponents() {
@@ -116,6 +120,7 @@ public class BazaarUtils implements ClientModInitializer {
     private void getModProperties(){
         FabricLoader.getInstance().getModContainer(MODID).ifPresent(modContainer -> {
             ModMetadata metadata = modContainer.getMetadata();
+            currentVersion = metadata.getVersion().getFriendlyString();
 
             CustomValue updateNotesValue = metadata.getCustomValue("latestMajorUpdateNotes");
             if (updateNotesValue != null)

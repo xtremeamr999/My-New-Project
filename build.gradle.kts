@@ -5,6 +5,7 @@ plugins {
     `maven-publish`
     java
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
+    id("com.gradleup.shadow") version "9.2.2"
 }
 
 group = property("maven_group")!!
@@ -32,6 +33,9 @@ repositories {
     }
     maven("https://maven.wispforest.io") {
         name = "Owo Lib"
+    }
+    maven("https://repo.nea.moe/releases"){
+        name = "Nea Repo for Auto Update"
     }
 
     exclusiveContent {
@@ -108,6 +112,9 @@ dependencies {
     //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
     include("io.wispforest:owo-sentinel:${property("owo_version")}")
 
+    // Auto Update Library
+    implementation("moe.nea:libautoupdate:1.3.1")
+    shadow("moe.nea:libautoupdate:1.3.1")
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
@@ -145,6 +152,13 @@ tasks {
             rename { "${it}_${archiveBaseName.get()}" }
         }
     }
+    shadowJar {
+        configurations = listOf(project.configurations.shadow.get())
+    }
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.get().archiveFile)
+    }
 }
 loom {
     runConfigs.all {
@@ -172,6 +186,9 @@ publishMods {
         projectId = "c4u7nzUZ"
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
+        if( maxMcVersion != mcVersion ) {
+            minecraftVersions.add(maxMcVersion)
+        }
 
         requires("fabric-api", "yacl", "owo-lib")
         optional("modmenu", "amecs-reborn")
