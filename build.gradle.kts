@@ -186,9 +186,7 @@ publishMods {
         projectId = "c4u7nzUZ"
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
-        if( maxMcVersion != mcVersion ) {
-            minecraftVersions.add(maxMcVersion)
-        }
+        minecraftVersions.add(maxMcVersion)
 
         requires("fabric-api", "yacl", "owo-lib")
         optional("modmenu", "amecs-reborn")

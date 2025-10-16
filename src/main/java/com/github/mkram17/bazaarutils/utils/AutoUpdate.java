@@ -2,8 +2,10 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.moulberry.mixinconstraints.annotations.IfDevEnvironment;
 import moe.nea.libautoupdate.*;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class AutoUpdate {
@@ -15,19 +17,17 @@ public class AutoUpdate {
     );
 
     public static void checkForUpdates() {
-        var potentialUpdate = updateContext.checkUpdate("upstream");
-        try {
-            var update = potentialUpdate.get();
-            if(update.isUpdateAvailable()){
-                if(BUConfig.get().autoUpdateEnabled) {
-                    PlayerActionUtil.notifyAll("Successfully updated. Restart for changes to take effect.");
-                    update.launchUpdate();
-                } else {
-                    PlayerActionUtil.notifyAll("A new version of Bazaar Utils is available! To update, download it from the Modrinth/GitHub, or enable auto update.");
-                }
+        updateContext.cleanup();
+        updateContext.checkUpdate("pre").thenCompose(update -> {
+            if (!update.isUpdateAvailable()) return CompletableFuture.completedFuture(null);
+
+            if (BUConfig.get().autoUpdateEnabled) {
+                PlayerActionUtil.notifyAll("Successfully updated. Restart for changes to take effect.");
+                return update.launchUpdate();
+            } else {
+                PlayerActionUtil.notifyAll("A new version of Bazaar Utils is available! To update, download it from the Modrinth/GitHub, or enable auto update.");
+                return CompletableFuture.completedFuture(null);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 }

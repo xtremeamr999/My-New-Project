@@ -114,7 +114,11 @@ public class PickSlotMenu extends Screen {
                 int x = gridX + c * SLOT_SIZE;
                 int y = gridY + r * SLOT_SIZE;
 
+                //? if < 1.21.6 {
                 ctx.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x, y, 18, 18);
+                //? } else {
+                //ctx.drawTexture(RenderPipelines.GUI_TEXTURED, x, y, 18, 18)
+                //? }
 
                 ItemStack stack = slotItems[r * COLUMNS + c];
                 if(!stack.isEmpty()){
