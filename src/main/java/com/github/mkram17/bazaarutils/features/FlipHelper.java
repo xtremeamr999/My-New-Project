@@ -243,34 +243,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         return Util.findComponentWith(lore.lines(), CANNOT_CANCEL_IDENTIFIER) != null;
     }
 
-    //an item to cancel the order being present means that the order has not been filled or is otherwise not ready to be flipped
-//    private static boolean isCancelItem(GenericContainerScreen inventory, int slot) {
-//        ItemStack itemStack = inventory.getScreenHandler().getInventory().getStack(slot);
-//        if (itemStack.isEmpty()) {
-//            return false;
-//        }
-//
-//        Text customName = itemStack.get(DataComponentTypes.CUSTOM_NAME);
-//        if (customName != null && customName.getString().contains(CANCEL_ORDER_IDENTIFIER)) {
-//            return true;
-//        }
-//
-//        LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
-//        if (lore != null) {
-//            return lore.lines().stream()
-//                    .noneMatch(line -> line.getString().contains(CANNOT_CANCEL_IDENTIFIER));
-//        }
-//
-//        return false;
-//    }
-
-    public Option<Boolean> createOption() {
-        return super.createOption("Flip Helper",
-                "Button in flip order menu to undercut market prices for items.",
-                this::isEnabled,
-                this::setEnabled);
-    }
-
     @Override
     public void subscribe() {
         EVENT_BUS.subscribe(this);

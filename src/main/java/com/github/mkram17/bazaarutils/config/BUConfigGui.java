@@ -35,20 +35,19 @@ public class BUConfigGui {
         ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder()
                 .name(Text.literal("General"));
 
-        generalBuilder.option(config.flipHelper.createOption());
         generalBuilder.options(config.outbidOrderHandler.createOptions());
         generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
         generalBuilder.option(config.stashMessages.createOption());
         generalBuilder.option(config.priceCharts.createOption());
         generalBuilder.option(config.orderStatusHighlight.createOption());
         generalBuilder.option(createDisableErrorNotifsOption(config));
+        generalBuilder.option(config.orderLimit.createOption());
 
         if (!BUCompatibilityHelper.isAmecsReborn()) {
             generalBuilder.option(createAmecsDownloadButton());
         }
 
         generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
-        generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
 
         builder.category(generalBuilder.build());
     }

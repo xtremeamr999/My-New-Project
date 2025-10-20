@@ -22,7 +22,6 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
-import dev.isxander.yacl3.api.controller.DoubleFieldControllerBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -31,11 +30,11 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class OrderLimit implements BUListener {
+public class OrderLimit implements BUListener, BUToggleableFeature {
     @Getter @Setter
     private boolean enabled;
-    @Getter @Setter
-    private double coinLimit;
+    @Getter
+    private static final double COIN_LIMIT = 15_000_000_000d;
 
     @Getter
     private final List<OrderLimitEntry> orderLimitEntries;
@@ -44,9 +43,8 @@ public class OrderLimit implements BUListener {
         return orderLimitEntries.stream().mapToDouble(OrderLimitEntry::price).sum();
     }
 
-    public OrderLimit(boolean enabled, double coinLimit) {
+    public OrderLimit(boolean enabled) {
         this.enabled = enabled;
-        this.coinLimit = coinLimit;
         this.orderLimitEntries = new ArrayList<>();
     }
 
@@ -82,6 +80,9 @@ public class OrderLimit implements BUListener {
     }
 
     public void addOrderToLimit(double price) {
+        if(price > Integer.MAX_VALUE){
+            price = Integer.MAX_VALUE; // hypixel doesnt count coins over the integer limit
+        }
         orderLimitEntries.add(new OrderLimitEntry(price, ZonedDateTime.now()));
     }
 
@@ -96,8 +97,8 @@ public class OrderLimit implements BUListener {
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
         String orderedCoinsFormatted = formatNumberWithPrefix(orderLimit.getTotalOrderedCoins());
 
-        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= orderLimit.getCoinLimit() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
-        Text limitText = Text.literal("/" + formatNumberWithPrefix(orderLimit.getCoinLimit())).formatted(Formatting.GOLD);
+        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= orderLimit.getCOIN_LIMIT() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
+        Text limitText = Text.literal("/" + formatNumberWithPrefix(orderLimit.getCOIN_LIMIT())).formatted(Formatting.GOLD);
         Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
                 .append(orderedCoinsText)
                 .append(limitText);
@@ -129,40 +130,11 @@ public class OrderLimit implements BUListener {
             }
         }
 
-    public OptionGroup buildOrderLimitGroup() {
-        OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
-                .name(Text.literal("Order Limit"))
-                .description(OptionDescription.of(Text.literal("Shows you how close you are to the coin order limit for the bazaar. Resets at 12am GMT.")));
-
-        buildOptions(restrictSellGroupBuilder);
-
-        return restrictSellGroupBuilder.build();
-    }
-    private void buildOptions(OptionGroup.Builder builder){
-            builder.option(createEnabledOption());
-            builder.option(createLimitOption());
-    }
-
-
-    private Option<Boolean> createEnabledOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Show Bazaar Order Limit"))
-                .description(OptionDescription.of(Text.literal("Shows you how close you are to the coin order limit for the bazaar at the top of the bazaar. Resets at 12am GMT.")))
-                .binding(false,
-                        this::isEnabled,
-                        this::setEnabled)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    private Option<Double> createLimitOption() {
-        return Option.<Double>createBuilder()
-                .name(Text.literal("Order Limit"))
-                .description(OptionDescription.of(Text.literal("The order limit you want to display.")))
-                .binding(coinLimit,
-                        this::getCoinLimit,
-                        this::setCoinLimit)
-                .controller(DoubleFieldControllerBuilder::create)
-                .build();
+    public Option<Boolean> createOption() {
+        return BUToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
+                "Shows you how close you are to the coin order limit for the bazaar at the top of the bazaar. Resets at 12am GMT.",
+                false,
+                this::isEnabled,
+                this::setEnabled);
     }
 }

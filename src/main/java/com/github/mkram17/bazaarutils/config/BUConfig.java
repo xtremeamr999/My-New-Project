@@ -89,7 +89,7 @@ public class BUConfig {
     @SerialEntry @Getter @Setter
     public boolean orderFilledSound = true;
     @SerialEntry
-    public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
+    public OrderLimit orderLimit = new OrderLimit(true);
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
 

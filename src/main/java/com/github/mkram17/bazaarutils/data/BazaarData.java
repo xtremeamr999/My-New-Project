@@ -45,8 +45,6 @@ public final class BazaarData {
     @Setter
     private static volatile boolean conversionsLoaded = false;
 
-    private BazaarData() {}
-
     @RunOnInit
     public static void init() {
         scheduleFetch(0);

@@ -17,7 +17,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class StashMessages implements BUListener {
+public class StashMessages implements BUListener, BUToggleableFeature {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
@@ -100,13 +100,10 @@ public class StashMessages implements BUListener {
     }
 
     public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Disable Stash Messages"))
-                .description(OptionDescription.of(Text.literal("When this option is ON, messages reminding you to pick up your stash will no longer appear in chat.")))
-                .binding(false,
-                        this::shouldRemoveMessages,
-                        this::setRemoveMessages)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
+        return BUToggleableFeature.createOptionHelper("Disable Stash Messages",
+                "When this option is ON, messages reminding you to pick up your stash will no longer appear in chat.",
+                false,
+                this::shouldRemoveMessages,
+                this::setRemoveMessages);
     }
 }

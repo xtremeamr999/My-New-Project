@@ -58,31 +58,21 @@ public class OutbidOrderHandler {
     }
 
     public Collection<Option<Boolean>> createOptions() {
-        ArrayList<Option<Boolean>> options = new ArrayList<>();
-        options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Open Bazaar on Outbid Orders"))
-                .description(OptionDescription.of(Text.literal("Automatically open the bazaar after a delay when an order becomes outdated.")))
-                .binding(false,
+        return new ArrayList<>(List.of(BUToggleableFeature.createOptionHelper("Open Bazaar on Outbid Orders",
+                        "Automatically open the bazaar after a delay when an order becomes outdated.",
+                        false,
                         this::isAutoOpenEnabled,
-                        this::setAutoOpenEnabled)
-                .controller(BUConfigGui::createBooleanController)
-                .build());
-        options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Chat Notification on Outbid Orders"))
-                .description(OptionDescription.of(Text.literal("Sends a message in chat when someone has undercut your order.")))
-                .binding(true,
+                        this::setAutoOpenEnabled),
+                BUToggleableFeature.createOptionHelper("Chat Notification on Outbid Orders",
+                        "Sends a message in chat when someone has undercut your order.",
+                        true,
                         this::isNotifyOutbid,
-                        this::setNotifyOutbid)
-                .controller(BUConfigGui::createBooleanController)
-                .build());
-        options.add(Option.<Boolean>createBuilder()
-                .name(Text.literal("Sound on Outbid Order"))
-                .description(OptionDescription.of(Text.literal("Plays three short notification sounds when your order becomes outdated.")))
-                .binding(true,
+                        this::setNotifyOutbid),
+                BUToggleableFeature.createOptionHelper("Sound on Outbid Order",
+                        "Plays three short notification sounds when your order becomes outdated.",
+                        true,
                         this::isNotificationSound,
-                        this::setNotificationSound)
-                .controller(BUConfigGui::createBooleanController)
-                .build());
-        return options;
+                        this::setNotificationSound))
+        );
     }
 }

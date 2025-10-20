@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PriceCharts implements ItemTooltipCallback, BUListener {
+public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleableFeature {
     @Getter @Setter
     private boolean showOutsideBazaar = false;
 
@@ -104,13 +104,10 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     }
 
     public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Show Price Charts Outside Bazaar"))
-                .description(OptionDescription.of(Text.literal("Usually the option to CTRL+SHIFT click an item to see the price charts and other information on skyblock.finance is only shown inside the Bazaar while in an item view. This enables the feature outside of the Bazaar as well.")))
-                .binding(false,
-                        this::isShowOutsideBazaar,
-                        this::setShowOutsideBazaar)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
+        return BUToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
+                "Usually the option to CTRL+SHIFT click an item to see the price charts and other information on skyblock.finance is only shown inside the Bazaar while in an item view. This enables the feature outside of the Bazaar as well.",
+                false,
+                this::isShowOutsideBazaar,
+                this::setShowOutsideBazaar);
     }
 }
