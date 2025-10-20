@@ -51,12 +51,12 @@ public class BUCommands {
                             .executes((context) -> {
                                 String name = StringArgumentType.getString(context, "item name")
                                         .replaceAll("_", " ");
-                                String productID = BazaarData.findProductId(name);
+                                var productIDOpt = BazaarData.findProductIdOptional(name);
 
-                                if(productID == null){
-                                    PlayerActionUtil.notifyAll("Could not find product ID for " + name);
+                                if(productIDOpt.isPresent()){
+                                    PlayerActionUtil.notifyAll(name + ": " + productIDOpt.get());
                                 } else {
-                                    PlayerActionUtil.notifyAll(name + ": " + productID);
+                                    PlayerActionUtil.notifyAll("Could not find product ID for " + name);
                                 }
                                 return 1;
                             })

@@ -244,21 +244,6 @@ public final class BazaarData {
         }
     }
 
-    @Deprecated
-    public static Double findItemPrice(String productId, PriceInfoContainer.PriceType priceType) {
-        return findItemPriceOptional(productId, priceType).orElse(-1.0);
-    }
-
-    @Deprecated
-    public static String findProductId(String name) {
-        return findProductIdOptional(name).orElse(null);
-    }
-
-    @Deprecated
-    public static int getOrderCount(String productId, PriceInfoContainer.PriceType priceType, double price) {
-        return getOrderCountOptional(productId, priceType, price).orElse(-1);
-    }
-
     public static Optional<Duration> getCurrentSnapshotAge() {
         long ts = lastSnapshotTs;
         if (ts <= 0) return Optional.empty();

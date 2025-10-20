@@ -63,7 +63,8 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         }
     }
     public static boolean isValidName(String itemName){
-        return itemName != null && BazaarData.findProductId(itemName) != null;
+        var productIdOpt = BazaarData.findProductIdOptional(itemName);
+        return itemName != null && productIdOpt.isPresent();
     }
 
     public void updateMarketPrice(){
