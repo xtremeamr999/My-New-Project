@@ -1,9 +1,13 @@
 package com.github.mkram17.bazaarutils.features;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -27,6 +31,8 @@ import lombok.Setter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -90,21 +96,50 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     public static List<ClickableWidget> getWidget() {
         OrderLimit orderLimit = BUConfig.get().orderLimit;
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        boolean isTargetScreen = screenInfo.inBazaar();
+        boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
+
         if (!orderLimit.isEnabled() || !isTargetScreen || !(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen))
             return Collections.emptyList();
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
         String orderedCoinsFormatted = formatNumberWithPrefix(orderLimit.getTotalOrderedCoins());
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen,
+                screenTitle);
+
+
+        return List.of(createLimitWidget(dimensions, orderedCoinsFormatted), createTimeUntilResetWidget(dimensions));
+    }
+
+    private static TextDisplayWidget createTimeUntilResetWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions){
+
+        int spacing = 7;
+        int limitWidgetHeight = 16;
+        int textSizeX = 43;
+        if(BUCompatibilityHelper.isSkyblockerLoaded())
+            spacing += 21;
+        int widgetX = dimensions.x() + textSizeX;
+        int widgetY = dimensions.y() - spacing - limitWidgetHeight;
+
+        ZonedDateTime nextReset = TimeUtil.getNextBazaarLimitReset();
+        Duration duration = Duration.between(ZonedDateTime.now(), nextReset);
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+
+        MutableText timeUntilResetFormatted = Text.literal(String.format("%02d:%02d", hours, minutes)).formatted(Formatting.DARK_PURPLE);
+        MutableText timeUntilText = Text.literal("Time Until Reset: ").formatted(Formatting.GOLD);
+        Text timeUntilResetText = timeUntilText.append(timeUntilResetFormatted);
+
+        return new TextDisplayWidget(widgetX, widgetY, 30, 8, timeUntilResetText);
+    }
+
+    private static ClickableWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions, String orderedCoinsFormatted){
+        OrderLimit orderLimit = BUConfig.get().orderLimit;
 
         Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= orderLimit.getCOIN_LIMIT() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
         Text limitText = Text.literal("/" + formatNumberWithPrefix(orderLimit.getCOIN_LIMIT())).formatted(Formatting.GOLD);
         Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
                 .append(orderedCoinsText)
                 .append(limitText);
-
-        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen,
-                screenTitle);
 
         int textSizeX = 58;
         int textSizeY = 8;
@@ -113,8 +148,7 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
             spacing += 21;
         int buttonX = dimensions.x() + textSizeX;
         int buttonY = dimensions.y() - spacing - textSizeY;
-        TextDisplayWidget widget = new TextDisplayWidget(buttonX, buttonY, textSizeX, textSizeY, message);
-        return Collections.singletonList(widget);
+        return new TextDisplayWidget(buttonX, buttonY, textSizeX, textSizeY, message);
     }
 
     @Override
@@ -123,12 +157,12 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     }
 
     public record OrderLimitEntry(@Getter double price, @Getter ZonedDateTime time) {
-            public OrderLimitEntry(double price, ZonedDateTime time) {
-                this.price = price;
-                this.time = time;
-                Util.scheduleConfigSave();
-            }
+        public OrderLimitEntry(double price, ZonedDateTime time) {
+            this.price = price;
+            this.time = time;
+            Util.scheduleConfigSave();
         }
+    }
 
     public Option<Boolean> createOption() {
         return BUToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
