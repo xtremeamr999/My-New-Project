@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
@@ -13,13 +13,10 @@ import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
-import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
@@ -41,8 +38,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
-    private static final String FLIP_ORDER_IDENTIFIER = "Flip Order";
-    private static final String CANNOT_CANCEL_IDENTIFIER = "can't be flipped";
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
@@ -152,7 +147,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
                 continue;
             }
 
-            if (itemStack.getName().getString().contains(FLIP_ORDER_IDENTIFIER)) {
+            if (itemStack.getName().getString().contains("Flip Order")) {
                 LoreComponent lore = itemStack.getComponents().get(DataComponentTypes.LORE);
                 if (lore != null) {
                     return Optional.of(itemStack);
@@ -209,38 +204,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     private static boolean inCorrectScreen(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !inCancelOrderScreen();
-    }
-
-    private static boolean inCancelOrderScreen() {
-        if (!(MinecraftClient.getInstance().currentScreen instanceof GenericContainerScreen inventory)) {
-            return false;
-        }
-
-        try {
-            return cantBeFlippedLineIsPresent(inventory, FLIP_ORDER_SLOT);
-        } catch (Exception ex) {
-            Util.notifyError("Error while checking if in cancel screen", ex);
-            return false;
-        }
-    }
-
-    private static boolean cantBeFlippedLineIsPresent(GenericContainerScreen inventory, int slot){
-        ItemStack itemStack = inventory.getScreenHandler().getInventory().getStack(slot);
-        if (itemStack.isEmpty()) {
-            return false;
-        }
-
-        Text customName = itemStack.get(DataComponentTypes.CUSTOM_NAME);
-        if (customName == null || !customName.getString().contains(FLIP_ORDER_IDENTIFIER)) {
-            return false;
-        }
-
-        LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
-        if (lore == null || lore.lines().isEmpty()) {
-            return false;
-        }
-        return Util.findComponentWith(lore.lines(), CANNOT_CANCEL_IDENTIFIER) != null;
+        return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
     }
 
     @Override

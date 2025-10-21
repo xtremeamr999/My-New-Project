@@ -5,13 +5,16 @@ import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
@@ -37,15 +40,19 @@ public class ScreenInfo implements BUListener {
         BAZAAR_MAIN_PAGE("Bazaar ➜ "),
         BAZAAR_SETTINGS_PAGE("Settings"),
         ITEM_GROUP_PAGE(info -> {
-            String name = info.getContainerName();
+            String name = info.getScreenName();
             if (name == null || !name.contains("➜")) return false;
             return !GUIUtils.getChestItem(34).getItem().equals(Items.FURNACE);
         }),
-
         INDIVIDUAL_ITEM(info -> {
-            String name = info.getContainerName();
+            String name = info.getScreenName();
             if (name == null || !name.contains("➜")) return false;
             return GUIUtils.getChestItem(33).getItem().equals(Items.PAPER);
+        }),
+        CANCEL_ORDER(info -> {
+            String name = info.getScreenName();
+            if (name == null) return false;
+            return cantBeFlippedLineIsPresent();
         });
 
         @Getter
@@ -56,7 +63,7 @@ public class ScreenInfo implements BUListener {
         BazaarMenuType(String titleString) {
             this.titleString = titleString;
             this.matcher = info -> {
-                String n = info.getContainerName();
+                String n = info.getScreenName();
                 return n != null && n.contains(titleString);
             };
         }
@@ -135,9 +142,48 @@ public class ScreenInfo implements BUListener {
                 BazaarMenuType.INSTA_BUY, BazaarMenuType.INDIVIDUAL_ITEM);
     }
 
-    public String getContainerName(){
+    public String getScreenName(){
         if(screen == null || screen.getTitle() == null)
             return null;
         return Util.removeFormatting(screen.getTitle().getString());
+    }
+
+    public Optional<GenericContainerScreen> inGenericContainerScreen(){
+        if(currentScreenInfo.screen instanceof GenericContainerScreen containerScreen){
+            return Optional.of(containerScreen);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+
+    private static boolean cantBeFlippedLineIsPresent(){
+        final int FLIP_ORDER_SLOT = 15;
+
+        var screenInfo = ScreenInfo.currentScreenInfo;
+        var containerOpt = screenInfo.inGenericContainerScreen();
+        GenericContainerScreen genericContainerScreen;
+
+        if(containerOpt.isPresent()){
+            genericContainerScreen = containerOpt.get();
+        } else {
+            return false;
+        }
+
+        ItemStack itemStack = genericContainerScreen.getScreenHandler().getInventory().getStack(FLIP_ORDER_SLOT);
+        if (itemStack.isEmpty()) {
+            return false;
+        }
+
+        Text customName = itemStack.get(DataComponentTypes.CUSTOM_NAME);
+        if (customName == null || !customName.getString().contains("Flip Order")) {
+            return false;
+        }
+
+        LoreComponent lore = itemStack.get(DataComponentTypes.LORE);
+        if (lore == null || lore.lines().isEmpty()) {
+            return false;
+        }
+        return Util.findComponentWith(lore.lines(), "can't be flipped") != null;
     }
 }

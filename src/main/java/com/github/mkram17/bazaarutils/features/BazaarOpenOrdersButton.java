@@ -43,7 +43,7 @@ public class BazaarOpenOrdersButton {
             return Collections.emptyList();
 
 
-        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getContainerName());
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
 
         ItemSlotButtonWidget button = getItemSlotButtonWidget(dimensions);
         return Collections.singletonList(button);

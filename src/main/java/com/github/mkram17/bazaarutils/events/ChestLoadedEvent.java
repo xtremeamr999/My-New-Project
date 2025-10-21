@@ -53,7 +53,7 @@ public class ChestLoadedEvent implements ICancellable {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
-                                event.containerName = ScreenInfo.getCurrentScreenInfo().getContainerName();
+                                event.containerName = ScreenInfo.getCurrentScreenInfo().getScreenName();
                                 event.itemStacks = getChestItemSlots(inv);
                                 BazaarUtils.EVENT_BUS.post(event);
                             } else {

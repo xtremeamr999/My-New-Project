@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc;
+package com.github.mkram17.bazaarutils.misc.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;

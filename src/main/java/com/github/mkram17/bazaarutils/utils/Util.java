@@ -12,6 +12,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -196,6 +197,7 @@ public class Util {
         }
         return -1;
     }
+    @Nullable
     public static Text findComponentWith(List<Text> components, String lookingFor){
         for(Text component : components){
             if(component.getString().contains(lookingFor))

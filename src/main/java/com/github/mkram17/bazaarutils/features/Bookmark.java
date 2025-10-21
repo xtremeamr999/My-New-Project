@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
+import com.github.mkram17.bazaarutils.misc.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
@@ -160,7 +160,7 @@ public class Bookmark extends CustomItemButton {
 
     private static String findItemNameFromContainer(){
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        String containerName = screenInfo.getContainerName();
+        String containerName = screenInfo.getScreenName();
         if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         } else {
@@ -208,7 +208,7 @@ public class Bookmark extends CustomItemButton {
         if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
             return Collections.emptyList();
 
-        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getContainerName());
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
 
         int buttonSize = 18;
         int spacing = 4;
