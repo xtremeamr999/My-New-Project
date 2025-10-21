@@ -92,7 +92,7 @@ public class Bookmark extends CustomItemButton {
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         reverseBookmarkStatus();
         bookmarkedItemStack = findItemStack(name);
-        Util.scheduleConfigSave();
+        BUConfig.scheduleConfigSave();
     }
 
     public void onWidgetLeftClick(){
@@ -113,7 +113,7 @@ public class Bookmark extends CustomItemButton {
 
     public void onWidgetShiftClick(){
         BUConfig.get().bookmarks.remove(this);
-        Util.scheduleConfigSave();
+        BUConfig.scheduleConfigSave();
     }
 
     private void reverseBookmarkStatus(){
@@ -124,7 +124,7 @@ public class Bookmark extends CustomItemButton {
             changeVisuals(true);
             BUConfig.get().bookmarks.add(this);
         }
-        Util.scheduleConfigSave();
+        BUConfig.scheduleConfigSave();
     }
 
     private void changeVisuals(boolean bookmarked){

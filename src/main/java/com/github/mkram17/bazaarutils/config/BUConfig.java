@@ -33,6 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BUConfig {
+    private static boolean configSaveScheduled = false;
+
     public static RuntimeTypeAdapterFactory<CustomOrder> customOrderAdapterFactory = RuntimeTypeAdapterFactory.of(CustomOrder.class)
             .registerSubtype(MaxBuyOrder.class)
             .registerSubtype(CustomOrder.class);
@@ -97,6 +99,16 @@ public class BUConfig {
     public static void openGUI() {
         MinecraftClient client = MinecraftClient.getInstance();
         client.send(() -> client.setScreen(BUConfigGui.create(null, get())));
+    }
+
+    public static void scheduleConfigSave() {
+        if (!configSaveScheduled) {
+            configSaveScheduled = true;
+            Util.tickExecuteLater(20, () -> { // 1 second
+                HANDLER.save();
+                configSaveScheduled = false;
+            });
+        }
     }
 
     public Screen createGUI(Screen parent) {

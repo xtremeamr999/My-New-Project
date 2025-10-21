@@ -59,7 +59,7 @@ public class ResourceManager {
                 Files.copy(inputStream, LOCAL_RESOURCES_PATH);
                 // don't know the SHA of the bundled file, so stays null to force an update check.
                 BUConfig.get().resourcesSha = "";
-                Util.scheduleConfigSave();
+                BUConfig.scheduleConfigSave();
             }
         } else {
             Util.notifyError("Could not find bundled bazaar-resources.json", null);
@@ -111,7 +111,7 @@ public class ResourceManager {
             Files.move(tempPath, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
             BUConfig.get().resourcesSha = latestSha;
-            Util.scheduleConfigSave();
+            BUConfig.scheduleConfigSave();
             BazaarData.setConversionsLoaded(false);
             PlayerActionUtil.notifyAll("Successfully updated Bazaar resources!");
         } catch (Exception e) {

@@ -10,7 +10,6 @@ import com.github.mkram17.bazaarutils.misc.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
-import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -128,10 +127,10 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         }
     }
 
-    public void remove(){
+    public void removeFromConfig(){
         if (BUConfig.get().customOrders.contains(this)) {
             BUConfig.get().customOrders.remove(this);
-            Util.scheduleConfigSave();
+            BUConfig.scheduleConfigSave();
             EVENT_BUS.unsubscribe(this);
         }
     }

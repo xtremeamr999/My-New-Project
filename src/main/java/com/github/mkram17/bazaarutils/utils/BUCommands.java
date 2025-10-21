@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.features.customorder.management.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
@@ -114,7 +113,7 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
                     BUConfig.get().developerMode = !BUConfig.get().developerMode;
-                    Util.scheduleConfigSave();
+                    BUConfig.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
                     PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
@@ -123,62 +122,6 @@ public class BUCommands {
                     }
                     return 1;
                 })
-        );
-
-        bazaarutils.then(ClientCommandManager.literal("customorder")
-                .then(ClientCommandManager.literal("add")
-                        .then(ClientCommandManager.argument("order amount", IntegerArgumentType.integer(1, 71680))
-                                .then(ClientCommandManager.argument("slot number", IntegerArgumentType.integer(1, 36))
-                                        .executes(context -> {
-                                            int orderAmount = IntegerArgumentType.getInteger(context, "order amount");
-                                            int slotNumber = IntegerArgumentType.getInteger(context, "slot number");
-
-                                            if (orderAmount < 1 || orderAmount > 71679) {
-                                                context.getSource().sendError(Text.literal("Order amount must be 1-71,679"));
-                                                return 0;
-                                            }
-
-                                            if (slotNumber < 1 || slotNumber > 36) {
-                                                context.getSource().sendError(Text.literal("Slot number must be 1-36"));
-                                                return 0;
-                                            }
-                                            CustomOrder orderToAdd = new CustomOrder(
-                                                    true,
-                                                    orderAmount,
-                                                    slotNumber - 1
-                                            );
-
-                                            BUConfig.get().customOrders.add(orderToAdd);
-                                            PlayerActionUtil.notifyAll("Added order for " + orderToAdd.getOrderAmount() + " in slot number " + slotNumber);
-                                            Util.scheduleConfigSave();
-                                            return 1;
-                                        })
-                                )
-                        )
-                )
-        );
-        bazaarutils.then(ClientCommandManager.literal("customorder")
-                .then(ClientCommandManager.literal("remove")
-                        .then(ClientCommandManager.argument("order number", IntegerArgumentType.integer(1))
-                                .executes(context -> {
-                                    int orderNum = IntegerArgumentType.getInteger(context, "order number") - 1;
-                                    if (BUConfig.get().customOrders.size() < orderNum) {
-                                        PlayerActionUtil.notifyAll("There is no Custom Order #" + orderNum + ". The Custom Order # is based on the order they are displayed in the config.");
-                                        return 0;
-                                    }
-                                    CustomOrder customOrder = BUConfig.get().customOrders.get(orderNum);
-                                    if (customOrder.getOrderAmount() != 71680) {
-                                        PlayerActionUtil.notifyAll("Removed Custom Order for " + BUConfig.get().customOrders.get(orderNum).getOrderAmount());
-                                        BUConfig.get().customOrders.get(orderNum).remove();
-                                    } else {
-                                        PlayerActionUtil.notifyAll("Cannot remove Max Buy Order.");
-                                        return 0;
-                                    }
-                                    Util.scheduleConfigSave();
-                                    return 1;
-                                })
-                        )
-                )
         );
         bazaarutils.then(ClientCommandManager.literal("customorders")
                 .executes(context -> {
@@ -195,7 +138,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.VOLUME, limit);
-                                            Util.scheduleConfigSave();
+                                            BUConfig.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
                                             return 1;
                                         })
@@ -207,7 +150,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             double limit = DoubleArgumentType.getDouble(context, "limit");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.PRICE, limit);
-                                            Util.scheduleConfigSave();
+                                            BUConfig.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
                                             return 1;
                                         })
@@ -219,7 +162,7 @@ public class BUCommands {
                                         .executes(context -> {
                                             String name = StringArgumentType.getString(context, "itemName");
                                             BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.NAME, name);
-                                            Util.scheduleConfigSave();
+                                            BUConfig.scheduleConfigSave();
                                             PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
                                             return 1;
                                         })
@@ -239,7 +182,7 @@ public class BUCommands {
                                         PlayerActionUtil.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
                                     }
                                     BUConfig.get().restrictSell.getControls().remove(restrictNum);
-                                    Util.scheduleConfigSave();
+                                    BUConfig.scheduleConfigSave();
                                     return 1;
                                 })
                         )

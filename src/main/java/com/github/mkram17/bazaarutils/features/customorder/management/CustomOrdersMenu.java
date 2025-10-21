@@ -122,6 +122,8 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                     }
                     CustomOrder newOrder = new CustomOrder(orderToAdd.isEnabled(), orderToAdd.getOrderAmount(), orderToAdd.getSlotNumber());
                     BUConfig.get().customOrders.add(newOrder);
+                    MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
+                    BUConfig.scheduleConfigSave();
                 })
                     .margins(Insets.of(3));
     }
@@ -138,7 +140,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                 Components.button(
                         Text.literal("\uD83D\uDDD1"),
                         button -> {
-                            customOrders.remove(order);
+                            order.removeFromConfig();
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                         }).margins(Insets.of(3,3,1,3))
                 );

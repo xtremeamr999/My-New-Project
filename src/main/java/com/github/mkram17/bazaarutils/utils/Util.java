@@ -14,8 +14,6 @@ import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -29,7 +27,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //main utility class. More specific utility classes are in utils package
 public class Util {
 
-    private static boolean configSaveScheduled = false;
 
 
     public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA;
@@ -110,17 +107,7 @@ public class Util {
         BUConfig.get().userOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item, notificationTypes.ORDERDATA);
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.ADD, item));
-        scheduleConfigSave();
-    }
-
-    public static void scheduleConfigSave() {
-        if (!configSaveScheduled) {
-            configSaveScheduled = true;
-            tickExecuteLater(20, () -> { // 1 second
-                BUConfig.HANDLER.save();
-                configSaveScheduled = false;
-            });
-        }
+        BUConfig.scheduleConfigSave();
     }
 
     @RunOnInit

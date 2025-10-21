@@ -6,7 +6,6 @@ import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
-import com.github.mkram17.bazaarutils.utils.Util;
 import com.mojang.serialization.Codec;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import lombok.Getter;
@@ -128,7 +127,7 @@ public class BazaarUtils implements ClientModInitializer {
             var currentVersionMajor = currentVersion.substring(currentVersion.indexOf(".")+1);
 
             BUConfig.get().MOD_VERSION = currentVersion;
-            Util.scheduleConfigSave();
+            BUConfig.scheduleConfigSave();
 
             if(!oldVersionMajor.equals(currentVersionMajor))
                 updatedMajorVersion = true;

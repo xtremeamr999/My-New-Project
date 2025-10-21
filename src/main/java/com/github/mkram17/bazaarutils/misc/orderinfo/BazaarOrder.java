@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
-import com.github.mkram17.bazaarutils.events.OutbidOrderEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -16,7 +15,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -197,6 +195,6 @@ public class BazaarOrder extends OrderInfoContainer {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.REMOVE, this));
-        Util.scheduleConfigSave();
+        BUConfig.scheduleConfigSave();
     }
 }

@@ -2,17 +2,14 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +36,7 @@ public class StashMessages implements BUListener, BUToggleableFeature {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if(message.getString().contains("You picked up") && message.getString().contains("from your material stash") && !stashPreviouslyClaimed) {
                 stashPreviouslyClaimed = true;
-                Util.scheduleConfigSave();
+                BUConfig.scheduleConfigSave();
                 Util.tickExecuteLater(2, () ->{
                     if(BUCompatibilityHelper.isAmecsReborn())
                         PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use " + BazaarUtils.stashHelper.getUsage() + " to close the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config.");
