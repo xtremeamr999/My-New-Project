@@ -125,7 +125,7 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
         long hours = duration.toHours();
         long minutes = duration.toMinutesPart();
 
-        MutableText timeUntilResetFormatted = Text.literal(String.format("%02d:%02d", hours, minutes)).formatted(Formatting.DARK_PURPLE);
+        MutableText timeUntilResetFormatted = Text.literal(String.format("%02d:%02d", hours, minutes)).formatted(Formatting.DARK_GREEN);
         MutableText timeUntilText = Text.literal("Time Until Reset: ").formatted(Formatting.GOLD);
         Text timeUntilResetText = timeUntilText.append(timeUntilResetFormatted);
 
@@ -135,8 +135,8 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     private static ClickableWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions, String orderedCoinsFormatted){
         OrderLimit orderLimit = BUConfig.get().orderLimit;
 
-        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= orderLimit.getCOIN_LIMIT() ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
-        Text limitText = Text.literal("/" + formatNumberWithPrefix(orderLimit.getCOIN_LIMIT())).formatted(Formatting.GOLD);
+        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= OrderLimit.COIN_LIMIT ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
+        Text limitText = Text.literal("/" + formatNumberWithPrefix(OrderLimit.COIN_LIMIT)).formatted(Formatting.GOLD);
         Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
                 .append(orderedCoinsText)
                 .append(limitText);
