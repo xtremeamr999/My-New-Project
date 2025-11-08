@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 //Object is created in GUIUtils when in an item's bazaar page
-public class Bookmark extends CustomItemButton {
+public class Bookmark extends CustomItemButton implements BUListener {
 
     @Getter
     public final String name;
@@ -65,8 +66,7 @@ public class Bookmark extends CustomItemButton {
         this.bookmarkedItemStack = findItemStack(name);
         this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
 
-        BazaarUtils.EVENT_BUS.subscribe(this);
-        subscribeToEventBusUnsubscriber();
+        subscribe();
     }
 
     @EventHandler
@@ -259,4 +259,9 @@ public class Bookmark extends CustomItemButton {
         return widgets;
     }
 
+    @Override
+    public void subscribe() {
+        BazaarUtils.EVENT_BUS.subscribe(this);
+        subscribeToEventBusUnsubscriber();
+    }
 }

@@ -22,8 +22,6 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
-import java.util.function.Predicate;
-
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO make inBazaar() work all the time
@@ -32,8 +30,6 @@ public class GUIUtils {
     private static guiTypes guiType;
     @Getter @Setter
     private static Inventory lowerChestInventory;
-    @Getter @Setter
-    private static Bookmark currentBookmark;
 
     @RunOnInit
     public static void subscribe() {
@@ -47,9 +43,7 @@ public class GUIUtils {
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
-            ScreenInfo currentInfo = ScreenInfo.getCurrentScreenInfo();
-            if(screen != null && currentInfo == null)
-                currentInfo = new ScreenInfo(screen);
+            ScreenInfo.initialize(screen);
         });
     }
 
@@ -66,15 +60,14 @@ public class GUIUtils {
 
     @EventHandler(priority = EventPriority.HIGH)
     private static void setUpBookmark(ChestLoadedEvent e){
-        currentBookmark = null;
         if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
             return;
         String name = Bookmark.findItemName(e);
         if (Bookmark.isItemBookmarked(name)) {
-            currentBookmark = Bookmark.findMatchingBookmark(name).get();
-            EVENT_BUS.subscribe(currentBookmark);
-        } else
-            currentBookmark = new Bookmark(name);
+            Bookmark.findMatchingBookmark(name).get().subscribe();
+        } else {
+            new Bookmark(name);
+        }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onLoad(ChestLoadedEvent e){

@@ -1,29 +1,24 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Predicate;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 // Utility class for current screen info
-public class ScreenInfo implements BUListener {
+public class ScreenInfo {
     @Getter
-    private static ScreenInfo currentScreenInfo;
+    private static final ScreenInfo currentScreenInfo = new ScreenInfo();
+    private static boolean initialized = false;
+
     @Getter
-    private final Screen screen;
-    @Getter
-    private static final List<ScreenInfo> previousScreenInfos = new ArrayList<>();
+    private Screen screen;
+    private Screen previousScreen;
 
     public enum BazaarMenuType {
         BUY_ORDER("How many do you want?"),
@@ -52,7 +47,6 @@ public class ScreenInfo implements BUListener {
         private final String titleString;
         private final Predicate<ScreenInfo> matcher;
 
-        // Constructor for simple title substring match
         BazaarMenuType(String titleString) {
             this.titleString = titleString;
             this.matcher = info -> {
@@ -61,7 +55,6 @@ public class ScreenInfo implements BUListener {
             };
         }
 
-        // Constructor for complex predicate
         BazaarMenuType(Predicate<ScreenInfo> matcher) {
             this.titleString = null;
             this.matcher = matcher;
@@ -72,32 +65,34 @@ public class ScreenInfo implements BUListener {
         }
     }
 
-    public ScreenInfo(Screen screen) {
-        this.screen = screen;
-        subscribe();
+    private ScreenInfo() {
+        // singleton
+    }
+
+    public static void initialize(Screen initialScreen) {
+        if (initialized) return;
+        currentScreenInfo.screen = initialScreen;
+        EVENT_BUS.subscribe(currentScreenInfo);
+        initialized = true;
     }
 
     @EventHandler
-    private void onScreenChange(ScreenChangeEvent e){
-        if(e.getNewScreen() == null) return;
+    private void onScreenChange(ScreenChangeEvent event) {
+        this.previousScreen = this.screen;
+        this.screen = event.getNewScreen();
+    }
 
-        EVENT_BUS.unsubscribe(this);
-
-        currentScreenInfo = new ScreenInfo(e.getNewScreen());
-        if(e.getOldScreen() == null){
-            previousScreenInfos.clear();
-        } else {
-            previousScreenInfos.add(this);
+    /**
+     * Gets a temporary ScreenInfo object representing the previous screen.
+     * Returns null if there was no previous screen.
+     */
+    public ScreenInfo getPreviousScreenInfo() {
+        if (previousScreen == null) {
+            return null;
         }
-    }
-
-    public static boolean previousScreenHas(Predicate<ScreenInfo> filter){
-        return previousScreenInfos.stream().anyMatch(filter);
-    }
-
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
+        ScreenInfo prevInfo = new ScreenInfo();
+        prevInfo.screen = this.previousScreen;
+        return prevInfo;
     }
 
     /*
@@ -112,7 +107,7 @@ public class ScreenInfo implements BUListener {
         return false;
     }
 
-    public boolean inBazaar(){
+    public boolean inBazaar() {
         return inMenu(
                 BazaarMenuType.BUY_ORDER,
                 BazaarMenuType.FLIP_GUI,
@@ -128,15 +123,8 @@ public class ScreenInfo implements BUListener {
         );
     }
 
-    // only for specific items
-    public boolean inAnyItemScreen(){
-        if(inMenu(BazaarMenuType.BAZAAR_MAIN_PAGE)) return false;
-        return inMenu(BazaarMenuType.ITEM_GROUP_PAGE, BazaarMenuType.BUY_ORDER,
-                BazaarMenuType.INSTA_BUY, BazaarMenuType.INDIVIDUAL_ITEM);
-    }
-
-    public String getContainerName(){
-        if(screen == null || screen.getTitle() == null)
+    public String getContainerName() {
+        if (screen == null || screen.getTitle() == null)
             return null;
         return Util.removeFormatting(screen.getTitle().getString());
     }
