@@ -94,6 +94,8 @@ public class BUConfig {
     public OrderLimit orderLimit = new OrderLimit(true);
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
+    @SerialEntry
+    public UselessBazaarNotificationRemover uselessNotificationRemover = new UselessBazaarNotificationRemover();
 
 
     public static void openGUI() {

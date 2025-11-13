@@ -38,6 +38,7 @@ public class BUConfigGui {
         generalBuilder.options(config.outbidOrderHandler.createOptions());
         generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
         generalBuilder.option(config.stashMessages.createOption());
+        generalBuilder.option(config.uselessNotificationRemover.createOption());
         generalBuilder.option(config.priceCharts.createOption());
         generalBuilder.option(config.orderStatusHighlight.createOption());
         generalBuilder.option(createDisableErrorNotifsOption(config));

@@ -97,10 +97,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "init", at = @At("TAIL"))
 	private void bazaarutils$addConfiguredButtons(CallbackInfo ci) {
-		int buttonsAdded = 0;
 		for (ClickableWidget button : BUConfig.getWidgets()) {
 			this.addDrawableChild(button);
-			buttonsAdded++;
 		}
 	}
 
