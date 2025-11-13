@@ -85,6 +85,7 @@ dependencies {
     include("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-core:4.4")
 
+    // Config lib and settings screen
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
