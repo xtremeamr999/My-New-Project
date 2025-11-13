@@ -31,10 +31,10 @@ public class PriceInfoContainer {
     @Setter @Getter
     protected PriceType priceType;
     @Getter
-    private Double instaSellPrice;
+    private double instaSellPrice;
     //the price of the opposite type of order
     @Getter @Setter
-    private Double instaBuyPrice;
+    private double instaBuyPrice;
 
     public PriceInfoContainer(Double pricePerItem, PriceType priceType) {
         this.priceType = priceType;
@@ -43,11 +43,13 @@ public class PriceInfoContainer {
             this.pricePerItem = (double) Math.round(pricePerItem * 10) / 10;
         }
         if(priceType == null){
-            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value of buy order
+            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value of buy order (INSTASELL)
             this.priceType = PriceType.INSTASELL;
         }
     }
 
+    /* Returns the current market price for the given PriceType (INSTASELL or INSTABUY)
+     */
     public Double getMarketPrice(PriceType priceType){
         return switch (priceType) {
             case INSTASELL -> instaSellPrice;
@@ -59,8 +61,8 @@ public class PriceInfoContainer {
         var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
         var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
 
-        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.truncateNum(price));
-        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.truncateNum(price));
+        instaSellPriceOpt.ifPresentOrElse(price -> instaSellPrice = Util.truncateNum(price), () -> instaSellPrice = -1.0);
+        instaBuyPriceOpt.ifPresentOrElse(price -> instaBuyPrice = Util.truncateNum(price), () -> instaBuyPrice = -1.0);
     }
 
     public void flipPrices(double newPrice){

@@ -50,7 +50,7 @@ public class ChestLoadedEvent {
                         if (handler instanceof GenericContainerScreenHandler containerHandler) {
                             Inventory inv = containerHandler.getInventory();
                             // Check if inventory is populated and not in a loading state
-                            if (inv.size() > 0 && !inv.getStack(inv.size() - 1).isEmpty() && !isItemLoading(inv)) {
+                            if (!inv.isEmpty() && !inv.getStack(inv.size() - 1).isEmpty() && !isItemLoading(inv)) {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
