@@ -181,7 +181,6 @@ publishMods {
         repository = "mkram17/Bazaar-Utils"
         commitish = "modern"
         type = STABLE
-
     }
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
