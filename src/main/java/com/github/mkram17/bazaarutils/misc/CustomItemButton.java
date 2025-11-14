@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 
 public class CustomItemButton {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
+    @Getter
     protected int slotNumber;
     @Getter @Setter
     protected transient ItemStack replacementItem;

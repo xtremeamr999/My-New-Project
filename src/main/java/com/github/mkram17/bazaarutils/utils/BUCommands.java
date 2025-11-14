@@ -2,8 +2,9 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
-import com.github.mkram17.bazaarutils.features.CustomOrder;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
+import com.github.mkram17.bazaarutils.features.customorder.management.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -97,18 +98,16 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("discord")
                 .executes((context) -> {
                     MinecraftClient client = MinecraftClient.getInstance();
-                    client.send(() -> {
-                        context.getSource().getClient().setScreen(new ConfirmLinkScreen((confirmed) -> {
-                            if (confirmed) {
-                                    try {
-                                        net.minecraft.util.Util.getOperatingSystem().open(new URI(Util.DISCORD_LINK));
-                                    } catch (URISyntaxException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                            }
-                            MinecraftClient.getInstance().setScreen(null);
-                        }, Util.DISCORD_LINK, true));
-                    });
+                    client.send(() -> context.getSource().getClient().setScreen(new ConfirmLinkScreen((confirmed) -> {
+                        if (confirmed) {
+                                try {
+                                    net.minecraft.util.Util.getOperatingSystem().open(new URI(Util.DISCORD_LINK));
+                                } catch (URISyntaxException e) {
+                                    throw new RuntimeException(e);
+                                }
+                        }
+                        MinecraftClient.getInstance().setScreen(null);
+                    }, Util.DISCORD_LINK, true)));
                     return 1;
                 })
         );
@@ -146,8 +145,7 @@ public class BUCommands {
                                             CustomOrder orderToAdd = new CustomOrder(
                                                     true,
                                                     orderAmount,
-                                                    slotNumber - 1,
-                                                    CustomOrder.getNextColoredPane()
+                                                    slotNumber - 1
                                             );
 
                                             BUConfig.get().customOrders.add(orderToAdd);
@@ -181,6 +179,13 @@ public class BUCommands {
                                 })
                         )
                 )
+        );
+        bazaarutils.then(ClientCommandManager.literal("customorders")
+                .executes(context -> {
+                    var client = MinecraftClient.getInstance();
+                    client.send(() -> client.setScreen(new CustomOrdersMenu()));
+                    return 1;
+                })
         );
         bazaarutils.then(ClientCommandManager.literal("rule")
                 .then(ClientCommandManager.literal("add")

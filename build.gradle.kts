@@ -1,3 +1,4 @@
+import me.modmuss50.mpp.ReleaseType
 
 plugins {
     id("fabric-loom")
@@ -5,38 +6,42 @@ plugins {
     `maven-publish`
     java
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
+    id("com.gradleup.shadow") version "9.2.2"
 }
 
 group = property("maven_group")!!
-version = "v" + property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
+
+var releaseType = property("release_type").toString()
+var plainVersion = property("mod_version").toString()
+if(releaseType != "stable") plainVersion += releaseType
+
+project.version = "v$plainVersion+mc" + property("deps.core.mcVersion") as String
 
 base {
     archivesName.set(property("mod.id").toString())
 }
 
 repositories {
-    maven {
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") {
         name = "Dev Auth"
-        url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     }
-    maven {
+    maven("https://maven.meteordev.org/releases") {
         name = "meteor-maven"
-        url = uri("https://maven.meteordev.org/releases")
     }
-    maven {
+    maven("https://repo.hypixel.net/repository/Hypixel/") {
         name = "Hypixel"
-        url = uri("https://repo.hypixel.net/repository/Hypixel/")
     }
-    maven {
+    maven("https://maven.isxander.dev/releases") {
         name = "YACL"
-        url = uri("https://maven.isxander.dev/releases")
     }
-    maven {
+    maven("https://maven.terraformersmc.com/") {
         name = "Terraformers (for gui)"
-        url = uri("https://maven.terraformersmc.com/")
     }
-    maven("https://moulberry.repo.ax/v1") {
-        name = "Moulberry's Maven"
+    maven("https://maven.wispforest.io") {
+        name = "Owo Lib"
+    }
+    maven("https://repo.nea.moe/releases"){
+        name = "Nea Repo for Auto Update"
     }
 
     exclusiveContent {
@@ -74,7 +79,7 @@ dependencies {
     mappings("net.fabricmc:yarn:${mcVersion}+build.${deps["yarn_build"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${deps["fabricLoaderVersion"]}")
 
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${deps["fabric_api"]}")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
@@ -108,6 +113,15 @@ dependencies {
     include("org.danilopianini:gson-extras:3.3.0")
     // Skyblocker for compatibility
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
+
+    // Owo Lib
+    modImplementation("io.wispforest:owo-lib:${property("owo_version")}+${mcVersion}")
+    //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
+    include("io.wispforest:owo-sentinel:${property("owo_version")}")
+
+    // Auto Update Library
+    implementation("moe.nea:libautoupdate:1.3.1")
+    shadow("moe.nea:libautoupdate:1.3.1")
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
@@ -133,6 +147,7 @@ tasks {
             expand(mapOf(
                 "version" to project.version,
                 "mod_version" to rootProject.property("mod_version"),
+                "version_type" to releaseType,
                 "mcVersion" to mcVersion,
                 "maxMcVersion" to maxMcVersion,
                 "major_update_notes" to rootProject.property("major_update_notes")
@@ -144,6 +159,13 @@ tasks {
         from("LICENSE"){
             rename { "${it}_${archiveBaseName.get()}" }
         }
+    }
+    shadowJar {
+        configurations = listOf(project.configurations.shadow.get())
+    }
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.get().archiveFile)
     }
 }
 loom {
@@ -160,11 +182,11 @@ publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = "Changelog"
-    type = if(version.toString().contains("alpha")) ALPHA else STABLE
+    type = ReleaseType.of(releaseType.uppercase())
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
-    version = "v" + property("mod_version").toString()
-    displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
+    version = "v$plainVersion"
+    displayName = "Bazaar Utils v$plainVersion for $mcVersion"
 //    dryRun = true
 
     modrinth {
@@ -172,8 +194,9 @@ publishMods {
         projectId = "c4u7nzUZ"
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
+        minecraftVersions.add(maxMcVersion)
 
-        requires("fabric-api", "yacl")
+        requires("fabric-api", "yacl", "owo-lib")
         optional("modmenu", "amecs-reborn")
     }
     github {

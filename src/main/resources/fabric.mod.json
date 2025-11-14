@@ -33,7 +33,8 @@
 		"minecraft": ">=${mcVersion} <=${maxMcVersion}",
 		"java": ">=21",
 		"fabric-api": "*",
-		"yet_another_config_lib_v3": "*"
+		"yet_another_config_lib_v3": "*",
+		"owo-lib": ">=0.12.21"
 	},
 	"suggests": {
 		"amecsreborn": ">=2.02",
@@ -41,6 +42,7 @@
 	},
 	"custom": {
 		"latestMajorUpdateNotes": "${major_update_notes}",
+		"releaseType": "${version_type}",
 		"modmenu": {
 			"links": {
 				"modmenu.discord": "https://discord.gg/xDKjvm5hQd"
