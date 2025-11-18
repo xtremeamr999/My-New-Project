@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.ui;
+package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;

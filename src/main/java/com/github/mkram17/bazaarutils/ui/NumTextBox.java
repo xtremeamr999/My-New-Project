@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.ui;
+package com.github.mkram17.bazaarutils.ui;
 
 import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.core.Sizing;
