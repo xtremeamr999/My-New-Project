@@ -17,7 +17,7 @@ public class JoinMessages {
 
     @RunOnInit(priority = RunOnInit.EVENT_PRIORITIES.HIGH)
     public static void initializeFields(){
-        welcomeMessage = Text.literal("Thanks for installing! Use /buconfig to configure the mod.")
+        welcomeMessage = Text.literal("Thanks for installing! Use /bu or /bazaarutils to configure the mod.")
                 .formatted(Formatting.GREEN);
         discordMessage = Text.literal("For more help or to report a bug, join the ")
                 .formatted(Formatting.GREEN)
