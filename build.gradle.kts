@@ -1,7 +1,7 @@
 import me.modmuss50.mpp.ReleaseType
 
 plugins {
-    id("fabric-loom")
+    id("fabric-loom") version "1.11-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
@@ -115,9 +115,9 @@ dependencies {
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
 
     // Owo Lib
-    modImplementation("io.wispforest:owo-lib:${property("owo_version")}+${mcVersion}")
+    modImplementation("io.wispforest:owo-lib:${deps["owo_version"]}")
     //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
-    include("io.wispforest:owo-sentinel:${property("owo_version")}")
+    include("io.wispforest:owo-sentinel:${deps["owo_version"]}")
 
     // Auto Update Library
     implementation("moe.nea:libautoupdate:1.3.1")
