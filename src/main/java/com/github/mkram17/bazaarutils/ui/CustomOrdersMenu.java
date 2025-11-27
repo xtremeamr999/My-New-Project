@@ -1,9 +1,8 @@
-package com.github.mkram17.bazaarutils.features.customorder.management;
+package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.misc.ui.NumTextBox;
-import com.github.mkram17.bazaarutils.misc.ui.PickSlotMenu;
+import com.github.mkram17.bazaarutils.features.customorder.management.OrderToAdd;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;

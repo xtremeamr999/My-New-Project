@@ -12,10 +12,10 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 
+import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.ui.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import dev.isxander.yacl3.api.Option;

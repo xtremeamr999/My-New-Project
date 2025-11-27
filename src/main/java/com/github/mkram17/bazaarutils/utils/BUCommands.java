@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
-import com.github.mkram17.bazaarutils.features.customorder.management.CustomOrdersMenu;
+import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;

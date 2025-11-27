@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.widgets;
+package com.github.mkram17.bazaarutils.ui.widgets;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

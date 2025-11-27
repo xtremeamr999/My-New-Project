@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;

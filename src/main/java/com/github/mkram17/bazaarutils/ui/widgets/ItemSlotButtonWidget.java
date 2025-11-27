@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.widgets;
+package com.github.mkram17.bazaarutils.ui.widgets;
 
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;

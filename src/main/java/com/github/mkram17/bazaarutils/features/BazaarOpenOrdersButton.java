@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
