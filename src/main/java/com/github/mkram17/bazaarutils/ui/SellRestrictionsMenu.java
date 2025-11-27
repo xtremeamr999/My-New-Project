@@ -2,11 +2,11 @@ package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.customorder.management.OrderToAdd;
+import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
+import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
@@ -15,14 +15,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
-public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
+public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
     private static final float BACKGROUND_BLUR_QUALITY = 10f;
     private static final float BACKGROUND_BLUR_SIZE = 10f;
 
-    public OrderToAdd orderToAdd = new OrderToAdd();
-
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
+    private static RestrictSell.restrictBy restrictionTypeToAdd;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -70,20 +69,18 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private FlowLayout generateOrderButtonsContainer() {
-        var customOrders = BUConfig.get().customOrders;
+        var sellRestrictions = BUConfig.get().restrictSell.getControls();
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
-        for(CustomOrder order : customOrders) {
-            verticalFlow.child(generateOrderButton(order));
+        for(RestrictSellControl control : sellRestrictions) {
+            verticalFlow.child(generateOrderButton(control));
         }
         return verticalFlow;
     }
     private ParentComponent generateNewOrderParent() {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
-        horizontalFlow.child(Components.label(Text.literal("New Order").formatted(Formatting.BOLD)).margins(Insets.of(10)));
-        horizontalFlow.child(Components.label(Text.literal("Amount:")));
-        horizontalFlow.child(addOrderAmountTextBox());
-        horizontalFlow.child(chooseSlotButton());
+        horizontalFlow.child(Components.label(Text.literal("New Sell Restriction").formatted(Formatting.BOLD)).margins(Insets.of(10)));
+        horizontalFlow.child(addRestrictionTypeDropdown());
         horizontalFlow.child(addOrderButton());
 
         return horizontalFlow
@@ -91,58 +88,56 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                 .surface(Surface.DARK_PANEL);
     }
 
-    private Component addOrderAmountTextBox() {
-        TextBoxComponent orderAmountBox = new NumTextBox(Sizing.fixed(50));
-        TextBoxComponent.OnChanged updateOrderAmount = orderAmount -> orderToAdd.setOrderAmount(orderAmount.isEmpty() ? null : Integer.parseInt(orderAmount));
-        orderAmountBox.onChanged().subscribe(updateOrderAmount);
-        return orderAmountBox;
-    }
-    private Component chooseSlotButton() {
-        return Components.button(
-                        Text.literal("Choose Slot"),
-                        button -> {
-                            if(orderToAdd.getOrderAmount() == null){
-                                PlayerActionUtil.notifyAll("Please enter a valid order amount first.");
-                                return;
-                            }
-                            var pickSlotMenu = new PickSlotMenu(this, orderToAdd.getOrderAmount(), (pickedSlot) -> orderToAdd.setSlotNumber(pickedSlot));
-                            MinecraftClient.getInstance().setScreen(pickSlotMenu);
-                        });
+    private Component addRestrictionTypeDropdown() {
+        return Components.dropdown(Sizing.content())
+                .closeWhenNotHovered(false)
+                .button(Text.literal("Choose sell Restriction Type"),
+                        button -> restrictionTypeToAdd = RestrictSell.restrictBy.NAME)
+                .nested(Text.literal("Submenu"), Sizing.content(), submenu -> {
+                    submenu.checkbox(Text.literal("Restrict By Name"),
+                                    restrictionTypeToAdd == RestrictSell.restrictBy.NAME,
+                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.NAME);
+                    submenu.checkbox(Text.literal("Restrict By Volume"),
+                                    restrictionTypeToAdd == RestrictSell.restrictBy.VOLUME,
+                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.VOLUME);
+                    submenu.checkbox(Text.literal("Restrict By Price"),
+                                    restrictionTypeToAdd == RestrictSell.restrictBy.PRICE,
+                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.PRICE);
+                })
+                .padding(Insets.of(5));
     }
 
     private Component addOrderButton() {
         return Components.button(
-                Text.literal("Add"),
-                button -> {
-                    if(orderToAdd.getOrderAmount() == null || orderToAdd.getSlotNumber() == null){
-                        PlayerActionUtil.notifyAll("Please enter a valid order amount and slot number.");
-                        return;
-                    }
-                    CustomOrder newOrder = new CustomOrder(orderToAdd.isEnabled(), orderToAdd.getOrderAmount(), orderToAdd.getSlotNumber());
-                    BUConfig.get().customOrders.add(newOrder);
-                    MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
-                    BUConfig.scheduleConfigSave();
-                })
-                    .margins(Insets.of(3));
+                        Text.literal("Add"),
+                        button -> {
+                                PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
+
+                            RestrictSellControl newControl = new RestrictSellControl(RestrictSell.restrictBy.NAME, "Example Item");
+                            BUConfig.get().restrictSell.addRule(newControl);
+                            MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
+                            BUConfig.scheduleConfigSave();
+                        })
+                .margins(Insets.of(3));
     }
 
-    private FlowLayout generateOrderButton(CustomOrder order) {
-        var customOrders = BUConfig.get().customOrders;
+    private FlowLayout generateOrderButton(RestrictSellControl control) {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         String garbageCanEmoji = "\uD83D\uDDD1";
+        boolean isRestrictedByName = control.getRule() == RestrictSell.restrictBy.NAME;
 
         horizontalFlow.child(
                 Components.label(
-                        Text.literal(order.getOrderAmount() + "x, Slot #" + (order.getSlotNumber()+1))
+                        Text.literal("Restrict Insta Selling: " + control.getRestrictionAsString())
                 ).margins(Insets.of(3,3,3,1))
         ).child(
                 Components.button(
                         Text.literal(garbageCanEmoji),
                         button -> {
-                            order.removeFromConfig();
+                            BUConfig.get().restrictSell.getControls().remove(control);
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                         }).margins(Insets.of(3,3,1,3))
-                );
+        );
         return horizontalFlow;
     }
 }

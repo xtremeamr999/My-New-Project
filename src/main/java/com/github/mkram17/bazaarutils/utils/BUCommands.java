@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.ui.SellRestrictionsMenu;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -130,63 +131,12 @@ public class BUCommands {
                     return 1;
                 })
         );
-        bazaarutils.then(ClientCommandManager.literal("rule")
-                .then(ClientCommandManager.literal("add")
-                        // Volume branch
-                        .then(ClientCommandManager.literal("volume")
-                                .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
-                                        .executes(context -> {
-                                            double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.VOLUME, limit);
-                                            BUConfig.scheduleConfigSave();
-                                            PlayerActionUtil.notifyAll("Added rule: VOLUME" + ": " + limit);
-                                            return 1;
-                                        })
-                                )
-                        )
-                        // Price branch
-                        .then(ClientCommandManager.literal("price")
-                                .then(ClientCommandManager.argument("limit", DoubleArgumentType.doubleArg(0.1))
-                                        .executes(context -> {
-                                            double limit = DoubleArgumentType.getDouble(context, "limit");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.PRICE, limit);
-                                            BUConfig.scheduleConfigSave();
-                                            PlayerActionUtil.notifyAll("Added rule: PRICE" + ": " + limit);
-                                            return 1;
-                                        })
-                                )
-                        )
-                        // Name branch
-                        .then(ClientCommandManager.literal("name")
-                                .then(ClientCommandManager.argument("itemName", StringArgumentType.string())
-                                        .executes(context -> {
-                                            String name = StringArgumentType.getString(context, "itemName");
-                                            BUConfig.get().restrictSell.addRule(RestrictSell.restrictBy.NAME, name);
-                                            BUConfig.scheduleConfigSave();
-                                            PlayerActionUtil.notifyAll("Added rule: NAME" + ": " + name);
-                                            return 1;
-                                        })
-                                )
-                        )
-                )
-        );
-        bazaarutils.then(ClientCommandManager.literal("rule")
-                .then(ClientCommandManager.literal("remove")
-                        .then(ClientCommandManager.argument("rule number", IntegerArgumentType.integer(1))
-                                .executes(context -> {
-                                    int restrictNum = IntegerArgumentType.getInteger(context, "rule number") - 1;
-                                    RestrictSellControl rule = BUConfig.get().restrictSell.getControls().get(restrictNum);
-                                    if (rule == null)
-                                        context.getSource().sendError(Text.literal("Invalid rule number. Check the order in /bu"));
-                                    if (rule.getRule() != null) {
-                                        PlayerActionUtil.notifyAll(rule.getRule() == RestrictSell.restrictBy.NAME ? "Removed rule: NAME: " + rule.getName() : "Removed rule: " + rule.getRule() + ": " + rule.getAmount());
-                                    }
-                                    BUConfig.get().restrictSell.getControls().remove(restrictNum);
-                                    BUConfig.scheduleConfigSave();
-                                    return 1;
-                                })
-                        )
-                )
+        bazaarutils.then(ClientCommandManager.literal("sellrestrictions")
+                .executes(context -> {
+                    var client = MinecraftClient.getInstance();
+                    client.send(() -> client.setScreen(new SellRestrictionsMenu()));
+                    return 1;
+                })
         );
         bazaarutils.then(ClientCommandManager.literal("updateresources")
                 .executes(context -> {

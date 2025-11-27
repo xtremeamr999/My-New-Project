@@ -22,4 +22,12 @@ public class RestrictSellControl {
         this.rule = rule;
         this.name = name;
     }
+
+    public String getRestrictionAsString(){
+        if(this.rule == RestrictSell.restrictBy.NAME){
+            return this.name;
+        } else {
+            return String.valueOf(this.amount);
+        }
+    }
 }

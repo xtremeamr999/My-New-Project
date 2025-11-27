@@ -168,11 +168,8 @@ public class RestrictSell implements BUListener {
         }
         return false;
     }
-    public void addRule(restrictBy newRule, double limit){
-        controls.add(new RestrictSellControl(newRule, limit));
-    }
-    public void addRule(restrictBy newRule, String name){
-        controls.add(new RestrictSellControl(newRule, name));
+    public void addRule(RestrictSellControl control){
+        controls.add(control);
     }
 
     public String getMessage(){
