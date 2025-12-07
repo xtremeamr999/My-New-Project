@@ -9,8 +9,8 @@ public class StringSellRestrictionControl extends SellRestrictionControl{
     @Getter
     @Setter
     private String name;
-    public StringSellRestrictionControl(InstaSellRestrictions.restrictBy rule, String name) {
-        super(rule);
+    public StringSellRestrictionControl(String name) {
+        super(InstaSellRestrictions.restrictBy.NAME);
         this.name = name;
     }
 

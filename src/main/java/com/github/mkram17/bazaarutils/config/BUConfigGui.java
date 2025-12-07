@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
-import com.github.mkram17.bazaarutils.features.CustomOrder;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
@@ -49,10 +49,7 @@ public class BUConfigGui {
             generalBuilder.option(createAmecsDownloadButton());
         }
 
-        generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
         generalBuilder.group(buildRestrictSellGroup(config.instaSellRestrictions));
-        generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
-
         builder.category(generalBuilder.build());
     }
 

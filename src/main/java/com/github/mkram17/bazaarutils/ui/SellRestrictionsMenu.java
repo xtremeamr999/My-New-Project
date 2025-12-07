@@ -1,9 +1,9 @@
 package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.Components;
@@ -21,7 +21,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
 
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
-    private static RestrictSell.restrictBy restrictionTypeToAdd;
+    private static InstaSellRestrictions.restrictBy restrictionType;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -69,10 +69,10 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private FlowLayout generateOrderButtonsContainer() {
-        var sellRestrictions = BUConfig.get().restrictSell.getControls();
+        var sellRestrictions = BUConfig.get().instaSellRestrictions.getControls();
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
-        for(RestrictSellControl control : sellRestrictions) {
+        for(SellRestrictionControl control : sellRestrictions) {
             verticalFlow.child(generateOrderButton(control));
         }
         return verticalFlow;
@@ -92,17 +92,18 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
         return Components.dropdown(Sizing.content())
                 .closeWhenNotHovered(false)
                 .button(Text.literal("Choose sell Restriction Type"),
-                        button -> restrictionTypeToAdd = RestrictSell.restrictBy.NAME)
+                        button -> {//TODO implementation
+                    })
                 .nested(Text.literal("Submenu"), Sizing.content(), submenu -> {
                     submenu.checkbox(Text.literal("Restrict By Name"),
-                                    restrictionTypeToAdd == RestrictSell.restrictBy.NAME,
-                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.NAME);
+                                    restrictionType == InstaSellRestrictions.restrictBy.NAME,
+                                    button -> restrictionType = InstaSellRestrictions.restrictBy.NAME);
                     submenu.checkbox(Text.literal("Restrict By Volume"),
-                                    restrictionTypeToAdd == RestrictSell.restrictBy.VOLUME,
-                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.VOLUME);
+                                    restrictionType == InstaSellRestrictions.restrictBy.VOLUME,
+                                    button -> restrictionType = InstaSellRestrictions.restrictBy.VOLUME);
                     submenu.checkbox(Text.literal("Restrict By Price"),
-                                    restrictionTypeToAdd == RestrictSell.restrictBy.PRICE,
-                                    button -> restrictionTypeToAdd = RestrictSell.restrictBy.PRICE);
+                                    restrictionType == InstaSellRestrictions.restrictBy.PRICE,
+                                    button -> restrictionType = InstaSellRestrictions.restrictBy.PRICE);
                 })
                 .padding(Insets.of(5));
     }
@@ -113,28 +114,27 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                         button -> {
                                 PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
 
-                            RestrictSellControl newControl = new RestrictSellControl(RestrictSell.restrictBy.NAME, "Example Item");
-                            BUConfig.get().restrictSell.addRule(newControl);
+                            SellRestrictionControl newControl = new StringSellRestrictionControl("Example Restriction");
+                            BUConfig.get().instaSellRestrictions.addRule(newControl);
                             MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
                             BUConfig.scheduleConfigSave();
                         })
                 .margins(Insets.of(3));
     }
 
-    private FlowLayout generateOrderButton(RestrictSellControl control) {
+    private FlowLayout generateOrderButton(SellRestrictionControl control) {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         String garbageCanEmoji = "\uD83D\uDDD1";
-        boolean isRestrictedByName = control.getRule() == RestrictSell.restrictBy.NAME;
 
         horizontalFlow.child(
                 Components.label(
-                        Text.literal("Restrict Insta Selling: " + control.getRestrictionAsString())
+                        Text.literal("Restrict Insta Selling: " + control.getRule())
                 ).margins(Insets.of(3,3,3,1))
         ).child(
                 Components.button(
                         Text.literal(garbageCanEmoji),
                         button -> {
-                            BUConfig.get().restrictSell.getControls().remove(control);
+                            BUConfig.get().instaSellRestrictions.getControls().remove(control);
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                         }).margins(Insets.of(3,3,1,3))
         );
