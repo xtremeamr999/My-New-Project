@@ -12,7 +12,7 @@ public abstract class SellRestrictionControl implements SellRestrictor{
     @Getter @Setter
     private InstaSellRestrictions.restrictBy rule;
 
-    public SellRestrictionControl(InstaSellRestrictions.restrictBy rule) {
+    SellRestrictionControl(InstaSellRestrictions.restrictBy rule) {
         this.rule = rule;
     }
 }

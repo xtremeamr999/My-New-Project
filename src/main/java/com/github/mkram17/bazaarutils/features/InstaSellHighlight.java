@@ -77,7 +77,11 @@ public class InstaSellHighlight implements BUListener {
 
     private List<ItemStack> getInventoryStacks(List<String> names){
         List<ItemStack> inventoryStacks = new ArrayList<>();
-        var inventory = getInventory().get();
+
+        var inventoryOpt = getInventory();
+        if (inventoryOpt.isEmpty()) return Collections.emptyList();
+        var inventory = inventoryOpt.get();
+
         var stacks = inventory.getMainStacks();
 
         stacks.forEach(itemStack -> {
