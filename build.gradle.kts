@@ -160,7 +160,7 @@ publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = "Changelog"
-    type = ALPHA
+    type = STABLE
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
     version = "v" + property("mod_version").toString()

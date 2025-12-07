@@ -2,10 +2,8 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
@@ -75,7 +73,7 @@ public class BUConfig {
     public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
-    public RestrictSell restrictSell = new RestrictSell(true, 3, new ArrayList<>(List.of(new RestrictSellControl(RestrictSell.restrictBy.PRICE, 1000000))));
+    public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, 3, new ArrayList<>());
     @SerialEntry
     public Developer developer = new Developer();
     @SerialEntry
@@ -96,6 +94,8 @@ public class BUConfig {
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
     @SerialEntry
     public UselessBazaarNotificationRemover uselessNotificationRemover = new UselessBazaarNotificationRemover();
+    @SerialEntry
+    public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
 
 
     public static void openGUI() {

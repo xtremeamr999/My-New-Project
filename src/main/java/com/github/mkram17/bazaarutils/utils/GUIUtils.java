@@ -114,6 +114,23 @@ public class GUIUtils {
             throw new RuntimeException(e);
         }
     }
+    //TODO switch to using ItemStack instead of OrderData so it's faster
+
+    // indexes are in order from top left to bottom right, except hotbar slots which go first
+    public static int getSlotFromItemStack(Inventory lowerChestInventory, ItemStack itemStack) {
+        if (lowerChestInventory == null)
+            return -1;
+
+        for (int i = 0; i < lowerChestInventory.size(); i++) {
+            ItemStack inventoryStack = lowerChestInventory.getStack(i);
+            if (!inventoryStack.isEmpty()) {
+                if (inventoryStack.equals(itemStack)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
 
     public static void closeSign(){
         try {
