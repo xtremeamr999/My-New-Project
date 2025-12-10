@@ -8,6 +8,8 @@ import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellR
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.ui.SellRestrictionsMenu;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -43,7 +45,7 @@ public class BUCommands {
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
                         for (BazaarOrder item : OutbidOrderHandler.getOutbidOrders()) {
-                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getInstaSellPrice() + " Order Price: " + item.getPricePerItem());
+                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL) + " Order Price: " + item.getPricePerItem());
                         }
                         return 1;
                     }),

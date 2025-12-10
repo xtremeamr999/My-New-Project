@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-//Simply a container for information about price of an item. For actual orders, use OrderInfoContainer or BazaarOrder instead
+//Simply a container for information about the price of an item. For actual orders, use OrderInfoContainer or BazaarOrder instead
 public class PriceInfoContainer {
     @Getter
     public enum PriceType {INSTASELL,INSTABUY;
@@ -30,11 +30,12 @@ public class PriceInfoContainer {
     protected Double pricePerItem;
     @Setter @Getter
     protected PriceType priceType;
-    @Getter
-    private Double instaSellPrice;
-    //the price of the opposite type of order
-    @Getter @Setter
-    private Double instaBuyPrice;
+
+    //insta sell price = buy order price, insta buy price = sell order price
+    @Setter
+    private Double marketInstaSellPrice;
+    @Setter
+    private Double marketInstaBuyPrice;
 
     public PriceInfoContainer(Double pricePerItem, PriceType priceType) {
         this.priceType = priceType;
@@ -43,15 +44,16 @@ public class PriceInfoContainer {
             this.pricePerItem = (double) Math.round(pricePerItem * 10) / 10;
         }
         if(priceType == null){
-            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value of buy order
+            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value
+            //TODO revisit whether this still needs to have default value
             this.priceType = PriceType.INSTASELL;
         }
     }
 
     public Double getMarketPrice(PriceType priceType){
         return switch (priceType) {
-            case INSTASELL -> instaSellPrice;
-            case INSTABUY -> instaBuyPrice;
+            case INSTASELL -> marketInstaSellPrice;
+            case INSTABUY -> marketInstaBuyPrice;
         };
     }
 
@@ -59,8 +61,8 @@ public class PriceInfoContainer {
         var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
         var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
 
-        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.truncateNum(price));
-        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.truncateNum(price));
+        instaSellPriceOpt.ifPresent(price -> marketInstaSellPrice = Util.truncateNum(price));
+        instaBuyPriceOpt.ifPresent(price -> marketInstaBuyPrice = Util.truncateNum(price));
     }
 
     public void flipPrices(double newPrice){

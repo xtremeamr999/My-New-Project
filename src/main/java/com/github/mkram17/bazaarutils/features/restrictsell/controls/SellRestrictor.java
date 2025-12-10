@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 
 public interface SellRestrictor {
-    public boolean shouldRestrict(PriceInfoContainer container);
+    public boolean shouldRestrict(OrderInfoContainer container);
 }
