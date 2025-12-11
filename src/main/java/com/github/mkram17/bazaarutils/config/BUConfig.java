@@ -73,7 +73,7 @@ public class BUConfig {
     public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true);
     //TODO make restrict sell able to take empty array list (might need to think about config gui group + options)
     @SerialEntry
-    public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, 3, new ArrayList<>());
+    public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, new ArrayList<>());
     @SerialEntry
     public Developer developer = new Developer();
     @SerialEntry

@@ -33,86 +33,85 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
         rootComponent.surface(Surface.blur(BACKGROUND_BLUR_QUALITY, BACKGROUND_BLUR_SIZE))
                 .verticalAlignment(VerticalAlignment.CENTER)
                 .horizontalAlignment(HorizontalAlignment.CENTER);
+        FlowLayout horizontalFlow = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
+        horizontalFlow.child(generateNewRestrictionsParent());
 
-        var grid = Containers.grid(Sizing.fill(100), Sizing.fill(100), 1, 3);
-        grid.horizontalAlignment(HorizontalAlignment.CENTER);
-        grid.padding(Insets.of(15));
-        // Top-left: New Order (absolute)
-        grid.child(
-                generateNewOrderParent()
-                        .verticalAlignment(VerticalAlignment.CENTER),
-                0,
-                0
-        );
 
         // Center: Orders (wrap in full-size container that centers its child)
         FlowLayout centered = Containers.verticalFlow(Sizing.content(), Sizing.content());
-        centered.horizontalAlignment(HorizontalAlignment.CENTER);
-        centered.child(generateOrderButtonsParent());
+        centered.child(generateUserRestrictionsParent());
 
-        grid.child(centered, 0, 1);
+        horizontalFlow.child(centered);
 
-        rootComponent.child(grid);
+        rootComponent.child(horizontalFlow);
     }
 
-    private ParentComponent generateOrderButtonsParent() {
+    private Component generateUserRestrictionsParent() {
         var customOrders = BUConfig.get().customOrders;
         ParentComponent parent;
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
-            parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateOrderButtonsContainer());
+            parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
         } else {
-            parent = generateOrderButtonsContainer();
+            parent = generateRestrictionsContainer();
         }
         return parent
                 .padding(Insets.of(8))
-                .surface(Surface.DARK_PANEL);
+                .surface(Surface.DARK_PANEL)
+                .margins(Insets.top(20));
     }
 
-    private FlowLayout generateOrderButtonsContainer() {
+    private ParentComponent generateRestrictionsContainer() {
         var sellRestrictions = BUConfig.get().instaSellRestrictions.getControls();
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
-        for(SellRestrictionControl control : sellRestrictions) {
-            verticalFlow.child(generateOrderButton(control));
+
+        for (SellRestrictionControl control : sellRestrictions) {
+            verticalFlow.child(generateRestrictionButton(control));
         }
-        return verticalFlow;
+        return verticalFlow.padding(Insets.of(20));
     }
-    private ParentComponent generateNewOrderParent() {
+
+    private ParentComponent generateNewRestrictionsParent() {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         horizontalFlow.child(Components.label(Text.literal("New Sell Restriction").formatted(Formatting.BOLD)).margins(Insets.of(10)));
         horizontalFlow.child(addRestrictionTypeDropdown());
-        horizontalFlow.child(addOrderButton());
+        horizontalFlow.child(addRestrictionButton());
 
         return horizontalFlow
+                .margins(Insets.of(20))
                 .padding(Insets.of(8))
-                .surface(Surface.DARK_PANEL);
+                .surface(Surface.DARK_PANEL)
+                .verticalAlignment(VerticalAlignment.CENTER);
     }
 
     private Component addRestrictionTypeDropdown() {
-        return Components.dropdown(Sizing.content())
-                .closeWhenNotHovered(false)
-                .button(Text.literal("Choose sell Restriction Type"),
-                        button -> {//TODO implementation
-                    })
-                .nested(Text.literal("Submenu"), Sizing.content(), submenu -> {
-                    submenu.checkbox(Text.literal("Restrict By Name"),
-                                    restrictionType == InstaSellRestrictions.restrictBy.NAME,
-                                    button -> restrictionType = InstaSellRestrictions.restrictBy.NAME);
-                    submenu.checkbox(Text.literal("Restrict By Volume"),
-                                    restrictionType == InstaSellRestrictions.restrictBy.VOLUME,
-                                    button -> restrictionType = InstaSellRestrictions.restrictBy.VOLUME);
-                    submenu.checkbox(Text.literal("Restrict By Price"),
-                                    restrictionType == InstaSellRestrictions.restrictBy.PRICE,
-                                    button -> restrictionType = InstaSellRestrictions.restrictBy.PRICE);
+        SingleOptionCheckboxDropdownComponent dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
+        return dropdown.closeWhenNotHovered(false)
+                .checkbox(Text.literal("Restrict By Name"),
+                        restrictionType == InstaSellRestrictions.restrictBy.NAME,
+                        button -> {
+                    dropdown.disableCheckboxes();
+                    restrictionType = InstaSellRestrictions.restrictBy.NAME;
                 })
-                .padding(Insets.of(5));
+                .checkbox(Text.literal("Restrict By Volume"),
+                        restrictionType == InstaSellRestrictions.restrictBy.VOLUME,
+                        button -> {
+                            dropdown.disableCheckboxes();
+                            restrictionType = InstaSellRestrictions.restrictBy.VOLUME;
+                        })
+                .checkbox(Text.literal("Restrict By Price"),
+                        restrictionType == InstaSellRestrictions.restrictBy.PRICE,
+                        button -> {
+                            dropdown.disableCheckboxes();
+                            restrictionType = InstaSellRestrictions.restrictBy.PRICE;
+                        });
     }
 
-    private Component addOrderButton() {
+    private Component addRestrictionButton() {
         return Components.button(
                         Text.literal("Add"),
                         button -> {
-                                PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
+                            PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
 
                             SellRestrictionControl newControl = new StringSellRestrictionControl("Example Restriction");
                             BUConfig.get().instaSellRestrictions.addRule(newControl);
@@ -122,21 +121,21 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                 .margins(Insets.of(3));
     }
 
-    private FlowLayout generateOrderButton(SellRestrictionControl control) {
+    private FlowLayout generateRestrictionButton(SellRestrictionControl control) {
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         String garbageCanEmoji = "\uD83D\uDDD1";
 
         horizontalFlow.child(
                 Components.label(
                         Text.literal("Restrict Insta Selling: " + control.getRule())
-                ).margins(Insets.of(3,3,3,1))
+                ).margins(Insets.of(3, 3, 3, 1))
         ).child(
                 Components.button(
                         Text.literal(garbageCanEmoji),
                         button -> {
                             BUConfig.get().instaSellRestrictions.getControls().remove(control);
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
-                        }).margins(Insets.of(3,3,1,3))
+                        }).margins(Insets.of(3, 3, 1, 3))
         );
         return horizontalFlow;
     }

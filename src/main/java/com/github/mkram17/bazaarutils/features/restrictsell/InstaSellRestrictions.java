@@ -8,7 +8,6 @@ import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellR
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -31,24 +30,23 @@ public class InstaSellRestrictions implements BUListener {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
-    private int safetyClicksRequired;
+    private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
     @Getter @Setter
     private ArrayList<SellRestrictionControl> controls;
     @Getter
     private int safetyClicks = 0;
-    private boolean blockClicks;
+    private boolean isInstaSellRestricted;
 
     private static final int INSTA_SELL_SLOT_INDEX = 47;
 
-    public InstaSellRestrictions(boolean enabled, int safetyClicksRequired, ArrayList<SellRestrictionControl> controls) {
+    public InstaSellRestrictions(boolean enabled, ArrayList<SellRestrictionControl> controls) {
         this.enabled = enabled;
-        this.safetyClicksRequired = safetyClicksRequired;
         this.controls = controls;
     }
     private void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             safetyClicks = 0;
-            blockClicks = true;
+            isInstaSellRestricted = true;
         });
     }
     @EventHandler
@@ -57,14 +55,14 @@ public class InstaSellRestrictions implements BUListener {
             return;
 
         List<OrderInfoContainer> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
-        blockClicks = shouldRestrictInstaSell(items);
+        isInstaSellRestricted = shouldRestrictInstaSell(items);
     }
 
     @EventHandler
     private void onClick(SlotClickEvent clickEvent){
         if(!enabled || clickEvent.slot.getIndex() != INSTA_SELL_SLOT_INDEX)
             return;
-        if (safetyClicks < safetyClicksRequired) {
+        if (isInstaSellRestricted && safetyClicks < SAFETY_CLICKS_REQUIRED) {
             safetyClicks++;
             PlayerActionUtil.notifyAll(getMessage());
             clickEvent.cancel();
