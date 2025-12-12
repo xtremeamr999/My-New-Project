@@ -99,7 +99,7 @@ public class BazaarChatEventHandler {
         double totalPrice = order.getVolume() * order.getPricePerItem();
 
         BUConfig.get().orderLimit.addOrderToLimit(totalPrice);
-        PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
+        PlayerActionUtil.notifyAll("Insta buy for " + order, Util.notificationTypes.FEATURE);
     }
 
     /**
