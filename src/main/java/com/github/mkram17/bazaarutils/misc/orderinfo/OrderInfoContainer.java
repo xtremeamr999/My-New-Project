@@ -18,12 +18,20 @@ import java.util.function.Function;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-//Can be used when you need to store info about an item with automatic price updates and health checks. Actual orders should use OrderData instead.
+/**
+ * Stores Bazaar item information while automatically tracking market price updates and performing
+ * health checks on product identifiers. Intended for order-like data that does not need the full
+ * {@link BazaarOrder} lifecycle.
+ */
 //TODO turn into builder class
 public class OrderInfoContainer extends PriceInfoContainer implements BUListener {
 
     private static final double DEFAULT_TOLERANCE = 0.9;
-    private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;public enum Statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
+    private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
+    /**
+     * Represents how an order compares to current market activity or fulfillment status.
+     */
+    public enum Statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
     @Getter
     protected final String name; //name of the item in game
     @Getter
@@ -37,6 +45,15 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     @Getter @Setter
     private ItemInfo itemInfo;
 
+    /**
+     * Creates a container that tracks market data for a specific Bazaar product.
+     *
+     * @param name         display name of the item
+     * @param volume       quantity represented by the order
+     * @param pricePerItem current price per unit for the order
+     * @param priceType    whether the price represents an insta-sell or insta-buy
+     * @param itemInfo     optional UI context from the Bazaar screen
+     */
     public OrderInfoContainer(@Nullable String name, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable PriceType priceType, @Nullable ItemInfo itemInfo) {
         super(pricePerItem, priceType);
         this.volume = volume;
@@ -62,10 +79,20 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
             return (Math.round(priceMaximumInaccuracy * 10)) / 10.0;
         }
     }
+
+    /**
+     * Checks whether a provided item name can be resolved to a Bazaar product.
+     *
+     * @param itemName name to validate
+     * @return {@code true} when a product ID exists for the name
+     */
     public static boolean isValidName(String itemName){
         return itemName != null && BazaarData.findProductId(itemName) != null;
     }
 
+    /**
+     * Refreshes cached market price data for this product using the tracked product ID.
+     */
     public void updateMarketPrice(){
         updateMarketPrice(productID);
     }
@@ -108,6 +135,11 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         return !(productID == null || productID.isEmpty() || BazaarData.findItemPriceOptional(productID, getPriceType()).isEmpty());
     }
 
+    /**
+     * Determines whether the order price is competitive, matched, or outbid relative to the market.
+     *
+     * @return status reflecting how this order compares to current prices, if calculable
+     */
     public Optional<Statuses> findOutbidStatus() {
         if(pricePerItem == null || !isProductIDHealthy()) return Optional.empty();
         updateMarketPrice();
@@ -146,6 +178,14 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     public void subscribe() {
         EVENT_BUS.subscribe(this);
     }
+
+    /**
+     * Tests whether this order corresponds to another order, optionally using loose comparisons for volume and price.
+     *
+     * @param other    order to compare against
+     * @param isStrict when true requires exact matches, when false allows small deviations
+     * @return {@code true} if the two orders can be considered the same
+     */
     public boolean isSimilarTo(BazaarOrder other, boolean isStrict) {
         String otherOrderName = other.getName();
         Double otherOrderPrice = other.getPricePerItem();
@@ -182,6 +222,12 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         return false;
     }
 
+    /**
+     * Finds a matching order in the provided list, preferring the closest match when multiple entries are similar.
+     *
+     * @param list list of existing orders to search
+     * @return best matching order if one exists
+     */
     public Optional<BazaarOrder> findOrderInList(List<BazaarOrder> list) {
         List<BazaarOrder> itemList = findAllMatchesInList(list);
         if (itemList.size() > 1) {
@@ -193,6 +239,12 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         return Optional.of(itemList.getFirst());
     }
 
+    /**
+     * Locates all orders in the provided list that resemble this order.
+     *
+     * @param list candidate orders
+     * @return list of matches, ordered first by strict then loose similarity
+     */
     public List<BazaarOrder> findAllMatchesInList(List<BazaarOrder> list) {
         List<BazaarOrder> itemList = new ArrayList<>();
         for (BazaarOrder item : list) {
@@ -215,6 +267,12 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         return Util.genericIsSimilarValue(pricePerItem, price, tolerance + price * .01);
     }
 
+    /**
+     * Projects each stored user order to a single variable, such as volume or price.
+     *
+     * @param variable accessor used to extract a value from each order
+     * @return immutable list of extracted values
+     */
     //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<BazaarOrder, T> variable) {
         return BUConfig.get().userOrders.stream()
@@ -256,6 +314,9 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
                 ")";
     }
 
+    /**
+     * Converts the current container into a fully tracked {@link BazaarOrder}.
+     */
     public BazaarOrder toBazaarOrder(){
         return new BazaarOrder(name, volume, pricePerItem, priceType, null);
     }
