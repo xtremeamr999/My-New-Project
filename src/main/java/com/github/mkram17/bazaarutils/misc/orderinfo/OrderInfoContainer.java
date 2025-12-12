@@ -28,10 +28,12 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
 
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
+
     /**
      * Represents how an order compares to current market activity or fulfillment status.
      */
     public enum Statuses {SET, FILLED, OUTBID, COMPETITIVE, MATCHED}
+
     @Getter
     protected final String name; //name of the item in game
     @Getter
@@ -268,12 +270,14 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
     }
 
     /**
-     * Projects each stored user order to a single variable, such as volume or price.
+     * Projects each stored user order to a single variable, such as volume or price. For example,
+     * {@code getVariables(BazaarOrder::getPricePerItem)} extracts all prices from user orders in
+     * {@link BUConfig#userOrders}.
      *
+     * @param <T>      type of value extracted from each order
      * @param variable accessor used to extract a value from each order
      * @return immutable list of extracted values
      */
-    //run by ex: getVariables((item) -> item.getPrice()) orItemData.getVariables(ItemData::getPrice);
     public static <T> List<T> getVariables(Function<BazaarOrder, T> variable) {
         return BUConfig.get().userOrders.stream()
                 .map(variable)
