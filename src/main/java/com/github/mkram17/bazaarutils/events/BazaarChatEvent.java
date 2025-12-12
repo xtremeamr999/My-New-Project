@@ -2,18 +2,57 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 
+/**
+ * Event fired when a bazaar-related chat message is received and parsed.
+ * <p>
+ * This event is triggered when the mod detects and parses a bazaar-related message from the game chat,
+ * such as order creation, cancellation, filling, claiming, or instant transactions. The event contains
+ * the parsed order information and the type of bazaar action that occurred.
+ * </p>
+ * 
+ * <p><strong>Usage Example:</strong></p>
+ * <pre>
+ * {@code
+ * @EventHandler
+ * public void onBazaarChat(BazaarChatEvent<?> event) {
+ *     switch (event.type()) {
+ *         case ORDER_CREATED -> handleOrderCreated(event.order());
+ *         case ORDER_FILLED -> playNotificationSound();
+ *         case INSTA_SELL -> updateOrderLimit(event.order());
+ *     }
+ * }
+ * }
+ * </pre>
+ * 
+ * @param <T> the type of order information container, must extend OrderInfoContainer
+ * @param type the type of bazaar event that occurred
+ * @param order the order information associated with the event
+ * 
+ * @see OrderInfoContainer
+ * @see BazaarEventTypes
+ */
 //TODO use this instead of OutdatedOrderEvent
 public record BazaarChatEvent<T extends OrderInfoContainer>(
         BazaarEventTypes type,
         T order
 ) {
+    /**
+     * Enumeration of bazaar event types that can be detected from chat messages.
+     */
     public enum BazaarEventTypes {
+        /** A new buy or sell order was created */
         ORDER_CREATED,
+        /** An existing order was cancelled */
         ORDER_CANCELLED,
+        /** An order was completely filled */
         ORDER_FILLED,
+        /** Coins or items from a filled order were claimed */
         ORDER_CLAIMED,
+        /** An order's price was flipped/updated */
         ORDER_FLIPPED,
+        /** Items were instantly sold to buy orders */
         INSTA_SELL,
+        /** Items were instantly bought from sell offers */
         INSTA_BUY,
     }
 }

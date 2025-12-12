@@ -21,16 +21,71 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Event fired when a chest/container GUI is fully loaded with all items.
+ * <p>
+ * This event is triggered after a chest or container screen opens and all items have finished loading.
+ * The mod waits for all item slots to be populated (checking that items are not in a "Loading..." state)
+ * before firing this event. This ensures that listeners can safely access all container contents.
+ * </p>
+ * 
+ * <p>The event includes:</p>
+ * <ul>
+ *   <li>The container's inventory</li>
+ *   <li>A list of all non-empty item stacks</li>
+ *   <li>The container's display name</li>
+ * </ul>
+ * 
+ * <p><strong>Usage Example:</strong></p>
+ * <pre>
+ * {@code
+ * @EventHandler
+ * public void onChestLoaded(ChestLoadedEvent event) {
+ *     String containerName = event.getContainerName();
+ *     if (containerName.contains("Bazaar")) {
+ *         List<ItemStack> items = event.getItemStacks();
+ *         processBazaarItems(items);
+ *     }
+ * }
+ * }
+ * </pre>
+ * 
+ * <p><strong>Implementation Note:</strong></p>
+ * The event uses a polling mechanism that checks every 40ms (up to 50 attempts / 2 seconds)
+ * to determine when the GUI is fully loaded. This is necessary because Hypixel loads items
+ * asynchronously with placeholder "Loading..." items initially.
+ * 
+ * @see Inventory
+ * @see ItemStack
+ */
 public class ChestLoadedEvent implements ICancellable {
+    /**
+     * The inventory of the lower chest/container (excluding the player's inventory).
+     */
     @Getter
     private Inventory lowerChestInventory;
+    
+    /**
+     * List of all non-empty item stacks in the container.
+     */
     @Getter
     private List<ItemStack> itemStacks = new ArrayList<>();
+    
+    /**
+     * The display name of the container.
+     */
     @Getter
     private String containerName;
 
+    /**
+     * Singleton instance used for event registration.
+     */
     public static final ChestLoadedEvent INSTANCE = new ChestLoadedEvent();
 
+    /**
+     * Registers the screen event listener that triggers this event when chests are loaded.
+     * This method is automatically called during mod initialization.
+     */
     @RunOnInit
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {

@@ -6,16 +6,62 @@ import meteordevelopment.orbit.ICancellable;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Event fired when an item in an inventory is about to be replaced.
+ * <p>
+ * This event is triggered before an item in a simple inventory is replaced with another item.
+ * Listeners can modify the replacement item or cancel the replacement entirely. This is commonly
+ * used for modifying item displays in GUI menus or adding custom overlays to items.
+ * </p>
+ * 
+ * <p><strong>Usage Example:</strong></p>
+ * <pre>
+ * {@code
+ * @EventHandler
+ * public void onItemReplace(ReplaceItemEvent event) {
+ *     ItemStack original = event.getOriginal();
+ *     ItemStack modified = addCustomLore(original);
+ *     event.setReplacement(modified);
+ * }
+ * }
+ * </pre>
+ * 
+ * @see ItemStack
+ * @see SimpleInventory
+ */
 public class ReplaceItemEvent implements ICancellable {
+    /**
+     * The original item stack before replacement.
+     */
     @Getter
     private final ItemStack original;
+    
+    /**
+     * The inventory containing the item being replaced.
+     */
     @Getter
     private final SimpleInventory inventory;
+    
+    /**
+     * The slot ID where the replacement is occurring.
+     */
     @Getter
     private final int slotId;
+    
+    /**
+     * The item stack that will replace the original.
+     * Can be modified by event handlers.
+     */
     @Setter @Getter
     private ItemStack replacement;
 
+    /**
+     * Creates a new ReplaceItemEvent.
+     *
+     * @param original the original item stack
+     * @param inventory the inventory containing the item
+     * @param slotId the slot where the replacement occurs
+     */
     public ReplaceItemEvent(ItemStack original, SimpleInventory inventory, int slotId) {
         this.original = original;
         this.inventory = inventory;
