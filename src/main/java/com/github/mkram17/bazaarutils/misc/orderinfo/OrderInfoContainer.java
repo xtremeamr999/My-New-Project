@@ -51,9 +51,9 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
      * Creates a container that tracks market data for a specific Bazaar product.
      *
      * @param name         display name of the item
-     * @param volume       quantity represented by the order
+     * @param volume       quantity of the order
      * @param pricePerItem current price per unit for the order
-     * @param priceType    whether the price represents an insta-sell or insta-buy
+     * @param priceType    whether the price represents an insta-sell (buy order) or insta-buy (sell order)
      * @param itemInfo     optional UI context from the Bazaar screen
      */
     public OrderInfoContainer(@Nullable String name, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable PriceType priceType, @Nullable ItemInfo itemInfo) {
@@ -89,11 +89,11 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
      * @return {@code true} when a product ID exists for the name
      */
     public static boolean isValidName(String itemName){
-        return itemName != null && BazaarData.findProductId(itemName) != null;
+        return itemName != null && BazaarData.findProductIdOptional(itemName).isPresent();
     }
 
     /**
-     * Refreshes cached market price data for this product using the tracked product ID.
+     * Refreshes cached market price data for this product.
      */
     public void updateMarketPrice(){
         updateMarketPrice(productID);
@@ -133,6 +133,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
         }
     }
 
+    //TODO this ideally isn't needed -- fix any bugs that cause these issues in the first place
     private boolean isProductIDHealthy() {
         return !(productID == null || productID.isEmpty() || BazaarData.findItemPriceOptional(productID, getPriceType()).isEmpty());
     }
@@ -283,7 +284,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
                 .map(variable)
                 .toList();
     }
-    /* Used for when there are duplicate matches found and the best should be chosen to use.
+    /** Used for when there are duplicate matches found and the best should be chosen to use.
     Typically, volume is the variable that is different, but it can also be price
     */
     private BazaarOrder findBestMatch(List<BazaarOrder> list) {

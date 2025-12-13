@@ -50,7 +50,7 @@ public class BazaarOrder extends OrderInfoContainer {
     }
 
     /**
-     * Creates a Bazaar order, initializing tracking and market price updates.
+     * Creates a Bazaar order, initializing ItemInfo with slot index and ItemStack of the order.
      */
     public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
         super(name, volume, pricePerItem, priceType, itemInfo);
@@ -185,7 +185,7 @@ public class BazaarOrder extends OrderInfoContainer {
     /**
      * Calculates a competitive flip price using the opposite side of the market.
      *
-     * @return recommended unit price for flipping, or {@code 0} when market data is missing
+     * @return price .1 coin more competitive than market rate.
      */
     public double getFlipPrice() {
         updateMarketPrice();

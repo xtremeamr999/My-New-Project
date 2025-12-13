@@ -55,7 +55,7 @@ public class PriceInfoContainer {
     }
 
     /**
-     * Returns the current market price for the given {@link PriceType}.
+     * @return current market price for the given {@link PriceType} or {@code -1.0} for error.
      */
     public Double getMarketPrice(PriceType priceType){
         return switch (priceType) {
