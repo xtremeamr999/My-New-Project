@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screen.Screen;
  * }
  * }
  * </pre>
+ * @see com.github.mkram17.bazaarutils.mixin.MinecraftClientMixin
  */
 @AllArgsConstructor
 public class ScreenChangeEvent {

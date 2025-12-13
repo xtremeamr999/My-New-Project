@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack;
  * Event fired when an item in an inventory is about to be replaced.
  * <p>
  * This event is triggered before an item in a simple inventory is replaced with another item.
- * Listeners can modify the replacement item or cancel the replacement entirely. This is commonly
- * used for modifying item displays in GUI menus or adding custom overlays to items.
+ * Listeners can modify the replacement item or cancel the replacement entirely. This is
+ * used for modifying item displays in GUI menus.
  * </p>
  * 
  * <p><strong>Usage Example:</strong></p>

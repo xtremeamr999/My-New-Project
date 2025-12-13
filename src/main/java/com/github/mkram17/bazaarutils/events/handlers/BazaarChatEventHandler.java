@@ -43,8 +43,6 @@ public class BazaarChatEventHandler {
     /**
      * General handler that fires for any bazaar chat event.
      * Sends a notification with the event type.
-     *
-     * @param event the bazaar chat event
      */
     @EventHandler
     private static void onAnyOrder(BazaarChatEvent<? extends OrderInfoContainer> event) {
@@ -55,8 +53,6 @@ public class BazaarChatEventHandler {
     /**
      * Handles order creation events.
      * Updates the order limit tracker and adds the order to the watched orders list.
-     *
-     * @param event the bazaar chat event containing order creation information
      */
     @EventHandler
     private static void onOrderCreated(BazaarChatEvent<? extends OrderInfoContainer> event) {
@@ -69,8 +65,6 @@ public class BazaarChatEventHandler {
      * Handles instant sell events.
      * Updates the order limit tracker with the pre-tax price.
      * Note: Chat shows price before tax, but actual transaction includes tax.
-     *
-     * @param event the bazaar chat event containing instant sell information
      */
     @EventHandler
     private static void onInstaSell(BazaarChatEvent<? extends OrderInfoContainer> event) {
@@ -88,8 +82,6 @@ public class BazaarChatEventHandler {
     /**
      * Handles instant buy events.
      * Updates the order limit tracker with the total purchase price.
-     *
-     * @param event the bazaar chat event containing instant buy information
      */
     @EventHandler
     private static void onInstaBuy(BazaarChatEvent<? extends OrderInfoContainer> event) {
@@ -105,8 +97,6 @@ public class BazaarChatEventHandler {
     /**
      * Handles order filled events.
      * Plays notification sounds if enabled, marks the order as filled, and notifies the player.
-     *
-     * @param event the bazaar chat event containing filled order information
      */
     @EventHandler
     private static void onOrderFilled(BazaarChatEvent<? extends OrderInfoContainer> event) {
@@ -126,10 +116,6 @@ public class BazaarChatEventHandler {
         }
     }
 
-    /**
-     * Subscribes this handler to the event bus.
-     * This method is automatically called during mod initialization.
-     */
     @RunOnInit
     public static void subscribe() {
         EVENT_BUS.subscribe(BazaarChatEventHandler.class);

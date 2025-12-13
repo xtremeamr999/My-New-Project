@@ -48,12 +48,12 @@ public class SlotClickEvent implements ICancellable {
     public final Slot slot;
     
     /**
-     * The numeric ID of the slot that was clicked.
+     * The index of the slot that was clicked.
      */
     public final int slotId;
     
     /**
-     * The mouse button that was clicked (0 = left, 1 = right, 2 = middle).
+     * The mouse button that was clicked.
      */
     public int clickedButton;
     
@@ -89,14 +89,6 @@ public class SlotClickEvent implements ICancellable {
         this.slotId = slotId;
         this.clickedButton = clickedButton;
         this.clickType = actionType;
-    }
-
-    /**
-     * Sets this event to use the pickblock action instead of the normal click.
-     * Pickblock is typically used for creative mode middle-clicking.
-     */
-    public void usePickblockInstead() {
-        usePickblockInstead = true;
     }
 
 }

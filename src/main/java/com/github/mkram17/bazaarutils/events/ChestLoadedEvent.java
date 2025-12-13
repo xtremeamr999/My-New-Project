@@ -2,20 +2,15 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +18,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Event fired when a chest/container GUI is fully loaded with all items.
+ * <p><strong>Note: You cannot use the default Fabric event for this on Hypixel, as not all item slots are loaded at screen initializion.</strong></p>
+ *
  * <p>
  * This event is triggered after a chest or container screen opens and all items have finished loading.
  * The mod waits for all item slots to be populated (checking that items are not in a "Loading..." state)
@@ -41,26 +38,22 @@ import java.util.concurrent.CompletableFuture;
  * {@code
  * @EventHandler
  * public void onChestLoaded(ChestLoadedEvent event) {
- *     String containerName = event.getContainerName();
- *     if (containerName.contains("Bazaar")) {
- *         List<ItemStack> items = event.getItemStacks();
- *         processBazaarItems(items);
- *     }
+ *    List<ItemStack> items = event.getItemStacks();
+ *    processBazaarItems(items);
  * }
  * }
  * </pre>
  * 
  * <p><strong>Implementation Note:</strong></p>
  * The event uses a polling mechanism that checks every 40ms (up to 50 attempts / 2 seconds)
- * to determine when the GUI is fully loaded. This is necessary because Hypixel loads items
- * asynchronously with placeholder "Loading..." items initially.
+ * to determine when the GUI is fully loaded.
  * 
  * @see Inventory
  * @see ItemStack
  */
 public class ChestLoadedEvent implements ICancellable {
     /**
-     * The inventory of the lower chest/container (excluding the player's inventory).
+     * The inventory of the lower chest/container (this is actually the inventory on top, NOT the player's inventory (ask Mojang, not me)).
      */
     @Getter
     private Inventory lowerChestInventory;
@@ -76,11 +69,6 @@ public class ChestLoadedEvent implements ICancellable {
      */
     @Getter
     private String containerName;
-
-    /**
-     * Singleton instance used for event registration.
-     */
-    public static final ChestLoadedEvent INSTANCE = new ChestLoadedEvent();
 
     /**
      * Registers the screen event listener that triggers this event when chests are loaded.

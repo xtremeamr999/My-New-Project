@@ -26,6 +26,7 @@ import meteordevelopment.orbit.ICancellable;
  * 
  * @see BazaarOrder
  */
+//TODO actually use this maybe? not sure what my thinking on this was back then
 public class OutbidOrderEvent implements ICancellable {
     /**
      * The bazaar order that was affected.

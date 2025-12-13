@@ -9,20 +9,7 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
  * such as order creation, cancellation, filling, claiming, or instant transactions. The event contains
  * the parsed order information and the type of bazaar action that occurred.
  * </p>
- * 
- * <p><strong>Usage Example:</strong></p>
- * <pre>
- * {@code
- * @EventHandler
- * public void onBazaarChat(BazaarChatEvent<?> event) {
- *     switch (event.type()) {
- *         case ORDER_CREATED -> handleOrderCreated(event.order());
- *         case ORDER_FILLED -> playNotificationSound();
- *         case INSTA_SELL -> updateOrderLimit(event.order());
- *     }
- * }
- * }
- * </pre>
+ *
  * 
  * @param <T> the type of order information container, must extend OrderInfoContainer
  * @param type the type of bazaar event that occurred
@@ -42,7 +29,7 @@ public record BazaarChatEvent<T extends OrderInfoContainer>(
     public enum BazaarEventTypes {
         /** A new buy or sell order was created */
         ORDER_CREATED,
-        /** An existing order was cancelled */
+        /** An existing order was canceled */
         ORDER_CANCELLED,
         /** An order was completely filled */
         ORDER_FILLED,

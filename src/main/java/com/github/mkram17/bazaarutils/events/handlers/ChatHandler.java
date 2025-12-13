@@ -28,17 +28,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  * When a bazaar message is detected, it creates and posts the appropriate {@link BazaarChatEvent}.
  * </p>
  * 
- * <p>Supported message types:</p>
- * <ul>
- *   <li>ORDER_CREATED - Buy Order/Sell Offer Setup messages</li>
- *   <li>ORDER_FILLED - Order completion messages</li>
- *   <li>ORDER_CLAIMED - Item/coin claim messages</li>
- *   <li>ORDER_CANCELLED - Order cancellation messages</li>
- *   <li>ORDER_FLIPPED - Order price flip messages</li>
- *   <li>INSTA_SELL - Instant sell transaction messages</li>
- *   <li>INSTA_BUY - Instant buy transaction messages</li>
- * </ul>
- * 
  * <p>The handler automatically registers itself during mod initialization via the
  * {@link RunOnInit} annotation on {@link #registerBazaarChat()}.</p>
  * 
@@ -68,8 +57,8 @@ public class ChatHandler {
      * Registers the chat message listener that parses bazaar messages.
      * This method is automatically called during mod initialization.
      * <p>
-     * The listener examines each incoming game chat message and attempts to identify
-     * and parse bazaar-related messages, then posts appropriate events to the event bus.
+     * The listener examines each incoming game chat messages, then
+     * posts appropriate events to the event bus.
      * </p>
      */
     @RunOnInit
@@ -94,7 +83,7 @@ public class ChatHandler {
 
     /**
      * Determines the type of bazaar event from a chat message.
-     * 
+     *
      * @param message the full chat message
      * @param siblings the individual text components of the message
      * @return the bazaar event type if detected, empty otherwise
@@ -158,7 +147,7 @@ public class ChatHandler {
      * 
      * @param siblings the text components of the message
      * @param eventType the type of bazaar event
-     * @param priceType the price type (buy/sell)
+     * @param priceType the price type (insta buy/insta sell)
      * @param volumeIndex index of the volume component
      * @param nameIndex index of the item name component
      * @param priceIndex index of the price component
@@ -287,7 +276,7 @@ public class ChatHandler {
      * 
      * @param siblings the text components of the message
      */
-    public static void handleClaimed(ArrayList<Text> siblings) {
+    private static void handleClaimed(ArrayList<Text> siblings) {
         Optional<BazaarOrder> orderOptional;
         try {
             if (siblings.get(6).getString().contains("worth")) {
