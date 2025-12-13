@@ -2,35 +2,78 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Event fired when a chest/container GUI is fully loaded with all items.
+ * <p><strong>Note: You cannot use the default Fabric event for this on Hypixel, as not all item slots are loaded at screen initialization.</strong></p>
+ *
+ * <p>
+ * This event is triggered after a chest or container screen opens and all items have finished loading.
+ * The mod waits for all item slots to be populated (checking that items are not in a "Loading..." state)
+ * before firing this event. This ensures that listeners can safely access all container contents.
+ * </p>
+ * 
+ * <p>The event includes:</p>
+ * <ul>
+ *   <li>The container's inventory</li>
+ *   <li>A list of all non-empty item stacks</li>
+ *   <li>The container's display name</li>
+ * </ul>
+ * 
+ * <p><strong>Usage Example:</strong></p>
+ * <pre>
+ * {@code
+ * @EventHandler
+ * public void onChestLoaded(ChestLoadedEvent event) {
+ *    List<ItemStack> items = event.getItemStacks();
+ *    processBazaarItems(items);
+ * }
+ * }
+ * </pre>
+ * 
+ * <p><strong>Implementation Note:</strong></p>
+ * The event uses a polling mechanism that checks every 40ms (up to 50 attempts / 2 seconds)
+ * to determine when the GUI is fully loaded.
+ * 
+ * @see Inventory
+ * @see ItemStack
+ */
 public class ChestLoadedEvent implements ICancellable {
+    /**
+     * The inventory of the lower chest/container (this is actually the inventory on top, NOT the player's inventory (ask Mojang, not me)).
+     */
     @Getter
     private Inventory lowerChestInventory;
+    
+    /**
+     * List of all non-empty item stacks in the container.
+     */
     @Getter
     private List<ItemStack> itemStacks = new ArrayList<>();
+    
+    /**
+     * The display name of the container.
+     */
     @Getter
     private String containerName;
 
-    public static final ChestLoadedEvent INSTANCE = new ChestLoadedEvent();
-
+    /**
+     * Registers the screen event listener that triggers this event when chests are loaded.
+     * This method is automatically called during mod initialization.
+     */
     @RunOnInit
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {

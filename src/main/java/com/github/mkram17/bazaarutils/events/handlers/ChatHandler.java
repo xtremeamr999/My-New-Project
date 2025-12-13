@@ -20,8 +20,28 @@ import java.util.Optional;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
+/**
+ * Handler for parsing and processing bazaar-related chat messages.
+ * <p>
+ * This class listens to incoming game chat messages and parses them to detect bazaar-related
+ * actions such as order creation, filling, claiming, instant transactions, and cancellations.
+ * When a bazaar message is detected, it creates and posts the appropriate {@link BazaarChatEvent}.
+ * </p>
+ * 
+ * <p>The handler automatically registers itself during mod initialization via the
+ * {@link RunOnInit} annotation on {@link #registerBazaarChat()}.</p>
+ * 
+ * @see BazaarChatEvent
+ * @see OrderInfoContainer
+ * @see BazaarOrder
+ */
 //TODO make finding order consistent. Some (eg handleClaimed) find the actual BazaarOrder object from userOrders, while others (eg handleFilled) just make a new OrderInfoContainer without finding the actual order
 public class ChatHandler {
+    /**
+     * Creates a configuration option for enabling/disabling order filled notification sounds.
+     * 
+     * @return the YACL configuration option for order filled sounds
+     */
     public static Option<Boolean> createOrderFilledSoundOption() {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal("Sound on Order Filled"))
@@ -33,6 +53,14 @@ public class ChatHandler {
                 .build();
     }
 
+    /**
+     * Registers the chat message listener that parses bazaar messages.
+     * This method is automatically called during mod initialization.
+     * <p>
+     * The listener examines each incoming game chat messages, then
+     * posts appropriate events to the event bus.
+     * </p>
+     */
     @RunOnInit
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
@@ -53,6 +81,13 @@ public class ChatHandler {
         });
     }
 
+    /**
+     * Determines the type of bazaar event from a chat message.
+     *
+     * @param message the full chat message
+     * @param siblings the individual text components of the message
+     * @return the bazaar event type if detected, empty otherwise
+     */
     private static Optional<BazaarChatEvent.BazaarEventTypes> getMessageType(Text message, ArrayList<Text> siblings) {
         if (siblings.isEmpty() && message.getString().contains("was filled!")) {
             return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED);
@@ -75,6 +110,15 @@ public class ChatHandler {
         return Optional.empty();
     }
 
+    /**
+     * Parses order data from chat message components.
+     * 
+     * @param siblings the text components of the message
+     * @param volumeIndex index of the volume component
+     * @param nameIndex index of the item name component
+     * @param priceIndex index of the price component
+     * @return the parsed order information if successful, empty otherwise
+     */
     private static Optional<OrderInfoContainer> parseOrderData(ArrayList<Text> siblings, int volumeIndex, int nameIndex, int priceIndex) {
         try {
             String volumeString = siblings.get(volumeIndex).getString().replace(",", "");
@@ -98,6 +142,16 @@ public class ChatHandler {
         }
     }
 
+    /**
+     * Processes an order event by parsing the order data and posting to the event bus.
+     * 
+     * @param siblings the text components of the message
+     * @param eventType the type of bazaar event
+     * @param priceType the price type (insta buy/insta sell)
+     * @param volumeIndex index of the volume component
+     * @param nameIndex index of the item name component
+     * @param priceIndex index of the price component
+     */
     private static void processOrderEvent(
             ArrayList<Text> siblings,
             BazaarChatEvent.BazaarEventTypes eventType,
@@ -112,24 +166,49 @@ public class ChatHandler {
         });
     }
 
+    /**
+     * Handles order flip messages (when an order's price is updated).
+     * 
+     * @param siblings the text components of the message
+     */
     public static void handleFlip(ArrayList<Text> siblings) {
         processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, PriceInfoContainer.PriceType.INSTABUY, 3, 4, 6);
     }
 
+    /**
+     * Handles order cancellation messages.
+     * 
+     * @param siblings the text components of the message
+     */
     public static void handleCancelled(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
         processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
     }
 
+    /**
+     * Handles instant sell transaction messages.
+     * 
+     * @param siblings the text components of the message
+     */
     public static void handleInstaSell(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
         processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
     }
 
+    /**
+     * Handles instant buy transaction messages.
+     * 
+     * @param siblings the text components of the message
+     */
     public static void handleInstaBuy(ArrayList<Text> siblings) {
         processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, PriceInfoContainer.PriceType.INSTABUY, 2, 4, 6);
     }
 
+    /**
+     * Handles order filled messages (when an order is completely filled).
+     * 
+     * @param message the full chat message
+     */
     private static void handleFilled(Text message) {
         String messageString = Util.removeFormatting(message.getString());
         // Example: "Your Buy Order for 2,304x Mithril was filled!"
@@ -154,6 +233,11 @@ public class ChatHandler {
         }
     }
 
+    /**
+     * Handles order creation messages (Buy Order Setup / Sell Offer Setup).
+     * 
+     * @param siblings the text components of the message
+     */
     private static void handleOrderCreated(ArrayList<Text> siblings) {
         String itemName = Util.removeFormatting(getName(siblings));
         int volume = Integer.parseInt(siblings.get(3).getString().replace(",", ""));
@@ -173,6 +257,12 @@ public class ChatHandler {
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
 
+    /**
+     * Extracts the item name from message components.
+     * 
+     * @param siblings the text components of the message
+     * @return the extracted item name without formatting
+     */
     private static String getName(List<Text> siblings) {
         if (siblings.size() == 10) {
             return Util.removeFormatting(siblings.get(6).getString());
@@ -181,7 +271,12 @@ public class ChatHandler {
         }
     }
 
-    public static void handleClaimed(ArrayList<Text> siblings) {
+    /**
+     * Handles order claim messages (when items or coins from filled orders are claimed).
+     * 
+     * @param siblings the text components of the message
+     */
+    private static void handleClaimed(ArrayList<Text> siblings) {
         Optional<BazaarOrder> orderOptional;
         try {
             if (siblings.get(6).getString().contains("worth")) {
@@ -202,6 +297,12 @@ public class ChatHandler {
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
 
+    /**
+     * Parses claimed buy order information from chat message components.
+     * 
+     * @param siblings the text components of the message
+     * @return the claimed buy order if found in tracked orders, empty otherwise
+     */
     private static Optional<BazaarOrder> getClaimedBuyOrder(ArrayList<Text> siblings) {
         // Parse volume with validation
         String volumeStr = siblings.get(3).getString().replace(",", "").trim();
@@ -251,6 +352,12 @@ public class ChatHandler {
         return getOrderInfo(item);
     }
 
+    /**
+     * Parses claimed sell order information from chat message components.
+     * 
+     * @param siblings the text components of the message
+     * @return the claimed sell order if found in tracked orders, empty otherwise
+     */
     private static Optional<BazaarOrder> getClaimedSellOrder(ArrayList<Text> siblings) {
         // Sell order claimed messages sometimes include volume and sometimes don't
 
@@ -270,6 +377,12 @@ public class ChatHandler {
         return getOrderInfo(item);
     }
 
+    /**
+     * Finds the matching BazaarOrder from tracked orders based on order info.
+     * 
+     * @param item the order information container to match
+     * @return the matching bazaar order if found, empty otherwise
+     */
     private static Optional<BazaarOrder> getOrderInfo(OrderInfoContainer item) {
         Optional<BazaarOrder> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
