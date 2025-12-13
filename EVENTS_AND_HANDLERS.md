@@ -73,7 +73,7 @@ All registered handlers for that event type will be called.
 @EventHandler
 public void onScreenChange(ScreenChangeEvent event) {
     Screen old = event.getOldScreen();
-    Screen new = event.getNewScreen();
+    Screen newScreen = event.getNewScreen();
     // Handle screen transition
 }
 ```
@@ -178,17 +178,15 @@ public void onItemReplace(ReplaceItemEvent event) {
 **Fields:**
 - `signEditScreen` (SignEditScreen) - The sign editing screen being opened
 
-**Cancellable:** Yes
+**Cancellable:** No
 
 **Usage:**
 ```java
 @EventHandler
 public void onSignOpen(SignOpenEvent event) {
-    if (shouldBlockSignEditing()) {
-        event.setCancelled(true);
-        return;
-    }
-    // Allow sign to open normally
+    // Example: Log when a sign editing screen is opened
+    System.out.println("Sign editing screen opened: " + event.getSignEditScreen());
+    // You can add additional logic here if needed
 }
 ```
 
@@ -489,9 +487,11 @@ public class CustomItemDisplay {
         List<Text> lore = new ArrayList<>();
         lore.add(Text.literal("Custom Info: " + calculateProfit(original)));
         
+        // Apply the lore to the modified item
+        modified.setLore(lore);
+        
         // Set the modified item as replacement
         event.setReplacement(modified);
-    }
 }
 ```
 

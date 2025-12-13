@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Event fired when a chest/container GUI is fully loaded with all items.
- * <p><strong>Note: You cannot use the default Fabric event for this on Hypixel, as not all item slots are loaded at screen initializion.</strong></p>
+ * <p><strong>Note: You cannot use the default Fabric event for this on Hypixel, as not all item slots are loaded at screen initialization.</strong></p>
  *
  * <p>
  * This event is triggered after a chest or container screen opens and all items have finished loading.
