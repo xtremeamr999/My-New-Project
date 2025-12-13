@@ -179,8 +179,9 @@ public final class BazaarData {
     }
 
     /**
-     * empty can mean: reply/product/priceType invalid or not found; exception while finding price
-     * INSTABUY -> top of buySummary (people selling). INSTASELL -> top of sellSummary (people buying).
+     * Empty can mean: reply/product/priceType invalid or not found; exception while finding price
+     * INSTABUY (top of buySummary aka people's sell orders). INSTASELL (top of sellSummary, aka people's buy orders).
+     * @return OptionalDouble price found.
      */
     public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.PriceType priceType) {
         SkyBlockBazaarReply reply = currentReply;

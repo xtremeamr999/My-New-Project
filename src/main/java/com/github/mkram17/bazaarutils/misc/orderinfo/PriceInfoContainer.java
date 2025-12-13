@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-//Simply a container for information about price of an item. For actual orders, use OrderInfoContainer or BazaarOrder instead
+/**
+ * Container for market price metadata of a single product. For actual user orders, prefer
+ * {@link OrderInfoContainer} or {@link BazaarOrder}.
+ */
 public class PriceInfoContainer {
     @Getter
     public enum PriceType {INSTASELL,INSTABUY;
@@ -17,6 +20,9 @@ public class PriceInfoContainer {
             INSTABUY.opposite = INSTASELL;
         }
 
+        /**
+         * @return Human-readable string for the price type as shown to players.
+         */
         public String getString(){
             return switch (this) {
                 case INSTASELL -> "Buy";
@@ -48,7 +54,8 @@ public class PriceInfoContainer {
         }
     }
 
-    /* Returns the current market price for the given PriceType (INSTASELL or INSTABUY)
+    /**
+     * @return current market price for the given {@link PriceType} or {@code -1.0} for error.
      */
     public Double getMarketPrice(PriceType priceType){
         return switch (priceType) {

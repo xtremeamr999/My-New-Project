@@ -25,7 +25,10 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO figure out how to handle rounding with price
 //TODO sometimes a BazaarOrder is created that is for the same order as one in userOrders, but not the same object. This causes problems sometimes, and should be fixed.
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
-//An eventful OrderInfoContainer, also tracks info only needed for actual user orders
+/**
+ * Extension of {@link OrderInfoContainer} that tracks live Bazaar orders and reacts to events such
+ * as outbids, user order changes, and price updates.
+ */
 @Slf4j
 public class BazaarOrder extends OrderInfoContainer {
 
@@ -39,10 +42,16 @@ public class BazaarOrder extends OrderInfoContainer {
     private int amountFilled = 0;
 
 
+    /**
+     * Creates a Bazaar order with no captured {@link ItemInfo} context.
+     */
     public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType) {
         this(name, volume, pricePerItem, priceType, null);
     }
 
+    /**
+     * Creates a Bazaar order, initializing ItemInfo with slot index and ItemStack of the order.
+     */
     public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
         super(name, volume, pricePerItem, priceType, itemInfo);
         this.fillStatus = Statuses.SET;
@@ -113,6 +122,9 @@ public class BazaarOrder extends OrderInfoContainer {
         }
     }
 
+    /**
+     * Opens the Bazaar order management screen after a short countdown if the player is not already there.
+     */
     public void openBazaar() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         if(screenInfo.inBazaar() )
@@ -135,6 +147,9 @@ public class BazaarOrder extends OrderInfoContainer {
     }
 
 
+    /**
+     * @return index of this order within the persisted user order list.
+     */
     public int getIndex() {
         return BUConfig.get().userOrders.indexOf(this);
     }
@@ -154,6 +169,11 @@ public class BazaarOrder extends OrderInfoContainer {
         return sb.toString();
     }
 
+    /**
+     * Converts a filled order into its opposite side for flipping and resets fill tracking.
+     *
+     * @param newPrice price to use for the flipped order
+     */
     public void flipItem(double newPrice) {
         flipPrices(newPrice);
         updateMarketPrice();
@@ -162,6 +182,11 @@ public class BazaarOrder extends OrderInfoContainer {
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE, this));
     }
 
+    /**
+     * Calculates a competitive flip price using the opposite side of the market.
+     *
+     * @return price .1 coin more competitive than market rate.
+     */
     public double getFlipPrice() {
         updateMarketPrice();
         Double marketPrice = getMarketPrice(priceType);
@@ -176,6 +201,9 @@ public class BazaarOrder extends OrderInfoContainer {
         }
     }
 
+    /**
+     * Updates the tracked filled amount and automatically marks the order as filled when the volume is reached.
+     */
     public void setAmountFilled(int amountFilled) {
         this.amountFilled = amountFilled;
         if (this.amountFilled >= volume) {
@@ -185,11 +213,17 @@ public class BazaarOrder extends OrderInfoContainer {
         }
     }
 
+    /**
+     * Marks the order as fully filled and syncs the filled amount with the expected volume.
+     */
     public void setFilled() {
         amountFilled = volume;
         fillStatus = Statuses.FILLED;
     }
 
+    /**
+     * Removes this order from the tracked watched items list and notifies listeners.
+     */
     public void removeFromWatchedItems() {
         if (!BUConfig.get().userOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");

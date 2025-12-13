@@ -2,7 +2,10 @@ package com.github.mkram17.bazaarutils.misc.orderinfo;
 
 import net.minecraft.item.ItemStack;
 
-//has info for an orders position in orders screen, etc.
+/**
+ * Encapsulates lightweight UI metadata for an item shown in the Bazaar orders screen,
+ * such as the originating slot index and the rendered {@link ItemStack}.
+ */
 public record ItemInfo(Integer slotIndex, ItemStack itemStack) {
     @Override
     public boolean equals(Object other) {
