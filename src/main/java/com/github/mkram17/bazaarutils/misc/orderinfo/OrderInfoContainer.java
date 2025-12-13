@@ -285,7 +285,7 @@ public class OrderInfoContainer extends PriceInfoContainer implements BUListener
                 .toList();
     }
     /** Used for when there are duplicate matches found and the best should be chosen to use.
-    Typically, volume is the variable that is different, but it can also be price
+     * Typically, volume is the variable that is different, but it can also be price
     */
     private BazaarOrder findBestMatch(List<BazaarOrder> list) {
         return list.stream()
