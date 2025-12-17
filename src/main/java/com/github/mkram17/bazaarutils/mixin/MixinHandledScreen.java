@@ -5,19 +5,17 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
-import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
-import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -28,11 +26,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//? if > 1.21.5 {
-/*import net.minecraft.client.gl.RenderPipelines;
-*///?} else {
-import net.minecraft.client.render.RenderLayer;
 //?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
@@ -80,18 +73,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 					client.player
 			);
 			ci.cancel();
-		}
-	}
-
-	@IfModLoaded(BUCompatibilityHelper.AMECS_MODID)
-	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-	public void onkeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();
-		if (!keyBinding.isPressed() && keyBinding.getDefaultKey().getCode() == keyCode && keyBinding.getDefaultModifiers().getAlt()) {
-//			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
-			if (keyBinding.getTicksBetweenPresses() > 10)
-				keyBinding.setPressed(true);
-			cir.setReturnValue(true);
 		}
 	}
 

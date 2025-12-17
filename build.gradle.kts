@@ -1,6 +1,6 @@
 
 plugins {
-    id("fabric-loom")
+    id("fabric-loom") version "1.11-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
@@ -96,10 +96,6 @@ dependencies {
 
     testCompileOnly("org.projectlombok:lombok:1.18.36")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.36")
-
-    //Amecs Reborn
-    modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${mcVersion}")
-
     // Mixin Constraints
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
 
@@ -174,7 +170,7 @@ publishMods {
         minecraftVersions.add(mcVersion)
 
         requires("fabric-api", "yacl")
-        optional("modmenu", "amecs-reborn")
+        optional("modmenu")
     }
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
