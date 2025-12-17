@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.features.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import dev.isxander.yacl3.api.*;
@@ -41,7 +41,6 @@ public class BUConfigGui {
         generalBuilder.option(config.stashMessages.createOption());
         generalBuilder.option(config.priceCharts.createOption());
         generalBuilder.option(config.orderStatusHighlight.createOption());
-        generalBuilder.option(config.autoUpdate.createOption());
         generalBuilder.option(createDisableErrorNotifsOption(config));
 
         if (!BUCompatibilityHelper.isAmecsReborn()) {

@@ -2,14 +2,11 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.utils.AutoUpdate;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.Option;
@@ -93,8 +90,6 @@ public class BUConfig {
     public OrderLimit orderLimit = new OrderLimit(true, 15_000_000_000d);
     @SerialEntry
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
-    @Setter
-    public AutoUpdate autoUpdate = new AutoUpdate();
 
 
     public static void openGUI() {

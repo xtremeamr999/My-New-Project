@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.customorder;
+package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -35,7 +35,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO find new name for this
 @NoArgsConstructor
 public class CustomOrder extends CustomItemButton implements BUListener {
-    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.RED_STAINED_GLASS_PANE));
+    public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BLACK_STAINED_GLASS_PANE, 4, Items.BLACK_STAINED_GLASS_PANE));
     private boolean buySignClicked = false;
 
     @Getter @Setter
@@ -45,11 +45,11 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     @Getter
     private Item item;
 
-    public CustomOrder(boolean enabled, int orderAmount, int slotNumber) {
+    public CustomOrder(boolean enabled, int orderAmount, int slotNumber, Item item) {
         this.enabled = enabled;
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
-        this.item = getNextColoredPane();
+        this.item = item;
         EVENT_BUS.subscribe(this);
     }
     protected CustomOrder(boolean enabled) {
@@ -121,7 +121,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     public static void buildOptions(OptionGroup.Builder builder){
         List<CustomOrder> customOrders = BUConfig.get().customOrders;
         if(customOrders.isEmpty())
-            customOrders.add(new CustomOrder(true, 71680, 17));
+            customOrders.add(new CustomOrder(true, 71680, 17, CustomOrder.COLORMAP.get(0)));
 
         for (CustomOrder order : customOrders) {
             builder.option(order.createOption());
