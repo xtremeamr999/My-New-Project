@@ -11,22 +11,22 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.util.Atlases;
 import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -113,19 +113,25 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		}
 
 		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
-		final var sprite = MinecraftClient.getInstance()
-				.getGuiAtlasManager()
-				.getSprite(OrderStatusHighlight.IDENTIFIER);
+
+        //? if > 1.21.8 {
+        final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
+                .getSprite(OrderStatusHighlight.IDENTIFIER);
+        //?}  else {
+//        final var sprite = MinecraftClient.getInstance()
+//                .getGuiAtlasManager()
+//                .getSprite(OrderStatusHighlight.IDENTIFIER);
+        //?}
 
 		//? if > 1.21.5 {
-		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
 		);
-		*///?} else {
-		context.drawSpriteStretched(RenderLayer::getGuiTextured,
+        //?} else {
+		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
 				sprite, x, y, 16, 16, color
 		);
-		//?}
+		*///?}
 	}
 
 }

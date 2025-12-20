@@ -10,7 +10,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
@@ -82,10 +82,10 @@ public class MaxBuyOrder extends CustomOrder {
     }
 
     private static void updatePurse(MinecraftClient client) {
-        ClientPlayerEntity player = client.player;
-        if (player == null) return;
+        ClientWorld world = client.world;
+        if (world == null) return;
 
-        Scoreboard scoreboard = player.getScoreboard();
+        Scoreboard scoreboard = world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
 
         if (objective == null) return;
