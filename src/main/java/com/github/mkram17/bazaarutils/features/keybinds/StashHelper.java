@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.features.keybinds;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -15,7 +16,7 @@ public class StashHelper {
     @Getter
     private static int ticksBetweenPresses;
     //? if > 1.21.8
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of("bazaarutils"));
+    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));
 
     private static final KeyBinding keyBinding = new KeyBinding(
        "Pick Up Stash",
