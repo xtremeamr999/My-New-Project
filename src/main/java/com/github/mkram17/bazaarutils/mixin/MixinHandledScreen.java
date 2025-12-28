@@ -16,11 +16,16 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
+//? if < 1.21.6 {
+import net.minecraft.client.render.RenderLayer;
+//? }
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.util.Atlases;
+//? if > 1.21.8 {
+//import net.minecraft.util.Atlases;
+//?}
 import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -115,23 +120,23 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
 
         //? if > 1.21.8 {
-        final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
+        /*final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
-        //?}  else {
-//        final var sprite = MinecraftClient.getInstance()
-//                .getGuiAtlasManager()
-//                .getSprite(OrderStatusHighlight.IDENTIFIER);
+        *///?} else {
+        final var sprite = MinecraftClient.getInstance()
+                .getGuiAtlasManager()
+                .getSprite(OrderStatusHighlight.IDENTIFIER);
         //?}
 
 		//? if > 1.21.5 {
-		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
 		);
-        //?} else {
-		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
+        *///?} else {
+		context.drawSpriteStretched(RenderLayer::getGuiTextured,
 				sprite, x, y, 16, 16, color
 		);
-		*///?}
+		//?}
 	}
 
 }

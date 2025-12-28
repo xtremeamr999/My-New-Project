@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.features.keybinds;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -9,24 +8,23 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class StashHelper {
     @Getter
     private static int ticksBetweenPresses;
     //? if > 1.21.8
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));
+    /*private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));*/
 
     private static final KeyBinding keyBinding = new KeyBinding(
        "Pick Up Stash",
        InputUtil.Type.KEYSYM,
        GLFW.GLFW_KEY_V,
-       //? if > 1.21.8{
-       CATEGORY
-       //?} else {
-//     "Bazaar Utils"
-        //? }
+       //? if > 1.21.8 {
+       /*CATEGORY
+       *///?} else {
+     "Bazaar Utils"
+        //?}
     );
 
     @RunOnInit

@@ -16,6 +16,9 @@ import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
+//? if < 1.21.10 {
+import net.minecraft.client.gui.screen.Screen;
+//? }
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -61,12 +64,13 @@ public class PriceCharts implements ItemTooltipCallback, BUListener {
     private void onClick(SlotClickEvent e){
         if (!shouldShow() || e.isCancelled())
             return;
-        //? if > 1.21.8{
-        if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed())
-            return;
-            //?} else {
-//       if (!(Screen.hasShiftDown() && Screen.hasControlDown())) {
-            //? }
+        //? if > 1.21.8 {
+        /*if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed())
+            *///?} else {
+       if (!(Screen.hasShiftDown() && Screen.hasControlDown()))
+            //?}
+           return;
+
         String itemName = sanitizeName(e.slot.getStack().getName().getString());
         if (!SHOW_CACHE.getOrDefault(itemName, false)) return;
 
