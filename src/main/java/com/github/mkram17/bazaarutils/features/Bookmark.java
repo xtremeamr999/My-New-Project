@@ -21,8 +21,8 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 //? if < 1.21.10 {
-import net.minecraft.client.gui.screen.Screen;
-//?}
+/*import net.minecraft.client.gui.screen.Screen;
+*///?}
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -106,7 +106,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         }
 
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
-        GUIUtils.setSignText(name, true);
+        GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(name, true));
 
         if(userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
@@ -243,10 +243,10 @@ public class Bookmark extends CustomItemButton implements BUListener {
                         SLOT_BUTTON_TEXTURES,
                         (btn) -> {
                             //? if > 1.21.8 {
-                            /*if (MinecraftClient.getInstance().isShiftPressed()) {
-                                *///?} else {
-                         if (Screen.hasShiftDown()) {
-                                //?}
+                            if (MinecraftClient.getInstance().isShiftPressed()) {
+                                //?} else {
+                         /*if (Screen.hasShiftDown()) {
+                                *///?}
                                 PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
                                 bookmark.onWidgetShiftClick();
                             } else {

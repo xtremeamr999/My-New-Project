@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //used for SignOpenEvent
 @Mixin(Screen.class)
 public class MixinSignOpen {
-    @Inject(method = "init", at = @At("HEAD"))
+    @Inject(method = "init(Lnet/minecraft/client/MinecraftClient;II)V", at = @At("TAIL"))
     private void onScreenInit(CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
 

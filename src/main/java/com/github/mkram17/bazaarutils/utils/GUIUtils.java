@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
@@ -21,6 +22,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+
+import java.util.function.Consumer;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -110,6 +113,19 @@ public class GUIUtils {
         }
     }
 
+    public static void runOnNextSignOpen(Consumer<SignOpenEvent> action) {
+        BazaarUtils.EVENT_BUS.subscribe(new Object() {
+            @EventHandler
+            private void onSignOpen(SignOpenEvent event) {
+                try {
+                    action.accept(event);
+                } finally {
+                    BazaarUtils.EVENT_BUS.unsubscribe(this);
+                }
+            }
+        });
+    }
+
     public static void closeSign(){
         try {
             PlayerActionUtil.notifyAll("Closing sign", Util.notificationTypes.GUI);
@@ -120,7 +136,6 @@ public class GUIUtils {
                 Util.notifyError("Error closing sign: client was null or not in a sign", new Throwable());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Util.notifyError("Unknown error while closing sign", e);
         }
     }

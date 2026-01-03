@@ -1,2 +1,1 @@
- - Removed Amecs Reborn optional dependency. If you liked using it, you can still use the original Amecs mod instead.
- - Fixed issues where some players were unable to use the Stash Helper feature/keybind.
+ - Fixed a bug causing errors when the mod tries to automatically close a sign
