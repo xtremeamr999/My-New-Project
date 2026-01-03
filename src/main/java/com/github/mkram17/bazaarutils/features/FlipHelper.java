@@ -89,14 +89,8 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
+        GUIUtils.runOnNextSignOpen(signOpenEvent -> handleFlip());
         shouldAddToSign = true;
-    }
-
-    @EventHandler
-    public void onSignOpen(SignOpenEvent e){
-        if(!shouldAddToSign) return;
-        handleFlip();
-        shouldAddToSign = false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
