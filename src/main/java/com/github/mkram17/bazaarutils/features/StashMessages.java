@@ -40,7 +40,7 @@ public class StashMessages implements BUListener {
             if(message.getString().contains("You picked up") && message.getString().contains("from your material stash") && !stashPreviouslyClaimed) {
                 stashPreviouslyClaimed = true;
                 Util.scheduleConfigSave();
-                Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, download Amecs Reborn and use the Stash Helper keybind, which the bazaar and claim stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config."));
+                Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use the Stash Helper keybind, which closes the bazaar and claims your stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config."));
             }
         });
     }

@@ -1,1 +1,2 @@
- - Fixed a bug causing errors when the mod tries to automatically close a sign
+ - Fixed a bug with internal annotation which caused issues with keybind registration.
+ - Fix null client error when using Flip Helper
