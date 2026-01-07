@@ -47,7 +47,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private static final int LORE_LINE_PRICE = 3;
 
 
-    private boolean shouldAddToSign = false;
     @Getter @Setter
     private boolean enabled;
     @Getter
@@ -90,7 +89,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
         GUIUtils.runOnNextSignOpen(signOpenEvent -> handleFlip());
-        shouldAddToSign = true;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -128,7 +126,6 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
     private void resetState() {
         this.order = null;
-        this.shouldAddToSign = false;
     }
 
     private void handleFlip() {
