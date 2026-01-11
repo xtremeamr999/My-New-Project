@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -108,6 +109,10 @@ public class BUConfigGui {
 
     public static BooleanControllerBuilder createBooleanController(Option<Boolean> opt) {
         return BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true);
+    }
+
+    public static <T extends Enum<T>> EnumControllerBuilder<T> createEnumController(Option<T> opt, Class<T> enumClass) {
+        return EnumControllerBuilder.create(opt).enumClass(enumClass);
     }
 }
 
