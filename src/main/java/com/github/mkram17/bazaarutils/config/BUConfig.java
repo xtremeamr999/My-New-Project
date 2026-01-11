@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
+import com.github.mkram17.bazaarutils.features.FlipHelper.BiddingType;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSellControl;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
@@ -58,7 +59,7 @@ public class BUConfig {
     @SerialEntry
     public String resourcesSha = "";
     @SerialEntry
-    public FlipHelper flipHelper = new FlipHelper(true, 17);
+    public FlipHelper flipHelper = new FlipHelper(true, BiddingType.COMPETITIVE, 17);
     @SerialEntry
     public List<BazaarOrder> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry

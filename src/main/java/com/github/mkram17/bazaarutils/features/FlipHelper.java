@@ -13,7 +13,11 @@ import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+
+import dev.isxander.yacl3.api.NameableEnum;
 import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -46,16 +50,36 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
+    public static enum BiddingType implements NameableEnum {
+      COMPETITIVE,
+      MATCHED,
+      OUTBIDDED;
+
+      @Override
+      public Text getDisplayName() {
+        return Text.of(name());
+      }
+    }
 
     @Getter @Setter
     private boolean enabled;
+    @Getter @Setter
+    private BiddingType biddingType;
+
     @Getter
     private static final Item BUTTON_ITEM = Items.CHERRY_SIGN;
     private BazaarOrder order;
 
-    public FlipHelper(boolean enabled, int slotNumber) {
+    public FlipHelper(boolean enabled, BiddingType biddingType, int slotNumber) {
         this.enabled = enabled;
+        this.biddingType = biddingType;
         this.slotNumber = slotNumber;
+    }
+
+    public static OptionGroup.Builder createFlipsGroup() {
+      return OptionGroup.createBuilder()
+              .name(Text.literal("Flip Helper Options"))
+              .description(OptionDescription.of(Text.literal("Manage buttons of flip helper action.")));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -260,6 +284,21 @@ public class FlipHelper extends CustomItemButton implements BUListener {
                 "Button in flip order menu to undercut market prices for items.",
                 this::isEnabled,
                 this::setEnabled);
+    }
+
+    public Option<BiddingType> createFlippingTypeOption() {
+      return super.createEnumOption("Bidding type",
+          "Select how the flip price should be chosen.",
+          BiddingType.class,
+          biddingType,
+          this::getBiddingType,
+          this::setBiddingType);
+    }
+
+    public static void buildOptions(OptionGroup.Builder builder) {
+      FlipHelper flipHelper = BUConfig.get().flipHelper;
+
+      builder.option(flipHelper.createFlippingTypeOption());  
     }
 
     @Override
