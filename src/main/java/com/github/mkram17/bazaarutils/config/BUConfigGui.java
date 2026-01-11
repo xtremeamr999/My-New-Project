@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.config;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.features.CustomOrder;
+import com.github.mkram17.bazaarutils.features.FlipHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictSell;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import dev.isxander.yacl3.api.*;
@@ -22,7 +23,7 @@ public class BUConfigGui {
             builder.title(Text.literal(BazaarUtils.MOD_NAME));
 
             buildGeneralCategory(builder, config);
-            buildCustomOrdersCategory(builder);
+            buildCustomHelpersCategory(builder);
 
             if (config.developerMode) {
                 buildDeveloperCategory(builder, config.developer);
@@ -63,13 +64,21 @@ public class BUConfigGui {
         return restrictSellGroupBuilder.build();
     }
 
-    private static void buildCustomOrdersCategory(YetAnotherConfigLib.Builder builder) {
-        OptionGroup.Builder customOrdersGroupBuilder = OptionGroup.createBuilder()
-                .name(Text.literal("Custom Buy Amounts"))
-                .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));
+    private static void buildCustomHelpersCategory(YetAnotherConfigLib.Builder builder) {
+      ConfigCategory.Builder customHelpersBuilder = ConfigCategory.createBuilder()
+                .name(Text.literal("Custom Helpers"))
+                .tooltip(Text.literal("Add or manage the functionality among the enabled helpers."));
 
-        CustomOrder.buildOptions(customOrdersGroupBuilder);
-        builder.category(CustomOrder.createOrdersCategory().group(customOrdersGroupBuilder.build()).build());
+      OptionGroup.Builder CustomOrderGroup = CustomOrder.createOrdersGroup();
+      OptionGroup.Builder FlipHelperGroup = FlipHelper.createFlipsGroup();
+
+      CustomOrder.buildOptions(CustomOrderGroup);
+      FlipHelper.buildOptions(FlipHelperGroup);
+
+      customHelpersBuilder.group(CustomOrderGroup.build());
+      customHelpersBuilder.group(FlipHelperGroup.build());
+  
+      builder.category(customHelpersBuilder.build());
     }
 
     private static void buildDeveloperCategory(YetAnotherConfigLib.Builder builder, BUConfig.Developer developer) {
