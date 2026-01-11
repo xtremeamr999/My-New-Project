@@ -47,4 +47,15 @@ public class CustomItemButton {
                 .controller(BUConfigGui::createBooleanController)
                 .build();
     }
+
+    public <T extends Enum<T>> Option<T> createEnumOption(String name, String description, Class<T> enumClass, T def, Supplier<T> getter, Consumer<T> setter) {
+        return Option.<T>createBuilder()
+                .name(Text.literal(name))
+                .binding(def,
+                        getter,
+                        setter)
+                .description(OptionDescription.of(Text.literal(description)))
+                .controller(opt -> BUConfigGui.createEnumController(opt, enumClass))
+                .build();
+    }
 }
