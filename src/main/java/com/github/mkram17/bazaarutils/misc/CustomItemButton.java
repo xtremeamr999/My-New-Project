@@ -37,7 +37,7 @@ public class CustomItemButton {
         return (event.slotId == slotNumber);
     }
 
-    public Option<Boolean> createOption(String name, String description, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public Option<Boolean> createBooleanOption(String name, String description, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal(name))
                 .binding(true,

@@ -103,7 +103,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     }
 
     public Option<Boolean> createOption() {
-        return super.createOption(
+        return super.createBooleanOption(
                 "Buy " + getOrderAmount() + " Button",
                 "Buy order button for " + getOrderAmount() + " of an item.",
                 this::isEnabled,

@@ -256,7 +256,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 //    }
 
     public Option<Boolean> createOption() {
-        return super.createOption("Flip Helper",
+        return super.createBooleanOption("Flip Helper",
                 "Button in flip order menu to undercut market prices for items.",
                 this::isEnabled,
                 this::setEnabled);
