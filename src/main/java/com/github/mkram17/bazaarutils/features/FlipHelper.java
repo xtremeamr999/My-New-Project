@@ -127,7 +127,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private Text getButtonText() {
-        double flipPrice = order.getFlipPrice();
+        double flipPrice = computeFlipPrice(order);
         if (flipPrice == 0) {
             return Text.literal("There are no competing sell offers.").formatted(Formatting.DARK_PURPLE);
         } else if (order == null) {
@@ -138,8 +138,8 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private String getButtonStackSize() {
-        double flipPrice = order.getFlipPrice();
-        if (order.getFlipPrice() == 0) {
+        double flipPrice = computeFlipPrice(order);
+        if (flipPrice == 0) {
             return "ANY";
         } else if (order == null) {
             return "???";
@@ -153,11 +153,29 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private void handleFlip() {
-        double flipPrice = order.getFlipPrice();
+        double flipPrice = computeFlipPrice(order);
         ScreenInfo previousScreen = ScreenInfo.getCurrentScreenInfo().getPreviousScreenInfo();
         if(order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
             GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
             order.flipItem(flipPrice);
+        }
+    }
+
+    private double computeFlipPrice(BazaarOrder order) {
+        PriceInfoContainer.PriceType currentType = order.getPriceType();
+        double marketOppositePrice = order.getMarketPrice(currentType.getOpposite());
+
+        if (marketOppositePrice <= 0) return 0;
+
+        switch (biddingType) {
+            case COMPETITIVE:
+                return order.getFlipPrice();
+            case MATCHED:
+                return Util.truncateNum(marketOppositePrice);
+            case OUTBIDDED:
+                return order.getOutbiddedPrice();
+            default:
+                return order.getFlipPrice();
         }
     }
 
