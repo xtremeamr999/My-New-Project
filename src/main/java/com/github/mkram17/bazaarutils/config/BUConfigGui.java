@@ -45,11 +45,9 @@ public class BUConfigGui {
         generalBuilder.option(createDisableErrorNotifsOption(config));
         generalBuilder.option(config.orderLimit.createOption());
 
-        if (!BUCompatibilityHelper.isAmecsReborn()) {
-            generalBuilder.option(createAmecsDownloadButton());
-        }
+        generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
+        generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
 
-        generalBuilder.group(buildRestrictSellGroup(config.instaSellRestrictions));
         builder.category(generalBuilder.build());
     }
 
@@ -108,26 +106,6 @@ public class BUConfigGui {
                         newVal -> config.disableErrorNotifications = newVal
                 )
                 .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    private static ButtonOption createAmecsDownloadButton() {
-        return ButtonOption.createBuilder()
-                .name(Text.of("Download Amecs Reborn"))
-                .description(OptionDescription.of(Text.of("Amecs Reborn is needed for the Stash Helper feature. Download here.")))
-                .text(Text.of("(for Stash Helper)"))
-                .action((yaclScreen, buttonOption) -> {
-                    MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirmed) -> {
-                        if (confirmed) {
-                            try {
-                                net.minecraft.util.Util.getOperatingSystem().open(new URI("https://modrinth.com/mod/amecs-reborn"));
-                            } catch (URISyntaxException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        MinecraftClient.getInstance().setScreen(null);
-                    }, "https://modrinth.com/mod/amecs-reborn", true));
-                })
                 .build();
     }
 

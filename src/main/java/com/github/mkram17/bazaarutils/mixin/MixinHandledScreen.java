@@ -9,8 +9,8 @@ import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.moulberry.mixinconstraints.annotations.IfModLoaded;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -19,17 +19,16 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+//? if > 1.21.8 {
+//import net.minecraft.util.Atlases;
+//?}
+import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//? if > 1.21.5 {
-/*import net.minecraft.client.gl.RenderPipelines;
-*///?} else {
 import net.minecraft.client.render.RenderLayer;
-//?}
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks, highlighting slots
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -64,18 +63,6 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 					client.player
 			);
 			ci.cancel();
-		}
-	}
-
-	@IfModLoaded(BUCompatibilityHelper.AMECS_MODID)
-	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-	public void onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-		StashHelper keyBinding = (StashHelper) BazaarUtils.keybinds.getFirst();
-		if (!keyBinding.isPressed() && keyBinding.getDefaultKey().getCode() == keyCode && keyBinding.getDefaultModifiers().getAlt()) {
-//			Util.notifyAll("Stash helper pressed", Util.notificationTypes.FEATURE);
-			if (keyBinding.getTicksBetweenPresses() > 10)
-				keyBinding.setPressed(true);
-			cir.setReturnValue(true);
 		}
 	}
 

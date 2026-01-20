@@ -1,6 +1,6 @@
 
 plugins {
-    id("fabric-loom")
+    id("fabric-loom") version "1.11-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
@@ -15,23 +15,28 @@ base {
 }
 
 repositories {
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") {
+    maven {
         name = "Dev Auth"
+        url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     }
-    maven("https://maven.meteordev.org/releases") {
+    maven {
         name = "meteor-maven"
+        url = uri("https://maven.meteordev.org/releases")
     }
-    maven("https://repo.hypixel.net/repository/Hypixel/") {
+    maven {
         name = "Hypixel"
+        url = uri("https://repo.hypixel.net/repository/Hypixel/")
     }
-    maven("https://maven.isxander.dev/releases") {
+    maven {
         name = "YACL"
+        url = uri("https://maven.isxander.dev/releases")
     }
-    maven("https://maven.terraformersmc.com/") {
+    maven {
         name = "Terraformers (for gui)"
+        url = uri("https://maven.terraformersmc.com/")
     }
-    maven("https://maven.wispforest.io") {
-        name = "Owo Lib"
+    maven("https://moulberry.repo.ax/v1") {
+        name = "Moulberry's Maven"
     }
 
     exclusiveContent {
@@ -80,6 +85,7 @@ dependencies {
     include("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-core:4.4")
 
+    // Config lib and settings screen
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
@@ -90,10 +96,6 @@ dependencies {
 
     testCompileOnly("org.projectlombok:lombok:1.18.36")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.36")
-
-    //Amecs Reborn
-    modCompileOnly("maven.modrinth:amecs-reborn:${property("amecsreborn_version")}+mc${mcVersion}")
-
     // Mixin Constraints
     include(implementation("com.moulberry:mixinconstraints:1.0.8")!!)
 
@@ -102,12 +104,6 @@ dependencies {
     include("org.danilopianini:gson-extras:3.3.0")
     // Skyblocker for compatibility
     modCompileOnly("maven.modrinth:skyblocker-liap:v${deps["skyblocker_version"]}")
-
-    // Owo Lib
-    modImplementation("io.wispforest:owo-lib:${property("owo_version")}+${mcVersion}")
-    //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
-    include("io.wispforest:owo-sentinel:${property("owo_version")}")
-
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
@@ -160,7 +156,7 @@ publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
     changelog = "Changelog"
-    type = STABLE
+    type = if(version.toString().contains("alpha")) ALPHA else STABLE
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
     version = "v" + property("mod_version").toString()
@@ -173,15 +169,14 @@ publishMods {
         version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
 
-        requires("fabric-api", "yacl", "owo-lib")
-        optional("modmenu", "amecs-reborn")
+        requires("fabric-api", "yacl")
+        optional("modmenu")
     }
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         repository = "mkram17/Bazaar-Utils"
         commitish = "modern"
         type = STABLE
-
     }
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")

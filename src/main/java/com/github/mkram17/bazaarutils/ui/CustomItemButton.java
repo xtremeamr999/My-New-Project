@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 
 public class CustomItemButton {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
-    @Getter
     protected int slotNumber;
     @Getter @Setter
     protected transient ItemStack replacementItem;
@@ -34,7 +33,7 @@ public class CustomItemButton {
         return event.getSlotId() == slotNumber;
     }
 
-    protected boolean shouldUseSlot(SlotClickEvent event) {
+    protected boolean wasButtonSlotClicked(SlotClickEvent event) {
         return (event.slotId == slotNumber);
     }
 

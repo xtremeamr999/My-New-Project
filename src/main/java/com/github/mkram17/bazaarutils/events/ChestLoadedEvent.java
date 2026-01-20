@@ -2,19 +2,24 @@ package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Event fired when a chest/container GUI is fully loaded with all items.
@@ -25,14 +30,14 @@ import java.util.concurrent.CompletableFuture;
  * The mod waits for all item slots to be populated (checking that items are not in a "Loading..." state)
  * before firing this event. This ensures that listeners can safely access all container contents.
  * </p>
- * 
+ *
  * <p>The event includes:</p>
  * <ul>
  *   <li>The container's inventory</li>
  *   <li>A list of all non-empty item stacks</li>
  *   <li>The container's display name</li>
  * </ul>
- * 
+ *
  * <p><strong>Usage Example:</strong></p>
  * <pre>
  * {@code
@@ -43,27 +48,27 @@ import java.util.concurrent.CompletableFuture;
  * }
  * }
  * </pre>
- * 
+ *
  * <p><strong>Implementation Note:</strong></p>
  * The event uses a polling mechanism that checks every 40ms (up to 50 attempts / 2 seconds)
  * to determine when the GUI is fully loaded.
- * 
+ *
  * @see Inventory
  * @see ItemStack
  */
-public class ChestLoadedEvent implements ICancellable {
+public class ChestLoadedEvent {
     /**
      * The inventory of the lower chest/container (this is actually the inventory on top, NOT the player's inventory (ask Mojang, not me)).
      */
     @Getter
     private Inventory lowerChestInventory;
-    
+
     /**
      * List of all non-empty item stacks in the container.
      */
     @Getter
     private List<ItemStack> itemStacks = new ArrayList<>();
-    
+
     /**
      * The display name of the container.
      */
@@ -78,11 +83,12 @@ public class ChestLoadedEvent implements ICancellable {
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (screen instanceof GenericContainerScreen genericContainerScreen) {
-                class GuiLoadedChecker implements Runnable {
-                    private int attempts = 0;
-                    private final int MAX_ATTEMPTS = 50; // 2 seconds timeout (50 * 40ms)
-                    private final long DELAY_MS = 40;
+                // Use an AtomicInteger for mutable integer in lambda
+                final AtomicInteger attempts = new AtomicInteger(0);
+                final int MAX_ATTEMPTS = 50; // ~2.5 seconds timeout (50 * 1 tick)
 
+                // Define the check as a Runnable
+                Runnable checkGuiLoaded = new Runnable() {
                     @Override
                     public void run() {
                         // Ensure we are still on the same screen
@@ -93,33 +99,23 @@ public class ChestLoadedEvent implements ICancellable {
                         ScreenHandler handler = genericContainerScreen.getScreenHandler();
                         if (handler instanceof GenericContainerScreenHandler containerHandler) {
                             Inventory inv = containerHandler.getInventory();
-                            if (!inv.isEmpty() && !inv.getStack(inv.size() - 1).isEmpty() && !areAnyItemsLoading(inv)) {
+                            // Check if inventory is populated and not in a loading state
+                            if (!inv.isEmpty() && !inv.getStack(inv.size() - 1).isEmpty() && !isItemLoading(inv)) {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
                                 event.containerName = ScreenInfo.getCurrentScreenInfo().getScreenName();
                                 event.itemStacks = getChestItemSlots(inv);
                                 BazaarUtils.EVENT_BUS.post(event);
-                            } else {
-                                // GUI not loaded, retry
-                                attempts++;
-                                if (attempts < MAX_ATTEMPTS) {
-                                    // Schedule to run again after a delay
-                                    CompletableFuture.runAsync(() -> {
-                                        try {
-                                            Thread.sleep(DELAY_MS);
-                                            client.execute(this);
-                                        } catch (InterruptedException e) {
-                                            Thread.currentThread().interrupt();
-                                        }
-                                    });
-                                }
+                            } else if (attempts.getAndIncrement() < MAX_ATTEMPTS) {
+                                // GUI not loaded, schedule the check for the next tick
+                                Util.tickExecuteLater(1, this);
                             }
                         }
                     }
-                }
-                // Start the check on the client thread
-                client.execute(new GuiLoadedChecker());
+                };
+                // Schedule the first check
+                Util.tickExecuteLater(1, checkGuiLoaded);
             }
         });
     }
@@ -135,29 +131,20 @@ public class ChestLoadedEvent implements ICancellable {
         return stacks;
     }
 
-    private static boolean areAnyItemsLoading(Inventory inventory) {
+    private static boolean isItemLoading(Inventory inventory) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack item = inventory.getStack(i);
-            if (isItemLoading(item)) {
-                return true;
+            if (item.isEmpty()) continue;
+
+            Text customName = item.get(DataComponentTypes.CUSTOM_NAME);
+            if (customName != null) {
+                String displayName = Util.removeFormatting(customName.getString());
+                if (displayName.contains("Loading")) {
+                    PlayerActionUtil.notifyAll("Loading item...", Util.notificationTypes.GUI);
+                    return true;
+                }
             }
         }
-        return false;
-    }
-
-    private static boolean isItemLoading(ItemStack item) {
-        if(item.isEmpty())
-            return false;
-        return item.getComponents().stream().anyMatch(component -> component.toString().contains("Loading"));
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-
-    }
-
-    @Override
-    public boolean isCancelled() {
         return false;
     }
 }

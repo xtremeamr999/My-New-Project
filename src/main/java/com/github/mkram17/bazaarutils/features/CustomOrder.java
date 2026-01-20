@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
-import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -93,20 +92,13 @@ public class CustomOrder extends CustomItemButton implements BUListener {
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
 
-        openSign();
+        openSignAndInputText();
     }
 
-    @EventHandler
-    private void onSignOpened(SignOpenEvent event) {
-        if (!buySignClicked) return;
-        GUIUtils.setSignText(Integer.toString(getOrderAmount()), true);
-        buySignClicked = false;
-    }
-
-    public void openSign() {
+    public void openSignAndInputText() {
         int signSlotId = 16;
         GUIUtils.clickSlot(signSlotId, 0);
-        buySignClicked = true;
+        GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(Integer.toString(getOrderAmount()), true));
     }
 
     public Option<Boolean> createOption() {

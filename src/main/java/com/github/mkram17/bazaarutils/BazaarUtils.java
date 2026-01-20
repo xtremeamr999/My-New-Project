@@ -3,17 +3,14 @@ package com.github.mkram17.bazaarutils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.features.StashHelper;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.mojang.serialization.Codec;
-import de.siphalor.amecs.api.AmecsKeyBinding;
 import lombok.Getter;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -30,7 +27,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus EVENT_BUS = new EventBus();
-    public static StashHelper stashHelper;
     public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
     public static final String MOD_NAME = "Bazaar Utils";
@@ -55,7 +51,6 @@ public class BazaarUtils implements ClientModInitializer {
         registerEventBus();
         subscribeEvents();
         registerCommands();
-        registerKeybinds();
         setDefaultValues();
     }
 
@@ -91,23 +86,10 @@ public class BazaarUtils implements ClientModInitializer {
         }
     }
 
-    private void registerKeybinds(){
-        if(!BUCompatibilityHelper.isAmecsReborn())
-            return;
-        stashHelper = new StashHelper();
-        stashHelper.registerTickCounter();
-        keybinds.add(stashHelper);
-
-        for(KeyBinding keybind : keybinds) {
-            if(keybind instanceof AmecsKeyBinding)
-                KeyBindingHelper.registerKeyBinding(keybind);
-        }
-    }
-
     private void setDefaultValues(){
         //causes errors if done as default in config bc constructor uses other config info which isnt loaded yet
         if(BUConfig.get().bookmarks.isEmpty()) {
-            BUConfig.get().bookmarks.add(new Bookmark("Diamond"));
+            BUConfig.get().bookmarks.add(new Bookmark("Diamond")); // Default
         }
 
 

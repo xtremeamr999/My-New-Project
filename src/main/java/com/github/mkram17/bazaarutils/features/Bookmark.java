@@ -5,8 +5,12 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -16,9 +20,12 @@ import com.github.mkram17.bazaarutils.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.screen.Screen;
+//? if < 1.21.10 {
+/*import net.minecraft.client.gui.screen.Screen;
+*///?}
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -35,7 +42,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class Bookmark extends CustomItemButton {
+//Object is created in GUIUtils when in an item's bazaar page
+public class Bookmark extends CustomItemButton implements BUListener {
 
     @Getter
     public final String name;
@@ -51,9 +59,8 @@ public class Bookmark extends CustomItemButton {
             BASE,
             HOVER);
 
-    @EventHandler
-    protected void onGuiLoad(ChestLoadedEvent event) {
-            BazaarUtils.EVENT_BUS.unsubscribe(this);
+    protected void subscribeToEventBusUnsubscriber() {
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> BazaarUtils.EVENT_BUS.unsubscribe(this));
     }
 
     public Bookmark(String name) {
@@ -64,12 +71,11 @@ public class Bookmark extends CustomItemButton {
         this.bookmarkedItemStack = findItemStack(name);
         this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
 
-        BazaarUtils.EVENT_BUS.subscribe(this);
+        subscribe();
     }
 
     @EventHandler
     protected void replaceItemEvent(ReplaceItemEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
             if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
@@ -86,8 +92,7 @@ public class Bookmark extends CustomItemButton {
 
     @EventHandler
     private void onBookmarkClick(SlotClickEvent event){
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(!super.shouldUseSlot(event))
+        if(!super.wasButtonSlotClicked(event))
             return;
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
         reverseBookmarkStatus();
@@ -104,7 +109,7 @@ public class Bookmark extends CustomItemButton {
         }
 
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
-        GUIUtils.setSignText(name, true);
+        GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(name, true));
 
         if(userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
@@ -236,7 +241,11 @@ public class Bookmark extends CustomItemButton {
                     buttonSize, buttonSize,
                     SLOT_BUTTON_TEXTURES,
                     (btn) -> {
-                        if (Screen.hasShiftDown()) {
+                        //? if > 1.21.8 {
+                        if (MinecraftClient.getInstance().isShiftPressed()) {
+                            //?} else {
+                            /*if (Screen.hasShiftDown()) {
+                             *///?}
                             PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
                             bookmark.onWidgetShiftClick();
                         } else {
@@ -255,4 +264,9 @@ public class Bookmark extends CustomItemButton {
         return widgets;
     }
 
+    @Override
+    public void subscribe() {
+        BazaarUtils.EVENT_BUS.subscribe(this);
+        subscribeToEventBusUnsubscriber();
+    }
 }

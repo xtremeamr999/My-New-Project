@@ -22,10 +22,8 @@ public class BUCompatibilityHelper {
     private static final String REI_CONFIG_SECTION = "appearance";
     private static final String REI_CONFIG_FIELD = "horizontalEntriesBoundariesColumns";
     private static final int HORIZONTALENTRIESBOUNDARIESCOLUMS_VALUE = 16;
-    public static final String AMECS_MODID = "amecs-reborn";
     public static final String FIRMAMENT_MODID = "firmament";
     @Getter
-    private static boolean amecsReborn = false;
 
     private static final Gson GSON_WRITER = new GsonBuilder().setPrettyPrinting().create();
 
@@ -34,8 +32,6 @@ public class BUCompatibilityHelper {
             Util.logMessage("REI detected. Attempting to modify REI config.");
             modifyReiConfigWithGson();
         }
-        if(FabricLoader.getInstance().isModLoaded(AMECS_MODID))
-            amecsReborn = true;
     }
 
     //TODO use dependency instead of reflection

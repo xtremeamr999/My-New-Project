@@ -2,10 +2,12 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import lombok.AllArgsConstructor;
+import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -21,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -140,6 +143,11 @@ public class Util {
         });
     }
 
+    @AllArgsConstructor
+    private static class ScheduledTask {
+        int ticksLeft;
+        Runnable action;
+    }
 
     //this one runs asynch and other one runs on main thread (i think)
     public static void tickExecuteLater(int ticks, Runnable action) {
@@ -147,13 +155,6 @@ public class Util {
             tasks.add(new ScheduledTask(ticks, action));
         }
     }
-
-    @AllArgsConstructor
-    private static class ScheduledTask {
-        int ticksLeft;
-        Runnable action;
-    }
-
 
     public static String getCallingClassName() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -205,15 +206,6 @@ public class Util {
         if (input.endsWith("B")) return (int) (value * 1_000_000_000);
 
         return (int) value;
-    }
-    public static <T> void writeFile(T content) {
-        try {
-            Files.write(Paths.get("bazaar_data.json"), content.toString().getBytes());
-            PlayerActionUtil.notifyAll("Data written to file successfully.");
-        } catch (Exception e) {
-            System.out.println("Failed to write data to file");
-            e.printStackTrace();
-        }
     }
 
     public static String extractTextAfterWord(String text, String word) {

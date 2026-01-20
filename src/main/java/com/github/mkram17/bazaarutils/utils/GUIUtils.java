@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.utils;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
@@ -22,6 +23,8 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 
+import java.util.function.Consumer;
+
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO make inBazaar() work all the time
@@ -30,8 +33,6 @@ public class GUIUtils {
     private static guiTypes guiType;
     @Getter @Setter
     private static Inventory lowerChestInventory;
-    @Getter @Setter
-    private static Bookmark currentBookmark;
 
     @RunOnInit
     public static void subscribe() {
@@ -45,9 +46,7 @@ public class GUIUtils {
     public static void registerScreenEvent(){
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             lowerChestInventory = null;
-            ScreenInfo currentInfo = ScreenInfo.getCurrentScreenInfo();
-            if(screen != null && currentInfo == null)
-                currentInfo = new ScreenInfo(screen);
+            ScreenInfo.initialize(screen);
         });
     }
 
@@ -64,15 +63,14 @@ public class GUIUtils {
 
     @EventHandler(priority = EventPriority.HIGH)
     private static void setUpBookmark(ChestLoadedEvent e){
-        currentBookmark = null;
         if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
             return;
         String name = Bookmark.findItemName(e);
         if (Bookmark.isItemBookmarked(name)) {
-            currentBookmark = Bookmark.findMatchingBookmark(name).get();
-            EVENT_BUS.subscribe(currentBookmark);
-        } else
-            currentBookmark = new Bookmark(name);
+            Bookmark.findMatchingBookmark(name).get().subscribe();
+        } else {
+            new Bookmark(name);
+        }
     }
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onLoad(ChestLoadedEvent e){
@@ -114,7 +112,6 @@ public class GUIUtils {
             throw new RuntimeException(e);
         }
     }
-
     // indexes are in order from top left to bottom right, except hotbar slots which go first
     public static int getSlotFromItemStack(Inventory lowerChestInventory, ItemStack itemStack) {
         if (lowerChestInventory == null)
@@ -133,6 +130,19 @@ public class GUIUtils {
         return -1;
     }
 
+    public static void runOnNextSignOpen(Consumer<SignOpenEvent> action) {
+        BazaarUtils.EVENT_BUS.subscribe(new Object() {
+            @EventHandler
+            private void onSignOpen(SignOpenEvent event) {
+                try {
+                    action.accept(event);
+                } finally {
+                    BazaarUtils.EVENT_BUS.unsubscribe(this);
+                }
+            }
+        });
+    }
+
     public static void closeSign(){
         try {
             PlayerActionUtil.notifyAll("Closing sign", Util.notificationTypes.GUI);
@@ -143,7 +153,6 @@ public class GUIUtils {
                 Util.notifyError("Error closing sign: client was null or not in a sign", new Throwable());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Util.notifyError("Unknown error while closing sign", e);
         }
     }

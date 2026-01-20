@@ -177,13 +177,14 @@ public final class BazaarData {
     }
 
     /**
-     * Preferred new method: obtain the best matching instantaneous price.
-     * INSTABUY -> top of buySummary (people selling). INSTASELL -> top of sellSummary (people buying).
+     * Empty can mean: reply/product/priceType invalid or not found; exception while finding price
+     * INSTABUY (top of buySummary aka people's sell orders). INSTASELL (top of sellSummary, aka people's buy orders).
+     * @return OptionalDouble price found.
      */
     public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.PriceType priceType) {
         SkyBlockBazaarReply reply = currentReply;
         if (reply == null || productId == null || priceType == null)
-            return OptionalDouble.empty();
+            return OptionalDouble.empty(); //TODO maybe throw error here instead. Needs testing to make sure it doesn't happen too frequently or at times where it is expected behavior
 
         try {
             SkyBlockBazaarReply.Product product = reply.getProduct(productId);
