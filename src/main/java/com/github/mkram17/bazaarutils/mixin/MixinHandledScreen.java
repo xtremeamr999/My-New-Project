@@ -5,8 +5,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
-import com.github.mkram17.bazaarutils.features.StashHelper;
-import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import net.minecraft.client.MinecraftClient;
@@ -20,9 +18,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 //? if > 1.21.8 {
-//import net.minecraft.util.Atlases;
-//?}
-import net.minecraft.util.math.ColorHelper;
+/*import net.minecraft.util.Atlases;
+*///?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -103,19 +100,24 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Unique
 	protected void draw(DrawContext context, int x, int y, int argb) {
-		final var sprite = MinecraftClient.getInstance()
-				.getGuiAtlasManager()
-				.getSprite(OrderStatusHighlight.IDENTIFIER);
+        //? if > 1.21.8 {
+        /*final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
+                .getSprite(OrderStatusHighlight.IDENTIFIER);
+        *///?} else {
+        final var sprite = MinecraftClient.getInstance()
+                .getGuiAtlasManager()
+                .getSprite(OrderStatusHighlight.IDENTIFIER);
+        //?}
 
 		//? if > 1.21.5 {
-		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, argb
 		);
-		*///?} else {
-		context.drawSpriteStretched(RenderLayer::getGuiTextured,
+		//?} else {
+		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
 				sprite, x, y, 16, 16, argb
 		);
-		//?}
+		*///?}
 	}
 
 }

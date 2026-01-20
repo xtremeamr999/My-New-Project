@@ -34,7 +34,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 @NoArgsConstructor
 public class CustomOrder extends CustomItemButton implements BUListener {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BROWN_STAINED_GLASS, 4, Items.RED_STAINED_GLASS_PANE));
-    private boolean buySignClicked = false;
 
     @Getter @Setter
     private boolean enabled;

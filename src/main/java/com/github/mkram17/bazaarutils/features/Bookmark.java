@@ -7,11 +7,8 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.widgets.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
@@ -24,8 +21,8 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 //? if < 1.21.10 {
-/*import net.minecraft.client.gui.screen.Screen;
-*///?}
+import net.minecraft.client.gui.screen.Screen;
+//?}
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -242,10 +239,10 @@ public class Bookmark extends CustomItemButton implements BUListener {
                     SLOT_BUTTON_TEXTURES,
                     (btn) -> {
                         //? if > 1.21.8 {
-                        if (MinecraftClient.getInstance().isShiftPressed()) {
-                            //?} else {
-                            /*if (Screen.hasShiftDown()) {
-                             *///?}
+                        /*if (MinecraftClient.getInstance().isShiftPressed()) {
+                            *///?} else {
+                            if (Screen.hasShiftDown()) {
+                             //?}
                             PlayerActionUtil.notifyAll("Removed " + bookmark.getName() + " bookmark from shift-click. Open Bazaar again to display changes.");
                             bookmark.onWidgetShiftClick();
                         } else {

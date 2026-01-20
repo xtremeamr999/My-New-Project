@@ -70,8 +70,8 @@ public class PriceInfoContainer {
         var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
         var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
 
-        instaSellPriceOpt.ifPresent(price -> instaSellPrice = Util.truncateNum(price));
-        instaBuyPriceOpt.ifPresent(price -> instaBuyPrice = Util.truncateNum(price));
+        instaSellPriceOpt.ifPresent(price -> marketInstaSellPrice = Util.truncateNum(price));
+        instaBuyPriceOpt.ifPresent(price -> marketInstaBuyPrice = Util.truncateNum(price));
     }
 
     public void flipPrices(double newPrice){

@@ -4,9 +4,14 @@ import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
@@ -146,8 +151,7 @@ public class ScreenInfo {
     private static boolean cantBeFlippedLineIsPresent(){
         final int FLIP_ORDER_SLOT = 15;
 
-        var screenInfo = ScreenInfo.currentScreenInfo;
-        var containerOpt = screenInfo.inGenericContainerScreen();
+        var containerOpt = ScreenInfo.currentScreenInfo.inGenericContainerScreen();
         GenericContainerScreen genericContainerScreen;
 
         if(containerOpt.isPresent()){

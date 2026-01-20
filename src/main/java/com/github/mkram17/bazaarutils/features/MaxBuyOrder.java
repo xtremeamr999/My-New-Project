@@ -14,6 +14,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 
 import java.util.List;
 import java.util.Optional;
