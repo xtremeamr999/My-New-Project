@@ -12,6 +12,7 @@ import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,9 +63,10 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         return CustomOrder.COLORMAP.get(size % 5);
     }
 
-    public static ConfigCategory.Builder createOrdersCategory(){
-        return ConfigCategory.createBuilder()
-                .name(Text.literal("Buy Amount Options"));
+    public static OptionGroup.Builder createOrdersGroup(){
+        return OptionGroup.createBuilder()
+                .name(Text.literal("Buy Amount Options"))
+                .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));
     }
 
     @EventHandler
@@ -103,7 +105,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     }
 
     public Option<Boolean> createOption() {
-        return super.createOption(
+        return super.createBooleanOption(
                 "Buy " + getOrderAmount() + " Button",
                 "Buy order button for " + getOrderAmount() + " of an item.",
                 this::isEnabled,

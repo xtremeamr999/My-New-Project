@@ -194,10 +194,29 @@ public class BazaarOrder extends OrderInfoContainer {
         if (marketPrice == 0) {
             return 0;
         }
+
         if (getPriceType() == PriceType.INSTABUY) {
             return (marketOppositePrice + .1);
         } else {
             return (marketOppositePrice - .1);
+        }
+    }
+
+    /**
+     * Calculates a non-competitive flip price.
+     * 
+     * @return price .1 coin less competitive than market rate.
+     */
+    public double getOutbiddedPrice() {
+        updateMarketPrice();
+
+        Double marketPrice = getMarketPrice(priceType);
+        Double marketOppositePrice = getMarketPrice(priceType.getOpposite());
+
+        if (getPriceType() == PriceType.INSTABUY) { 
+          return marketPrice + .1;
+        } else {
+          return marketOppositePrice + .1;
         }
     }
 

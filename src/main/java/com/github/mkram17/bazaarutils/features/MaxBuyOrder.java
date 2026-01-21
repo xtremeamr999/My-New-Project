@@ -123,7 +123,7 @@ public class MaxBuyOrder extends CustomOrder {
 
     @Override
     public Option<Boolean> createOption() {
-        return super.createOption(
+        return super.createBooleanOption(
                 "Buy Max Button",
                 "Buy order button for the maximum amount of an item you can buy with the coins in your purse.",
                 this::isEnabled,

@@ -13,7 +13,11 @@ import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+
+import dev.isxander.yacl3.api.NameableEnum;
 import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -46,16 +50,36 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
+    public enum BiddingType implements NameableEnum {
+      COMPETITIVE,
+      MATCHED,
+      OUTBIDDED;
+
+      @Override
+      public Text getDisplayName() {
+        return Text.of(name());
+      }
+    }
 
     @Getter @Setter
     private boolean enabled;
+    @Getter @Setter
+    private BiddingType biddingType;
+
     @Getter
     private static final Item BUTTON_ITEM = Items.CHERRY_SIGN;
     private BazaarOrder order;
 
-    public FlipHelper(boolean enabled, int slotNumber) {
+    public FlipHelper(boolean enabled, BiddingType biddingType, int slotNumber) {
         this.enabled = enabled;
+        this.biddingType = biddingType;
         this.slotNumber = slotNumber;
+    }
+
+    public static OptionGroup.Builder createFlipsGroup() {
+      return OptionGroup.createBuilder()
+              .name(Text.literal("Flip Helper Options"))
+              .description(OptionDescription.of(Text.literal("Manage buttons of flip helper action.")));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -103,7 +127,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private Text getButtonText() {
-        double flipPrice = order.getFlipPrice();
+        double flipPrice = computeFlipPrice(order);
         if (flipPrice == 0) {
             return Text.literal("There are no competing sell offers.").formatted(Formatting.DARK_PURPLE);
         } else if (order == null) {
@@ -114,8 +138,8 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private String getButtonStackSize() {
-        double flipPrice = order.getFlipPrice();
-        if (order.getFlipPrice() == 0) {
+        double flipPrice = computeFlipPrice(order);
+        if (flipPrice == 0) {
             return "ANY";
         } else if (order == null) {
             return "???";
@@ -129,12 +153,25 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     }
 
     private void handleFlip() {
-        double flipPrice = order.getFlipPrice();
+        double flipPrice = computeFlipPrice(order);
         ScreenInfo previousScreen = ScreenInfo.getCurrentScreenInfo().getPreviousScreenInfo();
         if(order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
             GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
             order.flipItem(flipPrice);
         }
+    }
+
+    private double computeFlipPrice(BazaarOrder order) {
+        PriceInfoContainer.PriceType currentType = order.getPriceType();
+        double marketOppositePrice = order.getMarketPrice(currentType.getOpposite());
+
+        if (marketOppositePrice <= 0) return 0;
+
+        return switch (biddingType) {
+            case COMPETITIVE -> order.getFlipPrice();
+            case MATCHED -> Util.truncateNum(marketOppositePrice);
+            case OUTBIDDED -> order.getOutbiddedPrice();
+        };
     }
 
     private Optional<ItemStack> getFlipSign(List<ItemStack> chestItemStacks) {
@@ -256,10 +293,30 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 //    }
 
     public Option<Boolean> createOption() {
-        return super.createOption("Flip Helper",
+        return super.createBooleanOption("Flip Helper",
                 "Button in flip order menu to undercut market prices for items.",
                 this::isEnabled,
                 this::setEnabled);
+    }
+
+    public Option<BiddingType> createFlippingTypeOption() {
+        // Users with config from before this option was added will have null value for the biddingType variable. This ensures a default value is set.
+        if(biddingType == null) {
+          biddingType = BiddingType.COMPETITIVE;
+        }
+
+      return super.createEnumOption("Bidding type",
+          "Select how the flip price should be chosen.",
+          BiddingType.class,
+          biddingType,
+          this::getBiddingType,
+          this::setBiddingType);
+    }
+
+    public static void buildOptions(OptionGroup.Builder builder) {
+      FlipHelper flipHelper = BUConfig.get().flipHelper;
+
+      builder.option(flipHelper.createFlippingTypeOption());  
     }
 
     @Override

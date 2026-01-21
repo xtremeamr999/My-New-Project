@@ -37,7 +37,7 @@ public class CustomItemButton {
         return (event.slotId == slotNumber);
     }
 
-    public Option<Boolean> createOption(String name, String description, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public Option<Boolean> createBooleanOption(String name, String description, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         return Option.<Boolean>createBuilder()
                 .name(Text.literal(name))
                 .binding(true,
@@ -45,6 +45,17 @@ public class CustomItemButton {
                         setter)
                 .description(OptionDescription.of(Text.literal(description)))
                 .controller(BUConfigGui::createBooleanController)
+                .build();
+    }
+
+    public <T extends Enum<T>> Option<T> createEnumOption(String name, String description, Class<T> enumClass, T def, Supplier<T> getter, Consumer<T> setter) {
+        return Option.<T>createBuilder()
+                .name(Text.literal(name))
+                .binding(def,
+                        getter,
+                        setter)
+                .description(OptionDescription.of(Text.literal(description)))
+                .controller(opt -> BUConfigGui.createEnumController(opt, enumClass))
                 .build();
     }
 }
