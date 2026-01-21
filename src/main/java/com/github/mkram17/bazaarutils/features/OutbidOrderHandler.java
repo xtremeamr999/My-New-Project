@@ -1,11 +1,12 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
+import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.text.MutableText;
@@ -17,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 //TODO change the message number instead of sending more
-public class OutbidOrderHandler {
+public class OutbidOrderHandler implements ConfigurableFeature {
 
     @Getter @Setter
     private boolean autoOpenEnabled;
@@ -57,22 +58,27 @@ public class OutbidOrderHandler {
                 .toList();
     }
 
-    public Collection<Option<Boolean>> createOptions() {
-        return new ArrayList<>(List.of(BUToggleableFeature.createOptionHelper("Open Bazaar on Outbid Orders",
+    private Collection<Option<Boolean>> createOptions() {
+        return new ArrayList<>(List.of(ToggleableFeature.createOptionHelper("Open Bazaar on Outbid Orders",
                         "Automatically open the bazaar after a delay when an order becomes outdated.",
                         false,
                         this::isAutoOpenEnabled,
                         this::setAutoOpenEnabled),
-                BUToggleableFeature.createOptionHelper("Chat Notification on Outbid Orders",
+                ToggleableFeature.createOptionHelper("Chat Notification on Outbid Orders",
                         "Sends a message in chat when someone has undercut your order.",
                         true,
                         this::isNotifyOutbid,
                         this::setNotifyOutbid),
-                BUToggleableFeature.createOptionHelper("Sound on Outbid Order",
+                ToggleableFeature.createOptionHelper("Sound on Outbid Order",
                         "Plays three short notification sounds when your order becomes outdated.",
                         true,
                         this::isNotificationSound,
                         this::setNotificationSound))
         );
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.options(this.createOptions());
     }
 }

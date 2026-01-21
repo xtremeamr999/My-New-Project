@@ -5,9 +5,11 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -32,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleableFeature {
+public class PriceCharts implements ItemTooltipCallback, BUListener, ToggleableFeature {
     @Getter @Setter
     private boolean showOutsideBazaar = false;
 
@@ -111,11 +113,16 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
         return raw;
     }
 
-    public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
+    private Option<Boolean> createOption() {
+        return ToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
                 "Usually the option to CTRL+SHIFT click an item to see the price charts and other information on skyblock.finance is only shown inside the Bazaar while in an item view. This enables the feature outside of the Bazaar as well.",
                 false,
                 this::isShowOutsideBazaar,
                 this::setShowOutsideBazaar);
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.option(this.createOption());
     }
 }

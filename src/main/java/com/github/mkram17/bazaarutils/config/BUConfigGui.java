@@ -4,8 +4,6 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.handlers.ChatHandler;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
-import com.github.mkram17.bazaarutils.features.FlipHelper;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
@@ -32,39 +30,23 @@ public class BUConfigGui {
         ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder()
                 .name(Text.literal("General"));
 
-        generalBuilder.options(config.outbidOrderHandler.createOptions());
+        config.outbidOrderHandler.createOption(generalBuilder);
         generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
-        generalBuilder.option(config.stashMessages.createOption());
-        generalBuilder.option(config.uselessNotificationRemover.createOption());
-        generalBuilder.option(config.priceCharts.createOption());
-        generalBuilder.option(config.orderStatusHighlight.createOption());
+        config.stashMessages.createOption(generalBuilder);
+        config.uselessNotificationRemover.createOption(generalBuilder);
+        config.priceCharts.createOption(generalBuilder);
+        config.orderStatusHighlight.createOption(generalBuilder);
         generalBuilder.option(createDisableErrorNotifsOption(config));
-        generalBuilder.option(config.orderLimit.createOption());
-
-        generalBuilder.group(buildRestrictSellGroup(config.instaSellRestrictions));
-        generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
+        config.orderLimit.createOption(generalBuilder);
+        config.instaSellRestrictions.createOption(generalBuilder);
 
         builder.category(generalBuilder.build());
     }
 
-    private static OptionGroup buildRestrictSellGroup(InstaSellRestrictions instaSellRestrictions) {
-        OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
-                .name(Text.literal("Sell rules"))
-                .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
-
-        if (instaSellRestrictions.getControls().isEmpty()) {
-            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000);
-            instaSellRestrictions.addRule(priceControl);
-        }
-        instaSellRestrictions.buildOptions(restrictSellGroupBuilder);
-
-        return restrictSellGroupBuilder.build();
-    }
-
-    private static void buildCustomHelpersCategory(YetAnotherConfigLib.Builder builder) {
-      ConfigCategory.Builder customHelpersBuilder = ConfigCategory.createBuilder()
-                .name(Text.literal("Custom Helpers"))
-                .tooltip(Text.literal("Add or manage the functionality among the enabled helpers."));
+    private static void buildCustomOrdersCategory(YetAnotherConfigLib.Builder builder) {
+        OptionGroup.Builder customOrdersGroupBuilder = OptionGroup.createBuilder()
+                .name(Text.literal("Custom Buy Amounts"))
+                .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));
 
       OptionGroup.Builder CustomOrderGroup = CustomOrder.createOrdersGroup();
       OptionGroup.Builder FlipHelperGroup = FlipHelper.createFlipsGroup();
@@ -121,4 +103,3 @@ public class BUConfigGui {
         return EnumControllerBuilder.create(opt).enumClass(enumClass);
     }
 }
-

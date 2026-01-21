@@ -9,6 +9,7 @@ import java.util.List;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -18,6 +19,8 @@ import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.ui.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
+import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +31,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class OrderLimit implements BUListener, BUToggleableFeature {
+public class OrderLimit implements BUListener, ToggleableFeature {
     @Getter @Setter
     private boolean enabled;
     @Getter
@@ -157,10 +160,15 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     }
 
     public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
+        return ToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
                 "Shows you how close you are to the coin order limit for the bazaar at the top of the bazaar. Resets at 12am GMT.",
                 false,
                 this::isEnabled,
                 this::setEnabled);
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.option(this.createOption());
     }
 }

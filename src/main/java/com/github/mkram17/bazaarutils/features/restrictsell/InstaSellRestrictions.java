@@ -7,10 +7,12 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -26,7 +28,7 @@ import java.util.List;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO maybe color chest if it is locked
-public class InstaSellRestrictions implements BUListener {
+public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
     public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
@@ -143,10 +145,25 @@ public class InstaSellRestrictions implements BUListener {
                 .build();
     }
 
-    public void buildOptions(OptionGroup.Builder builder){
+    private void buildOptions(OptionGroup.Builder builder){
         for(SellRestrictionControl control : getControls()){
             builder.option(createRuleOption(control));
         }
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
+                .name(Text.literal("Sell rules"))
+                .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
+
+        if (getControls().isEmpty()) {
+            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000);
+            addRule(priceControl);
+        }
+        buildOptions(restrictSellGroupBuilder);
+
+        builder.group(restrictSellGroupBuilder.build());
     }
     @Override
     public void subscribe() {
