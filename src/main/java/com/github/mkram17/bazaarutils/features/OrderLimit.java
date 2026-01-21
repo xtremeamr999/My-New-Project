@@ -9,6 +9,7 @@ import java.util.List;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -30,7 +31,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class OrderLimit implements BUListener, ConfigurableFeature {
+public class OrderLimit implements BUListener, ToggleableFeature {
     @Getter @Setter
     private boolean enabled;
     @Getter
@@ -159,7 +160,7 @@ public class OrderLimit implements BUListener, ConfigurableFeature {
     }
 
     public Option<Boolean> createOption() {
-        return com.github.mkram17.bazaarutils.features.util.ToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
+        return ToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
                 "Shows you how close you are to the coin order limit for the bazaar at the top of the bazaar. Resets at 12am GMT.",
                 false,
                 this::isEnabled,
@@ -169,6 +170,5 @@ public class OrderLimit implements BUListener, ConfigurableFeature {
     @Override
     public void createOption(ConfigCategory.Builder builder) {
         builder.option(this.createOption());
-        builder.group(this.buildOrderLimitGroup());
     }
 }

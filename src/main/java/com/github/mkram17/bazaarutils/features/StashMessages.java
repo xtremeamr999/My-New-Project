@@ -94,7 +94,7 @@ public class StashMessages implements BUListener, ToggleableFeature {
     }
 
     public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Disable Stash Messages",
+        return ToggleableFeature.createOptionHelper("Disable Stash Messages",
                 "When this option is ON, messages reminding you to pick up your stash will no longer appear in chat.",
                 false,
                 this::shouldRemoveMessages,

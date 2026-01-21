@@ -113,8 +113,8 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, ToggleableF
         return raw;
     }
 
-    public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
+    private Option<Boolean> createOption() {
+        return ToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
                 "Usually the option to CTRL+SHIFT click an item to see the price charts and other information on skyblock.finance is only shown inside the Bazaar while in an item view. This enables the feature outside of the Bazaar as well.",
                 false,
                 this::isShowOutsideBazaar,

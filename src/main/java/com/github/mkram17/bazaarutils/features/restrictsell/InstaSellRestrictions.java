@@ -145,7 +145,7 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
                 .build();
     }
 
-    public void buildOptions(OptionGroup.Builder builder){
+    private void buildOptions(OptionGroup.Builder builder){
         for(SellRestrictionControl control : getControls()){
             builder.option(createRuleOption(control));
         }
