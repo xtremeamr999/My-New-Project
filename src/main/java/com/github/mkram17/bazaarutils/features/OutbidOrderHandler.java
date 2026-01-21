@@ -1,9 +1,11 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
+import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -17,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 //TODO change the message number instead of sending more
-public class OutbidOrderHandler {
+public class OutbidOrderHandler implements ConfigurableFeature {
 
     @Getter @Setter
     private boolean autoOpenEnabled;
@@ -74,5 +76,10 @@ public class OutbidOrderHandler {
                         this::isNotificationSound,
                         this::setNotificationSound))
         );
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.options(this.createOptions());
     }
 }

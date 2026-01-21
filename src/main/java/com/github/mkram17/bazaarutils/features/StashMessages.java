@@ -3,9 +3,11 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +16,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class StashMessages implements BUListener, BUToggleableFeature {
+public class StashMessages implements BUListener, ToggleableFeature {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
@@ -97,5 +99,10 @@ public class StashMessages implements BUListener, BUToggleableFeature {
                 false,
                 this::shouldRemoveMessages,
                 this::setRemoveMessages);
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.option(this.createOption());
     }
 }

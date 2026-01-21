@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
@@ -17,6 +18,9 @@ import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
@@ -33,7 +37,7 @@ import java.util.regex.Pattern;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
-public class FlipHelper extends CustomItemButton implements BUListener {
+public class FlipHelper extends CustomItemButton implements BUListener, ConfigurableFeature {
 
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
@@ -202,5 +206,20 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     public void subscribe() {
         EVENT_BUS.subscribe(this);
     }
-}
 
+    public Option<Boolean> createOption() {
+        return Option.<Boolean>createBuilder()
+                .name(Text.literal("Flip Helper"))
+                .description(OptionDescription.of(Text.literal("Adds a button to quickly flip your orders from the bazaar GUI.")))
+                .binding(true,
+                        this::isEnabled,
+                        this::setEnabled)
+                .controller(BUConfigGui::createBooleanController)
+                .build();
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.option(this.createOption());
+    }
+}

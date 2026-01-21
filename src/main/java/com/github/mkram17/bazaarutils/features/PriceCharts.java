@@ -5,9 +5,11 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -32,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleableFeature {
+public class PriceCharts implements ItemTooltipCallback, BUListener, ToggleableFeature {
     @Getter @Setter
     private boolean showOutsideBazaar = false;
 
@@ -117,5 +119,10 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
                 false,
                 this::isShowOutsideBazaar,
                 this::setShowOutsideBazaar);
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        builder.option(this.createOption());
     }
 }
