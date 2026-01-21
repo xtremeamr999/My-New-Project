@@ -50,7 +50,7 @@ public class FlipHelper extends CustomItemButton implements BUListener {
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
-    public static enum BiddingType implements NameableEnum {
+    public enum BiddingType implements NameableEnum {
       COMPETITIVE,
       MATCHED,
       OUTBIDDED;
@@ -167,16 +167,11 @@ public class FlipHelper extends CustomItemButton implements BUListener {
 
         if (marketOppositePrice <= 0) return 0;
 
-        switch (biddingType) {
-            case COMPETITIVE:
-                return order.getFlipPrice();
-            case MATCHED:
-                return Util.truncateNum(marketOppositePrice);
-            case OUTBIDDED:
-                return order.getOutbiddedPrice();
-            default:
-                return order.getFlipPrice();
-        }
+        return switch (biddingType) {
+            case COMPETITIVE -> order.getFlipPrice();
+            case MATCHED -> Util.truncateNum(marketOppositePrice);
+            case OUTBIDDED -> order.getOutbiddedPrice();
+        };
     }
 
     private Optional<ItemStack> getFlipSign(List<ItemStack> chestItemStacks) {
