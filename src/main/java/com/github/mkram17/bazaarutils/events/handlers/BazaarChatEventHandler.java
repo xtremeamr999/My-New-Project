@@ -102,7 +102,7 @@ public class BazaarChatEventHandler {
     private static void onOrderFilled(BazaarChatEvent<? extends OrderInfoContainer> event) {
         if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
             return;
-        if (BUConfig.get().isOrderFilledSound()) {
+        if (BUConfig.get().orderFilledNotificationSound.isEnabled()) {
             SoundUtil.notifyMultipleTimes(ORDER_FILLED_NOTIFICATIONS);
         }
 

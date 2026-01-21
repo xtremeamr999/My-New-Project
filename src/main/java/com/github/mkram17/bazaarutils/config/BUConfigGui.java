@@ -30,7 +30,7 @@ public class BUConfigGui {
         ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder()
                 .name(Text.literal("General"));
 
-        config.orderFilledNotificationSound.createOption(generalBuilder);
+        config.disableErrorNotifications.createOption(generalBuilder);
         config.orderFilledNotificationSound.createOption(generalBuilder);
         config.outbidOrderHandler.createOption(generalBuilder);
         config.stashMessages.createOption(generalBuilder);
