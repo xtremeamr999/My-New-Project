@@ -1,12 +1,12 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.util;
 
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
+import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import net.minecraft.text.Text;
 
-public interface BUToggleableFeature {
-    Option<Boolean> createOption();
+public interface ToggleableFeature extends ConfigurableFeature  {
     static Option<Boolean> createOptionHelper(String name, 
                                         String description, 
                                         boolean defaultValue,
