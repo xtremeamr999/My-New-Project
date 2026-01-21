@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
@@ -114,7 +115,7 @@ public class PickSlotMenu extends Screen {
                 int x = gridX + c * SLOT_SIZE;
                 int y = gridY + r * SLOT_SIZE;
 
-                ctx.drawGuiTexture(RenderLayer::getGuiTextured, SLOT_TEXTURE, x, y, 18, 18);
+                ctx.drawGuiTexture(RenderPipelines.GUI_TEXTURED, SLOT_TEXTURE, x, y, 18, 18);
 
                 ItemStack stack = slotItems[r * COLUMNS + c];
                 if(!stack.isEmpty()){

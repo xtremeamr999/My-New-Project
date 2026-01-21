@@ -44,7 +44,7 @@ public class CancelOrderAndSearch extends CustomItemButton implements BUListener
 
     @EventHandler
     private void onClick(SlotClickEvent event) {
-        if(!isInCorrectScreen() || !shouldUseSlot(event)) return;
+        if(!isInCorrectScreen() || !wasButtonSlotClicked(event)) return;
         GUIUtils.closeHandledScreen();
         PlayerActionUtil.runCommand("bz " + orderInfo.getName());
     }

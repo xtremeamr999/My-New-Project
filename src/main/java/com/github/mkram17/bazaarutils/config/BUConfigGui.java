@@ -45,7 +45,7 @@ public class BUConfigGui {
         generalBuilder.option(createDisableErrorNotifsOption(config));
         generalBuilder.option(config.orderLimit.createOption());
 
-        generalBuilder.group(buildRestrictSellGroup(config.restrictSell));
+        generalBuilder.group(buildRestrictSellGroup(config.instaSellRestrictions));
         generalBuilder.group(config.orderLimit.buildOrderLimitGroup());
 
         builder.category(generalBuilder.build());

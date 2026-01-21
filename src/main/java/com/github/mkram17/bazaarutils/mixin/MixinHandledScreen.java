@@ -109,15 +109,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
         //?}
 
-		//? if > 1.21.5 {
 		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, argb
 		);
-		//?} else {
-		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
-				sprite, x, y, 16, 16, argb
-		);
-		*///?}
 	}
 
 }
