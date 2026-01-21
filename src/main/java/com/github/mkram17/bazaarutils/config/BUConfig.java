@@ -87,8 +87,8 @@ public class BUConfig {
     public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
     @SerialEntry @Getter @Setter
     public boolean disableErrorNotifications = false;
-    @SerialEntry @Getter @Setter
-    public boolean orderFilledSound = true;
+    @SerialEntry
+    public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(true);
     @SerialEntry
     public OrderLimit orderLimit = new OrderLimit(true);
     @SerialEntry

@@ -30,13 +30,14 @@ public class BUConfigGui {
         ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder()
                 .name(Text.literal("General"));
 
+        generalBuilder.option(createDisableErrorNotifsOption(config));
+
+        config.orderFilledNotificationSound.createOption(generalBuilder);
         config.outbidOrderHandler.createOption(generalBuilder);
-        generalBuilder.option(ChatHandler.createOrderFilledSoundOption());
         config.stashMessages.createOption(generalBuilder);
         config.uselessNotificationRemover.createOption(generalBuilder);
         config.priceCharts.createOption(generalBuilder);
         config.orderStatusHighlight.createOption(generalBuilder);
-        generalBuilder.option(createDisableErrorNotifsOption(config));
         config.orderLimit.createOption(generalBuilder);
         config.instaSellRestrictions.createOption(generalBuilder);
 

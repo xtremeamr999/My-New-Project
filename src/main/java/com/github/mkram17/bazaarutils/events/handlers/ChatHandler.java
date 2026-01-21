@@ -37,21 +37,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  */
 //TODO make finding order consistent. Some (eg handleClaimed) find the actual BazaarOrder object from userOrders, while others (eg handleFilled) just make a new OrderInfoContainer without finding the actual order
 public class ChatHandler {
-    /**
-     * Creates a configuration option for enabling/disabling order filled notification sounds.
-     * 
-     * @return the YACL configuration option for order filled sounds
-     */
-    public static Option<Boolean> createOrderFilledSoundOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Sound on Order Filled"))
-                .description(OptionDescription.of(Text.literal("Plays two short notification sounds when your order is filled.")))
-                .binding(true,
-                        BUConfig.get()::isOrderFilledSound,
-                        BUConfig.get()::setOrderFilledSound)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
 
     /**
      * Registers the chat message listener that parses bazaar messages.
