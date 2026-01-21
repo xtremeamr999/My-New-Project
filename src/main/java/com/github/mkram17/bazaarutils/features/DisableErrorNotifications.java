@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.features;
 
+import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -11,27 +12,24 @@ import lombok.Setter;
 import net.minecraft.text.Text;
 
 @AllArgsConstructor
-public class OrderFilledNotificationSound implements ToggleableFeature {
-    @Getter @Setter
+public class DisableErrorNotifications implements ToggleableFeature {
+    @Getter
+    @Setter
     private boolean enabled;
-    /**
-     * Creates a configuration option for enabling/disabling order filled notification sounds.
-     *
-     * @return the YACL configuration option for order filled sounds
-     */
-    private Option<Boolean> createOrderFilledSoundOption() {
+    private Option<Boolean> createDisableErrorNotifsOption() {
         return Option.<Boolean>createBuilder()
-                .name(Text.literal("Sound on Order Filled"))
-                .description(OptionDescription.of(Text.literal("Plays two short notification sounds when your order is filled.")))
-                .binding(true,
+                .name(Text.literal("Disable Error Notifications"))
+                .description(OptionDescription.of(Text.literal("Not recommended to enable this unless you are experiencing error spam. This will disable all error notifications, but not the errors themselves.")))
+                .binding(enabled,
                         this::isEnabled,
-                        this::setEnabled)
+                        this::setEnabled
+                )
                 .controller(BUConfigGui::createBooleanController)
                 .build();
     }
 
     @Override
     public void createOption(ConfigCategory.Builder builder) {
-        builder.option(createOrderFilledSoundOption());
+        builder.option(createDisableErrorNotifsOption());
     }
 }

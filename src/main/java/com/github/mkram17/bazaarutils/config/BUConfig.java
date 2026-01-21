@@ -85,8 +85,8 @@ public class BUConfig {
     public PriceCharts priceCharts = new PriceCharts();
     @SerialEntry
     public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
-    @SerialEntry @Getter @Setter
-    public boolean disableErrorNotifications = false;
+    @SerialEntry
+    public DisableErrorNotifications disableErrorNotifications = new DisableErrorNotifications(false);
     @SerialEntry
     public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(true);
     @SerialEntry

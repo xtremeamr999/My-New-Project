@@ -96,7 +96,7 @@ public class Util {
                     }
                 });
 
-        if (!BUConfig.get().disableErrorNotifications)
+        if (!BUConfig.get().disableErrorNotifications.isEnabled())
             PlayerActionUtil.sendPlayerMessage(messageText);
 
         logError(message,simpleCallingName, e);

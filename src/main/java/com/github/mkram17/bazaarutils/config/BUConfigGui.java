@@ -30,8 +30,7 @@ public class BUConfigGui {
         ConfigCategory.Builder generalBuilder = ConfigCategory.createBuilder()
                 .name(Text.literal("General"));
 
-        generalBuilder.option(createDisableErrorNotifsOption(config));
-
+        config.orderFilledNotificationSound.createOption(generalBuilder);
         config.orderFilledNotificationSound.createOption(generalBuilder);
         config.outbidOrderHandler.createOption(generalBuilder);
         config.stashMessages.createOption(generalBuilder);
@@ -83,18 +82,7 @@ public class BUConfigGui {
         builder.category(developerBuilder.build());
     }
 
-    private static Option<Boolean> createDisableErrorNotifsOption(BUConfig config) {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Disable Error Notifications"))
-                .description(OptionDescription.of(Text.literal("Not recommended to enable this unless you are experiencing error spam. This will disable all error notifications, but not the errors themselves.")))
-                .binding(
-                        config.disableErrorNotifications,
-                        () -> config.disableErrorNotifications,
-                        newVal -> config.disableErrorNotifications = newVal
-                )
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
+
 
     public static BooleanControllerBuilder createBooleanController(Option<Boolean> opt) {
         return BooleanControllerBuilder.create(opt).onOffFormatter().coloured(true);
