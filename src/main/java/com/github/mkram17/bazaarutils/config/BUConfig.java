@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.FlipHelper.BiddingType;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
@@ -14,14 +15,15 @@ import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import lombok.Getter;
-import lombok.Setter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
@@ -53,13 +55,15 @@ public class BUConfig {
         return HANDLER.instance();
     }
 
-
+    //Metadata
     @SerialEntry
     public String MOD_VERSION = "";
     @SerialEntry
     public boolean firstLoad = true;
     @SerialEntry
     public String resourcesSha = "";
+
+    //Features
     @SerialEntry
     public FlipHelper flipHelper = new FlipHelper(true, BiddingType.COMPETITIVE, 17);
     @SerialEntry
@@ -97,6 +101,14 @@ public class BUConfig {
     public UselessBazaarNotificationRemover uselessNotificationRemover = new UselessBazaarNotificationRemover();
     @SerialEntry
     public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
+
+    //Keybinds (must be static)
+    public static StashHelper stashHelper = new StashHelper(new KeyBinding(
+            "Pick Up Stash",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_V,
+            StashHelper.CATEGORY
+    ));
 
 
     public static void openGUI() {

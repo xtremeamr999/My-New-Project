@@ -3,33 +3,23 @@ package com.github.mkram17.bazaarutils.features.keybinds;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.features.util.BUKeybinding;
 import net.minecraft.util.Identifier;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import lombok.Getter;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import org.lwjgl.glfw.GLFW;
 
 public class StashHelper extends BUKeybinding {
     @Getter
     private static int ticksBetweenPresses;
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));
-    private static final KeyBinding keyBinding = new KeyBinding(
-       "Pick Up Stash",
-       InputUtil.Type.KEYSYM,
-       GLFW.GLFW_KEY_V,
-       CATEGORY
-    );
+    public static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));
 
-    @Override @RunOnInit
-    public void initializeKeybinding() {
-        registerKeybinding(keyBinding);
+    public StashHelper(KeyBinding keyBinding) {
+        super(keyBinding);
     }
 
-    @RunOnInit
-    public static void registerOnPressed(){
+    @Override
+    protected void registerOnPressed(){
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ticksBetweenPresses++;
             if(!keyBinding.isPressed()) {
@@ -41,9 +31,5 @@ public class StashHelper extends BUKeybinding {
                 PlayerActionUtil.runCommand("pickupstash");
             }
         });
-    }
-
-    public static String getUsage(){
-        return keyBinding.getBoundKeyTranslationKey();
     }
 }
