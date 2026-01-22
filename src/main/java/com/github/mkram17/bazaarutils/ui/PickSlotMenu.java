@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
@@ -98,7 +99,7 @@ public class PickSlotMenu extends Screen {
         int bg = 0xC0101010; // semi-transparent dark
         int border = 0xFF3F3F3F;
         ctx.fill(left, top, left + panelWidth, top + panelHeight, bg);
-        ctx.drawBorder(left, top, panelWidth, panelHeight, border);
+        ctx.drawStrokedRectangle(left, top, panelWidth, panelHeight, border);
 
         // Title
         String titleStr = "Pick slot for " + orderAmount;
@@ -140,8 +141,10 @@ public class PickSlotMenu extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int slot = getSlotAt((int) mouseX, (int) mouseY);
+    public boolean mouseClicked(Click click, boolean doubled) {
+        int clickX = (int) click.x();
+        int clickY = (int) click.y();
+        int slot = getSlotAt(clickX, clickY);
 
         if (slot < 0){
             MinecraftClient.getInstance().setScreen(previousScreen);
