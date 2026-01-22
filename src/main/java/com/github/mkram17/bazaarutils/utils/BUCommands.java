@@ -134,8 +134,8 @@ public class BUCommands {
                                             int orderAmount = IntegerArgumentType.getInteger(context, "order amount");
                                             int slotNumber = IntegerArgumentType.getInteger(context, "slot number");
 
-                                            if (orderAmount < 1 || orderAmount > 71679) {
-                                                context.getSource().sendError(Text.literal("Order amount must be 1-71,679"));
+                                            if (orderAmount < 1 || orderAmount > 71680) {
+                                                context.getSource().sendError(Text.literal("Order amount must be 1-71,680"));
                                                 return 0;
                                             }
 
