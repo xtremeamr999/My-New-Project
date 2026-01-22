@@ -17,15 +17,12 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-//? if > 1.21.8 {
-/*import net.minecraft.util.Atlases;
-*///?}
+import net.minecraft.util.Atlases;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.render.RenderLayer;
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks, highlighting slots
 @Mixin(value = HandledScreen.class, priority = 999)
@@ -100,14 +97,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Unique
 	protected void draw(DrawContext context, int x, int y, int argb) {
-        //? if > 1.21.8 {
-        /*final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
+        final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
-        *///?} else {
-        final var sprite = MinecraftClient.getInstance()
-                .getGuiAtlasManager()
-                .getSprite(OrderStatusHighlight.IDENTIFIER);
-        //?}
 
 		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, argb

@@ -11,16 +11,12 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
-//? if < 1.21.10 {
-import net.minecraft.client.gui.screen.Screen;
-//?}
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -66,11 +62,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, ToggleableF
     private void onClick(SlotClickEvent e){
         if (!shouldShow() || e.isCancelled())
             return;
-        //? if > 1.21.8 {
-        /*if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed())
-            *///?} else {
-       if (!(Screen.hasShiftDown() && Screen.hasControlDown()))
-            //?}
+        if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed())
            return;
 
         String itemName = sanitizeName(e.slot.getStack().getName().getString());
