@@ -2,9 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
-import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
-import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -16,7 +14,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class StashMessages implements BUListener, ToggleableFeature {
+public class StashMessages implements BUListener, BUToggleableFeature {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
@@ -94,7 +92,7 @@ public class StashMessages implements BUListener, ToggleableFeature {
     }
 
     public Option<Boolean> createOption() {
-        return ToggleableFeature.createOptionHelper("Disable Stash Messages",
+        return BUToggleableFeature.createOptionHelper("Disable Stash Messages",
                 "When this option is ON, messages reminding you to pick up your stash will no longer appear in chat.",
                 false,
                 this::shouldRemoveMessages,

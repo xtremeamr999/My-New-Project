@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
-import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
+import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
 import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -59,17 +59,17 @@ public class OutbidOrderHandler implements ConfigurableFeature {
     }
 
     private Collection<Option<Boolean>> createOptions() {
-        return new ArrayList<>(List.of(ToggleableFeature.createOptionHelper("Open Bazaar on Outbid Orders",
+        return new ArrayList<>(List.of(BUToggleableFeature.createOptionHelper("Open Bazaar on Outbid Orders",
                         "Automatically open the bazaar after a delay when an order becomes outdated.",
                         false,
                         this::isAutoOpenEnabled,
                         this::setAutoOpenEnabled),
-                ToggleableFeature.createOptionHelper("Chat Notification on Outbid Orders",
+                BUToggleableFeature.createOptionHelper("Chat Notification on Outbid Orders",
                         "Sends a message in chat when someone has undercut your order.",
                         true,
                         this::isNotifyOutbid,
                         this::setNotifyOutbid),
-                ToggleableFeature.createOptionHelper("Sound on Outbid Order",
+                BUToggleableFeature.createOptionHelper("Sound on Outbid Order",
                         "Plays three short notification sounds when your order becomes outdated.",
                         true,
                         this::isNotificationSound,

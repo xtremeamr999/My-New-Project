@@ -2,18 +2,17 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.features.util.ToggleableFeature;
+import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 
 import java.util.Arrays;
 
-public class UselessBazaarNotificationRemover implements BUListener, ToggleableFeature {
+public class UselessBazaarNotificationRemover implements BUListener, BUToggleableFeature {
     @Getter @Setter
     private boolean enabled;
     private boolean firstTimeRemoved = true;
@@ -55,7 +54,7 @@ public class UselessBazaarNotificationRemover implements BUListener, ToggleableF
 
     @Override
     public void createOption(ConfigCategory.Builder builder) {
-        builder.option(ToggleableFeature.createOptionHelper("Remove Useless Bazaar Notifications",
+        builder.option(BUToggleableFeature.createOptionHelper("Remove Useless Bazaar Notifications",
                 "Removes useless notifications that appear when making, claiming, and cancelling orders. Eg 'Putting goods in escrow...'",
                 true,
                 this::isEnabled, this::setEnabled));
