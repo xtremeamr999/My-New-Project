@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +13,7 @@ import lombok.Setter;
  */
 public class PriceInfo {
     @Setter @Getter
-    protected OrderType orderType;
+    protected PriceType priceType;
 
     @Setter @Getter
     protected PricingPosition pricingPosition;
@@ -23,49 +22,49 @@ public class PriceInfo {
     protected Double pricePerItem;
 
     @Setter
-    private Double marketSellPrice;
+    private Double marketInstaSellPrice;
 
     @Setter
-    private Double marketBuyPrice;
+    private Double marketInstaBuyPrice;
 
-    public PriceInfo(Double pricePerItem, OrderType orderType) {
-        this.orderType = orderType;
+    public PriceInfo(Double pricePerItem, PriceType priceType) {
+        this.priceType = priceType;
 
         if (pricePerItem != null) {
             //TODO figure out best rounding. Eg to the tenth, hundredth or thousandth
             this.pricePerItem = (double) Math.round(pricePerItem * 10) / 10;
         }
-        if (orderType == null) {
+        if (priceType == null) {
             //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value
             //TODO revisit whether this still needs to have default value
-            this.orderType = OrderType.SELL;
+            this.priceType = PriceType.INSTABUY;
         }
     }
 
     public void flipPrices(double newPrice) {
-        this.orderType = this.orderType.getOpposite();
+        this.priceType = this.priceType.getOpposite();
         this.pricePerItem = newPrice;
     }
 
     protected void updateMarketPrice(String productId) {
-        var sellPriceOpt = BazaarData.findItemPriceOptional(productId, OrderType.BUY);
-        var buyPriceOpt = BazaarData.findItemPriceOptional(productId, OrderType.SELL);
+        var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
+        var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
 
-        sellPriceOpt.ifPresent(price -> marketSellPrice = Util.truncateNum(price));
-        buyPriceOpt.ifPresent(price -> marketBuyPrice = Util.truncateNum(price));
+        instaSellPriceOpt.ifPresent(price -> marketInstaSellPrice = Util.truncateNum(price));
+        instaBuyPriceOpt.ifPresent(price -> marketInstaBuyPrice = Util.truncateNum(price));
     }
 
-    public Double getPriceForPosition(PricingPosition pricingPosition, OrderType orderType) {
-        return switch (orderType) {
-            case SELL -> switch (pricingPosition) {
-                case COMPETITIVE -> marketSellPrice - 0.1;
-                case MATCHED -> marketSellPrice;
-                case OUTBID -> marketSellPrice + 0.1;
+    public Double getPriceForPosition(PricingPosition pricingPosition, PriceType priceType) {
+        return switch (priceType) {
+            case INSTABUY -> switch (pricingPosition) {
+                case COMPETITIVE -> marketInstaBuyPrice - 0.1;
+                case MATCHED -> marketInstaBuyPrice;
+                case OUTBID -> marketInstaBuyPrice + 0.1;
             };
-            case BUY -> switch (pricingPosition) {
-                case COMPETITIVE -> marketBuyPrice + 0.1;
-                case MATCHED -> marketBuyPrice;
-                case OUTBID -> marketBuyPrice - 0.1;
+            case INSTASELL -> switch (pricingPosition) {
+                case COMPETITIVE -> marketInstaSellPrice + 0.1;
+                case MATCHED -> marketInstaSellPrice;
+                case OUTBID -> marketInstaSellPrice - 0.1;
             };
         };
     }

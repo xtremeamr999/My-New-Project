@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,6 +49,9 @@ public class OrderInfo extends PriceInfo implements BUListener {
     @Getter @Setter
     protected double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
 
+    @Setter @Getter
+    protected OrderType orderType;
+
     /**
      * Creates a container that tracks market data for a specific Bazaar product.
      *
@@ -59,13 +63,14 @@ public class OrderInfo extends PriceInfo implements BUListener {
      * @param status       status of the order
      */
     public OrderInfo(@Nullable String name, @Nullable ItemInfo itemInfo, @Nullable OrderStatus status, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable OrderType orderType) {
-        super(pricePerItem, orderType);
+        super(pricePerItem, orderType != null ? orderType.asPriceType() : null);
 
         this.name = name;
         this.itemInfo = itemInfo;
         this.status = status;
         this.volume = volume;
         this.tolerance = calculateTolerance();
+        this.orderType = orderType;
 
         validateProduct();
         BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
@@ -145,7 +150,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
     //TODO this ideally isn't needed -- fix any bugs that cause these issues in the first place
     private boolean isProductIDHealthy() {
-        return !(this.productID == null || this.productID.isEmpty() || BazaarData.findItemPriceOptional(this.productID, getOrderType()).isEmpty());
+        return !(this.productID == null || this.productID.isEmpty() || BazaarData.findItemPriceOptional(this.productID, getOrderType().asPriceType()).isEmpty());
     }
 
     /**
@@ -160,7 +165,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
         updateMarketPrice();
 
-        double marketPrice = getPriceForPosition(PricingPosition.MATCHED, getOrderType());
+        double marketPrice = getPriceForPosition(PricingPosition.MATCHED, getPriceType());
 
         var orderCountOpt = BazaarData.getOrderCountOptional(productID, getOrderType(), getPricePerItem());
 

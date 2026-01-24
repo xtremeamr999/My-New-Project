@@ -164,6 +164,7 @@ public class ChatHandler {
     ) {
         parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
             order.setOrderType(orderType);
+            order.setPriceType(orderType.asPriceType());
 
             EVENT_BUS.post(new BazaarChatEvent<>(eventType, order));
         });

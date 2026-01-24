@@ -113,7 +113,7 @@ public class Order extends OrderInfo {
             message = OutbidOrderHandler.getOutbidMessage(this);
 
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + this.getPriceForPosition(PricingPosition.MATCHED, this.getOrderType()) + " Order Price: " + this.getPricePerItem()));
+                message.append(Text.literal(". Market Price: " + this.getPriceForPosition(PricingPosition.MATCHED, this.getOrderType().asPriceType()) + " Order Price: " + this.getPricePerItem()));
             }
 
             if (shouldAutoOpenBazaar) {
@@ -214,7 +214,7 @@ public class Order extends OrderInfo {
     public double getMarketPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.MATCHED, orderType);
+        return this.getPriceForPosition(PricingPosition.MATCHED, orderType.asPriceType());
     }
 
     /**
@@ -225,7 +225,7 @@ public class Order extends OrderInfo {
     public double getUndercutPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.COMPETITIVE, orderType);
+        return this.getPriceForPosition(PricingPosition.COMPETITIVE, orderType.asPriceType());
     }
 
     /**
@@ -236,7 +236,7 @@ public class Order extends OrderInfo {
     public double getOutbidPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.OUTBID, orderType);
+        return this.getPriceForPosition(PricingPosition.OUTBID, orderType.asPriceType());
     }
 
     /**

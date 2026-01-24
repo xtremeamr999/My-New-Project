@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import lombok.Getter;
 import lombok.Setter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
@@ -192,10 +193,10 @@ public final class BazaarData {
      * BUY (top of buySummary aka people's sell orders). SELL (top of sellSummary, aka people's buy orders).
      * @return OptionalDouble price found.
      */
-    public static OptionalDouble findItemPriceOptional(String productId, OrderType orderType) {
+    public static OptionalDouble findItemPriceOptional(String productId, PriceType priceType) {
         SkyBlockBazaarReply reply = currentReply;
 
-        if (reply == null || productId == null || orderType == null) {
+        if (reply == null || productId == null || priceType == null) {
             return OptionalDouble.empty(); //TODO maybe throw error here instead. Needs testing to make sure it doesn't happen too frequently or at times where it is expected behavior
         }
 
@@ -206,8 +207,8 @@ public final class BazaarData {
                 return OptionalDouble.empty();
             }
 
-            return switch (orderType) {
-                case BUY -> {
+            return switch (priceType) {
+                case INSTABUY -> {
                     List<SkyBlockBazaarReply.Product.Summary> buySummary = product.getBuySummary();
 
                     if (buySummary == null || buySummary.isEmpty()) {
@@ -216,7 +217,7 @@ public final class BazaarData {
 
                     yield OptionalDouble.of(buySummary.getFirst().getPricePerUnit());
                 }
-                case SELL -> {
+                case INSTASELL -> {
                     List<SkyBlockBazaarReply.Product.Summary> sellSummary = product.getSellSummary();
 
                     if (sellSummary == null || sellSummary.isEmpty()) {

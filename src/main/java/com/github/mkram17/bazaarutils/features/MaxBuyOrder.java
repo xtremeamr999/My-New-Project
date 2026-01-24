@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import meteordevelopment.orbit.EventHandler;
@@ -63,7 +64,7 @@ public class MaxBuyOrder extends CustomOrder {
                 return;
             }
 
-            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), OrderType.BUY);
+            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), PriceType.INSTASELL);
 
             if (costOpt.isEmpty()) {
                 return;
