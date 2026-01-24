@@ -42,11 +42,16 @@ public class OrderUpdater {
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent event) {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) return;
+
+        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) {
+            return;
+        }
 
         lowerChestInventory = event.getLowerChestInventory();
+
         List<ItemStack> allInventoryStacks = event.getItemStacks();
         List<ItemStack> orderStacks = extractOrderStacks(allInventoryStacks);
+
         updateWatchedOrders(orderStacks);
     }
 
@@ -54,6 +59,7 @@ public class OrderUpdater {
         List<OrderInfo> parsedOrders = orderStacks.stream()
                 .map(OrderUpdater::parseOrderFromItemStack)
                 .toList();
+
         updateOrders(parsedOrders);
     }
 
@@ -87,24 +93,29 @@ public class OrderUpdater {
     private static void updateBazaarOrder(Order order, ItemInfo parsedItemInfo) {
         if (parsedItemInfo == null) {
             Util.notifyError("Error while updating order info", new Throwable("ItemInfo is null"));
+
             return;
         }
+
         order.setItemInfo(parsedItemInfo);
 
         Optional<? extends LoreComponent> loreComponent = order.getItemInfo().itemStack().getComponentChanges().get(DataComponentTypes.LORE);
+
         if (loreComponent == null || loreComponent.isEmpty()) {
             return;
         }
 
         List<Text> loreLines = loreComponent.get().styledLines();
 
-
         int amountFilled = parseAmountFilled(loreLines);
         int amountClaimed = parseAmountClaimed(loreLines, amountFilled);
+
         double pricePerItem = parseUnitPrice(loreLines);
 
         int volume = order.getVolume();
+
         order.setAmountFilled(amountFilled);
+
         if (Util.genericIsSimilarValue(amountFilled, volume, volume * FILL_TOLERANCE_RATIO)) {
             order.setFilled();
         }
@@ -112,6 +123,7 @@ public class OrderUpdater {
         if (amountClaimed >= 0) {
             order.setAmountClaimed(amountClaimed);
         }
+
         order.setPricePerItem(pricePerItem);
         order.setTolerance(0.0);
 
@@ -126,23 +138,30 @@ public class OrderUpdater {
         if (loreComponent == null || loreComponent.isEmpty()) {
             return null;
         }
+
         List<Text> loreLines = loreComponent.get().styledLines();
 
         OrderType orderType = detectOrderType(title);
+
         if (orderType == null) {
             Util.notifyError("Error while parsing order from item stack", new Exception("Could not determine order side"));
+
             return null;
         }
 
         double unitPrice = parseUnitPrice(loreLines);
+
         if (Double.isNaN(unitPrice)) {
             Util.notifyError("Error while parsing order from item stack", new Exception("Missing unit price"));
+
             return null;
         }
 
         int volume = parseVolume(loreLines);
+
         if (volume == -1) {
             Util.notifyError("Error while parsing order from item stack", new Exception("Missing volume"));
+
             return null;
         }
 
@@ -165,13 +184,19 @@ public class OrderUpdater {
 
     private static String stripPrefix(String title, OrderType type) {
         String prefix = (type == OrderType.BUY ? PREFIX_BUY : PREFIX_SELL) + " ";
+
         return title.startsWith(prefix) ? title.substring(prefix.length()) : title;
     }
 
     private static double parseUnitPrice(List<Text> lore) {
         Text line = Util.findComponentWith(lore, LORE_PER_UNIT);
-        if (line == null) return Double.NaN;
+
+        if (line == null) {
+            return Double.NaN;
+        }
+
         String raw = line.getString();
+
         try {
             return Double.parseDouble(Util.extractTextAfterWord(raw, WORD_UNIT));
         } catch (Exception ignored) {
@@ -181,10 +206,15 @@ public class OrderUpdater {
 
     private static int parseVolume(List<Text> lore) {
         Text line = Util.findComponentWith(lore, LORE_ORDER_AMOUNT);
+
         if (line == null) {
             line = Util.findComponentWith(lore, LORE_OFFER_AMOUNT);
         }
-        if (line == null) return -1;
+
+        if (line == null) {
+            return -1;
+        }
+
         try {
             // Original logic used sibling index 1
             return Util.parseNumber(line.getSiblings().get(1).getString());
@@ -195,10 +225,18 @@ public class OrderUpdater {
 
     private static int parseAmountFilled(List<Text> lore) {
         Text filledLine = Util.findComponentWith(lore, LORE_FILLED);
-        if (filledLine == null) return -1;
+
+        if (filledLine == null) {
+            return -1;
+        }
+
         String s = filledLine.getString();
         int slash = s.indexOf('/');
-        if (slash == -1) return -1;
+
+        if (slash == -1) {
+            return -1;
+        }
+
         try {
             // Original substring(8, indexOf("/")) behavior retained
             return Util.parseNumber(s.substring(8, slash));
@@ -208,20 +246,30 @@ public class OrderUpdater {
     }
 
     private static int parseAmountClaimed(List<Text> lore, int amountFilled) {
-        if (amountFilled < 0) return -1;
+        if (amountFilled < 0) {
+            return -1;
+        }
+
         Text unclaimedLine = Util.findComponentWith(lore, LORE_TO_CLAIM);
+
         if (unclaimedLine == null) {
             return amountFilled; // fully claimed
         }
+
         String raw = unclaimedLine.getString();
         int start = 9; // preserve original logic substring(9, ...)
         int end;
+
         if (!raw.contains(LORE_ITEMS)) {
             end = raw.indexOf(LORE_COINS);
         } else {
             end = raw.indexOf(LORE_ITEMS) - 1;
         }
-        if (end <= start) return -1;
+
+        if (end <= start) {
+            return -1;
+        }
+
         try {
             int unclaimed = Util.parseNumber(raw.substring(start, end));
             return amountFilled - unclaimed;
@@ -254,9 +302,5 @@ public class OrderUpdater {
     @RunOnInit
     public static void subscribe() {
         EVENT_BUS.subscribe(OrderUpdater.class);
-    }
-
-    private enum OrderType {
-        BUY, SELL
     }
 }

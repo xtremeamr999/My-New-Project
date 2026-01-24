@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.*;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -31,15 +32,18 @@ import java.util.List;
 public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
     @Getter @Setter
     private boolean enabled;
+
     public static final Identifier IDENTIFIER = Identifier.tryParse("bazaarutils", "orderstatushighlight/background");
+
     public static final float BACKGROUND_TRANSPARENCY = 0.9f;
 
-    public OrderStatusHighlight(boolean enabled){
+    public OrderStatusHighlight(boolean enabled) {
         this.enabled = enabled;
     }
 
     public static Order getHighlightedOrder(int slotIndex) {
         var order = OrderInfoUtil.getUserOrderFromIndex(slotIndex);
+
         return order.filter(
                 bazaarOrder -> bazaarOrder.getStatus() != null && bazaarOrder.getStatus() == OrderStatus.SET)
                 .orElse(null);
@@ -48,6 +52,7 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
     @Override
     public void subscribe() {
         registerTooltipListener();
+
         BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
@@ -67,29 +72,39 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         builder.option(this.createOption());
     }
 
-    public void updateHighlightCache(List<ItemStack> itemStacks){
-        if (!enabled) return;
-        for(ItemStack stack : itemStacks) {
+    public void updateHighlightCache(List<ItemStack> itemStacks) {
+        if (!enabled) {
+            return;
+        }
+
+        for (ItemStack stack : itemStacks) {
             MinecraftClient client = MinecraftClient.getInstance();
+
             if (client.player == null || !(client.currentScreen instanceof HandledScreen<?> handledScreen)) {
                 continue;
             }
 
             int index = -1;
+
             for (Slot slot : handledScreen.getScreenHandler().slots) {
-                if (!slot.hasStack() || !slot.getStack().equals(stack))
+                if (!slot.hasStack() || !slot.getStack().equals(stack)) {
                     continue;
+                }
+
                 index = slot.getIndex();
             }
 
-            if (index == -1)
+            if (index == -1) {
                 continue;
+            }
+
             SlotHighlightCache.orderStatusHighlightCache.computeIfAbsent(index, this::getHighlightColorFromIndex);
         }
     }
 
-    private Integer getHighlightColorFromIndex(int index){
-        BazaarOrder order = getHighlightedOrder(index);
+    private Integer getHighlightColorFromIndex(int index) {
+        Order order = getHighlightedOrder(index);
+
         if (order == null) {
             return null;
         }
@@ -106,16 +121,23 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
     //maybe could be split into separate methods, but this is fine for now
     private void registerTooltipListener() {
         ItemTooltipCallback.EVENT.register((ItemStack stack, net.minecraft.item.Item.TooltipContext context, TooltipType type, List<Text> lines) -> {
-            if (!enabled) return;
+            if (!enabled) {
+                return;
+            }
+
             MinecraftClient client = MinecraftClient.getInstance();
+
             if (!(client.currentScreen instanceof HandledScreen<?> handledScreen)) {
                 return;
             }
 
             int index = -1;
+
             for (Slot slot : handledScreen.getScreenHandler().slots) {
-                if (!slot.hasStack() || !(slot.getStack().equals(stack)))
+                if (!slot.hasStack() || !(slot.getStack().equals(stack))) {
                     continue;
+                }
+
                 index = slot.getIndex();
             }
 
@@ -138,6 +160,7 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
             switch (pricingPosition) {
                 case COMPETITIVE:
                     lines.add(1, Text.literal("COMPETITIVE").formatted(Formatting.GREEN, Formatting.BOLD));
+
                     break;
                 case MATCHED:
                     lines.add(1, Text.literal("MATCHED").formatted(Formatting.YELLOW, Formatting.BOLD));
@@ -160,7 +183,7 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         });
     }
 
-    private static int getArgbFromOutbidStatus(OrderInfoContainer.Statuses outbidStatus){
+    private static int getArgbFromOutbidStatus(PricingPosition pricingPosition) {
         int color;
         final float r, g, b;
 
@@ -171,7 +194,9 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         } else { // MATCHED
             r = 1.0f; g = 1.0f; b = 0.0f; // Yellow
         }
+
         color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
+
         return color;
     }
 }

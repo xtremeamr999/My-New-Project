@@ -17,15 +17,19 @@ public class InstaSellUtil {
         if (!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
             return Collections.emptyList();
         }
+
         Optional<ItemStack> instaSellItemStack = getInstaSellItemStack(itemStacks);
+
         if (instaSellItemStack.isEmpty()) {
             Util.notifyError("Could not find insta-sell item stack in Bazaar GUI. Please report this issue.", new Throwable());
+
             return Collections.emptyList();
         }
+
         return getInstaSellOrderData(instaSellItemStack.get());
     }
 
-    public static Optional<ItemStack> getInstaSellItemStack(List<ItemStack> itemStacks){
+    public static Optional<ItemStack> getInstaSellItemStack(List<ItemStack> itemStacks) {
         return itemStacks.stream().filter(itemStack -> itemStack.getName().getString().contains("Sell Inventory Now")).findFirst();
     }
 
@@ -33,10 +37,13 @@ public class InstaSellUtil {
         List<OrderInfo> orderData = new ArrayList<>();
 
         LoreComponent loreComponents = instaSellItemStack.get(DataComponentTypes.LORE);
-        if(loreComponents == null){
+
+        if (loreComponents == null) {
             return Collections.emptyList();
         }
+
         List<Text> loreLines = loreComponents.lines();
+
         return findInstaSellOrderData(loreLines);
     }
 
@@ -44,16 +51,20 @@ public class InstaSellUtil {
         List<OrderInfo> orderData = new ArrayList<>();
 
         List<Text> itemLoreLines = getItemLoreLines(loreLines);
-        for(Text line : itemLoreLines) {
+
+        for (Text line : itemLoreLines) {
             int volume = getVolume(line);
+
             double totalPrice = getTotalPrice(line);
             double pricePerUnit = Math.round(totalPrice / volume * 10)/10.0;
+
             String name = getName(line);
 
             OrderInfo instaSellItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY);
 
             orderData.add(instaSellItem);
         }
+
         return orderData;
     }
 
@@ -61,7 +72,7 @@ public class InstaSellUtil {
         int firstItemIndex = Util.componentIndexOf(loreLines, "coins");
         int totalCoinIndex = Util.componentLastIndexOf(loreLines, "coins");
 
-        if(firstItemIndex == -1 || totalCoinIndex == -1) {
+        if (firstItemIndex == -1 || totalCoinIndex == -1) {
             return Collections.emptyList();
         }
 
@@ -70,16 +81,19 @@ public class InstaSellUtil {
         return loreLines.subList(firstItemIndex, lastItemIndex+1);
     }
 
-    private static int getVolume(Text text){
+    private static int getVolume(Text text) {
         String volumeString = text.getSiblings().get(1).getString();
+
         return Util.parseNumber(volumeString);
     }
-    private static String getName(Text text){
+    private static String getName(Text text) {
         String nameString = text.getSiblings().get(3).getString();
+
         return nameString.trim();
     }
-    private static double getTotalPrice(Text text){
+    private static double getTotalPrice(Text text) {
         String priceString = text.getSiblings().get(5).getString();
+
         return Util.parseNumber(priceString);
     }
 }

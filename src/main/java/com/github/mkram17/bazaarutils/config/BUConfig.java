@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.config;
 
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.*;
-import com.github.mkram17.bazaarutils.features.FlipHelper.BiddingType;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;

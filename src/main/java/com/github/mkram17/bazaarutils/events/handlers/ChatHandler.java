@@ -47,9 +47,12 @@ public class ChatHandler {
     @RunOnInit
     public static void registerBazaarChat() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if(message.getString().contains("Error")) return;
+            if (message.getString().contains("Error")) {
+                return;
+            }
 
             ArrayList<Text> siblings = new ArrayList<>(message.getSiblings());
+
             getMessageType(message, siblings).ifPresent(messageType -> {
                 switch (messageType) {
                     case ORDER_CREATED -> handleOrderCreated(siblings);
@@ -78,17 +81,32 @@ public class ChatHandler {
 
         if (siblings.size() > 3) {
             String identifier = siblings.get(2).getString();
+
             if (identifier.contains("Buy Order Setup!") || identifier.contains("Sell Offer Setup!")) {
                 return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED);
             }
-            if (identifier.contains("Claimed")) return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED);
-            if (identifier.contains("Order Flipped!"))
+
+            if (identifier.contains("Claimed")) {
+                return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED);
+            }
+
+            if (identifier.contains("Order Flipped!")) {
                 return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED);
+            }
 
             identifier = siblings.get(1).getString();
-            if (identifier.contains("Sold")) return Optional.of(BazaarChatEvent.BazaarEventTypes.INSTA_SELL);
-            if (identifier.contains("Bought")) return Optional.of(BazaarChatEvent.BazaarEventTypes.INSTA_BUY);
-            if (identifier.contains("Cancelled")) return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED);
+
+            if (identifier.contains("Sold")) {
+                return Optional.of(BazaarChatEvent.BazaarEventTypes.INSTA_SELL);
+            }
+
+            if (identifier.contains("Bought")) {
+                return Optional.of(BazaarChatEvent.BazaarEventTypes.INSTA_BUY);
+            }
+
+            if (identifier.contains("Cancelled")) {
+                return Optional.of(BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED);
+            }
         }
         return Optional.empty();
     }
@@ -108,14 +126,15 @@ public class ChatHandler {
             int volume = Integer.parseInt(volumeString);
 
             String name = siblings.get(nameIndex).getString().trim();
+
             if (name.contains("x ")) { // For flipped orders
                 name = name.substring(name.indexOf("x ") + 2);
             }
 
             String priceString = siblings.get(priceIndex).getString().replace(",", "");
             priceString = priceString.substring(0, priceString.indexOf(" "));
-            double totalPrice = Double.parseDouble(priceString);
 
+            double totalPrice = Double.parseDouble(priceString);
             double pricePerUnit = totalPrice / volume;
 
             return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null));
@@ -199,8 +218,10 @@ public class ChatHandler {
         String messageString = Util.removeFormatting(message.getString());
         // Example: "Your Buy Order for 2,304x Mithril was filled!"
         String[] parts = messageString.split(" for |x | was filled!");
+
         if (parts.length < 3) {
             Util.notifyError("Invalid FILLED message format: " + messageString, new Throwable());
+
             return;
         }
 
@@ -233,6 +254,7 @@ public class ChatHandler {
         double price = Double.parseDouble(totalPriceString) / volume;
 
         boolean isSellOrder = siblings.get(2).getString().contains("Sell Offer Setup!");
+
         if (isSellOrder) {
             //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
             price /= ((100 - BUConfig.get().bzTax) / 100);
@@ -276,6 +298,7 @@ public class ChatHandler {
             Util.notifyError("Error in order claim text: " + siblings, e);
             return;
         }
+
         if (orderOptional.isEmpty()) {
             Util.notifyError("Could not find claimed order in watched orders", new Throwable("Order Claim Error"));
             return;
@@ -284,6 +307,7 @@ public class ChatHandler {
         Order order = orderOptional.get();
 
         PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
+
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
 
@@ -296,30 +320,36 @@ public class ChatHandler {
     private static Optional<Order> getClaimedBuyOrder(ArrayList<Text> siblings) {
         // Parse volume with validation
         String volumeStr = siblings.get(3).getString().replace(",", "").trim();
+
         if (volumeStr.isEmpty()) {
             Util.notifyError("Empty volume string in claimed order", new Throwable());
+
             return Optional.empty();
         }
 
         int volumeClaimed = Integer.parseInt(volumeStr);
-
         String itemName = siblings.get(5).getString().trim();
+
         if (itemName.isEmpty()) {
             Util.notifyError("Empty item name in claimed order", new Throwable());
+
             return Optional.empty();
         }
 
         String priceString = siblings.get(7).getString();
-
         int coinsIndex = priceString.indexOf(" coins");
+
         if (coinsIndex == -1) {
             Util.notifyError("Invalid price format - no 'coins' found in: " + priceString, new Throwable());
+
             return Optional.empty();
         }
 
         String priceStr = priceString.substring(0, coinsIndex).replace(",", "").trim();
+
         if (priceStr.isEmpty()) {
             Util.notifyError("Empty price string in claimed order", new Throwable());
+
             return Optional.empty();
         }
 
@@ -327,6 +357,7 @@ public class ChatHandler {
 
         if (volumeClaimed == 0) {
             Util.notifyError("Cannot divide by zero volume in claimed order", new Throwable());
+
             return Optional.empty();
         }
 
@@ -351,7 +382,6 @@ public class ChatHandler {
      */
     private static Optional<Order> getClaimedSellOrder(ArrayList<Text> siblings) {
         // Sell order claimed messages sometimes include volume and sometimes don't
-
         Text volumeComponent = siblings.get(Util.componentIndexOf(siblings, "x") - 1);
         String volumeString = volumeComponent.getString();
         int volume = Integer.parseInt(volumeString.replace(",", "").trim());

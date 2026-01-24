@@ -39,11 +39,12 @@ import java.util.Optional;
 
 //Object is created in GUIUtils when in an item's bazaar page
 public class Bookmark extends CustomItemButton implements BUListener {
-
     @Getter
     public final String name;
+
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
+
     @Getter
     private final OrderInfo orderInfo;
 
@@ -51,9 +52,11 @@ public class Bookmark extends CustomItemButton implements BUListener {
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
     private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_hover");
+
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
-            HOVER);
+            HOVER
+    );
 
     protected void subscribeToEventBusUnsubscriber() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> BazaarUtils.EVENT_BUS.unsubscribe(this));
@@ -74,11 +77,13 @@ public class Bookmark extends CustomItemButton implements BUListener {
     protected void replaceItemEvent(ReplaceItemEvent event) {
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
-            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
+            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this))) {
                 return;
+            }
 
-            if (replacementItem == null)
+            if (replacementItem == null) {
                 changeVisuals(isItemBookmarked(name));
+            }
 
             event.setReplacement(replacementItem);
         } catch (Exception e) {
@@ -87,61 +92,68 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
     @EventHandler
-    private void onBookmarkClick(SlotClickEvent event){
-        if(!super.wasButtonSlotClicked(event))
+    private void onBookmarkClick(SlotClickEvent event) {
+        if (!super.wasButtonSlotClicked(event)) {
             return;
+        }
+
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
+
         reverseBookmarkStatus();
         bookmarkedItemStack = findItemStack(name);
+
         BUConfig.scheduleConfigSave();
     }
 
-    public void onWidgetLeftClick(){
+    public void onWidgetLeftClick() {
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
+
         boolean userHasSkyblockerBazaarOverlay = BUCompatibilityHelper.isSkyblockerBazaarOverlayEnabled();
 
-        if(userHasSkyblockerBazaarOverlay) {
+        if (userHasSkyblockerBazaarOverlay) {
             BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(false);
         }
 
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(name, true));
 
-        if(userHasSkyblockerBazaarOverlay) {
+        if (userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
         }
     }
 
-    public void onWidgetShiftClick(){
+    public void onWidgetShiftClick() {
         BUConfig.get().bookmarks.remove(this);
         BUConfig.scheduleConfigSave();
     }
 
-    private void reverseBookmarkStatus(){
-        if(isItemBookmarked(name)) {
+    private void reverseBookmarkStatus() {
+        if (isItemBookmarked(name)) {
             changeVisuals(false);
             BUConfig.get().bookmarks.remove(this);
-        }else {
+        } else {
             changeVisuals(true);
             BUConfig.get().bookmarks.add(this);
         }
+
         BUConfig.scheduleConfigSave();
     }
 
-    private void changeVisuals(boolean bookmarked){
-        if(bookmarked) {
+    private void changeVisuals(boolean bookmarked) {
+        if (bookmarked) {
             replacementItem = new ItemStack(Items.GREEN_STAINED_GLASS_PANE, 1);
+
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Remove " + name + " Bookmark"));
             replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "⃠ ");
-        }
-        else {
+        } else {
             replacementItem = new ItemStack(Items.RED_STAINED_GLASS_PANE, 1);
+
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Bookmark " + name));
             replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         }
     }
 
-    public static String findItemName(ChestLoadedEvent e){
+    public static String findItemName(ChestLoadedEvent e) {
         String nameFromContainer = findItemNameFromContainer();
         if (!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
@@ -149,20 +161,25 @@ public class Bookmark extends CustomItemButton implements BUListener {
         return nameFromContainer;
     }
 
-    private static String findNameFromItemStacks(List<ItemStack> itemStacks, String nameFromContainer){
-        for(ItemStack stack : itemStacks){
-            if(stack == null) continue;
+    private static String findNameFromItemStacks(List<ItemStack> itemStacks, String nameFromContainer) {
+        for (ItemStack stack : itemStacks) {
+            if (stack == null) {
+                continue;
+            }
+
             if (!stack.isEmpty() && stack.getName().getString().startsWith(nameFromContainer)) {
                 return stack.getCustomName().getString();
             }
         }
+
         return "???";
     }
 
-    private static String findItemNameFromContainer(){
+    private static String findItemNameFromContainer() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         String containerName = screenInfo.getScreenName();
-        if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
+
+        if (screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         } else {
             return containerName.substring(containerName.indexOf("➜") + 2);
@@ -170,44 +187,53 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
 
-    private static ItemStack findItemStack(String name){
+    private static ItemStack findItemStack(String name) {
         ScreenHandler handler = GUIUtils.getHandledScreen();
 
-        if(handler == null) return null;
-        for(Slot slot : handler.slots){
+        if (handler == null) {
+            return null;
+        }
+
+        for (Slot slot : handler.slots) {
             ItemStack itemStack = slot.getStack();
-            if(itemStack == null) continue;
+            if (itemStack == null) {
+                continue;
+            }
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().startsWith(name)) {
                 return itemStack;
             }
         }
-        for(Slot slot : handler.slots){
+
+        for (Slot slot : handler.slots) {
             ItemStack itemStack = slot.getStack();
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().contains(name)) {
                 return itemStack;
             }
         }
+
         return Items.DIAMOND.getDefaultStack();
     }
 
-    public static boolean isItemBookmarked(String itemName){
+    public static boolean isItemBookmarked(String itemName) {
         return findMatchingBookmark(itemName).isPresent();
     }
 
-    public static Optional<Bookmark> findMatchingBookmark(String itemName){
+    public static Optional<Bookmark> findMatchingBookmark(String itemName) {
         return BUConfig.get().bookmarks.stream().filter(bookmark -> bookmark.getName().equalsIgnoreCase(itemName)).findAny();
     }
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidgets() {
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
+
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
 
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen) {
             return Collections.emptyList();
+        }
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
 

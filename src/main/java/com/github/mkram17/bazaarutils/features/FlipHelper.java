@@ -17,7 +17,7 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
-import dev.isxander.yacl3.api.NameableEnum;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -43,7 +43,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
 public class FlipHelper extends CustomItemButton implements BUListener, ConfigurableFeature {
-
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
@@ -80,6 +79,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
         if (!inCorrectScreen()) {
             resetState();
+
             return;
         }
 
@@ -90,6 +90,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
             if (orderOptional.isEmpty()) {
                 return;
+
             }
             order = orderOptional.get();
         } catch (Exception ex) {
@@ -104,18 +105,23 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         }
 
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
+
         GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
+
         GUIUtils.runOnNextSignOpen(signOpenEvent -> handleFlip());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if(!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || order == null)
+        if (!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || order == null) {
             return;
+        }
 
         ItemStack itemStack = new ItemStack(BUTTON_ITEM, 1);
+
         itemStack.set(DataComponentTypes.CUSTOM_NAME, getButtonText());
         itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, getButtonStackSize());
+
         event.setReplacement(itemStack);
     }
 
@@ -132,7 +138,8 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
     }
 
     private String getButtonStackSize() {
-        double flipPrice = computeFlipPrice(order);
+        double flipPrice = computeFlipPrice();
+
         if (flipPrice == 0) {
             return "ANY";
         } else if (order == null) {
@@ -150,8 +157,10 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         double flipPrice = computeFlipPrice();
 
         ScreenInfo previousScreen = ScreenInfo.getCurrentScreenInfo().getPreviousScreenInfo();
-        if(order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
+
+        if (order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
             GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
+
             order.flipItem(flipPrice);
         }
     }
@@ -172,11 +181,13 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
             if (itemStack.getName().getString().contains(FLIP_ORDER_IDENTIFIER)) {
                 LoreComponent lore = itemStack.getComponents().get(DataComponentTypes.LORE);
+
                 if (lore != null) {
                     return Optional.of(itemStack);
                 }
             }
         }
+
         return Optional.empty();
     }
 
@@ -186,6 +197,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         }
 
         String priceLine = lore.lines().get(LORE_LINE_PRICE).getString();
+
         Matcher matcher = PRICE_PATTERN.matcher(priceLine);
 
         if (matcher.find()) {
@@ -229,8 +241,9 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         return Optional.empty();
     }
 
-    private static boolean inCorrectScreen(){
+    private static boolean inCorrectScreen() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+
         return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
     }
 

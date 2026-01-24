@@ -21,7 +21,6 @@ import java.util.List;
 
 //TODO change the message number instead of sending more
 public class OutbidOrderHandler implements ConfigurableFeature {
-
     @Getter @Setter
     private boolean autoOpenEnabled;
     @Getter @Setter

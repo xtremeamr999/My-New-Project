@@ -178,9 +178,11 @@ public final class BazaarData {
                     return OptionalInt.of((int) s.getOrders());
                 }
             }
+
             return OptionalInt.of(0);
         } catch (Exception e) {
             Util.notifyError("Error in getOrderCountOptional for productId=" + productId, e);
+
             return OptionalInt.empty();
         }
     }
@@ -199,30 +201,45 @@ public final class BazaarData {
 
         try {
             SkyBlockBazaarReply.Product product = reply.getProduct(productId);
-            if (product == null)
+
+            if (product == null) {
                 return OptionalDouble.empty();
+            }
 
             return switch (orderType) {
                 case BUY -> {
                     List<SkyBlockBazaarReply.Product.Summary> buySummary = product.getBuySummary();
-                    if (buySummary == null || buySummary.isEmpty()) yield OptionalDouble.of(0.0);
+
+                    if (buySummary == null || buySummary.isEmpty()) {
+                        yield OptionalDouble.of(0.0);
+                    }
+
                     yield OptionalDouble.of(buySummary.getFirst().getPricePerUnit());
                 }
                 case SELL -> {
                     List<SkyBlockBazaarReply.Product.Summary> sellSummary = product.getSellSummary();
-                    if (sellSummary == null || sellSummary.isEmpty()) yield OptionalDouble.of(0.0);
+
+                    if (sellSummary == null || sellSummary.isEmpty()) {
+                        yield OptionalDouble.of(0.0);
+                    }
+
                     yield OptionalDouble.of(sellSummary.getFirst().getPricePerUnit());
                 }
             };
         } catch (Exception e) {
             Util.notifyError("Error in findItemPriceOptional for productId=" + productId, e);
+
             return OptionalDouble.empty();
         }
     }
 
     public static Optional<String> findProductIdOptional(String naturalName) {
-        if (naturalName == null || naturalName.isBlank()) return Optional.empty();
+        if (naturalName == null || naturalName.isBlank()) {
+            return Optional.empty();
+        }
+
         ensureConversionsLoaded();
+
         return Optional.ofNullable(nameToProductIdCache.get(naturalName.toLowerCase(Locale.ROOT)));
     }
 
@@ -230,24 +247,35 @@ public final class BazaarData {
      * Cached conversion load. Thread-safe (single pass).
      */
     private static void ensureConversionsLoaded() {
-        if (conversionsLoaded) return;
+        if (conversionsLoaded) {
+            return;
+        }
+
         synchronized (BazaarData.class) {
-            if (conversionsLoaded) return;
+            if (conversionsLoaded) {
+                return;
+            }
+
             try {
                 Map<String, String> mutable = new HashMap<>();
+
                 var resources = ResourceManager.getResourceJson();
                 var conversions = resources.getAsJsonObject();
+
                 for (String key : conversions.keySet()) {
                     String value = conversions.get(key).getAsString();
                     if (value != null) {
                         mutable.put(value.toLowerCase(Locale.ROOT), key);
                     }
                 }
+
                 nameToProductIdCache = Collections.unmodifiableMap(mutable);
                 conversionsLoaded = true;
+
                 PlayerActionUtil.notifyAll("Loaded bazaarConversions cache: " + nameToProductIdCache.size() + " entries.", Util.notificationTypes.BAZAARDATA);
             } catch (Exception e) {
                 Util.notifyError("Failed loading bazaarConversions cache", e);
+
                 nameToProductIdCache = Map.of();
                 conversionsLoaded = true;
             }
@@ -256,13 +284,21 @@ public final class BazaarData {
 
     public static Optional<Duration> getCurrentSnapshotAge() {
         long ts = lastSnapshotTs;
-        if (ts <= 0) return Optional.empty();
+
+        if (ts <= 0) {
+            return Optional.empty();
+        }
+
         return Optional.of(Duration.ofMillis(System.currentTimeMillis() - ts));
     }
 
     public static Optional<Duration> getTimeSinceLastFetchAttempt() {
         long f = lastFetchWallClock;
-        if (f <= 0) return Optional.empty();
+
+        if (f <= 0) {
+            return Optional.empty();
+        }
+
         return Optional.of(Duration.ofMillis(System.currentTimeMillis() - f));
     }
 }
