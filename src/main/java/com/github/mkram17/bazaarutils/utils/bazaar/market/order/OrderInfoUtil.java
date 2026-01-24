@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.orderinfo;
+package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 
@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrderInfoUtil {
-    public static List<BazaarOrder> getUserOrders() {
+    public static List<Order> getUserOrders() {
         return BUConfig.get().userOrders;
     }
 
-    public static Optional<BazaarOrder> getUserOrderFromIndex(int slotIndex) {
+    public static Optional<Order> getUserOrderFromIndex(int slotIndex) {
         return getUserOrders().stream()
                 .filter(order ->
                         order.getItemInfo() != null
