@@ -1,6 +1,7 @@
-package com.github.mkram17.bazaarutils.data;
+package com.github.mkram17.bazaarutils.utils.bazaar.data;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.data.APIUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-public final class BazaarData {
+public final class BazaarDataManager {
 
     private static final long BASE_INTERVAL_MS = 20_000;
     private static final long POST_OFFSET_MS = 500;
@@ -49,7 +50,7 @@ public final class BazaarData {
     @RunOnInit
     public static void init() {
         scheduleFetch(0);
-        PlayerActionUtil.notifyAll("BazaarData initialized (simple fixed-interval poller). Base=" + BASE_INTERVAL_MS + "ms", Util.notificationTypes.BAZAARDATA);
+        PlayerActionUtil.notifyAll("BazaarDataManager initialized (simple fixed-interval poller). Base=" + BASE_INTERVAL_MS + "ms", Util.notificationTypes.BAZAARDATA);
     }
 
 
@@ -58,7 +59,7 @@ public final class BazaarData {
             if (scheduledTask != null && !scheduledTask.isDone()) {
                 scheduledTask.cancel(false);
             }
-            scheduledTask = BazaarUtils.BUExecutorService.schedule(BazaarData::fetchOnceSafely, delayMs, TimeUnit.MILLISECONDS);
+            scheduledTask = BazaarUtils.BUExecutorService.schedule(BazaarDataManager::fetchOnceSafely, delayMs, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -66,7 +67,7 @@ public final class BazaarData {
         try {
             fetchOnce();
         } catch (Throwable t) {
-            Util.notifyError("Unexpected error in BazaarData fetch loop", t);
+            Util.notifyError("Unexpected error in BazaarDataManager fetch loop", t);
             scheduleFetch(FAILURE_RETRY_MS);
         }
     }
@@ -252,7 +253,7 @@ public final class BazaarData {
             return;
         }
 
-        synchronized (BazaarData.class) {
+        synchronized (BazaarDataManager.class) {
             if (conversionsLoaded) {
                 return;
             }

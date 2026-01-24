@@ -1,9 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import dev.isxander.yacl3.api.Option;
@@ -58,13 +56,13 @@ public class MaxBuyOrder extends CustomOrder {
             updatePurse(client);
 
             String name = itemStack.getCustomName().getString();
-            Optional<String> productIdOptional = BazaarData.findProductIdOptional(name);
+            Optional<String> productIdOptional = BazaarDataManager.findProductIdOptional(name);
 
             if (productIdOptional.isEmpty()) {
                 return;
             }
 
-            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), PriceType.INSTASELL);
+            OptionalDouble costOpt = BazaarDataManager.findItemPriceOptional(productIdOptional.get(), PriceType.INSTASELL);
 
             if (costOpt.isEmpty()) {
                 return;

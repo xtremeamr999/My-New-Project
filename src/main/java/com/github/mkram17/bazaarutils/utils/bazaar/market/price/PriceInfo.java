@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.utils.bazaar.market.price;
 
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
@@ -47,8 +47,8 @@ public class PriceInfo {
     }
 
     protected void updateMarketPrice(String productId) {
-        var instaSellPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTASELL);
-        var instaBuyPriceOpt = BazaarData.findItemPriceOptional(productId, PriceType.INSTABUY);
+        var instaSellPriceOpt = BazaarDataManager.findItemPriceOptional(productId, PriceType.INSTASELL);
+        var instaBuyPriceOpt = BazaarDataManager.findItemPriceOptional(productId, PriceType.INSTABUY);
 
         instaSellPriceOpt.ifPresent(price -> marketInstaSellPrice = Util.truncateNum(price));
         instaBuyPriceOpt.ifPresent(price -> marketInstaBuyPrice = Util.truncateNum(price));

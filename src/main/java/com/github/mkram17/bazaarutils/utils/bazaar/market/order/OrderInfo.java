@@ -2,12 +2,11 @@ package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,7 +72,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
         this.orderType = orderType;
 
         validateProduct();
-        BazaarData.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
+        BazaarDataManager.findProductIdOptional(name).ifPresent(productId -> this.productID = productId);
         findPricingPosition().ifPresent(pricingPosition -> this.pricingPosition = pricingPosition);
     }
 
@@ -99,7 +98,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
      * @return {@code true} when a product ID exists for the name
      */
     public static boolean isValidName(String itemName) {
-        return itemName != null && BazaarData.findProductIdOptional(itemName).isPresent();
+        return itemName != null && BazaarDataManager.findProductIdOptional(itemName).isPresent();
     }
 
     /**
@@ -135,7 +134,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
             return true;
         }
 
-        Optional<String> newProductID = BazaarData.findProductIdOptional(this.name);
+        Optional<String> newProductID = BazaarDataManager.findProductIdOptional(this.name);
 
         if (newProductID.isPresent()) {
             Util.logMessage("Successfully fixed product ID for " + this.name + ": " + newProductID);
@@ -150,7 +149,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
     //TODO this ideally isn't needed -- fix any bugs that cause these issues in the first place
     private boolean isProductIDHealthy() {
-        return !(this.productID == null || this.productID.isEmpty() || BazaarData.findItemPriceOptional(this.productID, getOrderType().asPriceType()).isEmpty());
+        return !(this.productID == null || this.productID.isEmpty() || BazaarDataManager.findItemPriceOptional(this.productID, getOrderType().asPriceType()).isEmpty());
     }
 
     /**
@@ -167,7 +166,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
         double marketPrice = getPriceForPosition(PricingPosition.MATCHED, getPriceType());
 
-        var orderCountOpt = BazaarData.getOrderCountOptional(productID, getOrderType(), getPricePerItem());
+        var orderCountOpt = BazaarDataManager.getOrderCountOptional(productID, getOrderType(), getPricePerItem());
 
         if (orderCountOpt.isEmpty()) {
             return Optional.empty();

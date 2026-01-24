@@ -1,11 +1,10 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.ui.SellRestrictionsMenu;
 import com.mojang.brigadier.CommandDispatcher;
@@ -50,7 +49,7 @@ public class BUCommands {
                             .executes((context) -> {
                                 String name = StringArgumentType.getString(context, "item name")
                                         .replaceAll("_", " ");
-                                var productIDOpt = BazaarData.findProductIdOptional(name);
+                                var productIDOpt = BazaarDataManager.findProductIdOptional(name);
 
                                 if(productIDOpt.isPresent()){
                                     PlayerActionUtil.notifyAll(name + ": " + productIDOpt.get());

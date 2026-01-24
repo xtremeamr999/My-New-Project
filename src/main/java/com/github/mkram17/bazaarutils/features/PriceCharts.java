@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
@@ -74,7 +74,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
             return;
         }
 
-        String productID = BazaarData.findProductIdOptional(itemName).get(); // All cached items are safe
+        String productID = BazaarDataManager.findProductIdOptional(itemName).get(); // All cached items are safe
         String link = "https://skyblock.finance/items/" + productID;
 
         MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen(confirmed -> {
