@@ -3,10 +3,11 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.ItemInfo;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -50,17 +51,17 @@ public class OrderUpdater {
     }
 
     private static void updateWatchedOrders(List<ItemStack> orderStacks) {
-        List<OrderInfoContainer> parsedOrders = orderStacks.stream()
+        List<OrderInfo> parsedOrders = orderStacks.stream()
                 .map(OrderUpdater::parseOrderFromItemStack)
                 .toList();
         updateOrders(parsedOrders);
     }
 
-    private static void updateOrders(List<OrderInfoContainer> parsedOrders) {
-        List<BazaarOrder> userOrdersCopy = new ArrayList<>(BUConfig.get().userOrders);
+    private static void updateOrders(List<OrderInfo> parsedOrders) {
+        List<Order> userOrdersCopy = new ArrayList<>(BUConfig.get().userOrders);
 
         parsedOrders.iterator().forEachRemaining(order -> {
-            Optional<BazaarOrder> matchedOrder = order.findOrderInList(userOrdersCopy);
+            Optional<Order> matchedOrder = order.findOrderInList(userOrdersCopy);
 
             //if we find a match, update its values that can be found only in the orders menu
             matchedOrder.ifPresent(matched -> {
@@ -69,8 +70,8 @@ public class OrderUpdater {
             });
 
             //if we can't find a match, this is an order that isn't being tracked, so we add it (shouldn't happen)
-            if(matchedOrder.isEmpty()){
-                BazaarOrder newOrder =  order.toBazaarOrder();
+            if (matchedOrder.isEmpty()) {
+                Order newOrder =  order.toBazaarOrder();
                 Util.addWatchedOrder(newOrder);
                 //add item info, amount filled, amount claimed
                 updateBazaarOrder(newOrder, order.getItemInfo());
@@ -78,13 +79,13 @@ public class OrderUpdater {
         });
 
         //any orders left in userOrdersCopy are old orders that should be removed
-        if(!userOrdersCopy.isEmpty()){
-            userOrdersCopy.forEach(BazaarOrder::removeFromWatchedItems);
+        if (!userOrdersCopy.isEmpty()) {
+            userOrdersCopy.forEach(Order::removeFromWatchedItems);
         }
     }
 
-    private static void updateBazaarOrder(BazaarOrder order, ItemInfo parsedItemInfo) {
-        if (parsedItemInfo == null){
+    private static void updateBazaarOrder(Order order, ItemInfo parsedItemInfo) {
+        if (parsedItemInfo == null) {
             Util.notifyError("Error while updating order info", new Throwable("ItemInfo is null"));
             return;
         }
@@ -116,11 +117,12 @@ public class OrderUpdater {
 
     }
 
-    private static OrderInfoContainer parseOrderFromItemStack(ItemStack stack) {
+    private static OrderInfo parseOrderFromItemStack(ItemStack stack) {
         String title = stack.getName().getString();
+        Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
+
         ItemInfo itemInfo = new ItemInfo(mapScreenIndexToInventoryIndex(stack), stack);
 
-        Optional<? extends LoreComponent> loreComponent = stack.getComponentChanges().get(DataComponentTypes.LORE);
         if (loreComponent == null || loreComponent.isEmpty()) {
             return null;
         }
@@ -146,16 +148,18 @@ public class OrderUpdater {
 
         String cleanName = stripPrefix(title, orderType);
 
-        PriceInfoContainer.PriceType priceType = orderType == OrderType.SELL
-                ? PriceInfoContainer.PriceType.INSTABUY
-                : PriceInfoContainer.PriceType.INSTASELL;
-
-        return new OrderInfoContainer(cleanName, volume, unitPrice, priceType, itemInfo);
+        return new OrderInfo(cleanName, itemInfo, null, volume, unitPrice, orderType);
     }
 
     private static OrderType detectOrderType(String title) {
-        if (title.contains(PREFIX_BUY)) return OrderType.BUY;
-        if (title.contains(PREFIX_SELL)) return OrderType.SELL;
+        if (title.contains(PREFIX_BUY)) {
+            return OrderType.BUY;
+        }
+
+        if (title.contains(PREFIX_SELL)) {
+            return OrderType.SELL;
+        }
+
         return null;
     }
 

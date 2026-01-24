@@ -1,8 +1,7 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +15,7 @@ public class StringSellRestrictionControl extends SellRestrictionControl{
     }
 
     @Override
-    public boolean shouldRestrict(OrderInfoContainer container) {
+    public boolean shouldRestrict(OrderInfo container) {
         return container.getName().equalsIgnoreCase(name);
     }
 }

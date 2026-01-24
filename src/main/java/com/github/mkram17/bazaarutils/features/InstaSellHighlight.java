@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
@@ -48,9 +48,9 @@ public class InstaSellHighlight implements BUListener {
         }
         PlayerInventory inventory = optionalInventory.get();
 
-        List<OrderInfoContainer> instaSellOrders = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        List<OrderInfo> instaSellOrders = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
         List<String> names = instaSellOrders.stream()
-                .map(OrderInfoContainer::getName)
+                .map(OrderInfo::getName)
                 .distinct()
                 .toList();
 

@@ -3,8 +3,8 @@ package com.github.mkram17.bazaarutils.events.handlers;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -30,8 +30,8 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  * {@link RunOnInit} annotation.</p>
  * 
  * @see BazaarChatEvent
- * @see BazaarOrder
- * @see OrderInfoContainer
+ * @see Order
+ * @see OrderInfo
  */
 public class BazaarChatEventHandler {
 
@@ -45,7 +45,7 @@ public class BazaarChatEventHandler {
      * Sends a notification with the event type.
      */
     @EventHandler
-    private static void onAnyOrder(BazaarChatEvent<? extends OrderInfoContainer> event) {
+    private static void onAnyOrder(BazaarChatEvent<? extends OrderInfo> event) {
 //        SoundUtil.notifyMultipleTimes(4);
         PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
     }
@@ -55,10 +55,14 @@ public class BazaarChatEventHandler {
      * Updates the order limit tracker and adds the order to the watched orders list.
      */
     @EventHandler
-    private static void onOrderCreated(BazaarChatEvent<? extends OrderInfoContainer> event) {
-        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED) || !(event.order() instanceof BazaarOrder bazaarOrder)) return;
-        BUConfig.get().orderLimit.addOrderToLimit(bazaarOrder.getVolume()*bazaarOrder.getPricePerItem());
-        Util.addWatchedOrder(bazaarOrder);
+    private static void onOrderCreated(BazaarChatEvent<? extends OrderInfo> event) {
+        if (!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_CREATED) || !(event.order() instanceof Order order)) {
+            return;
+        }
+
+        BUConfig.get().orderLimit.addOrderToLimit(order.getVolume()* order.getPricePerItem());
+
+        Util.addWatchedOrder(order);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
     }
     /**
@@ -67,10 +71,13 @@ public class BazaarChatEventHandler {
      * Note: Chat shows price before tax, but actual transaction includes tax.
      */
     @EventHandler
-    private static void onInstaSell(BazaarChatEvent<? extends OrderInfoContainer> event) {
-        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL))
+    private static void onInstaSell(BazaarChatEvent<? extends OrderInfo> event) {
+        if (!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_SELL)) {
             return;
-        OrderInfoContainer order = event.order();
+        }
+
+        OrderInfo order = event.order();
+
         //insta sell shows the price before tax in chat, but it actually costs more than that
         double totalPriceBeforeTax = order.getVolume()*order.getPricePerItem();
         double totalPriceWithTax = totalPriceBeforeTax * ((100 + BUConfig.get().bzTax)/100);
@@ -84,10 +91,13 @@ public class BazaarChatEventHandler {
      * Updates the order limit tracker with the total purchase price.
      */
     @EventHandler
-    private static void onInstaBuy(BazaarChatEvent<? extends OrderInfoContainer> event) {
-        if (!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_BUY))
+    private static void onInstaBuy(BazaarChatEvent<? extends OrderInfo> event) {
+        if (!(event.type() == BazaarChatEvent.BazaarEventTypes.INSTA_BUY)) {
             return;
-        OrderInfoContainer order = event.order();
+        }
+
+        OrderInfo order = event.order();
+
         double totalPrice = order.getVolume() * order.getPricePerItem();
 
         BUConfig.get().orderLimit.addOrderToLimit(totalPrice);
@@ -99,15 +109,19 @@ public class BazaarChatEventHandler {
      * Plays notification sounds if enabled, marks the order as filled, and notifies the player.
      */
     @EventHandler
-    private static void onOrderFilled(BazaarChatEvent<? extends OrderInfoContainer> event) {
-        if(!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED))
+    private static void onOrderFilled(BazaarChatEvent<? extends OrderInfo> event) {
+        if (!(event.type() == BazaarChatEvent.BazaarEventTypes.ORDER_FILLED)) {
             return;
+        }
+
         if (BUConfig.get().orderFilledNotificationSound.isEnabled()) {
             SoundUtil.notifyMultipleTimes(ORDER_FILLED_NOTIFICATIONS);
         }
 
-        OrderInfoContainer order = event.order();
-        Optional<BazaarOrder> orderMatch = order.findOrderInList(BUConfig.get().userOrders);
+        OrderInfo order = event.order();
+
+        Optional<Order> orderMatch = order.findOrderInList(BUConfig.get().userOrders);
+
         if (orderMatch.isPresent()) {
             orderMatch.get().setFilled();
             PlayerActionUtil.notifyAll(order.getName() + "[" + orderMatch.get().getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);

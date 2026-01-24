@@ -2,9 +2,11 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderStatus;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
@@ -33,28 +35,28 @@ public class OutbidOrderHandler implements ConfigurableFeature {
         this.notificationSound = true;
     }
 
-    public static MutableText getOutbidMessage(BazaarOrder order) {
+    public static MutableText getOutbidMessage(Order order) {
         return createYourOrderForText(order)
                 .append(Text.literal(" is now outdated.").formatted(Formatting.WHITE))
                 .append(Text.literal(" Click to open bazaar orders").formatted(Formatting.GOLD));
     }
-    public static MutableText getCompetitiveMessage(BazaarOrder order) {
+    public static MutableText getCompetitiveMessage(Order order) {
         return createYourOrderForText(order)
                 .append(Text.literal(" is no longer outdated.").formatted(Formatting.DARK_PURPLE));
     }
-    public static MutableText getMatchedMessage(BazaarOrder order) {
+    public static MutableText getMatchedMessage(Order order) {
         return createYourOrderForText(order)
                 .append(Text.literal(" has been matched.").formatted(Formatting.YELLOW));
     }
-    private static MutableText createYourOrderForText(BazaarOrder order){
-        return Text.literal("Your " + order.getPriceType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
+    private static MutableText createYourOrderForText(Order order) {
+        return Text.literal("Your " + order.getOrderType().getString().toLowerCase() + " order for ").formatted(Formatting.WHITE)
                 .append(Text.literal(order.getVolume().toString() + " ").formatted(Formatting.DARK_PURPLE))
                 .append(Text.literal(order.getName()).formatted(Formatting.GOLD));
     }
 
-    public static List<BazaarOrder> getOutbidOrders() {
+    public static List<Order> getOutbidOrders() {
         return BUConfig.get().userOrders.stream()
-                .filter(order -> order.getOutbidStatus() == OrderInfoContainer.Statuses.OUTBID && order.getFillStatus() != OrderInfoContainer.Statuses.FILLED)
+                .filter(order -> order.getPricingPosition() == PricingPosition.OUTBID && order.getStatus() != OrderStatus.FILLED)
                 .toList();
     }
 

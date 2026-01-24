@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
@@ -150,20 +150,29 @@ public final class BazaarData {
      * Get the number of orders at an exact price for a product & price type.
      * @return OptionalInt empty if reply / product / priceType invalid or not found.
      */
-    public static OptionalInt getOrderCountOptional(String productId, PriceInfoContainer.PriceType priceType, double price) {
+    public static OptionalInt getOrderCountOptional(String productId, OrderType orderType, double price) {
         SkyBlockBazaarReply reply = currentReply;
-        if (reply == null || productId == null || priceType == null) return OptionalInt.empty();
+
+        if (reply == null || productId == null || orderType == null) {
+            return OptionalInt.empty();
+        }
 
         try {
             SkyBlockBazaarReply.Product product = reply.getProduct(productId);
-            if (product == null) return OptionalInt.empty();
 
-            List<SkyBlockBazaarReply.Product.Summary> list = switch (priceType) {
-                case INSTABUY -> product.getBuySummary();
-                case INSTASELL -> product.getSellSummary();
+            if (product == null) {
+                return OptionalInt.empty();
+            }
+
+            List<SkyBlockBazaarReply.Product.Summary> list = switch (orderType) {
+                case BUY -> product.getBuySummary();
+                case SELL -> product.getSellSummary();
             };
 
-            if (list == null) return OptionalInt.empty();
+            if (list == null) {
+                return OptionalInt.empty();
+            }
+
             for (SkyBlockBazaarReply.Product.Summary s : list) {
                 if (Double.compare(s.getPricePerUnit(), price) == 0) {
                     return OptionalInt.of((int) s.getOrders());
@@ -178,26 +187,28 @@ public final class BazaarData {
 
     /**
      * Empty can mean: reply/product/priceType invalid or not found; exception while finding price
-     * INSTABUY (top of buySummary aka people's sell orders). INSTASELL (top of sellSummary, aka people's buy orders).
+     * BUY (top of buySummary aka people's sell orders). SELL (top of sellSummary, aka people's buy orders).
      * @return OptionalDouble price found.
      */
-    public static OptionalDouble findItemPriceOptional(String productId, PriceInfoContainer.PriceType priceType) {
+    public static OptionalDouble findItemPriceOptional(String productId, OrderType orderType) {
         SkyBlockBazaarReply reply = currentReply;
-        if (reply == null || productId == null || priceType == null)
+
+        if (reply == null || productId == null || orderType == null) {
             return OptionalDouble.empty(); //TODO maybe throw error here instead. Needs testing to make sure it doesn't happen too frequently or at times where it is expected behavior
+        }
 
         try {
             SkyBlockBazaarReply.Product product = reply.getProduct(productId);
             if (product == null)
                 return OptionalDouble.empty();
 
-            return switch (priceType) {
-                case INSTABUY -> {
+            return switch (orderType) {
+                case BUY -> {
                     List<SkyBlockBazaarReply.Product.Summary> buySummary = product.getBuySummary();
                     if (buySummary == null || buySummary.isEmpty()) yield OptionalDouble.of(0.0);
                     yield OptionalDouble.of(buySummary.getFirst().getPricePerUnit());
                 }
-                case INSTASELL -> {
+                case SELL -> {
                     List<SkyBlockBazaarReply.Product.Summary> sellSummary = product.getSellSummary();
                     if (sellSummary == null || sellSummary.isEmpty()) yield OptionalDouble.of(0.0);
                     yield OptionalDouble.of(sellSummary.getFirst().getPricePerUnit());

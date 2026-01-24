@@ -8,12 +8,13 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -44,7 +45,8 @@ public class Bookmark extends CustomItemButton implements BUListener {
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
     @Getter
-    private final OrderInfoContainer orderInfo;
+    private final OrderInfo orderInfo;
+
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
@@ -63,7 +65,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
+        this.orderInfo = new OrderInfo(name, null, null, null, null, OrderType.SELL);
 
         subscribe();
     }
@@ -141,7 +143,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
 
     public static String findItemName(ChestLoadedEvent e){
         String nameFromContainer = findItemNameFromContainer();
-        if(!OrderInfoContainer.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
+        if (!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
         return nameFromContainer;
@@ -222,12 +224,12 @@ public class Bookmark extends CustomItemButton implements BUListener {
             final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
             MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
 
-            OrderInfoContainer orderInfo = bookmark.getOrderInfo();
+            OrderInfo orderInfo = bookmark.getOrderInfo();
             orderInfo.updateMarketPrice();
 
             Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-            text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins").setStyle(style));
-            text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins").setStyle(style));
+            text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getPriceForPosition(PricingPosition.MATCHED, OrderType.BUY)) + " coins").setStyle(style));
+            text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getPriceForPosition(PricingPosition.MATCHED, OrderType.SELL)) + " coins").setStyle(style));
 
             ItemSlotButtonWidget button = new ItemSlotButtonWidget(
                     buttonX,

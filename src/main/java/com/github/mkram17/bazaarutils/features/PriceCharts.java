@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -44,7 +44,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
         String key = sanitizeName(stack.getName().getString());
 
         // Lazily populate cache if a synced/replaced stack appears later
-        if (!SHOW_CACHE.computeIfAbsent(key, OrderInfoContainer::isValidName))
+        if (!SHOW_CACHE.computeIfAbsent(key, OrderInfo::isValidName)) {
             return;
 
         MutableText text = Text.literal("CTRL+SHIFT click for price charts & other info")

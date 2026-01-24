@@ -2,7 +2,8 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.data.BazaarData;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -53,10 +54,16 @@ public class MaxBuyOrder extends CustomOrder {
             String name = itemStack.getCustomName().getString();
             Optional<String> productIdOptional = BazaarData.findProductIdOptional(name);
 
-            if(productIdOptional.isEmpty()) return;
+            if (productIdOptional.isEmpty()) {
+                return;
+            }
 
-            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), PriceInfoContainer.PriceType.INSTASELL);
-            if(costOpt.isEmpty()) return;
+            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), OrderType.BUY);
+
+            if (costOpt.isEmpty()) {
+                return;
+            }
+
             double cost = costOpt.getAsDouble() + .1;//.1 is for lowest competitive price
 
             int amountCanBuy = (int) (Math.floor(purse / cost));

@@ -1,16 +1,14 @@
 package com.github.mkram17.bazaarutils.events.handlers;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
@@ -32,8 +30,8 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  * {@link RunOnInit} annotation on {@link #registerBazaarChat()}.</p>
  * 
  * @see BazaarChatEvent
- * @see OrderInfoContainer
- * @see BazaarOrder
+ * @see OrderInfo
+ * @see Order
  */
 //TODO make finding order consistent. Some (eg handleClaimed) find the actual BazaarOrder object from userOrders, while others (eg handleFilled) just make a new OrderInfoContainer without finding the actual order
 public class ChatHandler {
@@ -104,7 +102,7 @@ public class ChatHandler {
      * @param priceIndex index of the price component
      * @return the parsed order information if successful, empty otherwise
      */
-    private static Optional<OrderInfoContainer> parseOrderData(ArrayList<Text> siblings, int volumeIndex, int nameIndex, int priceIndex) {
+    private static Optional<OrderInfo> parseOrderData(ArrayList<Text> siblings, int volumeIndex, int nameIndex, int priceIndex) {
         try {
             String volumeString = siblings.get(volumeIndex).getString().replace(",", "");
             int volume = Integer.parseInt(volumeString);
@@ -120,7 +118,7 @@ public class ChatHandler {
 
             double pricePerUnit = totalPrice / volume;
 
-            return Optional.of(new OrderInfoContainer(name, volume, pricePerUnit, null, null));
+            return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null));
         } catch (Exception e) {
             Util.notifyError("Failed to parse order data from chat: " + siblings.stream().map(Text::getString), e);
             return Optional.empty();
@@ -132,7 +130,7 @@ public class ChatHandler {
      * 
      * @param siblings the text components of the message
      * @param eventType the type of bazaar event
-     * @param priceType the price type (insta buy/insta sell)
+     * @param orderType the order type (buy/sell)
      * @param volumeIndex index of the volume component
      * @param nameIndex index of the item name component
      * @param priceIndex index of the price component
@@ -140,13 +138,14 @@ public class ChatHandler {
     private static void processOrderEvent(
             ArrayList<Text> siblings,
             BazaarChatEvent.BazaarEventTypes eventType,
-            PriceInfoContainer.PriceType priceType,
+            OrderType orderType,
             int volumeIndex,
             int nameIndex,
             int priceIndex
     ) {
         parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
-            order.setPriceType(priceType);
+            order.setOrderType(orderType);
+
             EVENT_BUS.post(new BazaarChatEvent<>(eventType, order));
         });
     }
@@ -157,7 +156,7 @@ public class ChatHandler {
      * @param siblings the text components of the message
      */
     public static void handleFlip(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, PriceInfoContainer.PriceType.INSTABUY, 3, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_FLIPPED, OrderType.SELL, 3, 4, 6);
     }
 
     /**
@@ -167,7 +166,8 @@ public class ChatHandler {
      */
     public static void handleCancelled(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
+
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.ORDER_CANCELLED, OrderType.SELL, 2, 4, priceIndex);
     }
 
     /**
@@ -177,7 +177,8 @@ public class ChatHandler {
      */
     public static void handleInstaSell(ArrayList<Text> siblings) {
         int priceIndex = Util.componentIndexOf(siblings, "for") + 1;
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, PriceInfoContainer.PriceType.INSTASELL, 2, 4, priceIndex);
+
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_SELL, OrderType.BUY, 2, 4, priceIndex);
     }
 
     /**
@@ -186,7 +187,7 @@ public class ChatHandler {
      * @param siblings the text components of the message
      */
     public static void handleInstaBuy(ArrayList<Text> siblings) {
-        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, PriceInfoContainer.PriceType.INSTABUY, 2, 4, 6);
+        processOrderEvent(siblings, BazaarChatEvent.BazaarEventTypes.INSTA_BUY, OrderType.SELL, 2, 4, 6);
     }
 
     /**
@@ -207,8 +208,8 @@ public class ChatHandler {
             int volume = Integer.parseInt(parts[1].replace(",", ""));
             String itemName = parts[2].trim();
 
-            PriceInfoContainer.PriceType priceType = messageString.contains("Sell Offer") ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
-            OrderInfoContainer item = new OrderInfoContainer(itemName, volume, null, priceType, null);
+            OrderType orderType = messageString.contains("Sell Offer") ? OrderType.SELL : OrderType.BUY;
+            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType);
 
             EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -237,8 +238,9 @@ public class ChatHandler {
             price /= ((100 - BUConfig.get().bzTax) / 100);
         }
 
-        PriceInfoContainer.PriceType priceType = isSellOrder ? PriceInfoContainer.PriceType.INSTABUY : PriceInfoContainer.PriceType.INSTASELL;
-        BazaarOrder orderToAdd = new BazaarOrder(itemName, volume, price, priceType);
+        OrderType orderType = isSellOrder ? OrderType.SELL : OrderType.BUY;
+        Order orderToAdd = new Order(itemName, volume, price, orderType, null);
+
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CREATED, orderToAdd));
     }
 
@@ -262,7 +264,8 @@ public class ChatHandler {
      * @param siblings the text components of the message
      */
     private static void handleClaimed(ArrayList<Text> siblings) {
-        Optional<BazaarOrder> orderOptional;
+        Optional<Order> orderOptional;
+
         try {
             if (siblings.get(6).getString().contains("worth")) {
                 orderOptional = getClaimedBuyOrder(siblings);
@@ -277,7 +280,9 @@ public class ChatHandler {
             Util.notifyError("Could not find claimed order in watched orders", new Throwable("Order Claim Error"));
             return;
         }
-        BazaarOrder order = orderOptional.get();
+
+        Order order = orderOptional.get();
+
         PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
@@ -288,7 +293,7 @@ public class ChatHandler {
      * @param siblings the text components of the message
      * @return the claimed buy order if found in tracked orders, empty otherwise
      */
-    private static Optional<BazaarOrder> getClaimedBuyOrder(ArrayList<Text> siblings) {
+    private static Optional<Order> getClaimedBuyOrder(ArrayList<Text> siblings) {
         // Parse volume with validation
         String volumeStr = siblings.get(3).getString().replace(",", "").trim();
         if (volumeStr.isEmpty()) {
@@ -327,11 +332,12 @@ public class ChatHandler {
 
         double price = totalPrice / volumeClaimed;
 
-        OrderInfoContainer item;
-        if (OrderInfoContainer.getVariables(OrderInfoContainer::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfoContainer(itemName, volumeClaimed, price, PriceInfoContainer.PriceType.INSTASELL, null);
+        OrderInfo item;
+
+        if (OrderInfo.getVariables(OrderInfo::getVolume).contains(volumeClaimed)) {
+            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY);
         } else {
-            item = new OrderInfoContainer(itemName, null, price, PriceInfoContainer.PriceType.INSTASELL, null);
+            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY);
         }
 
         return getOrderInfo(item);
@@ -343,7 +349,7 @@ public class ChatHandler {
      * @param siblings the text components of the message
      * @return the claimed sell order if found in tracked orders, empty otherwise
      */
-    private static Optional<BazaarOrder> getClaimedSellOrder(ArrayList<Text> siblings) {
+    private static Optional<Order> getClaimedSellOrder(ArrayList<Text> siblings) {
         // Sell order claimed messages sometimes include volume and sometimes don't
 
         Text volumeComponent = siblings.get(Util.componentIndexOf(siblings, "x") - 1);
@@ -357,7 +363,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfoContainer item = new OrderInfoContainer(name, volume, price, PriceInfoContainer.PriceType.INSTABUY, null);
+        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL);
 
         return getOrderInfo(item);
     }
@@ -368,8 +374,8 @@ public class ChatHandler {
      * @param item the order information container to match
      * @return the matching bazaar order if found, empty otherwise
      */
-    private static Optional<BazaarOrder> getOrderInfo(OrderInfoContainer item) {
-        Optional<BazaarOrder> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
+    private static Optional<Order> getOrderInfo(OrderInfo item) {
+        Optional<Order> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), Util.notificationTypes.ORDERDATA);

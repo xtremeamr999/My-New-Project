@@ -6,10 +6,8 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoUtil;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.*;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
@@ -40,10 +38,10 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         this.enabled = enabled;
     }
 
-    public static BazaarOrder getHighlightedOrder(int slotIndex) {
+    public static Order getHighlightedOrder(int slotIndex) {
         var order = OrderInfoUtil.getUserOrderFromIndex(slotIndex);
         return order.filter(
-                bazaarOrder -> bazaarOrder.getFillStatus() != null && bazaarOrder.getFillStatus() == BazaarOrder.Statuses.SET)
+                bazaarOrder -> bazaarOrder.getStatus() != null && bazaarOrder.getStatus() == OrderStatus.SET)
                 .orElse(null);
     }
 
@@ -96,9 +94,13 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
             return null;
         }
 
-        OrderInfoContainer.Statuses orderStatus = order.getOutbidStatus();
-        if (orderStatus == null) return null;
-        return getArgbFromOutbidStatus(orderStatus);
+        PricingPosition pricingPosition = order.getPricingPosition();
+
+        if (pricingPosition == null) {
+            return null;
+        }
+
+        return getArgbFromOutbidStatus(pricingPosition);
     }
 
     //maybe could be split into separate methods, but this is fine for now
@@ -117,33 +119,40 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
                 index = slot.getIndex();
             }
 
-            if(!SlotHighlightCache.orderStatusHighlightCache.containsKey(index)) return;
+            if (!SlotHighlightCache.orderStatusHighlightCache.containsKey(index)) {
+                return;
+            }
 
-            BazaarOrder order = getHighlightedOrder(index);
+            Order order = getHighlightedOrder(index);
+
             if (order == null) {
                 return;
             }
 
-            OrderInfoContainer.Statuses orderStatus = order.getOutbidStatus();
-            if(orderStatus == null) return;
+            PricingPosition pricingPosition = order.getPricingPosition();
 
-            switch (orderStatus) {
-                case OUTBID:
-                    lines.add(1, Text.literal("OUTBID").formatted(Formatting.RED, Formatting.BOLD));
-                    lines.add(2, Text.literal("Market Price: " + Util.getPrettyString(order.getMarketPrice(order.getPriceType()))).formatted(Formatting.RED));
-                    break;
+            if (pricingPosition == null) {
+                return;
+            }
+
+            switch (pricingPosition) {
                 case COMPETITIVE:
                     lines.add(1, Text.literal("COMPETITIVE").formatted(Formatting.GREEN, Formatting.BOLD));
                     break;
                 case MATCHED:
                     lines.add(1, Text.literal("MATCHED").formatted(Formatting.YELLOW, Formatting.BOLD));
+
+                    break;
+                case OUTBID:
+                    lines.add(1, Text.literal("OUTBID").formatted(Formatting.RED, Formatting.BOLD));
+                    lines.add(2, Text.literal("Market Price: " + Util.getPrettyString(order.getMarketPrice(order.getOrderType()))).formatted(Formatting.RED));
+
                     break;
             }
-            if(BUConfig.get().developerMode) {
-                var sellPrice = order.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL);
-                var buyPrice = order.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY);
-                if(sellPrice == null || buyPrice == null)
-                    return;
+
+            if (BUConfig.get().developerMode) {
+                var sellPrice = order.getMarketPrice(OrderType.BUY);
+                var buyPrice = order.getMarketPrice(OrderType.SELL);
 
                 lines.add(Text.literal("[BU] Buy: " + Util.getPrettyString(sellPrice) + " coins"));
                 lines.add(Text.literal("[BU] Sell: " + Util.getPrettyString(buyPrice) + " coins"));
@@ -155,9 +164,9 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         int color;
         final float r, g, b;
 
-        if (outbidStatus == OrderInfoContainer.Statuses.COMPETITIVE) {
+        if (pricingPosition == PricingPosition.COMPETITIVE) {
             r = 0.0f; g = 1.0f; b = 0.0f; // Green
-        } else if (outbidStatus == OrderInfoContainer.Statuses.OUTBID) {
+        } else if (pricingPosition == PricingPosition.OUTBID) {
             r = 1.0f; g = 0.0f; b = 0.0f; // Red
         } else { // MATCHED
             r = 1.0f; g = 1.0f; b = 0.0f; // Yellow

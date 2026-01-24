@@ -8,8 +8,9 @@ import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.misc.adapters.ItemStackCodecGsonAdapter;
 import com.github.mkram17.bazaarutils.misc.adapters.ZonedDateTimeAdapter;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
@@ -65,9 +66,9 @@ public class BUConfig {
 
     //Features
     @SerialEntry
-    public FlipHelper flipHelper = new FlipHelper(true, BiddingType.COMPETITIVE, 17);
+    public FlipHelper flipHelper = new FlipHelper(true, PricingPosition.COMPETITIVE, 17);
     @SerialEntry
-    public List<BazaarOrder> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
+    public List<Order> userOrders = new CopyOnWriteArrayList<>(); // the user's orders
     @SerialEntry
     public double bzTax = 1.125;
     @SerialEntry

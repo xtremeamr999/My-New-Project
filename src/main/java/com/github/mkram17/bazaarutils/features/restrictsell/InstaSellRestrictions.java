@@ -8,7 +8,7 @@ import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellR
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -56,7 +56,7 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
             return;
 
-        List<OrderInfoContainer> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        List<OrderInfo> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
         isInstaSellRestricted = shouldRestrictInstaSell(items);
     }
 
@@ -71,7 +71,7 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         }
     }
 
-    private boolean shouldRestrictInstaSell(List<OrderInfoContainer> items){
+    private boolean shouldRestrictInstaSell(List<OrderInfo> items){
         return items.stream().anyMatch(this::isItemRestricted);
     }
 
@@ -79,7 +79,7 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         controls.add(control);
     }
 
-    private boolean isItemRestricted(OrderInfoContainer item) {
+    private boolean isItemRestricted(OrderInfo item) {
         for(SellRestrictionControl control : controls) {
             if(!control.isEnabled())
                 continue;

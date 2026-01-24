@@ -1,7 +1,8 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
@@ -11,9 +12,8 @@ import java.util.*;
 
 //NOTE FROM INSTASELLRESTRICTION: if there are items with no buy orders in inv, you get "Some items can't be sold" and there are 2 extra components
 
-public class InstaSellUtil{
-
-    public static List<OrderInfoContainer> getInstaSellOrders(List<ItemStack> itemStacks) {
+public class InstaSellUtil {
+    public static List<OrderInfo> getInstaSellOrders(List<ItemStack> itemStacks) {
         if (!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
             return Collections.emptyList();
         }
@@ -29,8 +29,9 @@ public class InstaSellUtil{
         return itemStacks.stream().filter(itemStack -> itemStack.getName().getString().contains("Sell Inventory Now")).findFirst();
     }
 
-    private static List<OrderInfoContainer> getInstaSellOrderData(ItemStack instaSellItemStack){
-        List<OrderInfoContainer> orderData = new ArrayList<>();
+    private static List<OrderInfo> getInstaSellOrderData(ItemStack instaSellItemStack) {
+        List<OrderInfo> orderData = new ArrayList<>();
+
         LoreComponent loreComponents = instaSellItemStack.get(DataComponentTypes.LORE);
         if(loreComponents == null){
             return Collections.emptyList();
@@ -39,8 +40,9 @@ public class InstaSellUtil{
         return findInstaSellOrderData(loreLines);
     }
 
-    private static List<OrderInfoContainer> findInstaSellOrderData(List<Text> loreLines){
-        List<OrderInfoContainer> orderData = new ArrayList<>();
+    private static List<OrderInfo> findInstaSellOrderData(List<Text> loreLines) {
+        List<OrderInfo> orderData = new ArrayList<>();
+
         List<Text> itemLoreLines = getItemLoreLines(loreLines);
         for(Text line : itemLoreLines) {
             int volume = getVolume(line);
@@ -48,7 +50,8 @@ public class InstaSellUtil{
             double pricePerUnit = Math.round(totalPrice / volume * 10)/10.0;
             String name = getName(line);
 
-            OrderInfoContainer instaSellItem = new OrderInfoContainer(name, volume, pricePerUnit, PriceInfoContainer.PriceType.INSTASELL, null);
+            OrderInfo instaSellItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY);
+
             orderData.add(instaSellItem);
         }
         return orderData;

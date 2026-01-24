@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import lombok.Getter;
 import lombok.Setter;
 
