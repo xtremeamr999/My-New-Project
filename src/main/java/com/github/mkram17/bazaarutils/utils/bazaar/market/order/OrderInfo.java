@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,8 +62,8 @@ public class OrderInfo extends PriceInfo implements BUListener {
      * @param itemInfo     optional UI context from the Bazaar screen
      * @param status       status of the order
      */
-    public OrderInfo(@Nullable String name, @Nullable ItemInfo itemInfo, @Nullable OrderStatus status, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable OrderType orderType) {
-        super(pricePerItem, orderType != null ? orderType.asPriceType() : null);
+    public OrderInfo(@Nullable String name, @Nullable ItemInfo itemInfo, @Nullable OrderStatus status, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable OrderType orderType, @Nullable PriceType priceType) {
+        super(pricePerItem, priceType);
 
         this.name = name;
         this.itemInfo = itemInfo;
@@ -149,7 +150,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
 
     //TODO this ideally isn't needed -- fix any bugs that cause these issues in the first place
     private boolean isProductIDHealthy() {
-        return !(this.productID == null || this.productID.isEmpty() || BazaarDataManager.findItemPriceOptional(this.productID, getOrderType().asPriceType()).isEmpty());
+        return !(this.productID == null || this.productID.isEmpty() || BazaarDataManager.findItemPriceOptional(this.productID, getPriceType()).isEmpty());
     }
 
     /**

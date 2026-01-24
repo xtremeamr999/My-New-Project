@@ -69,7 +69,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfo(name, null, null, null, null, OrderType.SELL);
+        this.orderInfo = new OrderInfo(name, null, null, null, null, OrderType.SELL, PriceType.INSTABUY);
 
         subscribe();
     }

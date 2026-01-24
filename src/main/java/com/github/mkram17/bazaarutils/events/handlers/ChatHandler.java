@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
@@ -137,7 +138,7 @@ public class ChatHandler {
             double totalPrice = Double.parseDouble(priceString);
             double pricePerUnit = totalPrice / volume;
 
-            return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null));
+            return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null, null));
         } catch (Exception e) {
             Util.notifyError("Failed to parse order data from chat: " + siblings.stream().map(Text::getString), e);
             return Optional.empty();
@@ -231,7 +232,7 @@ public class ChatHandler {
             String itemName = parts[2].trim();
 
             OrderType orderType = messageString.contains("Sell Offer") ? OrderType.SELL : OrderType.BUY;
-            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType);
+            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType, orderType.asPriceType());
 
             EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -367,9 +368,9 @@ public class ChatHandler {
         OrderInfo item;
 
         if (OrderInfo.getVariables(OrderInfo::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY);
+            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY, PriceType.INSTASELL);
         } else {
-            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY);
+            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY, PriceType.INSTASELL);
         }
 
         return getOrderInfo(item);
@@ -394,7 +395,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL);
+        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL, PriceType.INSTABUY);
 
         return getOrderInfo(item);
     }

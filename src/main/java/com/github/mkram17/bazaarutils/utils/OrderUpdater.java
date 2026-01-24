@@ -167,7 +167,7 @@ public class OrderUpdater {
 
         String cleanName = stripPrefix(title, orderType);
 
-        return new OrderInfo(cleanName, itemInfo, null, volume, unitPrice, orderType);
+        return new OrderInfo(cleanName, itemInfo, null, volume, unitPrice, orderType, orderType.asPriceType());
     }
 
     private static OrderType detectOrderType(String title) {

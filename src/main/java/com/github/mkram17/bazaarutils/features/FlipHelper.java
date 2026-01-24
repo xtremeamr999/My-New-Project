@@ -235,7 +235,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             PriceInfo priceInfo = priceInfoOpt.get();
-            OrderInfo tempOrder = new OrderInfo(null, null, null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), priceInfo.getPriceType().asOrderType());
+            OrderInfo tempOrder = new OrderInfo(null, null, null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), priceInfo.getPriceType().asOrderType(), priceInfo.getPriceType());
 
             return tempOrder.findOrderInList(BUConfig.get().userOrders);
         }

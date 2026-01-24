@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
@@ -60,7 +61,7 @@ public class InstaSellUtil {
 
             String name = getName(line);
 
-            OrderInfo instaSellItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY);
+            OrderInfo instaSellItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY, PriceType.INSTASELL);
 
             orderData.add(instaSellItem);
         }
