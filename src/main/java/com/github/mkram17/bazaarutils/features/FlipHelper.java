@@ -8,6 +8,7 @@ import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
@@ -17,7 +18,6 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -205,7 +205,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
             try {
                 double orderPrice = Double.parseDouble(matcher.group(1).replace(",", ""));
 
-                return Optional.of(new PriceInfo(orderPrice, PriceType.INSTASELL));
+                return Optional.of(new PriceInfo(orderPrice, OrderType.BUY));
             } catch (NumberFormatException e) {
                 Util.notifyError("Error while trying to parse order price in Flip Helper", e);
             }
@@ -235,7 +235,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             PriceInfo priceInfo = priceInfoOpt.get();
-            OrderInfo tempOrder = new OrderInfo(null, null, null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), priceInfo.getPriceType().asOrderType(), priceInfo.getPriceType());
+            OrderInfo tempOrder = new OrderInfo(null, null, null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), priceInfo.getOrderType());
 
             return tempOrder.findOrderInList(BUConfig.get().userOrders);
         }

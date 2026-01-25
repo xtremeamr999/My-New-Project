@@ -9,10 +9,11 @@ import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
+import com.mojang.datafixers.util.Either;
 import lombok.Getter;
 import lombok.Setter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.*;
@@ -23,6 +24,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 public final class BazaarDataManager {
+    @Getter
+    public enum PriceType {
+        INSTABUY,
+        INSTASELL;
+
+        public String getString() {
+            return switch (this) {
+                case INSTASELL -> "Buy";
+                case INSTABUY -> "Sell";
+            };
+        }
+
+        private PriceType opposite;
+
+        static {
+            INSTASELL.opposite = INSTABUY;
+            INSTABUY.opposite = INSTASELL;
+        }
+    }
 
     private static final long BASE_INTERVAL_MS = 20_000;
     private static final long POST_OFFSET_MS = 500;
@@ -155,7 +175,9 @@ public final class BazaarDataManager {
     public static OptionalInt getOrderCountOptional(String productId, OrderType orderType, double price) {
         SkyBlockBazaarReply reply = currentReply;
 
-        if (reply == null || productId == null || orderType == null) {
+        PriceType priceType = orderType.asPriceType();
+
+        if (reply == null || productId == null || priceType == null) {
             return OptionalInt.empty();
         }
 
@@ -166,9 +188,9 @@ public final class BazaarDataManager {
                 return OptionalInt.empty();
             }
 
-            List<SkyBlockBazaarReply.Product.Summary> list = switch (orderType) {
-                case BUY -> product.getBuySummary();
-                case SELL -> product.getSellSummary();
+            List<SkyBlockBazaarReply.Product.Summary> list = switch (priceType) {
+                case INSTABUY -> product.getBuySummary();
+                case INSTASELL -> product.getSellSummary();
             };
 
             if (list == null) {
@@ -194,8 +216,10 @@ public final class BazaarDataManager {
      * BUY (top of buySummary aka people's sell orders). SELL (top of sellSummary, aka people's buy orders).
      * @return OptionalDouble price found.
      */
-    public static OptionalDouble findItemPriceOptional(String productId, PriceType priceType) {
+    public static OptionalDouble findItemPriceOptional(String productId, OrderType orderType) {
         SkyBlockBazaarReply reply = currentReply;
+
+        PriceType priceType = orderType.asPriceType();
 
         if (reply == null || productId == null || priceType == null) {
             return OptionalDouble.empty(); //TODO maybe throw error here instead. Needs testing to make sure it doesn't happen too frequently or at times where it is expected behavior

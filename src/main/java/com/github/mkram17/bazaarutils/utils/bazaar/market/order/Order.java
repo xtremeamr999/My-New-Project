@@ -9,7 +9,7 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,15 +44,15 @@ public class Order extends OrderInfo {
     /**
      * Creates a Bazaar order with no captured {@link ItemInfo} context.
      */
-    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, PriceType priceType) {
+    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, BazaarDataManager.PriceType priceType) {
         this(name, volume, pricePerItem, orderType, priceType, null);
     }
 
     /**
      * Creates a Bazaar order, initializing ItemInfo with slot index and ItemStack of the order.
      */
-    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, PriceType priceType, ItemInfo itemInfo) {
-        super(name, null, OrderStatus.SET, volume, pricePerItem, orderType, priceType);
+    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, BazaarDataManager.PriceType priceType, ItemInfo itemInfo) {
+        super(name, null, OrderStatus.SET, volume, pricePerItem, orderType);
 
         startTracking();
     }
@@ -114,7 +114,7 @@ public class Order extends OrderInfo {
             message = OutbidOrderHandler.getOutbidMessage(this);
 
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + this.getPriceForPosition(PricingPosition.MATCHED, this.getOrderType().asPriceType()) + " Order Price: " + this.getPricePerItem()));
+                message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getOrderType()) + " Order Price: " + this.getPricePerItem()));
             }
 
             if (shouldAutoOpenBazaar) {
@@ -215,7 +215,7 @@ public class Order extends OrderInfo {
     public double getMarketPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.MATCHED, orderType.asPriceType());
+        return this.getPriceForPosition(PricingPosition.MATCHED, orderType);
     }
 
     /**
@@ -226,7 +226,7 @@ public class Order extends OrderInfo {
     public double getUndercutPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.COMPETITIVE, orderType.asPriceType());
+        return this.getPriceForPosition(PricingPosition.COMPETITIVE, orderType);
     }
 
     /**
@@ -237,7 +237,7 @@ public class Order extends OrderInfo {
     public double getOutbidPrice(OrderType orderType) {
         updateMarketPrice();
 
-        return this.getPriceForPosition(PricingPosition.OUTBID, orderType.asPriceType());
+        return this.getPriceForPosition(PricingPosition.OUTBID, orderType);
     }
 
     /**

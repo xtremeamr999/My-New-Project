@@ -3,13 +3,12 @@ package com.github.mkram17.bazaarutils.events.handlers;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 
@@ -138,7 +137,7 @@ public class ChatHandler {
             double totalPrice = Double.parseDouble(priceString);
             double pricePerUnit = totalPrice / volume;
 
-            return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null, null));
+            return Optional.of(new OrderInfo(name, null, null, volume, pricePerUnit, null));
         } catch (Exception e) {
             Util.notifyError("Failed to parse order data from chat: " + siblings.stream().map(Text::getString), e);
             return Optional.empty();
@@ -165,7 +164,6 @@ public class ChatHandler {
     ) {
         parseOrderData(siblings, volumeIndex, nameIndex, priceIndex).ifPresent(order -> {
             order.setOrderType(orderType);
-            order.setPriceType(orderType.asPriceType());
 
             EVENT_BUS.post(new BazaarChatEvent<>(eventType, order));
         });
@@ -232,7 +230,7 @@ public class ChatHandler {
             String itemName = parts[2].trim();
 
             OrderType orderType = messageString.contains("Sell Offer") ? OrderType.SELL : OrderType.BUY;
-            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType, orderType.asPriceType());
+            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType);
 
             EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -368,9 +366,9 @@ public class ChatHandler {
         OrderInfo item;
 
         if (OrderInfo.getVariables(OrderInfo::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY, PriceType.INSTASELL);
+            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY);
         } else {
-            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY, PriceType.INSTASELL);
+            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY);
         }
 
         return getOrderInfo(item);
@@ -395,7 +393,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL, PriceType.INSTABUY);
+        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL);
 
         return getOrderInfo(item);
     }

@@ -1,25 +1,25 @@
 package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import lombok.Getter;
 
 @Getter
 public enum OrderType {
     BUY {
         @Override
-        public PriceType asPriceType() {
-            return PriceType.INSTASELL;
+        public BazaarDataManager.PriceType asPriceType() {
+            return BazaarDataManager.PriceType.INSTASELL;
         }
     },
 
     SELL {
         @Override
-        public PriceType asPriceType() {
-            return PriceType.INSTABUY;
+        public BazaarDataManager.PriceType asPriceType() {
+            return BazaarDataManager.PriceType.INSTABUY;
         }
     };
 
-    public abstract PriceType asPriceType();
+    public abstract BazaarDataManager.PriceType asPriceType();
 
     public String getString() {
         return switch (this) {

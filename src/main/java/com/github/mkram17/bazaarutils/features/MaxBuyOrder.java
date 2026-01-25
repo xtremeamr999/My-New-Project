@@ -3,7 +3,7 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import meteordevelopment.orbit.EventHandler;
@@ -62,7 +62,7 @@ public class MaxBuyOrder extends CustomOrder {
                 return;
             }
 
-            OptionalDouble costOpt = BazaarDataManager.findItemPriceOptional(productIdOptional.get(), PriceType.INSTASELL);
+            OptionalDouble costOpt = BazaarDataManager.findItemPriceOptional(productIdOptional.get(), OrderType.BUY);
 
             if (costOpt.isEmpty()) {
                 return;

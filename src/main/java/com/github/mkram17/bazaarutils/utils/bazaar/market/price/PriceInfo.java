@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,7 @@ import lombok.Setter;
  */
 public class PriceInfo {
     @Setter @Getter
-    protected PriceType priceType;
+    protected OrderType orderType;
 
     @Setter @Getter
     protected PricingPosition pricingPosition;
@@ -22,49 +23,52 @@ public class PriceInfo {
     protected Double pricePerItem;
 
     @Setter
-    private Double marketInstaSellPrice;
+    private Double marketBuyPrice;
 
     @Setter
-    private Double marketInstaBuyPrice;
+    private Double marketSellPrice;
 
-    public PriceInfo(Double pricePerItem, PriceType priceType) {
-        this.priceType = priceType;
+    public PriceInfo(Double pricePerItem, OrderType orderType) {
+        this.orderType = orderType;
 
         if (pricePerItem != null) {
             //TODO figure out best rounding. Eg to the tenth, hundredth or thousandth
             this.pricePerItem = (double) Math.round(pricePerItem * 10) / 10;
         }
-        if (priceType == null) {
-            //if the priceType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value
+        if (orderType == null) {
+            //if the orderType is null, it's value doesn't matter, but the rest of the code needs a value to run as expected, so we give a default value
             //TODO revisit whether this still needs to have default value
-            this.priceType = PriceType.INSTABUY;
+            this.orderType = OrderType.SELL;
         }
     }
 
     public void flipPrices(double newPrice) {
-        this.priceType = this.priceType.getOpposite();
+        this.orderType = this.orderType.getOpposite();
         this.pricePerItem = newPrice;
     }
 
     protected void updateMarketPrice(String productId) {
-        var instaSellPriceOpt = BazaarDataManager.findItemPriceOptional(productId, PriceType.INSTASELL);
-        var instaBuyPriceOpt = BazaarDataManager.findItemPriceOptional(productId, PriceType.INSTABUY);
+        var buyPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.BUY);
+        var sellPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.SELL);
 
-        instaSellPriceOpt.ifPresent(price -> marketInstaSellPrice = Util.truncateNum(price));
-        instaBuyPriceOpt.ifPresent(price -> marketInstaBuyPrice = Util.truncateNum(price));
+        Util.logMessage("buyPriceOpt (marketBuyPrice): " + buyPriceOpt.getAsDouble());
+        Util.logMessage("sellPriceOpt (marketSellPrice): " + sellPriceOpt.getAsDouble());
+
+        buyPriceOpt.ifPresent(price -> marketBuyPrice = Util.truncateNum(price));
+        sellPriceOpt.ifPresent(price -> marketSellPrice = Util.truncateNum(price));
     }
 
-    public Double getPriceForPosition(PricingPosition pricingPosition, PriceType priceType) {
-        return switch (priceType) {
-            case INSTABUY -> switch (pricingPosition) {
-                case COMPETITIVE -> marketInstaBuyPrice - 0.1;
-                case MATCHED -> marketInstaBuyPrice;
-                case OUTBID -> marketInstaBuyPrice + 0.1;
+    public Double getPriceForPosition(PricingPosition pricingPosition, OrderType orderType) {
+        return switch (orderType) {
+            case SELL -> switch (pricingPosition) {
+                case COMPETITIVE -> marketSellPrice - 0.1;
+                case MATCHED -> marketSellPrice;
+                case OUTBID -> marketSellPrice + 0.1;
             };
-            case INSTASELL -> switch (pricingPosition) {
-                case COMPETITIVE -> marketInstaSellPrice + 0.1;
-                case MATCHED -> marketInstaSellPrice;
-                case OUTBID -> marketInstaSellPrice - 0.1;
+            case BUY -> switch (pricingPosition) {
+                case COMPETITIVE -> marketBuyPrice + 0.1;
+                case MATCHED -> marketBuyPrice;
+                case OUTBID -> marketBuyPrice - 0.1;
             };
         };
     }
