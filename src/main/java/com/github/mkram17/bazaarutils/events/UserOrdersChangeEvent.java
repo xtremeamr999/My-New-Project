@@ -1,9 +1,8 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import meteordevelopment.orbit.ICancellable;
 
 /**
@@ -27,7 +26,7 @@ import meteordevelopment.orbit.ICancellable;
  * }
  * </pre>
  * 
- * @see BazaarOrder
+ * @see Order
  * @see ChangeTypes
  */
 @AllArgsConstructor
@@ -55,7 +54,7 @@ public class UserOrdersChangeEvent implements ICancellable {
      * The bazaar order that was affected by the change.
      */
     @Getter
-    private BazaarOrder order;
+    private Order order;
 
     @Override
     public void setCancelled(boolean cancelled) {

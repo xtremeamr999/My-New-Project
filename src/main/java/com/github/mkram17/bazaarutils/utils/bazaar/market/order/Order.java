@@ -1,13 +1,16 @@
-package com.github.mkram17.bazaarutils.misc.orderinfo;
+package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
+import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,39 +29,35 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO sometimes a BazaarOrder is created that is for the same order as one in userOrders, but not the same object. This causes problems sometimes, and should be fixed.
 //TODO use last viewed item in bazaar to help with finding accurate price instead of just chat message
 /**
- * Extension of {@link OrderInfoContainer} that tracks live Bazaar orders and reacts to events such
+ * Extension of {@link OrderInfo} that tracks live Bazaar orders and reacts to events such
  * as outbids, user order changes, and price updates.
  */
 @Slf4j
-public class BazaarOrder extends OrderInfoContainer {
-
+public class Order extends OrderInfo {
     public static final int OUTBID_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
 
-    @Getter @Setter
-    private Statuses fillStatus; //only used to determine if order is set or filled, not outdated, competitive, or matched
     @Getter @Setter
     private int amountClaimed = 0;
     @Getter
     private int amountFilled = 0;
 
-
     /**
      * Creates a Bazaar order with no captured {@link ItemInfo} context.
      */
-    public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType) {
-        this(name, volume, pricePerItem, priceType, null);
+    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, BazaarDataManager.PriceType priceType) {
+        this(name, volume, pricePerItem, orderType, priceType, null);
     }
 
     /**
      * Creates a Bazaar order, initializing ItemInfo with slot index and ItemStack of the order.
      */
-    public BazaarOrder(String name, Integer volume, Double pricePerItem, PriceType priceType, ItemInfo itemInfo) {
-        super(name, volume, pricePerItem, priceType, itemInfo);
-        this.fillStatus = Statuses.SET;
+    public Order(String name, Integer volume, Double pricePerItem, OrderType orderType, BazaarDataManager.PriceType priceType, ItemInfo itemInfo) {
+        super(name, null, OrderStatus.SET, volume, pricePerItem, orderType);
+
         startTracking();
     }
 
-    private void startTracking(){
+    private void startTracking() {
         handleOutbidStatusChange();
         subscribe();
         scheduleHealthCheck();
@@ -66,54 +65,72 @@ public class BazaarOrder extends OrderInfoContainer {
     }
 
     @EventHandler
-    private void onDataUpdate(BazaarDataUpdateEvent e){
+    private void onDataUpdate(BazaarDataUpdateEvent e) {
         updateMarketPrice();
         handleOutbidStatusChange();
     }
 
     @EventHandler
     private void onUserOrderChange(UserOrdersChangeEvent e) {
-        if(e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this)
+        if (e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this) {
             return;
+        }
+
         updateMarketPrice();
         handleOutbidStatusChange();
     }
 
-    private void handleOutbidStatusChange(){
-        Optional<Statuses> outbidOptional = findOutbidStatus();
-        if(outbidOptional.isEmpty()) return;
+    private void handleOutbidStatusChange() {
+        Optional<PricingPosition> outbidOptional = findPricingPosition();
 
-        Statuses newStatus = outbidOptional.get();
-        if(outbidStatus != newStatus){
-            outbidStatus = newStatus;
-            onOutbid(newStatus == Statuses.OUTBID);
+        if (outbidOptional.isEmpty()) {
+            return;
+        }
+
+        PricingPosition newPosition = outbidOptional.get();
+
+        if (this.pricingPosition != newPosition) {
+            this.pricingPosition = newPosition;
+            onOutbid(newPosition == PricingPosition.OUTBID);
         }
     }
 
-    private void onOutbid(boolean isOutbid){
+    private void onOutbid(boolean isOutbid) {
         boolean shouldNotifyUser = BUConfig.get().outbidOrderHandler.isNotifyOutbid();
         boolean shouldPlayNotificationSound = BUConfig.get().outbidOrderHandler.isNotificationSound();
         boolean shouldAutoOpenBazaar = BUConfig.get().outbidOrderHandler.isAutoOpenEnabled();
 
-        if(!shouldNotifyUser || !BUConfig.get().userOrders.contains(this)) return;
-        if(this.getFillStatus() == OrderInfoContainer.Statuses.FILLED) return;
+        if (!shouldNotifyUser || !BUConfig.get().userOrders.contains(this)) {
+            return;
+        }
+
+        if (getStatus() == OrderStatus.FILLED) {
+            return;
+        }
 
         MutableText message;
+
         if (isOutbid) {
             message = OutbidOrderHandler.getOutbidMessage(this);
+
             if (BUConfig.get().developerMode) {
-                message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getPriceType()) + " Order Price: " + this.getPricePerItem()));
+                message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getOrderType()) + " Order Price: " + this.getPricePerItem()));
             }
-            if(shouldAutoOpenBazaar){
+
+            if (shouldAutoOpenBazaar) {
                 openBazaar();
             }
+
             MinecraftClient client = MinecraftClient.getInstance();
+
             var player = client.player;
+
             if (shouldPlayNotificationSound && player != null) {
                 SoundUtil.notifyMultipleTimes(OUTBID_ORDER_NOTIFICATIONS);
             }
+
             Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyChatCommand(message, "managebazaarorders"));
-        } else if(this.getOutbidStatus() == OrderInfoContainer.Statuses.COMPETITIVE) {
+        } else if (getPricingPosition() == PricingPosition.COMPETITIVE) {
             message = OutbidOrderHandler.getCompetitiveMessage(this);
             Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll(message));
         } else {
@@ -127,15 +144,20 @@ public class BazaarOrder extends OrderInfoContainer {
      */
     public void openBazaar() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if(screenInfo.inBazaar() )
+
+        if (screenInfo.inBazaar()) {
             return;
+        }
+
         CompletableFuture.runAsync(() ->{
-            for(int i = 3; i >= 1; i--) {
+            for (int i = 3; i >= 1; i--) {
                 try {
-                    if(i == 3)
+                    if (i == 3) {
                         PlayerActionUtil.notifyAll("Opening bazaar in 3");
-                    else
+                    } else {
                         PlayerActionUtil.notifyAll(String.valueOf(i));
+                    }
+
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
@@ -157,15 +179,21 @@ public class BazaarOrder extends OrderInfoContainer {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
+
         sb.append(name).append("[").append(getIndex()).append("]");
+
         if (amountClaimed != 0) {
             sb.append(", amount claimed: ").append(amountClaimed);
         }
-        sb.append(", type: ").append(getPriceType().getString());
-        if (fillStatus == Statuses.FILLED) {
-            sb.append(", status: ").append(fillStatus);
+
+        sb.append(", type: ").append(getOrderType().getString());
+
+        if (status == OrderStatus.FILLED) {
+            sb.append(", status: ").append(status);
         }
+
         sb.append(")");
+
         return sb.toString();
     }
 
@@ -177,9 +205,17 @@ public class BazaarOrder extends OrderInfoContainer {
     public void flipItem(double newPrice) {
         flipPrices(newPrice);
         updateMarketPrice();
+
         this.amountFilled = 0;
-        this.fillStatus = Statuses.SET;
+        this.status = OrderStatus.SET;
+
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.UPDATE, this));
+    }
+
+    public double getMarketPrice(OrderType orderType) {
+        updateMarketPrice();
+
+        return this.getPriceForPosition(PricingPosition.MATCHED, orderType);
     }
 
     /**
@@ -187,19 +223,10 @@ public class BazaarOrder extends OrderInfoContainer {
      *
      * @return price .1 coin more competitive than market rate.
      */
-    public double getFlipPrice() {
+    public double getUndercutPrice(OrderType orderType) {
         updateMarketPrice();
-        Double marketPrice = getMarketPrice(priceType);
-        Double marketOppositePrice = getMarketPrice(priceType.getOpposite());
-        if (marketPrice == 0) {
-            return 0;
-        }
 
-        if (getPriceType() == PriceType.INSTABUY) {
-            return (marketOppositePrice + .1);
-        } else {
-            return (marketOppositePrice - .1);
-        }
+        return this.getPriceForPosition(PricingPosition.COMPETITIVE, orderType);
     }
 
     /**
@@ -207,17 +234,10 @@ public class BazaarOrder extends OrderInfoContainer {
      * 
      * @return price .1 coin less competitive than market rate.
      */
-    public double getOutbiddedPrice() {
+    public double getOutbidPrice(OrderType orderType) {
         updateMarketPrice();
 
-        Double marketPrice = getMarketPrice(priceType);
-        Double marketOppositePrice = getMarketPrice(priceType.getOpposite());
-
-        if (getPriceType() == PriceType.INSTABUY) { 
-          return marketPrice + .1;
-        } else {
-          return marketOppositePrice + .1;
-        }
+        return this.getPriceForPosition(PricingPosition.OUTBID, orderType);
     }
 
     /**
@@ -225,10 +245,11 @@ public class BazaarOrder extends OrderInfoContainer {
      */
     public void setAmountFilled(int amountFilled) {
         this.amountFilled = amountFilled;
+
         if (this.amountFilled >= volume) {
             setFilled();
         } else {
-            this.fillStatus = Statuses.SET;
+            this.status = OrderStatus.SET;
         }
     }
 
@@ -236,8 +257,8 @@ public class BazaarOrder extends OrderInfoContainer {
      * Marks the order as fully filled and syncs the filled amount with the expected volume.
      */
     public void setFilled() {
-        amountFilled = volume;
-        fillStatus = Statuses.FILLED;
+        this.amountFilled = volume;
+        this.status = OrderStatus.FILLED;
     }
 
     /**
@@ -247,7 +268,9 @@ public class BazaarOrder extends OrderInfoContainer {
         if (!BUConfig.get().userOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
+
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.REMOVE, this));
+
         BUConfig.scheduleConfigSave();
     }
 }

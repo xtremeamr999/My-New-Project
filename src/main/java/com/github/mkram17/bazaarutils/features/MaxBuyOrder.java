@@ -1,9 +1,9 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import meteordevelopment.orbit.EventHandler;
@@ -36,32 +36,42 @@ public class MaxBuyOrder extends CustomOrder {
     }
 
     @EventHandler
-    public void onScreenChange(ScreenChangeEvent event){
-        if(event.getNewScreen() == null || event.getOldScreen() == null)
+    public void onScreenChange(ScreenChangeEvent event) {
+        if (event.getNewScreen() == null || event.getOldScreen() == null) {
             return;
+        }
+
         try {
-            if(!inCorrectScreen(event)) {
+            if (!inCorrectScreen(event)) {
                 return;
             }
+
             ItemStack itemStack = getItemStack(event.getOldScreen());
-            if(itemStack == null)
+
+            if (itemStack == null) {
                 return;
+            }
 
             MinecraftClient client = MinecraftClient.getInstance();
             updatePurse(client);
 
             String name = itemStack.getCustomName().getString();
-            Optional<String> productIdOptional = BazaarData.findProductIdOptional(name);
+            Optional<String> productIdOptional = BazaarDataManager.findProductIdOptional(name);
 
-            if(productIdOptional.isEmpty()) return;
+            if (productIdOptional.isEmpty()) {
+                return;
+            }
 
-            OptionalDouble costOpt = BazaarData.findItemPriceOptional(productIdOptional.get(), PriceInfoContainer.PriceType.INSTASELL);
-            if(costOpt.isEmpty()) return;
+            OptionalDouble costOpt = BazaarDataManager.findItemPriceOptional(productIdOptional.get(), OrderType.BUY);
+
+            if (costOpt.isEmpty()) {
+                return;
+            }
+
             double cost = costOpt.getAsDouble() + .1;//.1 is for lowest competitive price
 
             int amountCanBuy = (int) (Math.floor(purse / cost));
             super.setOrderAmount(Math.min(amountCanBuy, 71680));
-
         } catch (Exception e) {
             Util.notifyError("Could not parse coins from scoreboard text", e);
         }
@@ -73,28 +83,36 @@ public class MaxBuyOrder extends CustomOrder {
     }
 
     private static ItemStack getItemStack(Screen previousScreen) {
-
-        if(!(previousScreen instanceof GenericContainerScreen containerScreen))
+        if (!(previousScreen instanceof GenericContainerScreen containerScreen)) {
             return null;
+        }
 
         ItemStack itemStack = containerScreen.getScreenHandler().getInventory().getStack(13);
+
         if (itemStack.isEmpty()) {
             Util.notifyError("Could not find item in previous container.", new Throwable());
             return null;
         }
+
         return itemStack;
     }
 
     private static void updatePurse(MinecraftClient client) {
         ClientWorld world = client.world;
-        if (world == null) return;
+
+        if (world == null) {
+            return;
+        }
 
         Scoreboard scoreboard = world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
 
-        if (objective == null) return;
+        if (objective == null) {
+            return;
+        }
 
         ObjectArrayList<String> stringLines = new ObjectArrayList<>();
+
         for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
             if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
                 Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
@@ -106,6 +124,7 @@ public class MaxBuyOrder extends CustomOrder {
                 }
             }
         }
+
         purse = getPurse(stringLines);
     }
 
@@ -113,6 +132,7 @@ public class MaxBuyOrder extends CustomOrder {
         for (String line : scoreboardLines) {
             if (line.contains("Purse:") || line.contains("Piggy:")) {
                 Matcher matcher = PURSE_PATTERN.matcher(line);
+
                 if (matcher.find()) {
                     try {
                         return Double.parseDouble(matcher.group("purse").replace(",", ""));
@@ -122,6 +142,7 @@ public class MaxBuyOrder extends CustomOrder {
                 }
             }
         }
+        
         return -1d;
     }
 

@@ -8,12 +8,14 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -38,20 +40,24 @@ import java.util.Optional;
 
 //Object is created in GUIUtils when in an item's bazaar page
 public class Bookmark extends CustomItemButton implements BUListener {
-
     @Getter
     public final String name;
+
     @Getter @Setter
     public ItemStack bookmarkedItemStack;
+
     @Getter
-    private final OrderInfoContainer orderInfo;
+    private final OrderInfo orderInfo;
+
     private static final int SIGN_SLOT_NUMBER = 45;
 
     private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_base");
     private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/bookmark_widget_hover");
+
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
             BASE,
-            HOVER);
+            HOVER
+    );
 
     protected void subscribeToEventBusUnsubscriber() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> BazaarUtils.EVENT_BUS.unsubscribe(this));
@@ -63,7 +69,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfoContainer(name, null, null, PriceInfoContainer.PriceType.INSTABUY, null);
+        this.orderInfo = new OrderInfo(name, null, null, null, null, OrderType.SELL);
 
         subscribe();
     }
@@ -72,11 +78,13 @@ public class Bookmark extends CustomItemButton implements BUListener {
     protected void replaceItemEvent(ReplaceItemEvent event) {
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
-            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this)))
+            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this))) {
                 return;
+            }
 
-            if (replacementItem == null)
+            if (replacementItem == null) {
                 changeVisuals(isItemBookmarked(name));
+            }
 
             event.setReplacement(replacementItem);
         } catch (Exception e) {
@@ -85,82 +93,94 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
     @EventHandler
-    private void onBookmarkClick(SlotClickEvent event){
-        if(!super.wasButtonSlotClicked(event))
+    private void onBookmarkClick(SlotClickEvent event) {
+        if (!super.wasButtonSlotClicked(event)) {
             return;
+        }
+
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
+
         reverseBookmarkStatus();
         bookmarkedItemStack = findItemStack(name);
+
         BUConfig.scheduleConfigSave();
     }
 
-    public void onWidgetLeftClick(){
+    public void onWidgetLeftClick() {
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
+
         boolean userHasSkyblockerBazaarOverlay = BUCompatibilityHelper.isSkyblockerBazaarOverlayEnabled();
 
-        if(userHasSkyblockerBazaarOverlay) {
+        if (userHasSkyblockerBazaarOverlay) {
             BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(false);
         }
 
         GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
         GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(name, true));
 
-        if(userHasSkyblockerBazaarOverlay) {
+        if (userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
         }
     }
 
-    public void onWidgetShiftClick(){
+    public void onWidgetShiftClick() {
         BUConfig.get().bookmarks.remove(this);
         BUConfig.scheduleConfigSave();
     }
 
-    private void reverseBookmarkStatus(){
-        if(isItemBookmarked(name)) {
+    private void reverseBookmarkStatus() {
+        if (isItemBookmarked(name)) {
             changeVisuals(false);
             BUConfig.get().bookmarks.remove(this);
-        }else {
+        } else {
             changeVisuals(true);
             BUConfig.get().bookmarks.add(this);
         }
+
         BUConfig.scheduleConfigSave();
     }
 
-    private void changeVisuals(boolean bookmarked){
-        if(bookmarked) {
+    private void changeVisuals(boolean bookmarked) {
+        if (bookmarked) {
             replacementItem = new ItemStack(Items.GREEN_STAINED_GLASS_PANE, 1);
+
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Remove " + name + " Bookmark"));
             replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "⃠ ");
-        }
-        else {
+        } else {
             replacementItem = new ItemStack(Items.RED_STAINED_GLASS_PANE, 1);
+
             replacementItem.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Bookmark " + name));
             replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         }
     }
 
-    public static String findItemName(ChestLoadedEvent e){
+    public static String findItemName(ChestLoadedEvent e) {
         String nameFromContainer = findItemNameFromContainer();
-        if(!OrderInfoContainer.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
+        if (!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
         return nameFromContainer;
     }
 
-    private static String findNameFromItemStacks(List<ItemStack> itemStacks, String nameFromContainer){
-        for(ItemStack stack : itemStacks){
-            if(stack == null) continue;
+    private static String findNameFromItemStacks(List<ItemStack> itemStacks, String nameFromContainer) {
+        for (ItemStack stack : itemStacks) {
+            if (stack == null) {
+                continue;
+            }
+
             if (!stack.isEmpty() && stack.getName().getString().startsWith(nameFromContainer)) {
                 return stack.getCustomName().getString();
             }
         }
+
         return "???";
     }
 
-    private static String findItemNameFromContainer(){
+    private static String findItemNameFromContainer() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         String containerName = screenInfo.getScreenName();
-        if(screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
+
+        if (screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         } else {
             return containerName.substring(containerName.indexOf("➜") + 2);
@@ -168,44 +188,53 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
 
-    private static ItemStack findItemStack(String name){
+    private static ItemStack findItemStack(String name) {
         ScreenHandler handler = GUIUtils.getHandledScreen();
 
-        if(handler == null) return null;
-        for(Slot slot : handler.slots){
+        if (handler == null) {
+            return null;
+        }
+
+        for (Slot slot : handler.slots) {
             ItemStack itemStack = slot.getStack();
-            if(itemStack == null) continue;
+            if (itemStack == null) {
+                continue;
+            }
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().startsWith(name)) {
                 return itemStack;
             }
         }
-        for(Slot slot : handler.slots){
+
+        for (Slot slot : handler.slots) {
             ItemStack itemStack = slot.getStack();
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().contains(name)) {
                 return itemStack;
             }
         }
+
         return Items.DIAMOND.getDefaultStack();
     }
 
-    public static boolean isItemBookmarked(String itemName){
+    public static boolean isItemBookmarked(String itemName) {
         return findMatchingBookmark(itemName).isPresent();
     }
 
-    public static Optional<Bookmark> findMatchingBookmark(String itemName){
+    public static Optional<Bookmark> findMatchingBookmark(String itemName) {
         return BUConfig.get().bookmarks.stream().filter(bookmark -> bookmark.getName().equalsIgnoreCase(itemName)).findAny();
     }
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidgets() {
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
+
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
 
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen)
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen) {
             return Collections.emptyList();
+        }
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
 
@@ -222,12 +251,12 @@ public class Bookmark extends CustomItemButton implements BUListener {
             final ItemStack itemForButton = (configuredItem == null) ? Items.BARRIER.getDefaultStack() : configuredItem;
             MutableText text = Text.literal(bookmark.getName()).formatted(Formatting.BOLD);
 
-            OrderInfoContainer orderInfo = bookmark.getOrderInfo();
+            OrderInfo orderInfo = bookmark.getOrderInfo();
             orderInfo.updateMarketPrice();
 
             Style style = Style.EMPTY.withColor(Formatting.GRAY).withBold(false);
-            text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL)) + " coins").setStyle(style));
-            text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getMarketPrice(PriceInfoContainer.PriceType.INSTABUY)) + " coins").setStyle(style));
+            text.append(Text.literal("\nBuy: " + Util.getPrettyString(orderInfo.getPriceForPosition(PricingPosition.MATCHED, OrderType.SELL)) + " coins").setStyle(style));
+            text.append(Text.literal("\nSell: " + Util.getPrettyString(orderInfo.getPriceForPosition(PricingPosition.MATCHED, OrderType.BUY)) + " coins").setStyle(style));
 
             ItemSlotButtonWidget button = new ItemSlotButtonWidget(
                     buttonX,

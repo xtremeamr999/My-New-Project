@@ -1,11 +1,11 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -44,8 +44,9 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
         String key = sanitizeName(stack.getName().getString());
 
         // Lazily populate cache if a synced/replaced stack appears later
-        if (!SHOW_CACHE.computeIfAbsent(key, OrderInfoContainer::isValidName))
+        if (!SHOW_CACHE.computeIfAbsent(key, OrderInfo::isValidName)) {
             return;
+        }
 
         MutableText text = Text.literal("CTRL+SHIFT click for price charts & other info")
                 .formatted(Formatting.GOLD, Formatting.BOLD);
@@ -59,16 +60,23 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
 
     @EventHandler
     private void onClick(SlotClickEvent e){
-        if (!shouldShow() || e.isCancelled())
+        if (!shouldShow() || e.isCancelled()) {
             return;
-        if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed())
-           return;
+        }
+
+        if (!MinecraftClient.getInstance().isShiftPressed() || !MinecraftClient.getInstance().isCtrlPressed()) {
+            return;
+        }
 
         String itemName = sanitizeName(e.slot.getStack().getName().getString());
-        if (!SHOW_CACHE.getOrDefault(itemName, false)) return;
 
-        String productID = BazaarData.findProductIdOptional(itemName).get(); // All cached items are safe
+        if (!SHOW_CACHE.getOrDefault(itemName, false)) {
+            return;
+        }
+
+        String productID = BazaarDataManager.findProductIdOptional(itemName).get(); // All cached items are safe
         String link = "https://skyblock.finance/items/" + productID;
+
         MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen(confirmed -> {
             if (confirmed) {
                 try {
@@ -79,6 +87,7 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
             }
             MinecraftClient.getInstance().setScreen(null);
         }, link, true));
+
         e.cancel();
     }
 
@@ -90,17 +99,20 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
         SHOW_CACHE.clear();
     }
 
-    private boolean shouldShow(){
+    private boolean shouldShow() {
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+
         return (screenInfo.inBazaar() || showOutsideBazaar) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
     }
 
     private static String sanitizeName(String raw){
         int len = raw.length();
+
         if (len > 3 && raw.charAt(len - 2) == 'x' && Character.isDigit(raw.charAt(len - 1))) {
             int idx = raw.lastIndexOf('x');
             if (idx > 0) return raw.substring(0, idx - 1);
         }
+
         return raw;
     }
 

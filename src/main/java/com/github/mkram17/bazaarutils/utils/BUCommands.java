@@ -1,14 +1,10 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.data.BazaarData;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
-import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
-import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
-import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
 import com.github.mkram17.bazaarutils.ui.SellRestrictionsMenu;
 import com.mojang.brigadier.CommandDispatcher;
@@ -22,7 +18,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
-import net.minecraft.text.Text;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,8 +39,8 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("outdated")
                     .executes((source) -> {
-                        for (BazaarOrder item : OutbidOrderHandler.getOutbidOrders()) {
-                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice(PriceInfoContainer.PriceType.INSTASELL) + " Order Price: " + item.getPricePerItem());
+                        for (Order item : OutbidOrderHandler.getOutbidOrders()) {
+                            PlayerActionUtil.notifyAll(item.getName() + " is outdated. Market Price: " + item.getMarketPrice(OrderType.BUY) + " Order Price: " + item.getPricePerItem());
                         }
                         return 1;
                     }),
@@ -54,7 +49,7 @@ public class BUCommands {
                             .executes((context) -> {
                                 String name = StringArgumentType.getString(context, "item name")
                                         .replaceAll("_", " ");
-                                var productIDOpt = BazaarData.findProductIdOptional(name);
+                                var productIDOpt = BazaarDataManager.findProductIdOptional(name);
 
                                 if(productIDOpt.isPresent()){
                                     PlayerActionUtil.notifyAll(name + ": " + productIDOpt.get());
@@ -67,7 +62,7 @@ public class BUCommands {
                     ),
             ClientCommandManager.literal("list")
                     .executes(context -> {
-                                PlayerActionUtil.notifyAll(BazaarOrder.getVariables(BazaarOrder::getName).toString());
+                                PlayerActionUtil.notifyAll(Order.getVariables(Order::getName).toString());
                                 return 1;
                             }
                     )
@@ -174,9 +169,9 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        BazaarOrder bazaarOrder = BUConfig.get().userOrders.get(index);
-        bazaarOrder.removeFromWatchedItems();
-        PlayerActionUtil.notifyAll("Removed " + bazaarOrder, Util.notificationTypes.COMMAND);
+        Order order = BUConfig.get().userOrders.get(index);
+        order.removeFromWatchedItems();
+        PlayerActionUtil.notifyAll("Removed " + order, Util.notificationTypes.COMMAND);
         return 1;
     }
 

@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.orderinfo;
+package com.github.mkram17.bazaarutils.utils.bazaar;
 
 import net.minecraft.item.ItemStack;
 
@@ -9,7 +9,10 @@ import net.minecraft.item.ItemStack;
 public record ItemInfo(Integer slotIndex, ItemStack itemStack) {
     @Override
     public boolean equals(Object other) {
-        if(!(other instanceof ItemInfo(Integer index, ItemStack stack))) return false;
+        if (!(other instanceof ItemInfo(Integer index, ItemStack stack))) {
+            return false;
+        }
+
         return this.slotIndex.equals(index) && ItemStack.areEqual(this.itemStack, stack);
     }
 }

@@ -2,12 +2,10 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import lombok.AllArgsConstructor;
-import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -18,12 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -103,7 +98,7 @@ public class Util {
     }
 
 
-    public static void addWatchedOrder(BazaarOrder item){
+    public static void addWatchedOrder(Order item){
         if(item == null)
             return;
         assert item.getProductID() != null;

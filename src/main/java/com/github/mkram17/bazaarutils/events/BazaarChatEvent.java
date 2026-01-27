@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 
 /**
  * Event fired when a bazaar-related chat message is received and parsed.
@@ -15,11 +15,11 @@ import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
  * @param type the type of bazaar event that occurred
  * @param order the order information associated with the event
  * 
- * @see OrderInfoContainer
+ * @see OrderInfo
  * @see BazaarEventTypes
  */
 //TODO use this instead of OutdatedOrderEvent
-public record BazaarChatEvent<T extends OrderInfoContainer>(
+public record BazaarChatEvent<T extends OrderInfo>(
         BazaarEventTypes type,
         T order
 ) {

@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -18,7 +18,7 @@ import net.minecraft.item.Items;
 public class CancelOrderAndSearch extends CustomItemButton implements BUListener {
     @Getter @Setter
     private boolean enabled;
-    private OrderInfoContainer orderInfo;
+    private OrderInfo orderInfo;
 
     public CancelOrderAndSearch(){
         super.slotNumber = 25; // below cancel button

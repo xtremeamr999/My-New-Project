@@ -1,7 +1,8 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.OrderInfoContainer;
-import com.github.mkram17.bazaarutils.misc.orderinfo.PriceInfoContainer;
+import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
@@ -11,46 +12,59 @@ import java.util.*;
 
 //NOTE FROM INSTASELLRESTRICTION: if there are items with no buy orders in inv, you get "Some items can't be sold" and there are 2 extra components
 
-public class InstaSellUtil{
-
-    public static List<OrderInfoContainer> getInstaSellOrders(List<ItemStack> itemStacks) {
+public class InstaSellUtil {
+    public static List<OrderInfo> getInstaSellOrders(List<ItemStack> itemStacks) {
         if (!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
             return Collections.emptyList();
         }
+
         Optional<ItemStack> instaSellItemStack = getInstaSellItemStack(itemStacks);
+
         if (instaSellItemStack.isEmpty()) {
             Util.notifyError("Could not find insta-sell item stack in Bazaar GUI. Please report this issue.", new Throwable());
+
             return Collections.emptyList();
         }
+
         return getInstaSellOrderData(instaSellItemStack.get());
     }
 
-    public static Optional<ItemStack> getInstaSellItemStack(List<ItemStack> itemStacks){
+    public static Optional<ItemStack> getInstaSellItemStack(List<ItemStack> itemStacks) {
         return itemStacks.stream().filter(itemStack -> itemStack.getName().getString().contains("Sell Inventory Now")).findFirst();
     }
 
-    private static List<OrderInfoContainer> getInstaSellOrderData(ItemStack instaSellItemStack){
-        List<OrderInfoContainer> orderData = new ArrayList<>();
+    private static List<OrderInfo> getInstaSellOrderData(ItemStack instaSellItemStack) {
+        List<OrderInfo> orderData = new ArrayList<>();
+
         LoreComponent loreComponents = instaSellItemStack.get(DataComponentTypes.LORE);
-        if(loreComponents == null){
+
+        if (loreComponents == null) {
             return Collections.emptyList();
         }
+
         List<Text> loreLines = loreComponents.lines();
+
         return findInstaSellOrderData(loreLines);
     }
 
-    private static List<OrderInfoContainer> findInstaSellOrderData(List<Text> loreLines){
-        List<OrderInfoContainer> orderData = new ArrayList<>();
+    private static List<OrderInfo> findInstaSellOrderData(List<Text> loreLines) {
+        List<OrderInfo> orderData = new ArrayList<>();
+
         List<Text> itemLoreLines = getItemLoreLines(loreLines);
-        for(Text line : itemLoreLines) {
+
+        for (Text line : itemLoreLines) {
             int volume = getVolume(line);
+
             double totalPrice = getTotalPrice(line);
             double pricePerUnit = Math.round(totalPrice / volume * 10)/10.0;
+
             String name = getName(line);
 
-            OrderInfoContainer instaSellItem = new OrderInfoContainer(name, volume, pricePerUnit, PriceInfoContainer.PriceType.INSTASELL, null);
-            orderData.add(instaSellItem);
+            OrderInfo buyOrderItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY);
+
+            orderData.add(buyOrderItem);
         }
+
         return orderData;
     }
 
@@ -58,7 +72,7 @@ public class InstaSellUtil{
         int firstItemIndex = Util.componentIndexOf(loreLines, "coins");
         int totalCoinIndex = Util.componentLastIndexOf(loreLines, "coins");
 
-        if(firstItemIndex == -1 || totalCoinIndex == -1) {
+        if (firstItemIndex == -1 || totalCoinIndex == -1) {
             return Collections.emptyList();
         }
 
@@ -67,16 +81,19 @@ public class InstaSellUtil{
         return loreLines.subList(firstItemIndex, lastItemIndex+1);
     }
 
-    private static int getVolume(Text text){
+    private static int getVolume(Text text) {
         String volumeString = text.getSiblings().get(1).getString();
+
         return Util.parseNumber(volumeString);
     }
-    private static String getName(Text text){
+    private static String getName(Text text) {
         String nameString = text.getSiblings().get(3).getString();
+
         return nameString.trim();
     }
-    private static double getTotalPrice(Text text){
+    private static double getTotalPrice(Text text) {
         String priceString = text.getSiblings().get(5).getString();
+
         return Util.parseNumber(priceString);
     }
 }

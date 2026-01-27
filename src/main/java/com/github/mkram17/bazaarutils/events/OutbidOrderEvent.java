@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.events;
 
-import com.github.mkram17.bazaarutils.misc.orderinfo.BazaarOrder;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import lombok.Getter;
 import meteordevelopment.orbit.ICancellable;
 
@@ -24,7 +24,7 @@ import meteordevelopment.orbit.ICancellable;
  * }
  * </pre>
  * 
- * @see BazaarOrder
+ * @see Order
  */
 //TODO actually use this maybe? not sure what my thinking on this was back then
 public class OutbidOrderEvent implements ICancellable {
@@ -32,7 +32,7 @@ public class OutbidOrderEvent implements ICancellable {
      * The bazaar order that was affected.
      */
     @Getter
-    private final BazaarOrder order;
+    private final Order order;
     
     /**
      * Whether the order was outbid (true) or became competitive again (false).
@@ -46,7 +46,7 @@ public class OutbidOrderEvent implements ICancellable {
      * @param order the bazaar order that was affected
      * @param isOutbid true if the order was outbid, false if it became competitive again
      */
-    public OutbidOrderEvent(BazaarOrder order, boolean isOutbid) {
+    public OutbidOrderEvent(Order order, boolean isOutbid) {
         this.order = order;
         this.isOutbid = isOutbid;
     }
