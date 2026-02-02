@@ -54,9 +54,6 @@ public class PriceInfo {
         var buyPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.BUY);
         var sellPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.SELL);
 
-        Util.logMessage("buyPriceOpt (marketBuyPrice): " + buyPriceOpt.getAsDouble());
-        Util.logMessage("sellPriceOpt (marketSellPrice): " + sellPriceOpt.getAsDouble());
-
         buyPriceOpt.ifPresent(price -> marketBuyPrice = Util.truncateNum(price));
         sellPriceOpt.ifPresent(price -> marketSellPrice = Util.truncateNum(price));
     }
