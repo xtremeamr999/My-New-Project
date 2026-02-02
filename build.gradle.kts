@@ -27,6 +27,9 @@ repositories {
     maven("https://maven.isxander.dev/releases") {
         name = "YACL"
     }
+    maven("https://maven.teamresourceful.com/repository/maven-public/"){
+        name = "Resourceful Config"
+    }
     maven("https://maven.terraformersmc.com/") {
         name = "Terraformers (for gui)"
     }
@@ -82,6 +85,7 @@ dependencies {
 
     // Config lib and settings screen
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
+    modImplementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-${deps["resourcefulconfig_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
 
