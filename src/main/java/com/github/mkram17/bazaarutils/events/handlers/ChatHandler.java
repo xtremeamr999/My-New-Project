@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.events.handlers;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
@@ -230,7 +229,7 @@ public class ChatHandler {
             String itemName = parts[2].trim();
 
             OrderType orderType = messageString.contains("Sell Offer") ? OrderType.SELL : OrderType.BUY;
-            OrderInfo item = new OrderInfo(itemName, null, null, volume, null, orderType);
+            OrderInfo item = new OrderInfo(itemName, orderType, null, volume, null, null);
 
             EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_FILLED, item));
         } catch (NumberFormatException e) {
@@ -366,9 +365,9 @@ public class ChatHandler {
         OrderInfo item;
 
         if (OrderInfo.getVariables(OrderInfo::getVolume).contains(volumeClaimed)) {
-            item = new OrderInfo(itemName, null, null, volumeClaimed, price, OrderType.BUY);
+            item = new OrderInfo(itemName, OrderType.BUY, null, volumeClaimed, price, null);
         } else {
-            item = new OrderInfo(itemName, null, null, null, price, OrderType.BUY);
+            item = new OrderInfo(itemName, OrderType.BUY, null, null, price, null);
         }
 
         return getOrderInfo(item);
@@ -393,7 +392,7 @@ public class ChatHandler {
         String priceString = priceComponent.getString().replace(",", "").trim();
         double price = Double.parseDouble(priceString);
 
-        OrderInfo item = new OrderInfo(name, null, null, volume, price, OrderType.SELL);
+        OrderInfo item = new OrderInfo(name, OrderType.SELL, null, volume, price, null);
 
         return getOrderInfo(item);
     }

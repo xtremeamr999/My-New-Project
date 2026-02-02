@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.utils;
 
-import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import net.minecraft.component.DataComponentTypes;
@@ -60,7 +59,7 @@ public class InstaSellUtil {
 
             String name = getName(line);
 
-            OrderInfo buyOrderItem = new OrderInfo(name, null, null, volume, pricePerUnit, OrderType.BUY);
+            OrderInfo buyOrderItem = new OrderInfo(name, OrderType.BUY, null, volume, pricePerUnit, null);
 
             orderData.add(buyOrderItem);
         }

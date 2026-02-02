@@ -36,9 +36,6 @@ public class OrderInfo extends PriceInfo implements BUListener {
     @Getter
     protected final String name; //name of the item in game
 
-    @Getter @Setter
-    private ItemInfo itemInfo;
-
     @Getter
     protected OrderStatus status;
 
@@ -48,17 +45,20 @@ public class OrderInfo extends PriceInfo implements BUListener {
     @Getter @Setter
     protected double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
 
+    @Getter @Setter
+    private ItemInfo itemInfo;
+
     /**
      * Creates a container that tracks market data for a specific Bazaar product.
      *
      * @param name         display name of the item
+     * @param orderType    whether the price represents a sell (buy order) or buy (sell order)
+     * @param status       status of the order
      * @param volume       quantity of the order
      * @param pricePerItem current price per unit for the order
-     * @param orderType    whether the price represents a sell (buy order) or buy (sell order)
      * @param itemInfo     optional UI context from the Bazaar screen
-     * @param status       status of the order
      */
-    public OrderInfo(@Nullable String name, @Nullable ItemInfo itemInfo, @Nullable OrderStatus status, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable OrderType orderType) {
+    public OrderInfo(@Nullable String name, @Nullable OrderType orderType, @Nullable OrderStatus status, @Nullable Integer volume, @Nullable Double pricePerItem, @Nullable ItemInfo itemInfo) {
         super(pricePerItem, orderType);
 
         this.name = name;

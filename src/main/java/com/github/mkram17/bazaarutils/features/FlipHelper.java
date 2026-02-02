@@ -8,7 +8,6 @@ import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
-import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
@@ -235,7 +234,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
 
         if (priceInfoOpt.isPresent() && orderVolumeFilledOpt.isPresent()) {
             PriceInfo priceInfo = priceInfoOpt.get();
-            OrderInfo tempOrder = new OrderInfo(null, null, null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), priceInfo.getOrderType());
+            OrderInfo tempOrder = new OrderInfo(null, priceInfo.getOrderType(), null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), null);
 
             return tempOrder.findOrderInList(BUConfig.get().userOrders);
         }

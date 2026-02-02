@@ -8,7 +8,6 @@ import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -69,7 +68,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         changeVisuals(isItemBookmarked(this.name));
         this.replacementItem.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, "★");
         this.bookmarkedItemStack = findItemStack(name);
-        this.orderInfo = new OrderInfo(name, null, null, null, null, OrderType.SELL);
+        this.orderInfo = new OrderInfo(name, OrderType.SELL, null, null, null, null);
 
         subscribe();
     }

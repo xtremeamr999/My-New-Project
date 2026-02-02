@@ -7,7 +7,6 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -167,7 +166,7 @@ public class OrderUpdater {
 
         String cleanName = stripPrefix(title, orderType);
 
-        return new OrderInfo(cleanName, itemInfo, null, volume, unitPrice, orderType);
+        return new OrderInfo(cleanName, orderType, null, volume, unitPrice, itemInfo);
     }
 
     private static OrderType detectOrderType(String title) {
