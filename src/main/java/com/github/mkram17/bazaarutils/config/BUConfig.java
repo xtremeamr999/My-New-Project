@@ -102,7 +102,7 @@ public class BUConfig {
     @SerialEntry
     public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
 
-    //Keybinds (must be static)
+    //Keybinds (must be static). They get registered on object creation.
     public static StashHelper stashHelper = new StashHelper(new KeyBinding(
             "Pick Up Stash",
             InputUtil.Type.KEYSYM,
