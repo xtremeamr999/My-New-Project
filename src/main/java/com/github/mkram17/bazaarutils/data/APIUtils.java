@@ -1,12 +1,9 @@
 package com.github.mkram17.bazaarutils.data;
 
-import com.github.mkram17.bazaarutils.utils.Util;
 import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.apache.ApacheHttpClient;
-import net.hypixel.api.reply.AbstractReply;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 public class APIUtils {
 
@@ -15,7 +12,7 @@ public class APIUtils {
         if (apiKey != null) {
             return apiKey;
         }
-        //fake api key, but wont be used so it doesnt matter
+        // This is a fake api key. The Hypixel API requires an api key to initialize, but it does not use it unless you make personal API requests, which BU does not do.
         return "11111111-2222-3333-4444-555555555555";
     }
 
@@ -25,18 +22,5 @@ public class APIUtils {
     static {
         uuid = UUID.fromString(getApiKey());
         API = new HypixelAPI(new ApacheHttpClient(uuid));
-    }
-
-    public static <T extends AbstractReply> BiConsumer<T, Throwable> getTestConsumer() {
-        return (result, throwable) -> {
-            if (throwable != null) {
-                Util.notifyError("Error while getting data from Hypixel API", throwable);
-                return;
-            }
-
-//            System.out.println(result);
-
-            System.exit(0);
-        };
     }
 }
