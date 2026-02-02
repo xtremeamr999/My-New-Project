@@ -86,13 +86,13 @@ public class Order extends OrderInfo {
     }
 
     private void handleOutbidStatusChange() {
-        Optional<PricingPosition> outbidOptional = findPricingPosition();
+        Optional<PricingPosition> pricingPositionOptional = findPricingPosition();
 
-        if (outbidOptional.isEmpty()) {
+        if (pricingPositionOptional.isEmpty()) {
             return;
         }
 
-        PricingPosition newPosition = outbidOptional.get();
+        PricingPosition newPosition = pricingPositionOptional.get();
 
         if (this.pricingPosition != newPosition) {
             this.pricingPosition = newPosition;
@@ -183,23 +183,23 @@ public class Order extends OrderInfo {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
+        StringBuilder builder = new StringBuilder(super.toString());
 
-        sb.append(name).append("[").append(getIndex()).append("]");
+        builder.append(name).append("[").append(getIndex()).append("]");
 
         if (amountClaimed != 0) {
-            sb.append(", amount claimed: ").append(amountClaimed);
+            builder.append(", amount claimed: ").append(amountClaimed);
         }
 
-        sb.append(", type: ").append(getOrderType().getString());
+        builder.append(", type: ").append(getOrderType().getString());
 
         if (status == OrderStatus.FILLED) {
-            sb.append(", status: ").append(status);
+            builder.append(", status: ").append(status);
         }
 
-        sb.append(")");
+        builder.append(")");
 
-        return sb.toString();
+        return builder.toString();
     }
 
     /**
