@@ -1,0 +1,177 @@
+package com.github.mkram17.bazaarutils.features.restrictsell;
+
+import com.github.mkram17.bazaarutils.config.BUConfigGui;
+import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
+import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.config.ConfigurableFeature;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
+import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import dev.isxander.yacl3.api.OptionGroup;
+import lombok.Getter;
+import lombok.Setter;
+import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
+//TODO maybe color chest if it is locked
+public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
+    public enum restrictBy{PRICE, VOLUME, NAME}
+    @Getter @Setter
+    private boolean enabled;
+    private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
+    @Getter @Setter
+    private ArrayList<SellRestrictionControl> controls;
+    @Getter
+    private int safetyClicks = 0;
+    private boolean isInstaSellRestricted;
+
+    private static final int INSTA_SELL_SLOT_INDEX = 47;
+
+    public InstaSellRestrictions(boolean enabled, ArrayList<SellRestrictionControl> controls) {
+        this.enabled = enabled;
+        this.controls = controls;
+    }
+
+    private void registerScreenEvent() {
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            safetyClicks = 0;
+            isInstaSellRestricted = true;
+        });
+    }
+
+    @EventHandler
+    private void onChestLoaded(ChestLoadedEvent e) {
+        if (!enabled || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
+            return;
+        }
+
+        List<OrderInfo> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
+        isInstaSellRestricted = shouldRestrictInstaSell(items);
+    }
+
+    @EventHandler
+    private void onClick(SlotClickEvent clickEvent){
+        if(!enabled || clickEvent.slot.getIndex() != INSTA_SELL_SLOT_INDEX)
+            return;
+        if (isInstaSellRestricted && safetyClicks < SAFETY_CLICKS_REQUIRED) {
+            safetyClicks++;
+            PlayerActionUtil.notifyAll(getMessage());
+            clickEvent.cancel();
+        }
+    }
+
+    private boolean shouldRestrictInstaSell(List<OrderInfo> items){
+        return items.stream().anyMatch(this::isItemRestricted);
+    }
+
+    public void addRule(SellRestrictionControl control){
+        controls.add(control);
+    }
+
+    private boolean isItemRestricted(OrderInfo item) {
+        for(SellRestrictionControl control : controls) {
+            if(!control.isEnabled())
+                continue;
+            if (control.shouldRestrict(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getMessage(){
+        StringBuilder message = new StringBuilder("Sell protected by rules:");
+        for(SellRestrictionControl control : controls) {
+            if(!control.isEnabled())
+                continue;
+            if(control instanceof DoubleSellRestrictionControl doubleControl) {
+                if (control.getRule() == restrictBy.PRICE)
+                    message.append(" PRICE: ");
+                else if (control.getRule() == restrictBy.VOLUME)
+                    message.append(" VOLUME: ");
+                message.append(doubleControl.getAmount());
+            } else {
+                StringSellRestrictionControl stringControl = (StringSellRestrictionControl) control;
+                message.append(" NAME: ");
+                message.append(stringControl.getName());
+            }
+        }
+        message.append(" (Safety Clicks Left: ").append(3 - safetyClicks).append(")");
+        return message.toString();
+    }
+
+    public Option<Boolean> createRuleOption(SellRestrictionControl control) {
+        // Determine display text based on rule type
+        Text nameText;
+        Text descriptionText;
+
+        if (control instanceof StringSellRestrictionControl stringControl) {
+            String itemName = stringControl.getName(); // Assuming getName() exists for NAME rules
+            nameText = Text.literal("Item: " + itemName);
+            descriptionText = Text.literal("Block insta-sell for item: " + itemName);
+        } else if (control instanceof DoubleSellRestrictionControl doubleControl){
+            double amount = doubleControl.getAmount();
+            String typeText = control.getRule() == restrictBy.VOLUME ? "Volume < " : "Price < ";
+            nameText = Text.literal(typeText + amount);
+            String desc = control.getRule() == restrictBy.PRICE ?
+                    "Block insta-sell if price exceeds " + amount :
+                    "Block insta-sell if volume exceeds " + amount;
+            descriptionText = Text.literal(desc);
+        } else {
+            nameText = Text.literal("Unknown Rule");
+            descriptionText = Text.literal("This rule is of an unknown type.");
+        }
+
+        return Option.<Boolean>createBuilder()
+                .name(nameText)
+                .description(OptionDescription.of(descriptionText))
+                .binding(
+                        false,
+                        control::isEnabled,
+                        control::setEnabled
+                )
+                .controller(BUConfigGui::createBooleanController)
+                .build();
+    }
+
+    private void buildOptions(OptionGroup.Builder builder){
+        for(SellRestrictionControl control : getControls()){
+            builder.option(createRuleOption(control));
+        }
+    }
+
+    @Override
+    public void createOption(ConfigCategory.Builder builder) {
+        OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
+                .name(Text.literal("Sell rules"))
+                .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
+
+        if (getControls().isEmpty()) {
+            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000);
+            addRule(priceControl);
+        }
+        buildOptions(restrictSellGroupBuilder);
+
+        builder.group(restrictSellGroupBuilder.build());
+    }
+    @Override
+    public void subscribe() {
+        registerScreenEvent();
+        EVENT_BUS.subscribe(this);
+    }
+}

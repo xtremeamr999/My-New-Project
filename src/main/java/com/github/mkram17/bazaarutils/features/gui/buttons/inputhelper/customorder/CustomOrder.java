@@ -10,6 +10,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.sign.SignManager;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
@@ -103,7 +104,7 @@ public class CustomOrder extends BUListener implements ItemButton  {
             return;
         }
 
-        if (event.slot.getIndex() != slotNumber) {
+        if (!wasButtonSlotClicked(event)) {
             return;
         }
 

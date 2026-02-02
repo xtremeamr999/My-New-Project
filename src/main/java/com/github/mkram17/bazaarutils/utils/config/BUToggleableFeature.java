@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.util;
+package com.github.mkram17.bazaarutils.utils.config;
 
 public interface BUToggleableFeature extends ConfigurableFeature  {
 }

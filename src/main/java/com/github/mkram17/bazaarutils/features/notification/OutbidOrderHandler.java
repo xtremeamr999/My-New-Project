@@ -2,16 +2,11 @@ package com.github.mkram17.bazaarutils.features.notification;
 
 import com.github.mkram17.bazaarutils.config.features.notification.NotificationsConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
-import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderStatus;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -19,7 +14,7 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 
 @Module
-public class OutbidOrderHandler implements ConfigurableFeature {
+public class OutbidOrderHandler implements BUToggleableFeature {
     public static boolean isEnabled() {
         return NotificationsConfig.ORDER_NOTIFICATIONS_OUTBID.isEnabled();
     }
