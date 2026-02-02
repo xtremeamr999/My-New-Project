@@ -1,13 +1,12 @@
-package com.github.mkram17.bazaarutils.utils;
+package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
+import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
-import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.component.DataComponentTypes;
@@ -41,9 +40,7 @@ public class OrderUpdater {
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) {
+        if (!ScreenManager.isCurrent(BazaarScreens.ORDERS_PAGE)) {
             return;
         }
 
