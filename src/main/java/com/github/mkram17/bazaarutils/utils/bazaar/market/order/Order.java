@@ -5,8 +5,8 @@ import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemInfo;
 import com.github.mkram17.bazaarutils.features.notification.OutbidOrderHandler;
-import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
@@ -68,14 +68,14 @@ public class Order extends OrderInfo {
     }
 
     @EventHandler
-    private void onDataUpdate(BazaarDataUpdateEvent e) {
+    private void onDataUpdate(BazaarDataUpdateEvent event) {
         updateMarketPrice();
         handleOutbidStatusChange();
     }
 
     @EventHandler
-    private void onUserOrderChange(UserOrdersChangeEvent e) {
-        if (e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this) {
+    private void onUserOrderChange(UserOrdersChangeEvent event) {
+        if (event.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || event.getOrder() != this) {
             return;
         }
 
@@ -236,7 +236,7 @@ public class Order extends OrderInfo {
 
     /**
      * Calculates a non-competitive flip price.
-     *
+     * 
      * @return price .1 coin less competitive than market rate.
      */
     public double getOutbidPrice(OrderType orderType) {

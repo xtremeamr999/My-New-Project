@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder;
+package com.github.mkram17.bazaarutils.features.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -9,6 +9,7 @@ import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
@@ -33,7 +34,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 //TODO find new name for this
 @NoArgsConstructor @ConfigObject
-public class CustomOrder extends BUListener implements CustomItemButton {
+public class CustomOrder extends BUListener implements ItemButton  {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BROWN_STAINED_GLASS, 4, Items.RED_STAINED_GLASS_PANE));
 
     @Getter @Setter @ConfigEntry(id = "enabled")

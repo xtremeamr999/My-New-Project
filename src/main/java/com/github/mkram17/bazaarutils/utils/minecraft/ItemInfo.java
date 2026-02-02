@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.utils.bazaar;
+package com.github.mkram17.bazaarutils.utils.minecraft;
 
 import net.minecraft.item.ItemStack;
 

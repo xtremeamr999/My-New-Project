@@ -7,7 +7,7 @@ import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
@@ -39,9 +39,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
-@ConfigObject
-public class FlipHelper extends BUListener implements ConfigurableFeature, CustomItemButton {
+public class FlipHelper extends BUListener implements ConfigurableFeature, ItemButton {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
@@ -80,7 +81,7 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onChestLoaded(ChestLoadedEvent e) {
+    public void onChestLoaded(ChestLoadedEvent event) {
         if (!enabled) {
             return;
         }
@@ -92,7 +93,7 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
         }
 
         try {
-            ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
+            ItemStack flipOrderSign = getFlipSign(event.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
 
             Optional<Order> orderOptional = matchToUserOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
 

@@ -10,7 +10,7 @@ import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
@@ -37,7 +37,7 @@ import java.util.*;
 
 @Slf4j
 @Module
-public class Bookmarks extends BUListener implements CustomItemButton {
+public class Bookmarks extends BUListener implements ItemButton {
     public record Bookmark(
             String name,
             ItemStack itemStack,
