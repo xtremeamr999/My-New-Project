@@ -6,8 +6,10 @@ import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenType;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
@@ -104,9 +106,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     }
 
     private boolean shouldShow() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        return (screenInfo.inBazaar() || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
+        return (ScreenManager.isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new)) || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE);
     }
 
     private static String sanitizeName(String raw){

@@ -1,7 +1,9 @@
 package com.github.mkram17.bazaarutils.utils;
 
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
@@ -13,7 +15,7 @@ import java.util.*;
 
 public class InstaSellUtil {
     public static List<OrderInfo> getInstaSellOrders(List<ItemStack> itemStacks) {
-        if (!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
+        if (!ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE)) {
             return Collections.emptyList();
         }
 

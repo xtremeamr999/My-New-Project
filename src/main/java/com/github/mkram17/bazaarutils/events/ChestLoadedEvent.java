@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -103,7 +103,7 @@ public class ChestLoadedEvent {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
-                                event.containerName = ScreenInfo.getCurrentScreenInfo().getScreenName();
+                                event.containerName = ContainerManager.getContainerName();
                                 event.itemStacks = getChestItemSlots(inv);
                                 BazaarUtils.EVENT_BUS.post(event);
                             } else if (attempts.getAndIncrement() < MAX_ATTEMPTS) {

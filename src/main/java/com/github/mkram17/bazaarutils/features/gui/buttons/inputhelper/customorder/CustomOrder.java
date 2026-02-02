@@ -1,16 +1,17 @@
-package com.github.mkram17.bazaarutils.features.customorder;
+package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.sign.SignManager;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
@@ -66,12 +67,14 @@ public class CustomOrder extends BUListener implements ItemButton  {
         this.item = getNextColoredPane();
         super.subscribe();
     }
+
     protected CustomOrder(boolean enabled) {
         this.enabled = enabled;
         this.orderAmount = 71680;
         this.slotNumber = 17;
         this.item = Items.PURPLE_STAINED_GLASS_PANE;
     }
+
     public static Item getNextColoredPane(){
         int size = BUConfig.get().feature.customOrders.size();
         return CustomOrder.COLORMAP.get(size % 5);
@@ -79,12 +82,13 @@ public class CustomOrder extends BUListener implements ItemButton  {
 
     @EventHandler
     public void replaceItemEvent(ReplaceItemEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY) || !isEnabled())
+        if (!ScreenManager.getInstance().isCurrent(BazaarScreens.BUY_ORDER_AMOUNT, BazaarScreens.INSTANT_BUY) || !isEnabled()) {
             return;
+        }
 
-        if (event.getSlotId() != slotNumber)
+        if (!shouldReplaceItem(event)) {
             return;
+        }
 
         ItemStack itemStack = new ItemStack(getItem(), 1);
         itemStack.set(BazaarUtils.CUSTOM_SIZE_COMPONENT, String.valueOf(getOrderAmount()));
@@ -95,12 +99,14 @@ public class CustomOrder extends BUListener implements ItemButton  {
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!screenInfo.inMenu(ScreenInfo.BazaarMenuType.BUY_ORDER, ScreenInfo.BazaarMenuType.INSTA_BUY) || !isEnabled())
+        if (!ScreenManager.getInstance().isCurrent(BazaarScreens.BUY_ORDER_AMOUNT, BazaarScreens.INSTANT_BUY) || !isEnabled()) {
             return;
+        }
 
-        if (event.slot.getIndex() != slotNumber)
+        if (event.slot.getIndex() != slotNumber) {
             return;
+        }
+
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
 
         openSignAndInputText();
@@ -108,8 +114,10 @@ public class CustomOrder extends BUListener implements ItemButton  {
 
     public void openSignAndInputText() {
         int signSlotId = 16;
-        GUIUtils.clickSlot(signSlotId, 0);
-        GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(Integer.toString(getOrderAmount()), true));
+
+        ContainerManager.clickSlot(signSlotId, 0);
+
+        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(Integer.toString(getOrderAmount()), true));
     }
 
     public void removeFromConfig(){

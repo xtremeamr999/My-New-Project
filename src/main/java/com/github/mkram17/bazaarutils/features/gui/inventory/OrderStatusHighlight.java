@@ -91,7 +91,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
             return null;
         }
 
-        return getArgbFromOutbidStatus(pricingPosition);
+        return getArgbFromPricingPosition(pricingPosition);
     }
 
     //maybe could be split into separate methods, but this is fine for now
@@ -170,7 +170,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
         });
     }
 
-    private static int getArgbFromOutbidStatus(PricingPosition pricingPosition) {
+    private static int getArgbFromPricingPosition(PricingPosition pricingPosition) {
         return switch (pricingPosition) {
             case COMPETITIVE -> InventoryConfig.ORDER_STATUS_HIGHLIGHT_COMPETITIVE_COLOR;
             case MATCHED -> InventoryConfig.ORDER_STATUS_HIGHLIGHT_MATCHED_COLOR;

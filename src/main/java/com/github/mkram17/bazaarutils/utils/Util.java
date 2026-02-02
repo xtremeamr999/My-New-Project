@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -180,6 +181,7 @@ public class Util {
         }
         return -1;
     }
+
     @Nullable
     public static Text findComponentWith(List<Text> components, String lookingFor){
         for(Text component : components){
@@ -187,6 +189,37 @@ public class Util {
                 return component;
         }
             return null;
+    }
+
+    public static List<Text> findComponentsSpanningMatch(List<Text> components, String lookingFor) {
+        String combined = components.stream()
+                .map(Text::getString)
+                .collect(Collectors.joining(" "));
+
+        int matchStart = combined.indexOf(lookingFor);
+
+        if (matchStart == -1) return List.of();
+
+        int matchEnd = matchStart + lookingFor.length();
+
+        List<Text> result = new LinkedList<>();
+
+        int currentOffset = 0;
+
+        for (Text component : components) {
+            String content = component.getString();
+
+            int componentStart = currentOffset;
+            int componentEnd = currentOffset + content.length();
+
+            if (componentStart < matchEnd && componentEnd > matchStart) {
+                result.add(component);
+            }
+
+            currentOffset = componentEnd;
+        }
+
+        return result.isEmpty() ? List.of() : result;
     }
 
     public static String removeFormatting(String str) {

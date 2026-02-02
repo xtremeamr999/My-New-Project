@@ -2,25 +2,25 @@ package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.sign.SignManager;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
 import lombok.Setter;
@@ -80,9 +80,9 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
         this.slotNumber = slotNumber;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onChestLoaded(ChestLoadedEvent event) {
-        if (!enabled) {
+        if (!isEnabled()) {
             return;
         }
 
@@ -99,7 +99,6 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
 
             if (orderOptional.isEmpty()) {
                 return;
-
             }
             order = orderOptional.get();
         } catch (Exception ex) {
@@ -109,20 +108,20 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!enabled || event.slot.getIndex() != slotNumber || !inCorrectScreen() || order == null) {
+        if (!isEnabled() || !(wasButtonSlotClicked(event)) || !inCorrectScreen() || order == null) {
             return;
         }
 
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
 
-        GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
+        ContainerManager.clickSlot(FLIP_ORDER_SLOT,0);
 
-        GUIUtils.runOnNextSignOpen(signOpenEvent -> handleFlip());
+        SignManager.runOnNextSignOpen(signOpenEvent -> handleFlip());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if (!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || order == null) {
+        if (!isEnabled() || !(shouldReplaceItem(event)) || !inCorrectScreen() || order == null) {
             return;
         }
 
@@ -165,10 +164,10 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
     private void handleFlip() {
         double flipPrice = computeFlipPrice();
 
-        ScreenInfo previousScreen = ScreenInfo.getCurrentScreenInfo().getPreviousScreenInfo();
+        ScreenManager previousScreen = ScreenManager.getPreviousScreen();
 
-        if (order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
-            GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
+        if (order != null && previousScreen != null && flipPrice != 0 && previousScreen.matches(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS)) {
+            SignManager.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
 
             order.flipItem(flipPrice);
         }
@@ -247,12 +246,11 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
 
             return tempOrder.findOrderInList(UserOrdersStorage.INSTANCE.get());
         }
+
         return Optional.empty();
     }
 
     private static boolean inCorrectScreen() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
+        return ScreenManager.isCurrent(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS);
     }
 }
