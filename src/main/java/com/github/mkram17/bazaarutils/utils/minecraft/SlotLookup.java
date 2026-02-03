@@ -8,9 +8,7 @@ import java.util.Optional;
 
 public class SlotLookup {
     public static ItemStack getInventoryItem(Inventory inventory, int chestSlot) {
-        ItemStack item = inventory.getStack(chestSlot);
-
-        return item.isEmpty() ? ItemStack.EMPTY : item;
+        return inventory.getStack(chestSlot);
     }
 
     public static Optional<Integer> getInventorySlotFromItemStack(Inventory inventory, ItemStack wanted) {
