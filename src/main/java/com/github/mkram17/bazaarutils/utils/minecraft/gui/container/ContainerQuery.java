@@ -1,9 +1,11 @@
 package com.github.mkram17.bazaarutils.utils.minecraft.gui.container;
 
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.minecraft.SlotLookup;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.NumberRange.IntRange;
@@ -75,14 +77,14 @@ public class ContainerQuery {
         }));
     }
 
-    public Optional<ItemStack> first() {
-        int invSize = ContainerManager.getLowerChestInventorySize();
+    public Optional<ItemStack> first(Inventory inventory) {
+        int invSize = inventory.size();
 
         int min = Math.max(0, slotRange.getMin().orElse(0));
         int max = Math.min(invSize - 1, slotRange.getMax().orElse(invSize - 1));
 
         for (int i = min; i <= max; i++) {
-            ItemStack stack = ScreenManager.getScreenItem(i);
+            ItemStack stack = SlotLookup.getInventoryItem(inventory, i);
 
             if (!stack.isEmpty() && filter.test(stack)) {
                 return Optional.of(stack);
@@ -92,8 +94,18 @@ public class ContainerQuery {
         return Optional.empty();
     }
 
-    public List<ItemStack> all() {
-        int invSize = ContainerManager.getLowerChestInventorySize();
+    public Optional<ItemStack> first() {
+        Optional<Inventory> inventory = ScreenManager.getScreenContainer();
+
+        if (inventory.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return first(inventory.get());
+    }
+
+    public List<ItemStack> all(Inventory inventory) {
+        int invSize = inventory.size();
 
         int min = Math.max(0, slotRange.getMin().orElse(0));
         int max = Math.min(invSize - 1, slotRange.getMax().orElse(invSize - 1));
@@ -101,7 +113,7 @@ public class ContainerQuery {
         List<ItemStack> out = new ArrayList<>();
 
         for (int i = min; i <= max; i++) {
-            ItemStack stack = ScreenManager.getScreenItem(i);
+            ItemStack stack = SlotLookup.getInventoryItem(inventory, i);
 
             if (!stack.isEmpty() && filter.test(stack)) {
                 out.add(stack);
@@ -109,5 +121,15 @@ public class ContainerQuery {
         }
 
         return out;
+    }
+
+    public List<ItemStack> all() {
+        Optional<Inventory> inventory = ScreenManager.getScreenContainer();
+
+        if (inventory.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return all(inventory.get());
     }
 }
