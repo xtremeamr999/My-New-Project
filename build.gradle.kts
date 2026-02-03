@@ -1,6 +1,6 @@
 
 plugins {
-    id("fabric-loom") version "1.11-SNAPSHOT"
+    id("fabric-loom") version "1.15-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
@@ -86,7 +86,7 @@ dependencies {
     include("net.hypixel:hypixel-api-core:4.4")
 
     // Config lib and settings screen
-    modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
+    modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}-fabric")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
 
