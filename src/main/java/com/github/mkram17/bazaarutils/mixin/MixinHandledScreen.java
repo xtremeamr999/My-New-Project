@@ -16,16 +16,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
-//? if < 1.21.6 {
-/*import net.minecraft.client.render.RenderLayer;
-*///? }
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-//? if > 1.21.8 {
 import net.minecraft.util.Atlases;
-//?}
 import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -35,8 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks
 @Mixin(value = HandledScreen.class, priority = 999)
-public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen {
-
+public abstract class MixinHandledScreen extends Screen {
 
 	protected MixinHandledScreen(Text title) {
 		super(title);
@@ -132,14 +125,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
 
-        //? if > 1.21.8 {
         final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
-        //?} else {
-        /*final var sprite = MinecraftClient.getInstance()
-                .getGuiAtlasManager()
-                .getSprite(OrderStatusHighlight.IDENTIFIER);
-        *///?}
 
 		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
