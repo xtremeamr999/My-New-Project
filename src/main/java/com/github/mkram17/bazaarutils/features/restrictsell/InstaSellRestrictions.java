@@ -29,7 +29,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO maybe color chest if it is locked
 public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
-    public enum restrictBy{PRICE, VOLUME, NAME}
     @Getter @Setter
     private boolean enabled;
     private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
@@ -96,9 +95,9 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
             if(!control.isEnabled())
                 continue;
             if(control instanceof DoubleSellRestrictionControl doubleControl) {
-                if (control.getRule() == restrictBy.PRICE)
+                if (control.getRule() == RestrictInstaSellBy.PRICE)
                     message.append(" PRICE: ");
-                else if (control.getRule() == restrictBy.VOLUME)
+                else if (control.getRule() == RestrictInstaSellBy.VOLUME)
                     message.append(" VOLUME: ");
                 message.append(doubleControl.getAmount());
             } else {
@@ -122,9 +121,9 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
             descriptionText = Text.literal("Block insta-sell for item: " + itemName);
         } else if (control instanceof DoubleSellRestrictionControl doubleControl){
             double amount = doubleControl.getAmount();
-            String typeText = control.getRule() == restrictBy.VOLUME ? "Volume < " : "Price < ";
+            String typeText = control.getRule() == RestrictInstaSellBy.VOLUME ? "Volume < " : "Price < ";
             nameText = Text.literal(typeText + amount);
-            String desc = control.getRule() == restrictBy.PRICE ?
+            String desc = control.getRule() == RestrictInstaSellBy.PRICE ?
                     "Block insta-sell if price exceeds " + amount :
                     "Block insta-sell if volume exceeds " + amount;
             descriptionText = Text.literal(desc);
@@ -158,7 +157,7 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
                 .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
 
         if (getControls().isEmpty()) {
-            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(InstaSellRestrictions.restrictBy.PRICE, 1000000);
+            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(RestrictInstaSellBy.PRICE, 1000000);
             addRule(priceControl);
         }
         buildOptions(restrictSellGroupBuilder);

@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -21,7 +22,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
 
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
-    private static InstaSellRestrictions.restrictBy restrictionType;
+    private static RestrictInstaSellBy restrictionType;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -88,22 +89,22 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
         SingleOptionCheckboxDropdownComponent dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
         return dropdown.closeWhenNotHovered(false)
                 .checkbox(Text.literal("Restrict By Name"),
-                        restrictionType == InstaSellRestrictions.restrictBy.NAME,
+                        restrictionType == RestrictInstaSellBy.NAME,
                         button -> {
                     dropdown.disableCheckboxes();
-                    restrictionType = InstaSellRestrictions.restrictBy.NAME;
+                    restrictionType = RestrictInstaSellBy.NAME;
                 })
                 .checkbox(Text.literal("Restrict By Volume"),
-                        restrictionType == InstaSellRestrictions.restrictBy.VOLUME,
+                        restrictionType == RestrictInstaSellBy.VOLUME,
                         button -> {
                             dropdown.disableCheckboxes();
-                            restrictionType = InstaSellRestrictions.restrictBy.VOLUME;
+                            restrictionType = RestrictInstaSellBy.VOLUME;
                         })
                 .checkbox(Text.literal("Restrict By Price"),
-                        restrictionType == InstaSellRestrictions.restrictBy.PRICE,
+                        restrictionType == RestrictInstaSellBy.PRICE,
                         button -> {
                             dropdown.disableCheckboxes();
-                            restrictionType = InstaSellRestrictions.restrictBy.PRICE;
+                            restrictionType = RestrictInstaSellBy.PRICE;
                         });
     }
 
