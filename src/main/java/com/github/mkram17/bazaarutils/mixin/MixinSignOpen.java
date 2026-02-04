@@ -21,8 +21,6 @@ public class MixinSignOpen {
             // Post the SignOpenEvent
             SignOpenEvent event = new SignOpenEvent((SignEditScreen) screen);
             BazaarUtils.EVENT_BUS.post(event);
-//            Util.notifyAll("Sign Open Event posted!");
-
         }
     }
 }

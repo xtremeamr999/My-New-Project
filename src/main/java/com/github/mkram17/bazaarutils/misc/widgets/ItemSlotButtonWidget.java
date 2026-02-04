@@ -23,8 +23,8 @@ public class ItemSlotButtonWidget extends TexturedButtonWidget {
     //? if > 1.21.10 {
     public void drawIcon(DrawContext context, int mouseX, int mouseY, float delta) {
     //? } else {
-    //public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-    //? }
+    /*public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    *///? }
         super.renderWidget(context, mouseX, mouseY, delta);
 
         if (this.itemStack != null && !this.itemStack.isEmpty()) {

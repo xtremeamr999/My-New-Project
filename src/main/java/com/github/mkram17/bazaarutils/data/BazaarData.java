@@ -139,7 +139,7 @@ public final class BazaarData {
 
     private static long extractLastUpdated(SkyBlockBazaarReply reply) {
         try {
-            return ((AccessorSkyBlockBazaarReply) reply).bazaarutils$getLastUpdated();
+            return ((AccessorSkyBlockBazaarReply) reply).getLastUpdated();
         } catch (Exception e) {
             Util.notifyError("Failed to access lastUpdated (mixin+reflection failed)", e);
             return -1;

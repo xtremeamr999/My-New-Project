@@ -44,33 +44,28 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
 	private void onHandleMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-		if (slot == null) return;
+		if (slot == null){
+            return;
+        }
 
-		//for insta sell rules
-		RestrictSell sell = BUConfig.get().restrictSell;
-		if (sell.isSlotLocked(slotId)) {
-			if (sell.getSafetyClicks() < 3) {
-				sell.addSafetyClick();
-				PlayerActionUtil.notifyAll(sell.getMessage());
-				ci.cancel();
-			} else {
-				sell.resetSafetyClicks();
-			}
-		}
+		if(shouldCancelClick(slotId)){
+            ci.cancel();
+        }
 
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
 		BazaarUtils.EVENT_BUS.post(event);
 		// Use the accessor to safely get the client instance
 		MinecraftClient client = ((AccessorScreen) screen).getClient();
+
 		if (event.isCancelled()) {
 			ci.cancel();
 			return;
 		}
 
 		if (event.usePickblockInstead) {
-			assert client != null && client.player != null;
-			client.interactionManager.clickSlot(
+			assert client != null && client.player != null && client.interactionManager != null;
+            client.interactionManager.clickSlot(
 					screen.getScreenHandler().syncId,
 					slotId,
 					2,
@@ -81,12 +76,26 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		}
 	}
 
+    @Unique
+    private boolean shouldCancelClick(int slotId){
+        //for insta sell rules
+        RestrictSell sell = BUConfig.get().restrictSell;
+        if (sell.isSlotLocked(slotId)) {
+            if (sell.getSafetyClicks() < 3) {
+                sell.addSafetyClick();
+                PlayerActionUtil.notifyAll(sell.getMessage());
+                return true;
+            } else {
+                sell.resetSafetyClicks();
+            }
+        }
+        return false;
+    }
+
 	@Inject(method = "init", at = @At("TAIL"))
-	private void bazaarutils$addConfiguredButtons(CallbackInfo ci) {
-		int buttonsAdded = 0;
+	private void addConfiguredButtons(CallbackInfo ci) {
 		for (ClickableWidget button : BUConfig.getWidgets()) {
 			this.addDrawableChild(button);
-			buttonsAdded++;
 		}
 	}
 
@@ -94,8 +103,8 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
     //? if > 1.21.10 {
     private void bazaarutils$drawOnItem(DrawContext context, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
     //? } else {
-//	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
-    //? }
+	/*private void drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
+    *///? }
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
 		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN) || !slot.hasStack())
 			return;
@@ -132,15 +141,9 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
         *///?}
 
-		//? if > 1.21.5 {
 		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
 		);
-        //?} else {
-		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
-				sprite, x, y, 16, 16, color
-		);
-		*///?}
 	}
 
 }
