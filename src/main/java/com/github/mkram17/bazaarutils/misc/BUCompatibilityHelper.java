@@ -140,15 +140,15 @@ public class BUCompatibilityHelper {
         }
         try {
             boolean currentValue = isSkyblockerBazaarOverlayEnabled();
-            PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay current state: " + currentValue, NotificationType.GUI);
 
             if (currentValue) {
                 SkyblockerConfigManager.update((config) -> config.uiAndVisuals.searchOverlay.enableBazaar = false);
-                PlayerActionUtil.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Attempting to disable Skyblocker Bazaar Overlay...", NotificationType.GUI);
 
-                PlayerActionUtil.notifyAll("Disabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Disabled Skyblocker Bazaar search overlay.", NotificationType.GUI);
             } else {
-                PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay already disabled.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Skyblocker Bazaar Overlay already disabled.", NotificationType.GUI);
             }
         } catch (NoClassDefFoundError | NoSuchFieldError | Exception e) {
             Util.notifyError("Failed to access or modify Skyblocker config setting.", e);
@@ -165,7 +165,7 @@ public class BUCompatibilityHelper {
                 Util.logMessage("Attempting to enable Skyblocker Bazaar Overlay...");
                 SkyblockerConfigManager.update((x) -> x.uiAndVisuals.searchOverlay.enableBazaar = true);
 
-                PlayerActionUtil.notifyAll("Enabled Skyblocker Bazaar search overlay.", Util.notificationTypes.GUI);
+                PlayerActionUtil.notifyAll("Enabled Skyblocker Bazaar search overlay.", NotificationType.GUI);
             } else {
                 Util.logMessage("Skyblocker Bazaar Overlay already enabled.");
             }

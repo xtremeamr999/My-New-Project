@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import lombok.AllArgsConstructor;
@@ -26,12 +27,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 public class Util {
 
 
-
-    public enum notificationTypes {GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA;
-        public boolean isEnabled() {
-            return BUConfig.get().developer.isDeveloperVariableEnabled(this);
-        }
-    }
     private static final LinkedList<ScheduledTask> tasks = new LinkedList<>();
     public static final String HELP_MESSAGE = "Commands: /bu or /bazaarutils to open settings gui. \n---------------------------\n " +
             "/bu tax {amount} to set bazaar tax. This is important for the mod to function correctly. /bu customorders to see current Custom Orders. /bu customorder {order amount} {slot number} to make new Custom Order /bu customorder remove {customorder number} to remove Custom Order (find number by using /bu customorders) \n---------------------------\n  ";
@@ -103,7 +98,7 @@ public class Util {
             return;
         assert item.getProductID() != null;
         BUConfig.get().userOrders.add(item);
-        PlayerActionUtil.notifyAll("Added item: § " + item, notificationTypes.ORDERDATA);
+        PlayerActionUtil.notifyAll("Added item: § " + item, NotificationType.ORDERDATA);
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.ADD, item));
         BUConfig.scheduleConfigSave();
     }

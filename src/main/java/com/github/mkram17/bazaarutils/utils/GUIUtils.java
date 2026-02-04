@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.features.Bookmark;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import lombok.Getter;
@@ -80,7 +81,7 @@ public class GUIUtils {
 
     public static void closeHandledScreen() {
         try {
-            PlayerActionUtil.notifyAll("Closing gui", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing gui", NotificationType.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
             if (client == null) {
                 Util.notifyError("Client is null", new Throwable());
@@ -145,7 +146,7 @@ public class GUIUtils {
 
     public static void closeSign(){
         try {
-            PlayerActionUtil.notifyAll("Closing sign", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing sign", NotificationType.GUI);
             MinecraftClient mcclient = MinecraftClient.getInstance();
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);

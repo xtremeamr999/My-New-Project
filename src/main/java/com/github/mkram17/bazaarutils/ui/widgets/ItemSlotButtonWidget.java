@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.ui.widgets;
 
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -38,7 +38,7 @@ public class ItemSlotButtonWidget extends TexturedButtonWidget {
         int currentBgWidth = screen.getBackgroundWidth();
 
         if (currentBgWidth <= 0) {
-            PlayerActionUtil.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("BackgroundWidth is not yet initialized correctly in init TAIL for " + screenTitle, NotificationType.GUI);
         }
         return new ScreenWidgetDimensions(currentX, currentY, currentBgWidth);
     }

@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -171,7 +172,7 @@ public class BUCommands {
         int index = IntegerArgumentType.getInteger(context, "index");
         Order order = BUConfig.get().userOrders.get(index);
         order.removeFromWatchedItems();
-        PlayerActionUtil.notifyAll("Removed " + order, Util.notificationTypes.COMMAND);
+        PlayerActionUtil.notifyAll("Removed " + order, NotificationType.COMMAND);
         return 1;
     }
 

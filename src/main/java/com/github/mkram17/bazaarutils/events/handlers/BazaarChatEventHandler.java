@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.events.handlers;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
@@ -47,7 +48,7 @@ public class BazaarChatEventHandler {
     @EventHandler
     private static void onAnyOrder(BazaarChatEvent<? extends OrderInfo> event) {
 //        SoundUtil.notifyMultipleTimes(4);
-        PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), Util.notificationTypes.ORDERDATA);
+        PlayerActionUtil.notifyAll("Bazaar Order: " + event.type().name(), NotificationType.ORDERDATA);
     }
 
     /**
@@ -85,7 +86,7 @@ public class BazaarChatEventHandler {
         //order limit does not count the tax
         BUConfig.get().orderLimit.addOrderToLimit(totalPriceBeforeTax);
 
-        PlayerActionUtil.notifyAll("Insta sell for " + order, Util.notificationTypes.FEATURE);
+        PlayerActionUtil.notifyAll("Insta sell for " + order, NotificationType.FEATURE);
     }
     /**
      * Handles instant buy events.
@@ -103,7 +104,7 @@ public class BazaarChatEventHandler {
 
         BUConfig.get().orderLimit.addOrderToLimit(totalPrice);
 
-        PlayerActionUtil.notifyAll("Insta buy for " + order, Util.notificationTypes.FEATURE);
+        PlayerActionUtil.notifyAll("Insta buy for " + order, NotificationType.FEATURE);
     }
 
     /**
@@ -126,7 +127,7 @@ public class BazaarChatEventHandler {
 
         if (orderMatch.isPresent()) {
             orderMatch.get().setFilled();
-            PlayerActionUtil.notifyAll(order.getName() + "[" + orderMatch.get().getIndex() + "] was filled", Util.notificationTypes.ORDERDATA);
+            PlayerActionUtil.notifyAll(order.getName() + "[" + orderMatch.get().getIndex() + "] was filled", NotificationType.ORDERDATA);
         } else {
             Util.notifyError("Could not find item to fill with info vol: " + order.getVolume() + " name: " + order.getName(), new Exception("Order Filled Event error"));
         }

@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.events.handlers;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
@@ -305,7 +306,7 @@ public class ChatHandler {
 
         Order order = orderOptional.get();
 
-        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), Util.notificationTypes.ORDERDATA);
+        PlayerActionUtil.notifyAll(order.getName() + " has claimed " + order.getAmountClaimed() + " out of " + order.getVolume(), NotificationType.ORDERDATA);
 
         EVENT_BUS.post(new BazaarChatEvent<>(BazaarChatEvent.BazaarEventTypes.ORDER_CLAIMED, order));
     }
@@ -407,7 +408,7 @@ public class ChatHandler {
         Optional<Order> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
 
         if (orderOptional.isEmpty()) {
-            PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), Util.notificationTypes.ORDERDATA);
+            PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), NotificationType.ORDERDATA);
             return Optional.empty();
         }
         return orderOptional;
