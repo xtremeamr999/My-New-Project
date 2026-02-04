@@ -17,14 +17,14 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 //? if < 1.21.6 {
-import net.minecraft.client.render.RenderLayer;
-//? }
+/*import net.minecraft.client.render.RenderLayer;
+*///? }
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 //? if > 1.21.8 {
-//import net.minecraft.util.Atlases;
+import net.minecraft.util.Atlases;
 //?}
 import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -91,7 +91,11 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	}
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
-	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
+    //? if > 1.21.10 {
+    private void bazaarutils$drawOnItem(DrawContext context, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+    //? } else {
+//	private void bazaarutils$drawOnItem(DrawContext context, Slot slot, CallbackInfo ci) {
+    //? }
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
 		if (slot == null || !BUConfig.get().orderStatusHighlight.isEnabled() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN) || !slot.hasStack())
 			return;
@@ -120,23 +124,23 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		final int color = ColorHelper.fromFloats(OrderStatusHighlight.BACKGROUND_TRANSPARENCY, r, g, b);
 
         //? if > 1.21.8 {
-        /*final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
+        final var sprite = MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(Atlases.GUI)
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
-        *///?} else {
-        final var sprite = MinecraftClient.getInstance()
+        //?} else {
+        /*final var sprite = MinecraftClient.getInstance()
                 .getGuiAtlasManager()
                 .getSprite(OrderStatusHighlight.IDENTIFIER);
-        //?}
+        *///?}
 
 		//? if > 1.21.5 {
-		/*context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
+		context.drawSpriteStretched(RenderPipelines.GUI_TEXTURED,
 				sprite, x, y, 16, 16, color
 		);
-        *///?} else {
-		context.drawSpriteStretched(RenderLayer::getGuiTextured,
+        //?} else {
+		/*context.drawSpriteStretched(RenderLayer::getGuiTextured,
 				sprite, x, y, 16, 16, color
 		);
-		//?}
+		*///?}
 	}
 
 }
