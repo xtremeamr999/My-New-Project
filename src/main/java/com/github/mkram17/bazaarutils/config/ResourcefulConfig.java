@@ -9,7 +9,10 @@ import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
+import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -46,6 +49,17 @@ public final class ResourcefulConfig {
 
     public static void registerConfig(){
         CONFIGURATOR.register(ResourcefulConfig.class);
+    }
+    public static Screen createGUI(Screen parent) {
+        return ResourcefulConfigScreen.make(CONFIGURATOR, ResourcefulConfig.class)
+                .withParent(parent)
+                .build();
+    }
+
+    public static void openGUI() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Screen parent = client.currentScreen;
+        client.send(() -> client.setScreen(createGUI(parent)));
     }
 
     public static void scheduleConfigSave() {

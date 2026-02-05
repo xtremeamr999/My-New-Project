@@ -111,24 +111,24 @@ public class BUConfig {
 //    ));
 
 
-    public static void openGUI() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.send(() -> client.setScreen(BUConfigGui.create(null, get())));
-    }
+//    public static void openGUI() {
+//        MinecraftClient client = MinecraftClient.getInstance();
+//        client.send(() -> client.setScreen(BUConfigGui.create(null, get())));
+//    }
 
-    public static void scheduleConfigSave() {
-        if (!configSaveScheduled) {
-            configSaveScheduled = true;
-            Util.tickExecuteLater(20, () -> { // 1 second
-                HANDLER.save();
-                configSaveScheduled = false;
-            });
-        }
-    }
+//    public static void scheduleConfigSave() {
+//        if (!configSaveScheduled) {
+//            configSaveScheduled = true;
+//            Util.tickExecuteLater(20, () -> { // 1 second
+//                HANDLER.save();
+//                configSaveScheduled = false;
+//            });
+//        }
+//    }
 
-    public Screen createGUI(Screen parent) {
-        return BUConfigGui.create(parent, this);
-    }
+//    public Screen createGUI(Screen parent) {
+//        return BUConfigGui.create(parent, this);
+//    }
 
      public List<BUListener> getSerializedEvents() {
          List<BUListener> events = new ArrayList<>();

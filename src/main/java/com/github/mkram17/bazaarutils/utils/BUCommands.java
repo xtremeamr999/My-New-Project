@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.ResourcefulConfig;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
@@ -23,8 +24,6 @@ import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
-import static com.github.mkram17.bazaarutils.config.BUConfig.openGUI;
 
 public class BUCommands {
 
@@ -69,7 +68,7 @@ public class BUCommands {
                     )
     );
     private static final LiteralArgumentBuilder<FabricClientCommandSource> bazaarutils = ClientCommandManager.literal("bazaarutils").executes(context -> {
-        openGUI();
+        ResourcefulConfig.openGUI();
         return 1;
     });
 
