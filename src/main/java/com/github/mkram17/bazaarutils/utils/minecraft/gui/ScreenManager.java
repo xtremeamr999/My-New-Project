@@ -37,14 +37,6 @@ public class ScreenManager {
     @Getter
     private static final ScreenManager instance = new ScreenManager();
 
-    @Getter @Setter
-    private static ScreenKind screenKind;
-
-    public enum ScreenKind {
-        CONTAINER,
-        SIGN
-    }
-
     @RunOnInit
     public static void initialize() {
         BazaarScreens.initialize();
@@ -58,23 +50,17 @@ public class ScreenManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onScreenChange(ScreenChangeEvent event) {
-        screenKind = ScreenKind.CONTAINER;
-
         setCurrentScreen(event.getNewScreen());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onChestLoaded(ChestLoadedEvent event) {
-        screenKind = ScreenKind.CONTAINER;
-
         ContainerManager.onChestLoaded(event);
         computeCurrentType();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onSignOpened(SignOpenEvent event){
-        screenKind = ScreenKind.SIGN;
-
         setCurrentScreen(event.getSignEditScreen());
         computeCurrentType();
     }
