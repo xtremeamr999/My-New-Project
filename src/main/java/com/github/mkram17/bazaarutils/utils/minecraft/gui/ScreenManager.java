@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.utils.minecraft.gui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
-import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmarks;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -12,7 +11,6 @@ import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.minecraft.SlotLookup;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
 import lombok.Getter;
-import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -44,25 +42,31 @@ public class ScreenManager {
         EVENT_BUS.subscribe(ScreenManager.class);
 
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            setCurrentScreen(screen);
+            instance.setCurrentScreen(screen);
         });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onScreenChange(ScreenChangeEvent event) {
-        setCurrentScreen(event.getNewScreen());
-    }
+        instance.setCurrentScreen(event.getNewScreen());
+}
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onChestLoaded(ChestLoadedEvent event) {
         ContainerManager.onChestLoaded(event);
-        computeCurrentType();
+
+        // Ensures that the instances' state matches that of the loaded screen:container per this event
+        if (instance.current != null && (instance.current.type() == null || instance.current.screen() == event.getGenericContainerScreen())) {
+            instance.current = new ScreenSnapshot(
+                    event.getGenericContainerScreen(),
+                    matchType(event.getGenericContainerScreen()).orElse(null)
+            );
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onSignOpened(SignOpenEvent event){
-        setCurrentScreen(event.getSignEditScreen());
-        computeCurrentType();
+        instance.setCurrentScreen(event.getSignEditScreen());
     }
 
     private static final Set<ScreenType> types = ConcurrentHashMap.newKeySet();
@@ -73,82 +77,64 @@ public class ScreenManager {
         }
     }
 
-    @Getter
-    private static ScreenType currentType;
-
-    @Getter
-    private Screen current;
-    @Getter
-    private Screen previous;
-
-    private static void computeCurrentType() {
-        currentType = null;
+    public static Optional<ScreenType> matchType(Screen screen) {
+        if (screen instanceof GenericContainerScreen gcs) {
+            if (gcs.getScreenHandler() == null || gcs.getScreenHandler().getInventory() == null) {
+                return Optional.empty();
+            }
+        }
 
         for (ScreenType type : types) {
             try {
-                if (type.test(instance.getCurrent())) {
-                    currentType = type;
-
-                    return;
+                if (type.test(screen)) {
+                    return Optional.of(type);
                 }
-            } catch (Throwable ignored) {
+            } catch (Exception e) {
+                return Optional.empty();
             }
         }
+        return Optional.empty();
+    }
+
+    public record ScreenSnapshot(
+            Screen screen,
+            ScreenType type
+    ) {}
+
+    public void setCurrentScreen(Screen screen) {
+        previous = current;
+        current = new ScreenSnapshot(screen, matchType(screen).orElse(null));
+    }
+
+    private ScreenSnapshot current;
+
+    public Optional<ScreenContext> current() {
+        return Optional.ofNullable(current).map(ScreenContext::new);
+    }
+
+    private ScreenSnapshot previous;
+
+    /**
+     * Gets a temporary ScreenContext object representing the previous screen.
+     * Returns null if there was no previous screen.
+     */
+    public Optional<ScreenContext> previous() {
+        return Optional.ofNullable(previous).map(ScreenContext::new);
     }
 
     /*
      * returns true if the instance is in any of the specified types of bazaar menus
      */
-    public static boolean isCurrent(ScreenType... wanted) {
-        if (currentType == null) {
-            return false;
-        }
-
-        for (ScreenType type : wanted) {
-            if (type == currentType) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean matches(ScreenType wanted) {
-        return wanted.test(current);
-    }
-
-    public Optional<GenericContainerScreen> inGenericContainerScreen() {
-        if (current instanceof GenericContainerScreen containerScreen) {
-            return Optional.of(containerScreen);
-        } else {
-            return Optional.empty();
-        }
+    public boolean isCurrent(ScreenType... wanted) {
+        return current().map(context -> context.isAnyOf(wanted)).orElse(false);
     }
 
     public boolean inRegisteredScreenType() {
         return isCurrent(types.toArray(ScreenType[]::new));
     }
 
-    /**
-     * Gets a temporary ContainerManager object representing the previous screen.
-     * Returns null if there was no previous screen.
-     */
-    public static ScreenManager getPreviousScreen() {
-        if (instance.previous == null) {
-            return null;
-        }
-
-        ScreenManager prevInfo = new ScreenManager();
-        prevInfo.current = instance.previous;
-
-        return prevInfo;
-    }
-
-    public static void setCurrentScreen(Screen screen) {
-        instance.previous = instance.current;
-        instance.current = screen;
-
-        computeCurrentType();
+    public Optional<GenericContainerScreen> inGenericContainerScreen() {
+        return current().flatMap(context -> context.as(GenericContainerScreen.class));
     }
 
     public static <T extends ScreenHandler> Optional<T> getCurrentScreenHandler(Class<T> type) {

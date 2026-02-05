@@ -40,7 +40,7 @@ public class OrderUpdater {
 
     @EventHandler(priority = EventPriority.HIGH)
     public static void onGUI(ChestLoadedEvent event) {
-        if (!ScreenManager.isCurrent(BazaarScreens.ORDERS_PAGE)) {
+        if (!ScreenManager.getInstance().isCurrent(BazaarScreens.ORDERS_PAGE)) {
             return;
         }
 

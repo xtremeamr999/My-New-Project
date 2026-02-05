@@ -150,7 +150,7 @@ public class Order extends OrderInfo {
      * Opens the Bazaar order management screen after a short countdown if the player is not already there.
      */
     public void openBazaar() {
-        if (ScreenManager.isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new))) {
+        if (ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new))) {
             return;
         }
 

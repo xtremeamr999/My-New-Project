@@ -15,7 +15,7 @@ import java.util.*;
 
 public class InstaSellUtil {
     public static List<OrderInfo> getInstaSellOrders(List<ItemStack> itemStacks) {
-        if (!ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE)) {
+        if (!ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
             return Collections.emptyList();
         }
 

@@ -6,12 +6,14 @@ import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenContext;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SignManager {
@@ -35,18 +37,19 @@ public class SignManager {
             MinecraftClient client = MinecraftClient.getInstance();
             ScreenManager screenManager = ScreenManager.getInstance();
 
-            Screen screen = screenManager.getCurrent();
+            Optional<ScreenContext> context = screenManager.current();
 
-            if (client.currentScreen instanceof SignEditScreen signEditScreen && signEditScreen != screen) {
-                ScreenManager.setCurrentScreen(signEditScreen);
-                screen = signEditScreen;
-            }
-
-            if (screen != null) {
-                client.execute(screen::close);
-            } else {
+            if (context.isEmpty()) {
                 Util.notifyError("Error closing sign: client and manager was null or not in a sign", new Throwable());
+
+                return;
             }
+
+            if (client.currentScreen instanceof SignEditScreen signEditScreen && signEditScreen != context.get().screen()) {
+                screenManager.setCurrentScreen(signEditScreen);
+            }
+
+            client.execute(context.get().screen()::close);
         } catch (Exception e) {
             Util.notifyError("Unknown error while closing sign", e);
         }
@@ -72,46 +75,61 @@ public class SignManager {
         }
 
         client.execute(() -> {
-            Screen screen = null;
-
             ScreenManager screenManager = ScreenManager.getInstance();
 
-            screen = screenManager.getCurrent();
+            Screen currentScreen = client.currentScreen;
+            if (currentScreen instanceof SignEditScreen) {
+                Optional<ScreenContext> context = screenManager.current();
 
-            if (client.currentScreen instanceof SignEditScreen signEditScreen && signEditScreen != screen) {
-
-
-                ScreenManager.setCurrentScreen(signEditScreen);
-                screen = signEditScreen;
+                if (context.isEmpty() || context.get().screen() != currentScreen) {
+                    screenManager.setCurrentScreen(currentScreen);
+                }
             }
 
-            if (screen instanceof SignEditScreen) {
-                try {
-                    AccessorSignEditScreen signScreen = (AccessorSignEditScreen) screen;
+            Optional<ScreenContext> context = screenManager.current();
 
-                    String[] lines = text.split("\n", 4);
-                    int originalRow = signScreen.getCurrentRow();
-
-                    for (int i = 0; i < 4; i++) {
-                        String line = i < lines.length ? lines[i] : "";
-
-                        signScreen.setCurrentRow(i);
-                        signScreen.callSetCurrentRowMessage(line);
-                    }
-
-                    signScreen.setCurrentRow(originalRow);
-
-                    if (closeAfter) {
-                        closeSign();
-                    }
-                } catch (Exception exception) {
-                    Util.notifyError("Error executing sign text update", exception);
-
-                    exception.printStackTrace();
-                }
-            } else {
-                // Screen not open yet, schedule a retry
+            if (context.isEmpty()) {
                 Util.tickExecuteLater(4, () -> setSignTextInternal(text, closeAfter, attemptsLeft - 1));
+
+                return;
+            }
+
+            Screen screen = context.get().screen();
+
+            if (!(screen instanceof SignEditScreen)) {
+                Util.tickExecuteLater(4, () -> setSignTextInternal(text, closeAfter, attemptsLeft - 1));
+
+                return;
+            }
+
+
+
+            if (client.currentScreen instanceof SignEditScreen signEditScreen && signEditScreen != context.get().screen()) {
+                screenManager.setCurrentScreen(signEditScreen);
+            }
+
+            try {
+                AccessorSignEditScreen signScreen = (AccessorSignEditScreen) context.get().screen();
+
+                String[] lines = text.split("\n", 4);
+                int originalRow = signScreen.getCurrentRow();
+
+                for (int i = 0; i < 4; i++) {
+                    String line = i < lines.length ? lines[i] : "";
+
+                    signScreen.setCurrentRow(i);
+                    signScreen.callSetCurrentRowMessage(line);
+                }
+
+                signScreen.setCurrentRow(originalRow);
+
+                if (closeAfter) {
+                    closeSign();
+                }
+            } catch (Exception exception) {
+                Util.notifyError("Error executing sign text update", exception);
+
+                exception.printStackTrace();
             }
         });
     }

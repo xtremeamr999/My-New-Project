@@ -189,7 +189,7 @@ public class Bookmarks extends BUListener implements ItemButton {
         }
 
         ContainerManager.clickSlot(SIGN_SLOT_NUMBER, 0);
-        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(bookmark.name(), true));
+        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(name, true));
 
         if (userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
@@ -204,7 +204,7 @@ public class Bookmarks extends BUListener implements ItemButton {
 
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
 
-        boolean isTargetScreen = ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE);
+        boolean isTargetScreen = ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE);
 
         if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen) {
             return Collections.emptyList();
@@ -314,7 +314,7 @@ public class Bookmarks extends BUListener implements ItemButton {
     private static String findItemNameFromContainer() {
         String containerName = ContainerManager.getContainerName();
 
-        if (ScreenManager.isCurrent(BazaarScreens.INSTANT_BUY)) {
+        if (ScreenManager.getInstance().isCurrent(BazaarScreens.INSTANT_BUY)) {
             return containerName.substring(0, containerName.indexOf("➜")-1);
         } else {
             return containerName.substring(containerName.indexOf("➜") + 2);

@@ -3,10 +3,10 @@ package com.github.mkram17.bazaarutils.utils.minecraft.gui.container;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.minecraft.SlotLookup;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenContext;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.inventory.Inventory;
@@ -23,13 +23,13 @@ public class ContainerManager {
     }
 
     public static String getContainerName() {
-        Screen screen = ScreenManager.getInstance().getCurrent();
+        Optional<ScreenContext> context = ScreenManager.getInstance().current();
 
-        if (screen == null || screen.getTitle() == null) {
+        if (context.isEmpty() || context.get().screen().getTitle() == null) {
             return null;
         }
 
-        return Util.removeFormatting(screen.getTitle().getString());
+        return Util.removeFormatting(context.get().screen().getTitle().getString());
     }
 
     @Getter

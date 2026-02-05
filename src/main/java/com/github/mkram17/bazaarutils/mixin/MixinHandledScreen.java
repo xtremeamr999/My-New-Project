@@ -78,7 +78,7 @@ public abstract class MixinHandledScreen extends Screen {
 			/*?} else {*/
 	private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
 		/*?}*/
-		if (slot == null || !slot.hasStack() || !ScreenManager.isCurrent(BazaarScreens.ORDERS_PAGE)) {
+		if (slot == null || !slot.hasStack() || !ScreenManager.getInstance().isCurrent(BazaarScreens.ORDERS_PAGE)) {
 			return;
 		}
 
@@ -101,7 +101,7 @@ public abstract class MixinHandledScreen extends Screen {
 			/*?} else {*/
 	private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
 		/*?}*/
-		if (slot == null || !slot.hasStack() || !ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE)) {
+		if (slot == null || !slot.hasStack() || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
 			return;
 		}
 
@@ -127,4 +127,5 @@ public abstract class MixinHandledScreen extends Screen {
 				sprite, x, y, 16, 16, argb
 		);
 	}
+
 }

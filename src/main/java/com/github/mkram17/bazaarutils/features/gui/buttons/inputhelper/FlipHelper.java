@@ -12,6 +12,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenContext;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -93,6 +94,7 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
         }
 
         try {
+
             ItemStack flipOrderSign = getFlipSign(event.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
 
             Optional<Order> orderOptional = matchToUserOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
@@ -164,9 +166,9 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
     private void handleFlip() {
         double flipPrice = computeFlipPrice();
 
-        ScreenManager previousScreen = ScreenManager.getPreviousScreen();
+        Optional<ScreenContext> previousScreen = ScreenManager.getInstance().previous();
 
-        if (order != null && previousScreen != null && flipPrice != 0 && previousScreen.matches(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS)) {
+        if (order != null && previousScreen.isPresent() && flipPrice != 0 && previousScreen.get().matches(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS)) {
             SignManager.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
 
             order.flipItem(flipPrice);
@@ -251,6 +253,6 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, ItemB
     }
 
     private static boolean inCorrectScreen() {
-        return ScreenManager.isCurrent(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS);
+        return ScreenManager.getInstance().isCurrent(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS);
     }
 }

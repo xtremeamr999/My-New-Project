@@ -102,7 +102,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     }
 
     private boolean shouldShow() {
-        return (ScreenManager.isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new)) || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !ScreenManager.isCurrent(BazaarScreens.MAIN_PAGE);
+        return (ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new)) || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE);
     }
 
     private static String sanitizeName(String raw){
