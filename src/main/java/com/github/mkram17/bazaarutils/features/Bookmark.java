@@ -80,7 +80,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
     protected void replaceItemEvent(ReplaceItemEvent event) {
         try {
             //The bookmark can be null if it was a previously added one, not a potential new one
-            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().bookmarks.contains(this))) {
+            if (!super.shouldReplaceItem(event) || (bookmarkedItemStack == null && !BUConfig.get().feature.bookmarks.contains(this))) {
                 return;
             }
 
@@ -105,7 +105,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         reverseBookmarkStatus();
         bookmarkedItemStack = findItemStack(name);
 
-        BUConfig.scheduleConfigSave();
+        ConfigUtil.scheduleConfigSave();
     }
 
     public void onWidgetLeftClick() {
@@ -126,20 +126,20 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
     public void onWidgetShiftClick() {
-        BUConfig.get().bookmarks.remove(this);
-        BUConfig.scheduleConfigSave();
+        BUConfig.get().feature.bookmarks.remove(this);
+        ConfigUtil.scheduleConfigSave();
     }
 
     private void reverseBookmarkStatus() {
         if (isItemBookmarked(name)) {
             changeVisuals(false);
-            BUConfig.get().bookmarks.remove(this);
+            BUConfig.get().feature.bookmarks.remove(this);
         } else {
             changeVisuals(true);
-            BUConfig.get().bookmarks.add(this);
+            BUConfig.get().feature.bookmarks.add(this);
         }
 
-        BUConfig.scheduleConfigSave();
+        ConfigUtil.scheduleConfigSave();
     }
 
     private void changeVisuals(boolean bookmarked) {
@@ -224,7 +224,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
     }
 
     public static Optional<Bookmark> findMatchingBookmark(String itemName) {
-        return BUConfig.get().bookmarks.stream().filter(bookmark -> bookmark.getName().equalsIgnoreCase(itemName)).findAny();
+        return BUConfig.get().feature.bookmarks.stream().filter(bookmark -> bookmark.getName().equalsIgnoreCase(itemName)).findAny();
     }
 
     @RegisterWidget
@@ -245,7 +245,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
         int buttonX = dimensions.x() + dimensions.backgroundWidth() + spacing;
         int currentButtonY = dimensions.y() + spacing;
 
-        List<Bookmark> bookmarks = BUConfig.get().bookmarks;
+        List<Bookmark> bookmarks = BUConfig.get().feature.bookmarks;
 
         for (Bookmark bookmark : bookmarks) {
             ItemStack configuredItem = bookmark.getBookmarkedItemStack();

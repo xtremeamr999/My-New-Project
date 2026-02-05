@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.config.feature;
 
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.features.FlipHelper;
+import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
@@ -22,46 +21,35 @@ public class FeatureConfig {
     public FlipHelper flipHelper = new FlipHelper(true, PricingPosition.COMPETITIVE, 17);
 
     @ConfigEntry(id = "outbidOrderHandler")
-    public OutbidOrderHandlerConfig outbidOrderHandler = new OutbidOrderHandlerConfig();
+    public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true, true);
 
     @ConfigEntry(id = "instaSellRestrictions")
     public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, new ArrayList<>());
 
-    @ConfigEntry(id = "enableOrderLimitVisual")
-    public boolean enableOrderLimitVisual = true;
+    @ConfigEntry(id = "orderLimitVisual")
+    public OrderLimitVisual orderLimitVisual = new OrderLimitVisual(true);
 
     @ConfigEntry(id = "showPriceChartsOutsideBazaar")
-    public boolean showPriceChartsOutsideBazaar = false;
+    public PriceCharts showPriceChartsOutsideBazaar = new PriceCharts(false);
 
-    @ConfigEntry(id = "enableOrderFilledNotificationSound")
-    public boolean enableOrderFilledNotificationSound = true;
+    @ConfigEntry(id = "orderFilledNotificationSound")
+    public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(false);
 
-    @ConfigEntry(id = "removeUselessNotifications")
-    public boolean removeUselessNotifications = true;
+    @ConfigEntry(id = "uselessBazaarNotificationRemover")
+    public UselessBazaarNotificationRemover uselessBazaarNotificationRemover = new UselessBazaarNotificationRemover(true);
 
-    @ConfigEntry(id = "enableStashMessages")
-    public boolean enableStashMessages = false;
+    @ConfigEntry(id = "stashMessages")
+    public StashMessages stashMessages = new StashMessages(false);
 
-    @ConfigEntry(id = "enableOrderStatusHighlight")
-    public boolean enableOrderStatusHighlight = true;
+    @ConfigEntry(id = "orderStatusHighlight")
+    public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
 
-    @ConfigEntry(id = "enableBazaarOpenOrdersButton")
-    public boolean enableBazaarOpenOrdersButton = true;
+    @ConfigEntry(id = "bazaarOpenOrdersButton")
+    public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
 
-    @ConfigEntry(id = "enableMaxBuyOrder")
-    public boolean enableMaxBuyOrder = true;
+    @ConfigEntry(id = "maxBuyOrder")
+    public MaxBuyOrder maxBuyOrder = new MaxBuyOrder(true);
 
-    @ConfigEntry(id = "enableInstaSellHighlight")
-    public boolean enableInstaSellHighlight = true;
-
-    public static class OutbidOrderHandlerConfig {
-        @ConfigEntry(id = "enableNotifyOutbid")
-        public boolean enableNotifyOutbid = false;
-
-        @ConfigEntry(id = "enableNotificationSound")
-        public boolean enableNotificationSound = true;
-
-        @ConfigEntry(id = "enableAutoOpen")
-        public boolean enableAutoOpen = false;
-    }
+    @ConfigEntry(id = "instaSellHighlight")
+    public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
 }

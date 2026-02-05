@@ -63,7 +63,7 @@ public class OrderUpdater {
     }
 
     private static void updateOrders(List<OrderInfo> parsedOrders) {
-        List<Order> userOrdersCopy = new ArrayList<>(BUConfig.get().userOrders);
+        List<Order> userOrdersCopy = new ArrayList<>(BUConfig.get().general.userOrders);
 
         parsedOrders.iterator().forEachRemaining(order -> {
             Optional<Order> matchedOrder = order.findOrderInList(userOrdersCopy);

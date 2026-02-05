@@ -6,8 +6,8 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindConfig {
-    //Keybinds (must be static). They get registered on object creation.
-    public static StashHelper stashHelper = new StashHelper(new KeyBinding(
+    //Keybinds get registered on object creation.
+    public StashHelper stashHelper = new StashHelper(new KeyBinding(
             "Pick Up Stash",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_V,

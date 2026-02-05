@@ -45,7 +45,7 @@ public class JoinMessages {
                     });
                 });
                 BUConfig.get().firstLoad = false;
-                BUConfig.scheduleConfigSave();
+                ConfigUtil.scheduleConfigSave();
             } else if (BazaarUtils.updatedMajorVersion) {
                 Util.tickExecuteLater(40, () -> PlayerActionUtil.notifyAll(updateMessage));
                 Util.tickExecuteLater(41, () -> PlayerActionUtil.notifyAll(Util.CHANGELOG));

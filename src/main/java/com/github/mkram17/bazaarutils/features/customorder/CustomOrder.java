@@ -125,7 +125,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     public void removeFromConfig(){
         if (BUConfig.get().customOrders.contains(this)) {
             BUConfig.get().customOrders.remove(this);
-            BUConfig.scheduleConfigSave();
+            ConfigUtil.scheduleConfigSave();
             EVENT_BUS.unsubscribe(this);
         }
     }

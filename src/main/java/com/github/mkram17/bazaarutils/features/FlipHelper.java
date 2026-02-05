@@ -239,7 +239,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
             PriceInfo priceInfo = priceInfoOpt.get();
             OrderInfo tempOrder = new OrderInfo(null, priceInfo.getOrderType(), null, orderVolumeFilledOpt.get(), priceInfo.getPricePerItem(), null);
 
-            return tempOrder.findOrderInList(BUConfig.get().userOrders);
+            return tempOrder.findOrderInList(BUConfig.get().general.userOrders);
         }
         return Optional.empty();
     }
@@ -265,7 +265,7 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
     }
 
     public static void buildOptions(OptionGroup.Builder builder) {
-      FlipHelper flipHelper = BUConfig.get().flipHelper;
+      FlipHelper flipHelper = BUConfig.get().feature.flipHelper;
 
       builder.option(flipHelper.createFlippingTypeOption());
     }

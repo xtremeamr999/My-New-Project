@@ -1,10 +1,13 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
@@ -14,13 +17,14 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import java.util.ArrayList;
 import java.util.Collections;
 
+@ConfigObject
 public class StashMessages implements BUListener, BUToggleableFeature {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
-    @Setter
+    @Setter @ConfigEntry(id = "removeMessages")
     private boolean removeMessages;
-    @Setter @Getter
+    @Setter @Getter @ConfigEntry(id = "stashsPreviouslyClaimed")
     private boolean stashPreviouslyClaimed = false;
     private transient ArrayList<String> pastMessages = new ArrayList<>(Collections.singleton(""));
     private static final String[] removeList = {" ", "materials stashed away", "type of material stashed", "to pick them up", "   "};
@@ -36,14 +40,14 @@ public class StashMessages implements BUListener, BUToggleableFeature {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if(message.getString().contains("You picked up") && message.getString().contains("from your material stash") && !stashPreviouslyClaimed) {
                 stashPreviouslyClaimed = true;
-                BUConfig.scheduleConfigSave();
+                ConfigUtil.scheduleConfigSave();
                 Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll("TIP - To claim stash more easily and quickly, use the Stash Helper keybind, which closes the bazaar and claims your stash! To disable stash messages, enable the \"Disable Stash Messages\" option in the Bazaar Utils config."));
             }
         });
     }
     private void registerStashRemover() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if (!BUConfig.get().stashMessages.shouldRemoveMessages() || message.getString().contains("Mana")) return true;
+            if (!shouldRemoveMessages() || message.getString().contains("Mana")) return true;
 
             String currentMessageString = message.getString();
             int currentMessageRoleIndex = indexOfMessage(currentMessageString);
@@ -89,18 +93,5 @@ public class StashMessages implements BUListener, BUToggleableFeature {
             }
         }
         return -1;
-    }
-
-    public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Disable Stash Messages",
-                "When this option is ON, messages reminding you to pick up your stash will no longer appear in chat.",
-                false,
-                this::shouldRemoveMessages,
-                this::setRemoveMessages);
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(this.createOption());
     }
 }

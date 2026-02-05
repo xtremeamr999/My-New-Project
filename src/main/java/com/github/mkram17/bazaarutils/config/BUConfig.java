@@ -5,6 +5,7 @@ import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.config.data.MetadataConfig;
 import com.github.mkram17.bazaarutils.config.developer.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.feature.FeatureConfig;
+import com.github.mkram17.bazaarutils.config.feature.KeybindConfig;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
@@ -27,9 +28,10 @@ public final class BUConfig {
     public MetadataConfig metadata = new MetadataConfig();
     public DeveloperConfig developer = new DeveloperConfig();
     public FeatureConfig feature = new FeatureConfig();
+    public KeybindConfig keybind = new KeybindConfig();
 
 
-    public BUConfig get(){
+    public static BUConfig get(){
         return INSTANCE;
     }
 }

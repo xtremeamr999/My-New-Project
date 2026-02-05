@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
@@ -19,6 +20,8 @@ import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.ui.widgets.TextDisplayWidget;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
@@ -30,32 +33,43 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-public class OrderLimit implements BUListener, BUToggleableFeature {
-    @Getter @Setter
+@ConfigObject
+public class OrderLimitVisual implements BUListener, BUToggleableFeature {
+
+    @ConfigObject
+    public record OrderLimitEntry(@Getter @ConfigEntry(id = "price") double price, @Getter @ConfigEntry(id = "time") ZonedDateTime time) {
+        public OrderLimitEntry(double price, ZonedDateTime time) {
+            this.price = price;
+            this.time = time;
+            ConfigUtil.scheduleConfigSave();
+        }
+    }
+
+    @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
     @Getter
     private static final double COIN_LIMIT = 15_000_000_000d;
 
-    @Getter
+    @Getter @ConfigEntry(id = "orderLimitEntries")
     private final List<OrderLimitEntry> orderLimitEntries;
 
     private double getTotalOrderedCoins() {
         return orderLimitEntries.stream().mapToDouble(OrderLimitEntry::price).sum();
     }
 
-    public OrderLimit(boolean enabled) {
+    public OrderLimitVisual(boolean enabled) {
         this.enabled = enabled;
         this.orderLimitEntries = new ArrayList<>();
     }
 
 
     @RunOnInit
-    public static void registerBazaarOpen() {
+    public void registerBazaarOpen() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
             if(screenInfo == null || !screenInfo.inBazaar())
                 return;
-            BUConfig.get().orderLimit.removeOldEntries();
+            removeOldEntries();
         });
     }
 
@@ -88,15 +102,15 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
 
     @RegisterWidget
     public static List<ClickableWidget> getWidget() {
-        OrderLimit orderLimit = BUConfig.get().orderLimit;
+        OrderLimitVisual orderLimitVisual = BUConfig.get().feature.orderLimitVisual;
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
         boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
 
-        if (!orderLimit.isEnabled() || !isTargetScreen || !(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen))
+        if (!orderLimitVisual.isEnabled() || !isTargetScreen || !(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen))
             return Collections.emptyList();
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
-        String orderedCoinsFormatted = formatNumberWithPrefix(orderLimit.getTotalOrderedCoins());
+        String orderedCoinsFormatted = formatNumberWithPrefix(orderLimitVisual.getTotalOrderedCoins());
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen,
                 screenTitle);
 
@@ -127,10 +141,10 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     }
 
     private static ClickableWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions, String orderedCoinsFormatted){
-        OrderLimit orderLimit = BUConfig.get().orderLimit;
+        OrderLimitVisual orderLimitVisual = BUConfig.get().feature.orderLimitVisual;
 
-        Text orderedCoinsText = orderLimit.getTotalOrderedCoins() >= OrderLimit.COIN_LIMIT ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
-        Text limitText = Text.literal("/" + formatNumberWithPrefix(OrderLimit.COIN_LIMIT)).formatted(Formatting.GOLD);
+        Text orderedCoinsText = orderLimitVisual.getTotalOrderedCoins() >= OrderLimitVisual.COIN_LIMIT ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED) : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
+        Text limitText = Text.literal("/" + formatNumberWithPrefix(OrderLimitVisual.COIN_LIMIT)).formatted(Formatting.GOLD);
         Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
                 .append(orderedCoinsText)
                 .append(limitText);
@@ -148,26 +162,5 @@ public class OrderLimit implements BUListener, BUToggleableFeature {
     @Override
     public void subscribe() {
         BazaarUtils.EVENT_BUS.subscribe(this);
-    }
-
-    public record OrderLimitEntry(@Getter double price, @Getter ZonedDateTime time) {
-        public OrderLimitEntry(double price, ZonedDateTime time) {
-            this.price = price;
-            this.time = time;
-            BUConfig.scheduleConfigSave();
-        }
-    }
-
-    public Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Show Bazaar Order Limit",
-                "Shows you how close you are to the coin order limit for the bazaar at the top of the bazaar. Resets at 12am GMT.",
-                false,
-                this::isEnabled,
-                this::setEnabled);
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(this.createOption());
     }
 }

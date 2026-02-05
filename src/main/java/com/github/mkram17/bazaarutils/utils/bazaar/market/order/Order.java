@@ -97,11 +97,11 @@ public class Order extends OrderInfo {
     }
 
     private void onOutbid(boolean isOutbid) {
-        boolean shouldNotifyUser = BUConfig.get().outbidOrderHandler.isNotifyOutbid();
-        boolean shouldPlayNotificationSound = BUConfig.get().outbidOrderHandler.isNotificationSound();
-        boolean shouldAutoOpenBazaar = BUConfig.get().outbidOrderHandler.isAutoOpenEnabled();
+        boolean shouldNotifyUser = BUConfig.get().feature.outbidOrderHandler.isNotifyOutbid();
+        boolean shouldPlayNotificationSound = BUConfig.get().feature.outbidOrderHandler.isNotificationSound();
+        boolean shouldAutoOpenBazaar = BUConfig.get().feature.outbidOrderHandler.isAutoOpenBazaarOnOutbid();
 
-        if (!shouldNotifyUser || !BUConfig.get().userOrders.contains(this)) {
+        if (!shouldNotifyUser || !BUConfig.get().general.userOrders.contains(this)) {
             return;
         }
 
@@ -114,7 +114,7 @@ public class Order extends OrderInfo {
         if (isOutbid) {
             message = OutbidOrderHandler.getOutbidMessage(this);
 
-            if (BUConfig.get().developerMode) {
+            if (BUConfig.get().developer.isDeveloperModeEnabled) {
                 message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getOrderType()) + " Order Price: " + this.getPricePerItem()));
             }
 
@@ -174,7 +174,7 @@ public class Order extends OrderInfo {
      * @return index of this order within the persisted user order list.
      */
     public int getIndex() {
-        return BUConfig.get().userOrders.indexOf(this);
+        return BUConfig.get().general.userOrders.indexOf(this);
     }
 
     @Override
@@ -266,12 +266,12 @@ public class Order extends OrderInfo {
      * Removes this order from the tracked watched items list and notifies listeners.
      */
     public void removeFromWatchedItems() {
-        if (!BUConfig.get().userOrders.remove(this)) {
+        if (!BUConfig.get().general.userOrders.remove(this)) {
             PlayerActionUtil.notifyAll("Error removing " + name + " from watched items. Item couldn't be found.");
         }
 
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.REMOVE, this));
 
-        BUConfig.scheduleConfigSave();
+        ConfigUtil.scheduleConfigSave();
     }
 }

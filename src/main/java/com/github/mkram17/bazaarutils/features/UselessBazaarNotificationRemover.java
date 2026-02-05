@@ -1,10 +1,13 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,10 +15,17 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 
 import java.util.Arrays;
 
+@ConfigObject
 public class UselessBazaarNotificationRemover implements BUListener, BUToggleableFeature {
-    @Getter @Setter
+
+    @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
+    @ConfigEntry(id = "firstTimeRemoved")
     private boolean firstTimeRemoved = true;
+
+    public UselessBazaarNotificationRemover(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     private static final String[] uselessNotifications = {
             "[Bazaar] Cancelling order...",
@@ -30,12 +40,15 @@ public class UselessBazaarNotificationRemover implements BUListener, BUToggleabl
 
     private void registerUselessNotificationDetector(){
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            if(!enabled)
+                return true;
+
             if(isNotificationUseless(message.getString())) {
                 if(firstTimeRemoved) {
                     Util.tickExecuteLater(2, () -> PlayerActionUtil.notifyAll("TIP - Useless Bazaar notifications such as \"Putting goods in escrow...\" are removed by default! " +
                             "To disable this feature, uncheck the \"Remove Useless Bazaar Notifications\" option in the Bazaar Utils settings."));
                     firstTimeRemoved = false;
-                    BUConfig.scheduleConfigSave();
+                    ConfigUtil.scheduleConfigSave();
                 }
 
                 return false;
@@ -50,13 +63,5 @@ public class UselessBazaarNotificationRemover implements BUListener, BUToggleabl
     @Override
     public void subscribe() {
         registerUselessNotificationDetector();
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(BUToggleableFeature.createOptionHelper("Remove Useless Bazaar Notifications",
-                "Removes useless notifications that appear when making, claiming, and cancelling orders. Eg 'Putting goods in escrow...'",
-                true,
-                this::isEnabled, this::setEnabled));
     }
 }

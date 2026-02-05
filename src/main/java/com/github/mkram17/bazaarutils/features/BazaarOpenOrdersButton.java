@@ -35,7 +35,7 @@ public class BazaarOpenOrdersButton {
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidget() {
-        if(!BUConfig.get().bazaarOpenOrdersButton.isEnabled())
+        if(!BUConfig.get().feature.bazaarOpenOrdersButton.isEnabled())
             return Collections.emptyList();
 
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();

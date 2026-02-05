@@ -88,8 +88,8 @@ public class BazaarUtils implements ClientModInitializer {
 
     private void setDefaultValues(){
         //causes errors if done as default in config bc constructor uses other config info which isnt loaded yet
-        if(BUConfig.get().bookmarks.isEmpty()) {
-            BUConfig.get().bookmarks.add(new Bookmark("Diamond")); // Default
+        if(BUConfig.get().feature.bookmarks.isEmpty()) {
+            BUConfig.get().feature.bookmarks.add(new Bookmark("Diamond")); // Default
         }
 
 
@@ -109,7 +109,7 @@ public class BazaarUtils implements ClientModInitializer {
             var currentVersionMajor = currentVersion.substring(currentVersion.indexOf(".")+1);
 
             BUConfig.get().MOD_VERSION = currentVersion;
-            BUConfig.scheduleConfigSave();
+            ConfigUtil.scheduleConfigSave();
 
             if(!oldVersionMajor.equals(currentVersionMajor))
                 updatedMajorVersion = true;

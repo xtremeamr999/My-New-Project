@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class OrderInfoUtil {
     public static List<Order> getUserOrders() {
-        return BUConfig.get().userOrders;
+        return BUConfig.get().general.userOrders;
     }
 
     public static Optional<Order> getUserOrderFromIndex(int slotIndex) {

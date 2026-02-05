@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
+import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
@@ -8,6 +9,8 @@ import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
@@ -29,9 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ConfigObject
 public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleableFeature {
-    @Getter @Setter
-    private boolean showOutsideBazaar = false;
+
+    @ConfigEntry(id = "showOutsideBazaar")
+    private boolean showOutsideBazaar;
+
+    public PriceCharts(boolean showOutsideBazaar) {
+        this.showOutsideBazaar = showOutsideBazaar;
+    }
 
     // Cache: sanitized item name -> should show tooltip
     private static final Map<String, Boolean> SHOW_CACHE = new ConcurrentHashMap<>();
@@ -114,18 +123,5 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
         }
 
         return raw;
-    }
-
-    private Option<Boolean> createOption() {
-        return BUToggleableFeature.createOptionHelper("Show Price Charts Outside Bazaar",
-                "Usually the option to CTRL+SHIFT click an item to see the price charts and other information on skyblock.finance is only shown inside the Bazaar while in an item view. This enables the feature outside of the Bazaar as well.",
-                false,
-                this::isShowOutsideBazaar,
-                this::setShowOutsideBazaar);
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(this.createOption());
     }
 }

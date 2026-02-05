@@ -309,7 +309,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
      * @return immutable list of extracted values
      */
     public static <T> List<T> getVariables(Function<Order, T> variable) {
-        return BUConfig.get().userOrders.stream()
+        return BUConfig.get().general.userOrders.stream()
                 .map(variable)
                 .toList();
     }

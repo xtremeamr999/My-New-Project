@@ -31,7 +31,7 @@ public class SlotHighlightCache {
         var screenInfo = ScreenInfo.getCurrentScreenInfo();
         if(!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN, ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) return;
 
-        var config = BUConfig.get();
+        var config = BUConfig.get().feature;
         config.orderStatusHighlight.updateHighlightCache(event.getItemStacks());
         config.instaSellHighlight.updateHighlightCache();
     }

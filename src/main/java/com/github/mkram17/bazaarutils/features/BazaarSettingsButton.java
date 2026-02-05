@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.ResourcefulConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
@@ -43,7 +43,7 @@ public class BazaarSettingsButton {
                 currentButtonY,
                 buttonSize, buttonSize,
                 SLOT_BUTTON_TEXTURES,
-                (btn) -> ResourcefulConfig.openGUI(),
+                (btn) -> ConfigUtil.openGUI(),
                 null,
                 Text.literal("Bazaar Utils Settings")
         );

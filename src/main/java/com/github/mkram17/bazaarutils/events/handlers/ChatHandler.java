@@ -257,7 +257,7 @@ public class ChatHandler {
 
         if (isSellOrder) {
             //the price calculated before is ignoring tax, so must be added to find the actual price (which is used in tooltips etc.)
-            price /= ((100 - BUConfig.get().bzTax) / 100);
+            price /= ((100 - BUConfig.get().general.userBazaarTax) / 100);
         }
 
         OrderType orderType = isSellOrder ? OrderType.SELL : OrderType.BUY;
@@ -405,7 +405,7 @@ public class ChatHandler {
      * @return the matching bazaar order if found, empty otherwise
      */
     private static Optional<Order> getOrderInfo(OrderInfo item) {
-        Optional<Order> orderOptional = item.findOrderInList(BUConfig.get().userOrders);
+        Optional<Order> orderOptional = item.findOrderInList(BUConfig.get().general.userOrders);
 
         if (orderOptional.isEmpty()) {
             PlayerActionUtil.notifyAll("Could not find claimed item: " + item.getName(), NotificationType.ORDERDATA);

@@ -121,7 +121,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                     CustomOrder newOrder = new CustomOrder(orderToAdd.isEnabled(), orderToAdd.getOrderAmount(), orderToAdd.getSlotNumber());
                     BUConfig.get().customOrders.add(newOrder);
                     MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
-                    BUConfig.scheduleConfigSave();
+                    ConfigUtil.scheduleConfigSave();
                 })
                     .margins(Insets.of(3));
     }

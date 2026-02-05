@@ -173,7 +173,7 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
                     break;
             }
 
-            if (BUConfig.get().developerMode) {
+            if (BUConfig.get().developer.isDeveloperModeEnabled) {
                 var sellPrice = order.getMarketPrice(OrderType.BUY);
                 var buyPrice = order.getMarketPrice(OrderType.SELL);
 

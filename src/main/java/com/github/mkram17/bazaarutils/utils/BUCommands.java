@@ -112,7 +112,7 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
                     BUConfig.get().developer.isDeveloperModeEnabled = !BUConfig.get().developer.isDeveloperModeEnabled;
-                    BUConfig.scheduleConfigSave();
+                    ConfigUtil.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
                     PlayerActionUtil.notifyAll(BUConfig.get().developer.isDeveloperModeEnabled ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 

@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.features.restrictsell;
 
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
@@ -14,15 +13,10 @@ import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,60 +107,6 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         return message.toString();
     }
 
-    public Option<Boolean> createRuleOption(SellRestrictionControl control) {
-        // Determine display text based on rule type
-        Text nameText;
-        Text descriptionText;
-
-        if (control instanceof StringSellRestrictionControl stringControl) {
-            String itemName = stringControl.getName(); // Assuming getName() exists for NAME rules
-            nameText = Text.literal("Item: " + itemName);
-            descriptionText = Text.literal("Block insta-sell for item: " + itemName);
-        } else if (control instanceof DoubleSellRestrictionControl doubleControl){
-            double amount = doubleControl.getAmount();
-            String typeText = control.getRule() == RestrictInstaSellBy.VOLUME ? "Volume < " : "Price < ";
-            nameText = Text.literal(typeText + amount);
-            String desc = control.getRule() == RestrictInstaSellBy.PRICE ?
-                    "Block insta-sell if price exceeds " + amount :
-                    "Block insta-sell if volume exceeds " + amount;
-            descriptionText = Text.literal(desc);
-        } else {
-            nameText = Text.literal("Unknown Rule");
-            descriptionText = Text.literal("This rule is of an unknown type.");
-        }
-
-        return Option.<Boolean>createBuilder()
-                .name(nameText)
-                .description(OptionDescription.of(descriptionText))
-                .binding(
-                        false,
-                        control::isEnabled,
-                        control::setEnabled
-                )
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    private void buildOptions(OptionGroup.Builder builder){
-        for(SellRestrictionControl control : getControls()){
-            builder.option(createRuleOption(control));
-        }
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        OptionGroup.Builder restrictSellGroupBuilder = OptionGroup.createBuilder()
-                .name(Text.literal("Sell rules"))
-                .description(OptionDescription.of(Text.literal("Blocks insta selling based on rules. You can add a new rule with /bu rule add {based on volume or price} {amount over which will be restricted} or you can remove it with /bu rule remove {rule number}")));
-
-        if (getControls().isEmpty()) {
-            DoubleSellRestrictionControl priceControl = new DoubleSellRestrictionControl(RestrictInstaSellBy.PRICE, 1000000);
-            addRule(priceControl);
-        }
-        buildOptions(restrictSellGroupBuilder);
-
-        builder.group(restrictSellGroupBuilder.build());
-    }
     @Override
     public void subscribe() {
         registerScreenEvent();

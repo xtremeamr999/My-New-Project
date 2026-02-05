@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.mixin;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.features.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
@@ -62,7 +63,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "init", at = @At("TAIL"))
 	private void addConfiguredButtons(CallbackInfo ci) {
-		for (ClickableWidget button : BUConfig.getWidgets()) {
+		for (ClickableWidget button : ConfigUtil.getWidgets()) {
 			this.addDrawableChild(button);
 		}
 	}
@@ -75,7 +76,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
 			return;
 
-		var config = BUConfig.get();
+		var config = BUConfig.get().feature;
 		if(config.orderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
 			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
 		}
@@ -89,7 +90,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 		if (MinecraftClient.getInstance().player != null && !(slot.inventory == MinecraftClient.getInstance().player.getInventory()))
 			return;
 
-		var config = BUConfig.get();
+		var config = BUConfig.get().feature;
 		if (config.instaSellHighlight.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
 			draw(context, slot.x, slot.y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
 		}

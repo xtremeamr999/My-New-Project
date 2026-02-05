@@ -9,6 +9,6 @@ public class MajorUpdateActions {
     @RunOnInit
     public static void runIfUpdated(){
         if(!BazaarUtils.updatedMajorVersion) return;
-        BUConfig.get().bookmarks.clear();
+        BUConfig.get().feature.bookmarks.clear();
     }
 }

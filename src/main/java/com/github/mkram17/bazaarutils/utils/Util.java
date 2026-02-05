@@ -97,10 +97,10 @@ public class Util {
         if(item == null)
             return;
         assert item.getProductID() != null;
-        BUConfig.get().userOrders.add(item);
+        BUConfig.get().general.userOrders.add(item);
         PlayerActionUtil.notifyAll("Added item: § " + item, NotificationType.ORDERDATA);
         EVENT_BUS.post(new UserOrdersChangeEvent(UserOrdersChangeEvent.ChangeTypes.ADD, item));
-        BUConfig.scheduleConfigSave();
+        ConfigUtil.scheduleConfigSave();
     }
 
     @RunOnInit

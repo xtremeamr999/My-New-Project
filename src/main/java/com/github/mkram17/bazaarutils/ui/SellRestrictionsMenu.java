@@ -117,7 +117,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                             SellRestrictionControl newControl = new StringSellRestrictionControl("Example Restriction");
                             BUConfig.get().instaSellRestrictions.addRule(newControl);
                             MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
-                            BUConfig.scheduleConfigSave();
+                            ConfigUtil.scheduleConfigSave();
                         })
                 .margins(Insets.of(3));
     }
