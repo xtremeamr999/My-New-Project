@@ -5,8 +5,8 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 
 public class DeveloperConfig {
 
-    @ConfigEntry(id = "developerMode")
-    public boolean developerMode = false;
+    @ConfigEntry(id = "isDeveloperModeEnabled")
+    public boolean isDeveloperModeEnabled = false;
 
     @ConfigEntry(id = "disableErrorNotifications")
     public boolean disableErrorNotifications = false;

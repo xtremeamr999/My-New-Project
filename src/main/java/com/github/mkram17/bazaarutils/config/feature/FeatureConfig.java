@@ -1,13 +1,22 @@
 package com.github.mkram17.bazaarutils.config.feature;
 
+import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.features.FlipHelper;
+import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FeatureConfig {
+
+    @ConfigEntry(id = "customOrders")
+    public final List<CustomOrder> customOrders = new ArrayList<>();
+
+    @ConfigEntry(id = "bookmarks")
+    public final List<Bookmark> bookmarks = new ArrayList<>();
 
     @ConfigEntry(id = "flipHelper")
     public FlipHelper flipHelper = new FlipHelper(true, PricingPosition.COMPETITIVE, 17);

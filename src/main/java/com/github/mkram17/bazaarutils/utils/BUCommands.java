@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.ResourcefulConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
@@ -68,7 +68,7 @@ public class BUCommands {
                     )
     );
     private static final LiteralArgumentBuilder<FabricClientCommandSource> bazaarutils = ClientCommandManager.literal("bazaarutils").executes(context -> {
-        ResourcefulConfig.openGUI();
+        ConfigUtil.openGUI();
         return 1;
     });
 
@@ -87,7 +87,7 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("tax")
                 .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1, 1.25))
                                 .executes((context) -> {
-                                    BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount") / 100;
+                                    BUConfig.get().general.userBazaarTax = DoubleArgumentType.getDouble(context, "amount") / 100;
                                     return 1;
                                 })
                         )
@@ -111,12 +111,12 @@ public class BUCommands {
         );
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
-                    BUConfig.get().developerMode = !BUConfig.get().developerMode;
+                    BUConfig.get().developer.isDeveloperModeEnabled = !BUConfig.get().developer.isDeveloperModeEnabled;
                     BUConfig.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
-                    PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
+                    PlayerActionUtil.notifyAll(BUConfig.get().developer.isDeveloperModeEnabled ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
-                    if(BUConfig.get().developerMode) {
+                    if(BUConfig.get().developer.isDeveloperModeEnabled) {
                         registerDeveloperCommands(dispatcher);
                     }
                     return 1;
@@ -145,7 +145,7 @@ public class BUCommands {
         );
 
 
-        if (BUConfig.get().developerMode) {
+        if (BUConfig.get().developer.isDeveloperModeEnabled) {
             registerDeveloperCommands(dispatcher);
         }
 //
@@ -169,7 +169,7 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        Order order = BUConfig.get().userOrders.get(index);
+        Order order = BUConfig.get().general.userOrders.get(index);
         order.removeFromWatchedItems();
         PlayerActionUtil.notifyAll("Removed " + order, NotificationType.COMMAND);
         return 1;
@@ -177,7 +177,7 @@ public class BUCommands {
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        PlayerActionUtil.notifyAll(BUConfig.get().userOrders.get(index).toString());
+        PlayerActionUtil.notifyAll(BUConfig.get().general.userOrders.get(index).toString());
         return 1;
     }
 }
