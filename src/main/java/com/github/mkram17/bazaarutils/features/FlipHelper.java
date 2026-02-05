@@ -18,6 +18,8 @@ import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
@@ -42,6 +44,7 @@ import java.util.regex.Pattern;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
+@ConfigObject
 public class FlipHelper extends CustomItemButton implements BUListener, ConfigurableFeature {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
@@ -50,9 +53,9 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
     private static final int LORE_LINE_VOLUME = 1;
     private static final int LORE_LINE_PRICE = 3;
 
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "pricingPosition")
     private PricingPosition pricingPosition;
 
     @Getter

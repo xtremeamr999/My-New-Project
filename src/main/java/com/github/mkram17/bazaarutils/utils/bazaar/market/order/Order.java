@@ -10,6 +10,8 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +33,13 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  * Extension of {@link OrderInfo} that tracks live Bazaar orders and reacts to events such
  * as outbids, user order changes, and price updates.
  */
-@Slf4j
+@Slf4j @ConfigObject
 public class Order extends OrderInfo {
     public static final int OUTBID_ORDER_NOTIFICATIONS = 3; // number of notifications to send when an order becomes outdated
 
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "amountClaimed")
     private int amountClaimed = 0;
-    @Getter
+    @Getter @ConfigEntry(id = "amountFilled")
     private int amountFilled = 0;
 
     /**

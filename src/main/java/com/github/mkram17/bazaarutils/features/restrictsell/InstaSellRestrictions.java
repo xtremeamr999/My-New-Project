@@ -12,6 +12,8 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -28,11 +30,12 @@ import java.util.List;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO maybe color chest if it is locked
+@ConfigObject
 public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
     private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "controls")
     private ArrayList<SellRestrictionControl> controls;
     @Getter
     private int safetyClicks = 0;

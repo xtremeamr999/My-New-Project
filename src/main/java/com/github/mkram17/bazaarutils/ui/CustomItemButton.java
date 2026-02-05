@@ -4,6 +4,7 @@ import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
 
 public class CustomItemButton {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
-    @Getter
+    @Getter @ConfigEntry(id = "slotNumber")
     protected int slotNumber;
     @Getter @Setter
     protected transient ItemStack replacementItem;

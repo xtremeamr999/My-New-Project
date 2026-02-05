@@ -9,6 +9,8 @@ import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
@@ -32,15 +34,15 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 //TODO find new name for this
-@NoArgsConstructor
+@NoArgsConstructor @ConfigObject
 public class CustomOrder extends CustomItemButton implements BUListener {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BROWN_STAINED_GLASS, 4, Items.RED_STAINED_GLASS_PANE));
 
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "orderAmount")
     private int orderAmount;
-    @Getter
+    @Getter @ConfigEntry(id = "item")
     private Item item;
 
     public CustomOrder(boolean enabled, int orderAmount, int slotNumber) {

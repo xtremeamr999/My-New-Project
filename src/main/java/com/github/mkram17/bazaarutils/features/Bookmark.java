@@ -15,6 +15,8 @@ import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -38,14 +40,15 @@ import java.util.List;
 import java.util.Optional;
 
 //Object is created in GUIUtils when in an item's bazaar page
+@ConfigObject
 public class Bookmark extends CustomItemButton implements BUListener {
-    @Getter
+    @Getter @ConfigEntry(id = "name")
     public final String name;
 
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "bookmarkedItemStack")
     public ItemStack bookmarkedItemStack;
 
-    @Getter
+    @Getter @ConfigEntry(id = "orderInfo")
     private final OrderInfo orderInfo;
 
     private static final int SIGN_SLOT_NUMBER = 45;

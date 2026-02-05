@@ -1,12 +1,12 @@
 package com.github.mkram17.bazaarutils.misc;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.ResourcefulConfig;
 
 public enum NotificationType {
 
-    GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA;
+    GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA, ERROR;
 
-//    public boolean isEnabled() {
-//        return BUConfig.get().developer.isDeveloperVariableEnabled(this);
-//    }
+    public boolean isEnabled() {
+        return ResourcefulConfig.INSTANCE.developer.isDeveloperVariableEnabled(this);
+    }
 }

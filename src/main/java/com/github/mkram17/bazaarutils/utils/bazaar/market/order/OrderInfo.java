@@ -8,6 +8,8 @@ import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -27,25 +29,26 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  * {@link Order} lifecycle.
  */
 //TODO turn into builder class
+@ConfigObject
 public class OrderInfo extends PriceInfo implements BUListener {
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
 
-    @Getter
+    @Getter @ConfigEntry(id = "productID")
     protected String productID; //Hypixel's code for the product
-    @Getter
+    @Getter @ConfigEntry(id = "name")
     protected final String name; //name of the item in game
 
-    @Getter
+    @Getter @ConfigEntry(id = "status")
     protected OrderStatus status;
 
-    @Getter
+    @Getter @ConfigEntry(id = "volume")
     protected final Integer volume;
 
     @Getter @Setter
     protected double tolerance; //When finding item price, it can round to the nearest coin sometimes, so tolerance is needed for price calculations
 
-    @Getter @Setter
+    @Getter @Setter @ConfigEntry(id = "itemInfo") //TODO fix config serialization for this
     private ItemInfo itemInfo;
 
     /**
