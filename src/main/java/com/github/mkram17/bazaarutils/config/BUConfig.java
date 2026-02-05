@@ -5,13 +5,9 @@ import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.config.data.MetadataConfig;
 import com.github.mkram17.bazaarutils.config.developer.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.feature.FeatureConfig;
-import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import org.lwjgl.glfw.GLFW;
 
 @ConfigInfo(title = "Bazaar Utils",
         description = "A QOL mod for Hypixel Skyblock focused on the bazaar.",
@@ -36,12 +32,4 @@ public final class BUConfig {
     public BUConfig get(){
         return INSTANCE;
     }
-
-    //Keybinds (must be static). They get registered on object creation.
-    public static StashHelper stashHelper = new StashHelper(new KeyBinding(
-            "Pick Up Stash",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_V,
-            StashHelper.CATEGORY
-    ));
 }
