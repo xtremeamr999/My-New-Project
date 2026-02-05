@@ -5,6 +5,10 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ClickableWidget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.github.mkram17.bazaarutils.config.BUConfig.CONFIGURATOR;
 
@@ -35,5 +39,11 @@ public class ConfigUtil {
                 configSaveScheduled = false;
             });
         }
+    }
+
+    public static List<ClickableWidget> getWidgets(){
+        List<ClickableWidget> widgets = new ArrayList<>();
+        //automatically added using @RegisterWidget annotation
+        return widgets;
     }
 }
