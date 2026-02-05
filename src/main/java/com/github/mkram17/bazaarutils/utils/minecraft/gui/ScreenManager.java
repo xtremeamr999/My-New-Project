@@ -26,9 +26,9 @@ import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -79,11 +79,12 @@ public class ScreenManager {
         computeCurrentType();
     }
 
-    private static final List<ScreenType> types = new CopyOnWriteArrayList<>();
+    private static final Set<ScreenType> types = ConcurrentHashMap.newKeySet();
 
     public static void register(ScreenType type) {
-        //  should probably add a check so that the same type doesn't register more than once
-        types.add(type);
+        if (!types.add(type)) {
+            Util.notifyError("ScreenType registered twice: " + type, new Throwable());
+        }
     }
 
     @Getter
