@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -32,26 +33,30 @@ public class JoinMessages {
     @RunOnInit
     public static void registerWelcomeMessageSender() {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            var isFirstLoad = BUConfig.get().firstLoad;
-            if (isFirstLoad) {
-                Util.tickExecuteLater(40, () -> {
-                    PlayerActionUtil.notifyAll(welcomeMessage);
-                    Util.tickExecuteLater(60, () -> {
-                        PlayerActionUtil.notifyAll(Util.HELP_MESSAGE);
-                        Util.tickExecuteLater(40, () -> {
-                            PlayerActionUtil.notifyAll(discordMessage);
-                        });
-
-                    });
-                });
-                BUConfig.get().firstLoad = false;
-                ConfigUtil.scheduleConfigSave();
+            if (BUConfig.get().metadata.isFirstLoad) {
+                sendFirstLoadMessages();
             } else if (BazaarUtils.updatedMajorVersion) {
-                Util.tickExecuteLater(40, () -> PlayerActionUtil.notifyAll(updateMessage));
-                Util.tickExecuteLater(41, () -> PlayerActionUtil.notifyAll(Util.CHANGELOG));
-                BazaarUtils.updatedMajorVersion = false;
+                sendMajorUpdateMessages();
             }
         });
+    }
+
+    private static void sendFirstLoadMessages(){
+        Util.tickExecuteLater(40, () -> {
+            PlayerActionUtil.notifyAll(welcomeMessage);
+            Util.tickExecuteLater(60, () -> {
+                PlayerActionUtil.notifyAll(Util.HELP_MESSAGE);
+                Util.tickExecuteLater(40, () -> PlayerActionUtil.notifyAll(discordMessage));
+            });
+        });
+        BUConfig.get().metadata.isFirstLoad = false;
+        ConfigUtil.scheduleConfigSave();
+    }
+
+    private static void sendMajorUpdateMessages(){
+        Util.tickExecuteLater(40, () -> PlayerActionUtil.notifyAll(updateMessage));
+        Util.tickExecuteLater(41, () -> PlayerActionUtil.notifyAll(Util.CHANGELOG));
+        BazaarUtils.updatedMajorVersion = false;
     }
 
 }

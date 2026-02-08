@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
@@ -27,7 +28,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class BazaarUtils implements ClientModInitializer {
     public static IEventBus EVENT_BUS = new EventBus();
-    public static ArrayList<KeyBinding> keybinds = new ArrayList<>();
     public static final String MODID = "bazaarutils";
     public static final String MOD_NAME = "Bazaar Utils";
     public static boolean updatedMajorVersion = false;
@@ -43,7 +43,7 @@ public class BazaarUtils implements ClientModInitializer {
     public void onInitializeClient() {
         registerDataComponents();
 
-        BUConfig.HANDLER.load();
+        BUConfig.register();
 
         BUCompatibilityHelper.initializePatches();
 
@@ -102,13 +102,13 @@ public class BazaarUtils implements ClientModInitializer {
             if (updateNotesValue != null)
                 updateNotes = updateNotesValue.getAsString();
 
-            var oldVersion = BUConfig.get().MOD_VERSION;
+            var oldVersion = BUConfig.get().metadata.MOD_VERSION;
             var currentVersion = metadata.getVersion().getFriendlyString();
 
             var oldVersionMajor = oldVersion.substring(oldVersion.indexOf(".")+1);
             var currentVersionMajor = currentVersion.substring(currentVersion.indexOf(".")+1);
 
-            BUConfig.get().MOD_VERSION = currentVersion;
+            BUConfig.get().metadata.MOD_VERSION = currentVersion;
             ConfigUtil.scheduleConfigSave();
 
             if(!oldVersionMajor.equals(currentVersionMajor))

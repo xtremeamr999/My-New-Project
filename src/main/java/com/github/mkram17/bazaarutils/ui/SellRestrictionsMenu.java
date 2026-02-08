@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
 import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
@@ -48,7 +49,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private Component generateUserRestrictionsParent() {
-        var customOrders = BUConfig.get().customOrders;
+        var customOrders = BUConfig.get().feature.customOrders;
         ParentComponent parent;
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
             parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
@@ -62,7 +63,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private ParentComponent generateRestrictionsContainer() {
-        var sellRestrictions = BUConfig.get().instaSellRestrictions.getControls();
+        var sellRestrictions = BUConfig.get().feature.instaSellRestrictions.getControls();
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
 
@@ -115,7 +116,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                             PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
 
                             SellRestrictionControl newControl = new StringSellRestrictionControl("Example Restriction");
-                            BUConfig.get().instaSellRestrictions.addRule(newControl);
+                            BUConfig.get().feature.instaSellRestrictions.addRule(newControl);
                             MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
                             ConfigUtil.scheduleConfigSave();
                         })
@@ -134,7 +135,7 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                 Components.button(
                         Text.literal(garbageCanEmoji),
                         button -> {
-                            BUConfig.get().instaSellRestrictions.getControls().remove(control);
+                            BUConfig.get().feature.instaSellRestrictions.getControls().remove(control);
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                         }).margins(Insets.of(3, 3, 1, 3))
         );

@@ -2,12 +2,10 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.*;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -54,22 +52,6 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
         registerTooltipListener();
 
         BazaarUtils.EVENT_BUS.subscribe(this);
-    }
-
-    public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Order Status Highlight"))
-                .description(OptionDescription.of(Text.literal("Adds a colored background and tooltip for orders that are competitive, matched or outbid in the orders gui inside the bazaar. For outdated orders, also adds the market price in the tooltip.")))
-                .binding(false,
-                        this::isEnabled,
-                        this::setEnabled)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(this.createOption());
     }
 
     public void updateHighlightCache(List<ItemStack> itemStacks) {

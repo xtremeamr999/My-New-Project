@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.customorder.OrderToAdd;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -57,7 +58,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private ParentComponent generateOrderButtonsParent() {
-        var customOrders = BUConfig.get().customOrders;
+        var customOrders = BUConfig.get().feature.customOrders;
         ParentComponent parent;
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
             parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateOrderButtonsContainer());
@@ -70,7 +71,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private FlowLayout generateOrderButtonsContainer() {
-        var customOrders = BUConfig.get().customOrders;
+        var customOrders = BUConfig.get().feature.customOrders;
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
         for(CustomOrder order : customOrders) {
@@ -119,7 +120,7 @@ public class CustomOrdersMenu extends BaseOwoScreen<FlowLayout> {
                         return;
                     }
                     CustomOrder newOrder = new CustomOrder(orderToAdd.isEnabled(), orderToAdd.getOrderAmount(), orderToAdd.getSlotNumber());
-                    BUConfig.get().customOrders.add(newOrder);
+                    BUConfig.get().feature.customOrders.add(newOrder);
                     MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                     ConfigUtil.scheduleConfigSave();
                 })

@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.features.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
@@ -59,7 +60,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         this.item = Items.PURPLE_STAINED_GLASS_PANE;
     }
     public static Item getNextColoredPane(){
-        int size = BUConfig.get().customOrders.size();
+        int size = BUConfig.get().feature.customOrders.size();
         return CustomOrder.COLORMAP.get(size % 5);
     }
 
@@ -104,27 +105,9 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(Integer.toString(getOrderAmount()), true));
     }
 
-    public Option<Boolean> createOption() {
-        return super.createBooleanOption(
-                "Buy " + getOrderAmount() + " Button",
-                "Buy order button for " + getOrderAmount() + " of an item.",
-                this::isEnabled,
-                this::setEnabled
-        );
-    }
-    public static void buildOptions(OptionGroup.Builder builder){
-        List<CustomOrder> customOrders = BUConfig.get().customOrders;
-        if(customOrders.isEmpty())
-            customOrders.add(new CustomOrder(true, 71680, 17));
-
-        for (CustomOrder order : customOrders) {
-            builder.option(order.createOption());
-        }
-    }
-
     public void removeFromConfig(){
-        if (BUConfig.get().customOrders.contains(this)) {
-            BUConfig.get().customOrders.remove(this);
+        if (BUConfig.get().feature.customOrders.contains(this)) {
+            BUConfig.get().feature.customOrders.remove(this);
             ConfigUtil.scheduleConfigSave();
             EVENT_BUS.unsubscribe(this);
         }

@@ -2,8 +2,6 @@ package com.github.mkram17.bazaarutils.events.handlers;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 
-import java.util.List;
-
 /**
  * Interface for event listeners.
  * <p>
@@ -23,13 +21,4 @@ public interface BUListener {
      * This method should register all event handlers for this listener.
      */
     void subscribe();
-
-    /**
-     * Retrieves the list of all registered event listeners from the config.
-     * 
-     * @return list of event listeners that are persisted in the configuration
-     */
-    static List<BUListener> getEventListeners(){
-        return BUConfig.get().getSerializedEvents();
-    }
 }

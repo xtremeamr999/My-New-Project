@@ -57,7 +57,7 @@ public class PickSlotMenu extends Screen {
         setSlotItem(16, Items.OAK_SIGN.getDefaultStack());
         setSlotItem(31, Items.ARROW.getDefaultStack());
 
-        for(CustomOrder order : BUConfig.get().customOrders){
+        for(CustomOrder order : BUConfig.get().feature.customOrders){
             setSlotItem(order.getSlotNumber(), order.getItem().getDefaultStack());
         }
     }

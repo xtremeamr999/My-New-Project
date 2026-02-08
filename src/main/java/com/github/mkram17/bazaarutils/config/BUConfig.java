@@ -34,4 +34,8 @@ public final class BUConfig {
     public static BUConfig get(){
         return INSTANCE;
     }
+
+    public static void register(){
+        CONFIGURATOR.register(BUConfig.class);
+    }
 }

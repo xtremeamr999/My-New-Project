@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.google.gson.JsonObject;
@@ -58,7 +59,7 @@ public class ResourceManager {
             try (InputStream inputStream = resourceOptional.get().getInputStream()) {
                 Files.copy(inputStream, LOCAL_RESOURCES_PATH);
                 // don't know the SHA of the bundled file, so stays null to force an update check.
-                BUConfig.get().resourcesSha = "";
+                BUConfig.get().metadata.resourcesSha = "";
                 ConfigUtil.scheduleConfigSave();
             }
         } else {
@@ -87,7 +88,7 @@ public class ResourceManager {
                     String latestSha = jsonObject.get("sha").getAsString();
                     String downloadUrl = jsonObject.get("download_url").getAsString();
 
-                    if (!latestSha.equals(BUConfig.get().resourcesSha)) {
+                    if (!latestSha.equals(BUConfig.get().metadata.resourcesSha)) {
                         if (manual)
                             PlayerActionUtil.notifyAll("New resources found, downloading...");
                         downloadLatestResources(downloadUrl, latestSha);
@@ -110,7 +111,7 @@ public class ResourceManager {
             Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
             Files.move(tempPath, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
-            BUConfig.get().resourcesSha = latestSha;
+            BUConfig.get().metadata.resourcesSha = latestSha;
             ConfigUtil.scheduleConfigSave();
             BazaarDataManager.setConversionsLoaded(false);
             PlayerActionUtil.notifyAll("Successfully updated Bazaar resources!");

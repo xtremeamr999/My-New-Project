@@ -1,22 +1,14 @@
 package com.github.mkram17.bazaarutils.ui;
 
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
-import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class CustomItemButton {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
@@ -33,27 +25,5 @@ public class CustomItemButton {
 
     protected boolean wasButtonSlotClicked(SlotClickEvent event) {
         return (event.slotId == slotNumber);
-    }
-
-    public Option<Boolean> createBooleanOption(String name, String description, Supplier<Boolean> getter, Consumer<Boolean> setter) {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal(name))
-                .binding(true,
-                        getter,
-                        setter)
-                .description(OptionDescription.of(Text.literal(description)))
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    public <T extends Enum<T>> Option<T> createEnumOption(String name, String description, Class<T> enumClass, T def, Supplier<T> getter, Consumer<T> setter) {
-        return Option.<T>createBuilder()
-                .name(Text.literal(name))
-                .binding(def,
-                        getter,
-                        setter)
-                .description(OptionDescription.of(Text.literal(description)))
-                .controller(opt -> BUConfigGui.createEnumController(opt, enumClass))
-                .build();
     }
 }

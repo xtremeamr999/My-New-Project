@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
 import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ public class StringSellRestrictionControl extends SellRestrictionControl{
     @Setter
     private String name;
     public StringSellRestrictionControl(String name) {
-        super(InstaSellRestrictions.restrictBy.NAME);
+        super(RestrictInstaSellBy.NAME);
         this.name = name;
     }
 

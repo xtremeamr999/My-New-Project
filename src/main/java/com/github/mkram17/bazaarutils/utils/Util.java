@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -86,7 +87,7 @@ public class Util {
                     }
                 });
 
-        if (!BUConfig.get().disableErrorNotifications.isEnabled())
+        if (!BUConfig.get().developer.disableErrorNotifications)
             PlayerActionUtil.sendPlayerMessage(messageText);
 
         logError(message,simpleCallingName, e);

@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.config.BUConfigGui;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
@@ -20,14 +19,12 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import dev.isxander.yacl3.api.ConfigCategory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
@@ -250,44 +247,8 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
     }
 
-    public Option<PricingPosition> createFlippingTypeOption() {
-        // Users with config from before this option was added will have null value for the biddingType variable. This ensures a default value is set.
-        if (pricingPosition == null) {
-          pricingPosition = PricingPosition.COMPETITIVE;
-        }
-
-      return super.createEnumOption("Bidding type",
-          "Select how the flip price should be chosen.",
-          PricingPosition.class,
-          pricingPosition,
-          this::getPricingPosition,
-          this::setPricingPosition);
-    }
-
-    public static void buildOptions(OptionGroup.Builder builder) {
-      FlipHelper flipHelper = BUConfig.get().feature.flipHelper;
-
-      builder.option(flipHelper.createFlippingTypeOption());
-    }
-
     @Override
     public void subscribe() {
         EVENT_BUS.subscribe(this);
-    }
-
-    public Option<Boolean> createOption() {
-        return Option.<Boolean>createBuilder()
-                .name(Text.literal("Flip Helper"))
-                .description(OptionDescription.of(Text.literal("Adds a button to quickly flip your orders from the bazaar GUI.")))
-                .binding(true,
-                        this::isEnabled,
-                        this::setEnabled)
-                .controller(BUConfigGui::createBooleanController)
-                .build();
-    }
-
-    @Override
-    public void createOption(ConfigCategory.Builder builder) {
-        builder.option(this.createOption());
     }
 }
