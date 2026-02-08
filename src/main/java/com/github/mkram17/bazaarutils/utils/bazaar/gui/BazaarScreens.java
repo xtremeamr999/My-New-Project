@@ -123,7 +123,7 @@ public class BazaarScreens {
             .containerQuery(BazaarSlots.INSTANT_SELL.SELL_INVENTORY::query)
             .build();
 
-    public static final List<ScreenType> ALL = List.of(
+    public static final Set<ScreenType> ALL = Set.of(
             MAIN_PAGE,
             SETTINGS_PAGE,
             ORDERS_PAGE,
