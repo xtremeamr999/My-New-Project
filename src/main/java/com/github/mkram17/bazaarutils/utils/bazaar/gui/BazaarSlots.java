@@ -40,6 +40,11 @@ public class BazaarSlots {
                 )
         ),
 
+        ITEM_DISPLAY(new BazaarSlot(
+                new SlotLookup.IndexReference.FixedIndex(13),
+                (query) -> query)
+        ),
+
         CREATE_BUY_ORDER(new BazaarSlot(
                 new SlotLookup.IndexReference.FixedIndex(15),
                 (query) -> query
