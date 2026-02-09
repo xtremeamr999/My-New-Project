@@ -49,7 +49,6 @@ public class BazaarUtils implements ClientModInitializer {
 
         getModProperties();
         registerEventBus();
-        subscribeEvents();
         registerCommands();
         setDefaultValues();
     }
@@ -77,13 +76,6 @@ public class BazaarUtils implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             BUCommands.register(dispatcher);
         });
-    }
-
-    //must be run after config load
-    private void subscribeEvents(){
-        for(BUListener listener : BUListener.getEventListeners()) {
-            listener.subscribe();
-        }
     }
 
     private void setDefaultValues(){

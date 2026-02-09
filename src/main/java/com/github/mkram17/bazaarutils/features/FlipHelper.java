@@ -19,8 +19,6 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -63,12 +61,6 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         this.enabled = enabled;
         this.pricingPosition = pricingPosition;
         this.slotNumber = slotNumber;
-    }
-
-    public static OptionGroup.Builder createFlipsGroup() {
-      return OptionGroup.createBuilder()
-              .name(Text.literal("Flip Helper Options"))
-              .description(OptionDescription.of(Text.literal("Manage buttons of flip helper action.")));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

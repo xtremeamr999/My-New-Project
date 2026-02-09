@@ -33,10 +33,9 @@
 		"minecraft": ">=${mcVersion} <=${maxMcVersion}",
 		"java": ">=21",
 		"fabric-api": "*",
-		"yet_another_config_lib_v3": "*"
+		"resourcefulconfig": "*"
 	},
 	"suggests": {
-		"amecsreborn": ">=2.02",
 		"modmenu": ">=13.0.1"
 	},
 	"custom": {

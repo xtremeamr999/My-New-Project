@@ -12,10 +12,6 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
-import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.OptionGroup;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +24,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
@@ -62,12 +57,6 @@ public class CustomOrder extends CustomItemButton implements BUListener {
     public static Item getNextColoredPane(){
         int size = BUConfig.get().feature.customOrders.size();
         return CustomOrder.COLORMAP.get(size % 5);
-    }
-
-    public static OptionGroup.Builder createOrdersGroup(){
-        return OptionGroup.createBuilder()
-                .name(Text.literal("Buy Amount Options"))
-                .description(OptionDescription.of(Text.literal("Add buttons for custom buy order/insta buy amounts. To add more do /bu customorder add {order amount} {slot number} (top left slot is slot #1, to the right is #2, etc etc.")));
     }
 
     @EventHandler

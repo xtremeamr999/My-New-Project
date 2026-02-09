@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
@@ -8,7 +7,6 @@ import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.ConfigCategory;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;

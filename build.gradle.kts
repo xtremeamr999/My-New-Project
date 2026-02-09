@@ -24,9 +24,6 @@ repositories {
     maven("https://repo.hypixel.net/repository/Hypixel/") {
         name = "Hypixel"
     }
-    maven("https://maven.isxander.dev/releases") {
-        name = "YACL"
-    }
     maven("https://maven.teamresourceful.com/repository/maven-public/"){
         name = "Resourceful Config"
     }
@@ -84,7 +81,6 @@ dependencies {
     include("net.hypixel:hypixel-api-core:4.4")
 
     // Config lib and settings screen
-    modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
     modImplementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-${deps["resourcefulconfig_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")

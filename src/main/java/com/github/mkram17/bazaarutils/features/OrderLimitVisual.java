@@ -22,8 +22,6 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -64,12 +62,12 @@ public class OrderLimitVisual implements BUListener, BUToggleableFeature {
 
 
     @RunOnInit
-    public void registerBazaarOpen() {
+    public static void registerBazaarOpen() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-            if(screenInfo == null || !screenInfo.inBazaar())
+            if(!screenInfo.inBazaar())
                 return;
-            removeOldEntries();
+            BUConfig.get().feature.orderLimitVisual.removeOldEntries();
         });
     }
 

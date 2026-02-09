@@ -1,7 +1,6 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.handlers.BUListener;
@@ -11,10 +10,6 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import dev.isxander.yacl3.api.ConfigCategory;
-import dev.isxander.yacl3.api.Option;
-import lombok.Getter;
-import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;

@@ -4,7 +4,6 @@ import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
-import dev.isxander.yacl3.api.Option;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
