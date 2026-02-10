@@ -90,7 +90,6 @@ dependencies {
     include("commons-codec:commons-codec:1.16.0")
 
     // Config lib and settings screen
-    modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
     modImplementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-${deps["resourcefulconfig_version"]}")
 
     modCompileOnly("com.terraformersmc:modmenu:${property("modmenu_version")}")
