@@ -7,5 +7,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(SkyBlockBazaarReply.class)
 public interface AccessorSkyBlockBazaarReply {
     @Accessor("lastUpdated")
-    long bazaarutils$getLastUpdated();
+    long getLastUpdated();
 }

@@ -8,20 +8,23 @@ import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 
 public class ItemSlotButtonWidget extends TexturedButtonWidget {
     private final ItemStack itemStack;
     public record ScreenWidgetDimensions(int x, int y, int backgroundWidth) {}
 
-    public ItemSlotButtonWidget(int x, int y, int width, int height, ButtonTextures textures, PressAction onPress, ItemStack itemStack, Text tooltip) {
-        super(x, y, width, height, textures, onPress, Text.empty());
+    public ItemSlotButtonWidget(int x, int y, int width, int height, ButtonTextures textures, PressAction onPress, ItemStack itemStack, MutableText tooltip) {
+        super(x, y, width, height, textures, onPress, net.minecraft.text.Text.empty());
         this.itemStack = itemStack;
         this.setTooltip(Tooltip.of(tooltip));
     }
-
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    //? if > 1.21.10 {
+    public void drawIcon(DrawContext context, int mouseX, int mouseY, float delta) {
+    //? } else {
+    /*public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    *///? }
         super.renderWidget(context, mouseX, mouseY, delta);
 
         if (this.itemStack != null && !this.itemStack.isEmpty()) {
@@ -31,7 +34,6 @@ public class ItemSlotButtonWidget extends TexturedButtonWidget {
             context.drawItem(this.itemStack, itemX, itemY);
         }
     }
-
     public static ScreenWidgetDimensions getSafeScreenDimensions(AccessorHandledScreen screen, String screenTitle) {
         int currentX = screen.getX();
         int currentY = screen.getY();

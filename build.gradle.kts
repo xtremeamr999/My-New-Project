@@ -1,14 +1,10 @@
-
 plugins {
-    id("fabric-loom") version "1.11-SNAPSHOT"
+    id("fabric-loom") version "1.15-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
     id("me.modmuss50.mod-publish-plugin") version "0.8.4"
 }
-
-group = property("maven_group")!!
-version = "v" + property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
 
 base {
     archivesName.set(property("mod.id").toString())
@@ -66,6 +62,10 @@ class ModDependencies {
 val deps = ModDependencies()
 val mcVersion = stonecutter.current.version
 val maxMcVersion = deps["core.maxMcVersion"]
+group = property("maven_group")!!
+val versionNumber = property("mod_version") as String
+val releaseChannel = property("mod_release_channel") as String
+version = "$versionNumber-$releaseChannel+mc$mcVersion"
 
 dependencies {
     minecraft("com.mojang:minecraft:${mcVersion}")
@@ -82,6 +82,12 @@ dependencies {
     modImplementation("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-core:4.4")
+
+    // Apache HTTP Client + all transitive deps — no longer bundled as of 1.21.11
+    include("org.apache.httpcomponents:httpclient:4.5.14")
+    include("org.apache.httpcomponents:httpcore:4.4.16")
+    include("commons-logging:commons-logging:1.2")
+    include("commons-codec:commons-codec:1.16.0")
 
     // Config lib and settings screen
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}")
@@ -160,18 +166,16 @@ java {
 publishMods {
     file = tasks.remapJar.get().archiveFile
     additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
-    changelog = "Changelog"
-    type = if(version.toString().contains("alpha")) ALPHA else STABLE
+    type = if(releaseChannel == "alpha") ALPHA else STABLE
+    version = versionNumber
     modLoaders.add("fabric")
     changelog = rootProject.file("UPDATES.MD").readText()
-    version = "v" + property("mod_version").toString()
-    displayName = "Bazaar Utils v${property("mod_version")} for $mcVersion"
-//    dryRun = true
+    displayName = "Bazaar Utils v$version for $mcVersion"
+    dryRun = true
 
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "c4u7nzUZ"
-        version = property("mod_version") as String + "+mc" + property("deps.core.mcVersion") as String
         minecraftVersions.add(mcVersion)
 
         requires("fabric-api", "yacl")

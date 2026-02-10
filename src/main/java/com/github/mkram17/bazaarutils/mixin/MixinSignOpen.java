@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //used for SignOpenEvent
 @Mixin(Screen.class)
 public class MixinSignOpen {
-    @Inject(method = "init(Lnet/minecraft/client/MinecraftClient;II)V", at = @At("TAIL"))
+    @Inject(method = "init()V", at = @At("TAIL"))
     private void onScreenInit(CallbackInfo ci) {
         Screen screen = (Screen) (Object) this;
 
@@ -21,8 +21,6 @@ public class MixinSignOpen {
             // Post the SignOpenEvent
             SignOpenEvent event = new SignOpenEvent((SignEditScreen) screen);
             BazaarUtils.EVENT_BUS.post(event);
-//            Util.notifyAll("Sign Open Event posted!");
-
         }
     }
 }
