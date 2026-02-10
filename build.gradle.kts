@@ -1,4 +1,3 @@
-
 plugins {
     id("fabric-loom") version "1.15-SNAPSHOT"
     id("maven-publish")
@@ -31,9 +30,6 @@ repositories {
     maven {
         name = "Terraformers (for gui)"
         url = uri("https://maven.terraformersmc.com/")
-    }
-    maven("https://moulberry.repo.ax/v1") {
-        name = "Moulberry's Maven"
     }
 
     exclusiveContent {
@@ -85,6 +81,12 @@ dependencies {
     modImplementation("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-core:4.4")
+
+    // Apache HTTP Client + all transitive deps — no longer bundled as of 1.21.11
+    include("org.apache.httpcomponents:httpclient:4.5.14")
+    include("org.apache.httpcomponents:httpcore:4.4.16")
+    include("commons-logging:commons-logging:1.2")
+    include("commons-codec:commons-codec:1.16.0")
 
     // Config lib and settings screen
     modImplementation("dev.isxander:yet-another-config-lib:${deps["yacl_version"]}-fabric")
