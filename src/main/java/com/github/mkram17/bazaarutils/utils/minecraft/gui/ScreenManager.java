@@ -49,7 +49,7 @@ public class ScreenManager {
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onScreenChange(ScreenChangeEvent event) {
         instance.setCurrentScreen(event.getNewScreen());
-}
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onChestLoaded(ChestLoadedEvent event) {
@@ -102,6 +102,10 @@ public class ScreenManager {
     ) {}
 
     public void setCurrentScreen(Screen screen) {
+        if (current != null && current.screen() == screen) {
+            return;
+        }
+
         previous = current;
         current = new ScreenSnapshot(screen, matchType(screen).orElse(null));
     }
