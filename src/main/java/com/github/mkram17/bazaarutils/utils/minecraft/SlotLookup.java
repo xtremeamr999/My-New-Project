@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.utils.minecraft;
 
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarSlots;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerQuery;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -9,6 +10,10 @@ import java.util.Optional;
 public class SlotLookup {
     public static ItemStack getInventoryItem(Inventory inventory, int chestSlot) {
         return inventory.getStack(chestSlot);
+    }
+
+    public static ItemStack getInventoryItem(Inventory inventory, BazaarSlots.BazaarSlot slot) {
+        return getInventoryItem(inventory, slot.resolve(inventory));
     }
 
     public static Optional<Integer> getInventorySlotFromItemStack(Inventory inventory, ItemStack wanted) {
