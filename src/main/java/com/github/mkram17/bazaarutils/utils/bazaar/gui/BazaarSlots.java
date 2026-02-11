@@ -192,6 +192,15 @@ public class BazaarSlots {
                 )
         ),
 
+
+        INPUT_FILLING_AMOUNT(new BazaarSlot(
+                new SlotLookup.IndexReference.FixedIndex(14),
+                (query) -> query
+                        .itemType(Items.OAK_SIGN)
+                        .withCustomName("Fill my inventory!")
+                )
+        ),
+
         INPUT_CUSTOM_AMOUNT(new BazaarSlot(
                 new SlotLookup.IndexReference.FixedIndex(16),
                 (query) -> query
@@ -214,7 +223,7 @@ public class BazaarSlots {
                 (query) -> query
                         .itemType(Items.OAK_SIGN)
                         .withCustomName("Custom Amount")
-        )
+                )
         ),
 
         INPUT_CUSTOM_PRICE(new BazaarSlot(
@@ -222,7 +231,7 @@ public class BazaarSlots {
                 (query) -> query
                         .itemType(Items.OAK_SIGN)
                         .withCustomName("Custom Price")
-        )
+                )
         );
 
         public final BazaarSlot slot;
