@@ -29,11 +29,6 @@ public class MaxBuyOrder extends CustomOrder {
         super(enabled);
     }
 
-    @Override
-    public void subscribe() {
-        super.subscribe();
-    }
-
     @EventHandler
     public void onScreenChange(ScreenChangeEvent event) {
         if (event.getNewScreen() == null || event.getOldScreen() == null) {

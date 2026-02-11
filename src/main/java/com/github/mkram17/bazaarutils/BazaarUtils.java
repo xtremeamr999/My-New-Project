@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.ListenerManager;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
@@ -76,7 +77,7 @@ public class BazaarUtils implements ClientModInitializer {
     }
 
     private void subscribeEvents(){
-        BUListener.subscribeAll();
+        ListenerManager.subscribeAll();
     }
 
     private void setDefaultValues(){

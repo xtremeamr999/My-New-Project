@@ -2,9 +2,7 @@ package com.github.mkram17.bazaarutils.events.listener;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Getter;
 
 /**
  * Interface for event listeners.
@@ -21,15 +19,14 @@ import java.util.List;
 //TODO switch to using fabric event system with annotation processor
 public abstract class BUListener implements AbstractListener{
 
-    public static final List<BUListener> listeners = new ArrayList<>();
-
-    public BUListener(){
-        listeners.add(this);
-    }
-
+    @Getter
     private boolean isSubscribed = false;
     protected boolean runOnInit = true;
     protected boolean subscribeToMeteorEventBus = true;
+
+    public BUListener(){
+        ListenerManager.listeners.add(this);
+    }
 
     /**
      * Subscribes this listener to the event bus.
@@ -54,13 +51,5 @@ public abstract class BUListener implements AbstractListener{
 
     private void subscribeToMeteorEventBus(){
         BazaarUtils.EVENT_BUS.subscribe(this);
-    }
-
-    public static void subscribeAll(){
-        for(BUListener listener : listeners){
-            if(listener.runOnInit) {
-                listener.subscribe();
-            }
-        }
     }
 }
