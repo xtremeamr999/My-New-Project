@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -20,10 +20,8 @@ import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
-
 @NoArgsConstructor
-public class InstaSellHighlight implements BUListener {
+public class InstaSellHighlight extends BUListener {
 
     @Getter @Setter
     private boolean enabled;
@@ -100,10 +98,6 @@ public class InstaSellHighlight implements BUListener {
         }
     }
 
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
-    }
     public OptionalInt getColorFromIndex(int slotIndex) {
         if(highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex)))
             return OptionalInt.empty();

@@ -1,9 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
@@ -15,7 +13,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 
 //TODO do this --high priority
-public class CancelOrderAndSearch extends CustomItemButton implements BUListener {
+public class CancelOrderAndSearch extends CustomItemButton {
     @Getter @Setter
     private boolean enabled;
     private OrderInfo orderInfo;
@@ -47,10 +45,5 @@ public class CancelOrderAndSearch extends CustomItemButton implements BUListener
         if(!isInCorrectScreen() || !wasButtonSlotClicked(event)) return;
         GUIUtils.closeHandledScreen();
         PlayerActionUtil.runCommand("bz " + orderInfo.getName());
-    }
-
-    @Override
-    public void subscribe() {
-        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 }

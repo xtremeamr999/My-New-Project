@@ -1,8 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.*;
@@ -24,7 +23,7 @@ import net.minecraft.util.math.ColorHelper;
 import java.util.List;
 
 //drawing done in MixinHandledScreen
-public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
+public class OrderStatusHighlight extends BUListener implements BUToggleableFeature {
     @Getter @Setter
     private boolean enabled;
 
@@ -45,10 +44,9 @@ public class OrderStatusHighlight implements BUListener, BUToggleableFeature {
     }
 
     @Override
-    public void subscribe() {
+    protected void registerFabricEvents() {
+        super.subscribeToMeteorEventBus = false;
         registerTooltipListener();
-
-        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 
     public void updateHighlightCache(List<ItemStack> itemStacks) {

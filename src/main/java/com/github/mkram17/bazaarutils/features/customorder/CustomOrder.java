@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils.features.customorder;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
@@ -31,7 +30,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 //TODO find new name for this
 @NoArgsConstructor @ConfigObject
-public class CustomOrder extends CustomItemButton implements BUListener {
+public class CustomOrder extends CustomItemButton {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BROWN_STAINED_GLASS, 4, Items.RED_STAINED_GLASS_PANE));
 
     @Getter @Setter @ConfigEntry(id = "enabled")
@@ -46,7 +45,7 @@ public class CustomOrder extends CustomItemButton implements BUListener {
         this.orderAmount = orderAmount;
         this.slotNumber = slotNumber;
         this.item = getNextColoredPane();
-        EVENT_BUS.subscribe(this);
+        super.subscribe();
     }
     protected CustomOrder(boolean enabled) {
         this.enabled = enabled;
@@ -100,10 +99,5 @@ public class CustomOrder extends CustomItemButton implements BUListener {
             ConfigUtil.scheduleConfigSave();
             EVENT_BUS.unsubscribe(this);
         }
-    }
-
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
     }
 }

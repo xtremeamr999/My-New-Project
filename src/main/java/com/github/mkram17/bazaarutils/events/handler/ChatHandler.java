@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.events.handlers;
+package com.github.mkram17.bazaarutils.events.handler;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;

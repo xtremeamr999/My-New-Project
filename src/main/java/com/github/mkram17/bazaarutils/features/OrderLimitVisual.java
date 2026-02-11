@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
@@ -32,7 +31,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 @ConfigObject
-public class OrderLimitVisual implements BUListener, BUToggleableFeature {
+public class OrderLimitVisual extends BUListener implements BUToggleableFeature {
 
     @ConfigObject
     public record OrderLimitEntry(@Getter @ConfigEntry(id = "price") double price, @Getter @ConfigEntry(id = "time") ZonedDateTime time) {
@@ -155,10 +154,5 @@ public class OrderLimitVisual implements BUListener, BUToggleableFeature {
         int buttonX = dimensions.x() + textSizeX;
         int buttonY = dimensions.y() - spacing - textSizeY;
         return new TextDisplayWidget(buttonX, buttonY, textSizeX, textSizeY, message);
-    }
-
-    @Override
-    public void subscribe() {
-        BazaarUtils.EVENT_BUS.subscribe(this);
     }
 }

@@ -1,9 +1,8 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ConfigObject
-public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleableFeature {
+public class PriceCharts extends BUListener implements ItemTooltipCallback, BUToggleableFeature {
 
     @ConfigEntry(id = "showOutsideBazaar")
     private boolean showOutsideBazaar;
@@ -96,9 +95,8 @@ public class PriceCharts implements ItemTooltipCallback, BUListener, BUToggleabl
     }
 
     @Override
-    public void subscribe() {
+    protected void registerFabricEvents() {
         ItemTooltipCallback.EVENT.register(this);
-        BazaarUtils.EVENT_BUS.subscribe(this);
         // Clear cache when (re)subscribing to avoid stale bazaar state leakage
         SHOW_CACHE.clear();
     }

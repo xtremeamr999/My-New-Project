@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.Bookmark;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
@@ -15,14 +15,12 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -51,6 +49,7 @@ public class BazaarUtils implements ClientModInitializer {
         registerEventBus();
         registerCommands();
         setDefaultValues();
+        subscribeEvents();
     }
 
     private static void registerDataComponents() {
@@ -73,9 +72,11 @@ public class BazaarUtils implements ClientModInitializer {
     }
 
     public static void registerCommands() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            BUCommands.register(dispatcher);
-        });
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> BUCommands.register(dispatcher));
+    }
+
+    private void subscribeEvents(){
+        BUListener.subscribeAll();
     }
 
     private void setDefaultValues(){

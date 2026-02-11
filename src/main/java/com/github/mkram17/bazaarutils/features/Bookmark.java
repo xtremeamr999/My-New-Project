@@ -6,7 +6,6 @@ import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
@@ -42,7 +41,7 @@ import java.util.Optional;
 
 //Object is created in GUIUtils when in an item's bazaar page
 @ConfigObject
-public class Bookmark extends CustomItemButton implements BUListener {
+public class Bookmark extends CustomItemButton {
     @Getter @ConfigEntry(id = "name")
     public final String name;
 
@@ -62,7 +61,12 @@ public class Bookmark extends CustomItemButton implements BUListener {
             HOVER
     );
 
-    protected void subscribeToEventBusUnsubscriber() {
+    @Override
+    protected void registerFabricEvents() {
+        registerEventBusUnsubscriber();
+    }
+
+    protected void registerEventBusUnsubscriber() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> BazaarUtils.EVENT_BUS.unsubscribe(this));
     }
 
@@ -285,11 +289,5 @@ public class Bookmark extends CustomItemButton implements BUListener {
         }
 
         return widgets;
-    }
-
-    @Override
-    public void subscribe() {
-        BazaarUtils.EVENT_BUS.subscribe(this);
-        subscribeToEventBusUnsubscriber();
     }
 }

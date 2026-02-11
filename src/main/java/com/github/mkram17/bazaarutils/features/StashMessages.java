@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 @ConfigObject
-public class StashMessages implements BUListener, BUToggleableFeature {
+public class StashMessages extends BUListener implements BUToggleableFeature {
     public boolean shouldRemoveMessages(){
         return removeMessages;
     }
@@ -29,10 +29,7 @@ public class StashMessages implements BUListener, BUToggleableFeature {
     public StashMessages(boolean removeMessages){
         this.removeMessages = removeMessages;
     }
-    public void subscribe(){
-        registerStashRemover();
-        registerStashClaimDetector();
-    }
+
     private void registerStashClaimDetector(){
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if(message.getString().contains("You picked up") && message.getString().contains("from your material stash") && !stashPreviouslyClaimed) {
@@ -90,5 +87,12 @@ public class StashMessages implements BUListener, BUToggleableFeature {
             }
         }
         return -1;
+    }
+
+    @Override
+    protected void registerFabricEvents() {
+        super.subscribeToMeteorEventBus = false;
+        registerStashRemover();
+        registerStashClaimDetector();
     }
 }

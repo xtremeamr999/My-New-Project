@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -14,7 +14,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import java.util.Arrays;
 
 @ConfigObject
-public class UselessBazaarNotificationRemover implements BUListener, BUToggleableFeature {
+public class UselessBazaarNotificationRemover extends BUListener implements BUToggleableFeature {
 
     @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
@@ -58,8 +58,10 @@ public class UselessBazaarNotificationRemover implements BUListener, BUToggleabl
     private static boolean isNotificationUseless(String message){
         return Arrays.stream(uselessNotifications).anyMatch(message::contains);
     }
+
     @Override
-    public void subscribe() {
+    protected void registerFabricEvents() {
+        super.subscribeToMeteorEventBus = false;
         registerUselessNotificationDetector();
     }
 }

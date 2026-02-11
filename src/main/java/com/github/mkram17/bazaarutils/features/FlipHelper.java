@@ -4,7 +4,6 @@ package com.github.mkram17.bazaarutils.features;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -36,11 +35,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
-
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
 @ConfigObject
-public class FlipHelper extends CustomItemButton implements BUListener, ConfigurableFeature {
+public class FlipHelper extends CustomItemButton implements ConfigurableFeature {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
@@ -237,10 +234,5 @@ public class FlipHelper extends CustomItemButton implements BUListener, Configur
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
 
         return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
-    }
-
-    @Override
-    public void subscribe() {
-        EVENT_BUS.subscribe(this);
     }
 }

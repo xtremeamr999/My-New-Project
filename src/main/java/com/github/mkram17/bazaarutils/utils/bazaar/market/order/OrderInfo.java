@@ -2,8 +2,8 @@ package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.events.listener.AbstractListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
@@ -30,7 +30,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
  */
 //TODO turn into builder class
 @ConfigObject
-public class OrderInfo extends PriceInfo implements BUListener {
+public class OrderInfo extends PriceInfo implements AbstractListener {
     private static final double DEFAULT_TOLERANCE = 0.9;
     private static final double TOTAL_PRICE_ROUNDING_THRESHOLD = 10000;
 
@@ -302,7 +302,7 @@ public class OrderInfo extends PriceInfo implements BUListener {
     /**
      * Projects each stored user order to a single variable, such as volume or price. For example,
      * {@code getVariables(BazaarOrder::getPricePerItem)} extracts all prices from user orders in
-     * {@link BUConfig#userOrders}.
+     * {@link com.github.mkram17.bazaarutils.config.data.GeneralDataConfig#userOrders}.
      *
      * @param <T>      type of value extracted from each order
      * @param variable accessor used to extract a value from each order

@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.features.restrictsell;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.events.handlers.BUListener;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.DoubleSellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
@@ -21,11 +21,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
-
 //TODO maybe color chest if it is locked
 @ConfigObject
-public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
+public class InstaSellRestrictions extends BUListener implements ConfigurableFeature {
     @Getter @Setter @ConfigEntry(id = "enabled")
     private boolean enabled;
     private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
@@ -41,12 +39,19 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         this.enabled = enabled;
         this.controls = controls;
     }
+
+    @Override
+    protected void registerFabricEvents() {
+        registerScreenEvent();
+    }
+
     private void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             safetyClicks = 0;
             isInstaSellRestricted = true;
         });
     }
+
     @EventHandler
     private void onChestLoaded(ChestLoadedEvent e) {
         if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
@@ -105,11 +110,5 @@ public class InstaSellRestrictions implements BUListener, ConfigurableFeature {
         }
         message.append(" (Safety Clicks Left: ").append(3 - safetyClicks).append(")");
         return message.toString();
-    }
-
-    @Override
-    public void subscribe() {
-        registerScreenEvent();
-        EVENT_BUS.subscribe(this);
     }
 }

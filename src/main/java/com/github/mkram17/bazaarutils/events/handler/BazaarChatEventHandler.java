@@ -1,8 +1,7 @@
-package com.github.mkram17.bazaarutils.events.handlers;
+package com.github.mkram17.bazaarutils.events.handler;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
-import com.github.mkram17.bazaarutils.features.OrderLimitVisual;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
