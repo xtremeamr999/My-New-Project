@@ -19,6 +19,8 @@ import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -275,7 +277,9 @@ public class Util {
     }
 
     public static double truncateNum(double num) {
-        return Math.round(num * 10.0) / 10.0;
+        return BigDecimal.valueOf(num)
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
 }
