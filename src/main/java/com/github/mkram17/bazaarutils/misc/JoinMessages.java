@@ -3,6 +3,7 @@ package com.github.mkram17.bazaarutils.misc;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
+import com.github.mkram17.bazaarutils.events.util.EventPriorities;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -16,7 +17,7 @@ public class JoinMessages {
     private static Text discordMessage;
     private static Text updateMessage;
 
-    @RunOnInit(priority = RunOnInit.EVENT_PRIORITIES.HIGH)
+    @RunOnInit(priority = EventPriorities.HIGH)
     public static void initializeFields(){
         welcomeMessage = Text.literal("Thanks for installing! Use /bu or /bazaarutils to configure the mod.")
                 .formatted(Formatting.GREEN);

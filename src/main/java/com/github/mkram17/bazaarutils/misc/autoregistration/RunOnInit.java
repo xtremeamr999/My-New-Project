@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.misc.autoregistration;
 
-import lombok.Getter;
+import com.github.mkram17.bazaarutils.events.util.EventPriorities;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,23 +14,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface RunOnInit {
-    @Getter
-    enum EVENT_PRIORITIES {
-        LOWEST(4),
-        LOW(3),
-        NORMAL(2),
-        HIGH(1),
-        HIGHEST(0);
-
-        private final int value;
-
-        EVENT_PRIORITIES(int value) {
-            this.value = value;
-        }
-    }
     /**
      * The priority of the initialization method. Lower values run first.
      * @return the priority, defaults to 2.
      */
-    EVENT_PRIORITIES priority() default EVENT_PRIORITIES.NORMAL;
+    EventPriorities priority() default EventPriorities.NORMAL;
 }
