@@ -50,6 +50,14 @@ public final class BUConfig {
         return INSTANCE;
     }
 
+    @ConfigEntry(id = "introductorySeparator")
+    @ConfigOption.Hidden
+    @ConfigOption.Separator(
+            value = "bazaarutils.config.separator.introductory.value",
+            description = "bazaarutils.config.separator.introductory.description"
+    )
+    public static boolean INTRODUCTORY_SEPARATOR = true;
+
     public GeneralDataConfig general = new GeneralDataConfig();
     public MetadataConfig metadata = new MetadataConfig();
     public DeveloperConfig developer = new DeveloperConfig();
