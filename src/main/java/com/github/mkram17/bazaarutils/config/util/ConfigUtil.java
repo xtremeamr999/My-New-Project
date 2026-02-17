@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config.util;
 
+import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen;
@@ -10,17 +11,19 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.mkram17.bazaarutils.config.BUConfig.CONFIGURATOR;
+import static com.github.mkram17.bazaarutils.BazaarUtils.CONFIGURATOR;
+
 
 public class ConfigUtil {
 
     private static boolean configSaveScheduled = false;
 
-    public static void registerConfig(){
-        CONFIGURATOR.register(BUConfig.class);
+    public static void registerConfig() {
+        BUConfig.register(CONFIGURATOR);
     }
+
     public static Screen createGUI(Screen parent) {
-        return ResourcefulConfigScreen.make(CONFIGURATOR, BUConfig.class)
+        return ResourcefulConfigScreen.make(BazaarUtils.config)
                 .withParent(parent)
                 .build();
     }
@@ -34,6 +37,7 @@ public class ConfigUtil {
     public static void scheduleConfigSave() {
         if (!configSaveScheduled) {
             configSaveScheduled = true;
+
             Util.tickExecuteLater(20, () -> { // 1 second
                 CONFIGURATOR.saveConfig(BUConfig.class);
                 configSaveScheduled = false;

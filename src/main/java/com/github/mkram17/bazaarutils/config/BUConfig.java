@@ -3,9 +3,9 @@ package com.github.mkram17.bazaarutils.config;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.config.data.MetadataConfig;
-import com.github.mkram17.bazaarutils.config.developer.DeveloperConfig;
-import com.github.mkram17.bazaarutils.config.feature.FeatureConfig;
-import com.github.mkram17.bazaarutils.config.feature.KeybindConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
+import com.github.mkram17.bazaarutils.config.features.FeatureConfig;
+import com.github.mkram17.bazaarutils.config.features.KeybindConfig;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
@@ -18,11 +18,14 @@ import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
                         icon = "modrinth",
                         text = "Modrinth"
                 )})
-@Config(value = BazaarUtils.MODID)
+@Config(value = BazaarUtils.MOD_ID)
 public final class BUConfig {
 
     private static final BUConfig INSTANCE = new BUConfig();
-    public static final Configurator CONFIGURATOR = new Configurator(BazaarUtils.MODID);
+
+    public static BUConfig get(){
+        return INSTANCE;
+    }
 
     public GeneralDataConfig general = new GeneralDataConfig();
     public MetadataConfig metadata = new MetadataConfig();
@@ -30,12 +33,9 @@ public final class BUConfig {
     public FeatureConfig feature = new FeatureConfig();
     public KeybindConfig keybind = new KeybindConfig();
 
+    public static ResourcefulConfig register(Configurator configurator) {
+        configurator.register(BUConfig.class);
 
-    public static BUConfig get(){
-        return INSTANCE;
-    }
-
-    public static void register(){
-        CONFIGURATOR.register(BUConfig.class);
+        return configurator.getConfig(BUConfig.class);
     }
 }
