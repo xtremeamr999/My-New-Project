@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.events.handler;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -81,7 +82,7 @@ public class BazaarChatEventHandler {
 
         //insta sell shows the price before tax in chat, but it actually costs more than that
         double totalPriceBeforeTax = order.getVolume()*order.getPricePerItem();
-        double totalPriceWithTax = totalPriceBeforeTax * ((100 + BUConfig.get().general.userBazaarTax)/100);
+        double totalPriceWithTax = totalPriceBeforeTax * ((100 + GeneralDataConfig.userBazaarTax)/100);
 
         //order limit does not count the tax
         BUConfig.get().feature.orderLimitVisual.addOrderToLimit(totalPriceBeforeTax);

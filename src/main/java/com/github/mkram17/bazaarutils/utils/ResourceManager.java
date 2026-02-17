@@ -28,9 +28,9 @@ import java.util.concurrent.CompletableFuture;
 //TODO move config to config/bazaarutils directory and rename to "config". See how REI does this.
 public class ResourceManager {
 
-    private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID);
+    private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MOD_ID);
     private static final Path LOCAL_RESOURCES_PATH = MOD_CONFIG_DIR.resolve("bazaar-resources.json");
-    private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MODID, "bazaar-resources.json");
+    private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MOD_ID, "bazaar-resources.json");
     private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Skyblock-Bazaar-Conversions/contents/conversionupdating/bazaar-conversions.json?ref=main";
 
 
@@ -59,7 +59,7 @@ public class ResourceManager {
             try (InputStream inputStream = resourceOptional.get().getInputStream()) {
                 Files.copy(inputStream, LOCAL_RESOURCES_PATH);
                 // don't know the SHA of the bundled file, so stays null to force an update check.
-                BUConfig.get().metadata.resourcesSha = "";
+                BUConfig.get().metadata.RESOURCES_SHA = "";
                 ConfigUtil.scheduleConfigSave();
             }
         } else {
@@ -88,7 +88,7 @@ public class ResourceManager {
                     String latestSha = jsonObject.get("sha").getAsString();
                     String downloadUrl = jsonObject.get("download_url").getAsString();
 
-                    if (!latestSha.equals(BUConfig.get().metadata.resourcesSha)) {
+                    if (!latestSha.equals(BUConfig.get().metadata.RESOURCES_SHA)) {
                         if (manual)
                             PlayerActionUtil.notifyAll("New resources found, downloading...");
                         downloadLatestResources(downloadUrl, latestSha);
@@ -111,7 +111,7 @@ public class ResourceManager {
             Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
             Files.move(tempPath, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
-            BUConfig.get().metadata.resourcesSha = latestSha;
+            BUConfig.get().metadata.RESOURCES_SHA = latestSha;
             ConfigUtil.scheduleConfigSave();
             BazaarDataManager.setConversionsLoaded(false);
             PlayerActionUtil.notifyAll("Successfully updated Bazaar resources!");

@@ -1,6 +1,8 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
@@ -87,7 +89,7 @@ public class BUCommands {
         bazaarutils.then(ClientCommandManager.literal("tax")
                 .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1, 1.25))
                                 .executes((context) -> {
-                                    BUConfig.get().general.userBazaarTax = DoubleArgumentType.getDouble(context, "amount") / 100;
+                                    GeneralDataConfig.userBazaarTax = DoubleArgumentType.getDouble(context, "amount") / 100;
                                     return 1;
                                 })
                         )
@@ -111,12 +113,12 @@ public class BUCommands {
         );
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
-                    BUConfig.get().developer.isDeveloperModeEnabled = !BUConfig.get().developer.isDeveloperModeEnabled;
+                    DeveloperConfig.enabled = !DeveloperConfig.enabled;
                     ConfigUtil.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
-                    PlayerActionUtil.notifyAll(BUConfig.get().developer.isDeveloperModeEnabled ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
+                    PlayerActionUtil.notifyAll(DeveloperConfig.enabled ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
-                    if(BUConfig.get().developer.isDeveloperModeEnabled) {
+                    if(DeveloperConfig.enabled) {
                         registerDeveloperCommands(dispatcher);
                     }
                     return 1;
@@ -145,10 +147,10 @@ public class BUCommands {
         );
 
 
-        if (BUConfig.get().developer.isDeveloperModeEnabled) {
+        if (DeveloperConfig.enabled) {
             registerDeveloperCommands(dispatcher);
         }
-//
+
         CommandNode<FabricClientCommandSource> bazaarutilsNode = dispatcher.register(bazaarutils);
         dispatcher.register(
                 ClientCommandManager.literal("bu")
