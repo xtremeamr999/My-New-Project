@@ -1,4 +1,74 @@
 {
   "mod.bazaarutils": "Bazaar Utils",
-  "key.category.minecraft.bazaarutils": "Bazaar Utils"
+  "key.category.minecraft.bazaarutils": "Bazaar Utils",
+
+  "bazaarutils.config.separator.introductory.value": "Welcome to Bazaar Utils!",
+  "bazaarutils.config.separator.introductory.description": [
+    "first line!",
+    "\n \n",
+    "second line!"
+  ],
+
+  "bazaarutils.config.meta.modVersion.value": "Mod Version",
+  "bazaarutils.config.meta.resourcesSha.value": "Resources SHA",
+  "bazaarutils.config.meta.isFirstLoad.value": "First Load?",
+
+  "bazaarutils.config.general.category.value": "General Config",
+  "bazaarutils.config.general.category.description": "Definitions for general data of the mod",
+  "bazaarutils.config.general.userBazaarTax.value": "Bazaar Tax (%)",
+  "bazaarutils.config.general.userBazaarTax.description": "The bazaar tax percentage of your current profile considering all possible upgrades.",
+
+  "bazaarutils.config.chat.category.value": "Chat",
+  "bazaarutils.config.chat.category.description": "Configurations for the chat features of the mod",
+
+  "bazaarutils.config.buttons.category.value": "Buttons",
+  "bazaarutils.config.buttons.category.description": "Configurations for the buttons to be injected/handled by the mod",
+
+  "bazaarutils.config.buttons.button.enabled.value": "Enabled",
+  "bazaarutils.config.buttons.button.enabled.description": "Whether the button will be registered or not",
+  "bazaarutils.config.buttons.button.size.value": "Button Size",
+  "bazaarutils.config.buttons.button.spacing.value": "Spacing",
+  "bazaarutils.config.buttons.button.offset.value": "Offset",
+
+  "bazaarutils.config.buttons.separator.general.value": "General Buttons",
+  "bazaarutils.config.buttons.separator.general.description": "asdjasdhgasfhga write this shit",
+
+  "bazaarutils.config.buttons.openOrders.value": "Orders Page Button",
+  "bazaarutils.config.buttons.openOrders.description": [
+    "Adds a button to selected menus/screen to quick access your orders page.",
+    "\n \n",
+    "Requires a ",
+    { "text": "Booster Cookie", "color": "light_purple" },
+    " effect active in order to function."
+  ],
+  "bazaarutils.config.buttons.modSettings.value": "Mod Settings Button",
+  "bazaarutils.config.buttons.modSettings.description": "Adds a button to selected menus/screen to quick access the mods' settings.",
+
+  "bazaarutils.config.buttons.separator.market.value": "Market Buttons",
+  "bazaarutils.config.buttons.separator.market.description": "asdjasdhgasfhga write this shit",
+
+  "bazaarutils.config.inventory.category.value": "Inventory",
+  "bazaarutils.config.inventory.category.description": "Configurations for the inventory features of the mod",
+
+  "bazaarutils.config.overlays.category.value": "Overlays",
+  "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
+
+  "bazaarutils.config.notifications.category.value": "Notifications",
+  "bazaarutils.config.notifications.category.description": "Configurations for the notifications to be pushed by the mod",
+
+  "bazaarutils.config.developer.category.value": "Developer Config",
+  "bazaarutils.config.developer.category.description": "Developer configurations & toggleable tools of the mod",
+  "bazaarutils.config.developer.enabled.value": "Enabled",
+  "bazaarutils.config.developer.enabled.description": "Global toggle for all developer related functionalities/utilities.",
+  "bazaarutils.config.developer.disableErrorNotifications.value": "Disable Error Notifications",
+
+  "bazaarutils.config.developer.debugMessages.category.value": "Debug Messages",
+  "bazaarutils.config.developer.debugMessages.category.description": "Configure the messages or notifications pushed to the chat about routines & the state of the mod",
+  "bazaarutils.config.developer.debugMessages.all.value": "All Messages",
+  "bazaarutils.config.developer.debugMessages.errors.value": "Error Messages",
+  "bazaarutils.config.developer.debugMessages.features.value": "Feature Messages",
+  "bazaarutils.config.developer.debugMessages.bazaarData.value": "Bazaar Data Messages",
+  "bazaarutils.config.developer.debugMessages.itemData.value": "Item Data Messages",
+  "bazaarutils.config.developer.debugMessages.gui.value": "GUI Messages",
+  "bazaarutils.config.developer.debugMessages.commands.value": "Commands Messages"
 }
