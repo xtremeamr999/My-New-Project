@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.config.feature;
+package com.github.mkram17.bazaarutils.config.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.features.keybinds.StashHelper;
@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class KeybindConfig {
 
-    public static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MODID));
+    public static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(BazaarUtils.MOD_ID));
 
     //Keybinds get registered on object creation.
     public StashHelper stashHelper = new StashHelper(new KeyBinding(
