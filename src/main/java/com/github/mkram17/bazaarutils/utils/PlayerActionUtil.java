@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
@@ -47,7 +47,7 @@ public class PlayerActionUtil {
                 .formatted(Formatting.GOLD)
                 .append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
-        if(notificationType.isEnabled() || BUConfig.get().developer.allMessages)
+        if(notificationType.isEnabled() || DeveloperConfig.DebugMessages.all)
             notifyAll(messageText);
     }
 

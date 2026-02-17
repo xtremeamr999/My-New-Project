@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 public class DataStorage<T> {
 
     private static final Set<DataStorage<?>> REQUIRES_SAVE = ConcurrentHashMap.newKeySet();
-    static final Path DEFAULT_PATH = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID).resolve("data");
+    static final Path DEFAULT_PATH = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MOD_ID).resolve("data");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static int tickCounter = 0;
 

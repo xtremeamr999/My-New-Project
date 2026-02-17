@@ -1,6 +1,6 @@
 package com.github.mkram17.bazaarutils.features;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
@@ -150,7 +150,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
                     break;
             }
 
-            if (BUConfig.get().developer.isDeveloperModeEnabled) {
+            if (DeveloperConfig.enabled) {
                 var sellPrice = order.getMarketPrice(OrderType.BUY);
                 var buyPrice = order.getMarketPrice(OrderType.SELL);
 

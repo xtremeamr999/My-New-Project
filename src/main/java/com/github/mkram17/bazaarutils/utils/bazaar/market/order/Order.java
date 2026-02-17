@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
@@ -115,7 +116,7 @@ public class Order extends OrderInfo {
         if (isOutbid) {
             message = OutbidOrderHandler.getOutbidMessage(this);
 
-            if (BUConfig.get().developer.isDeveloperModeEnabled) {
+            if (DeveloperConfig.enabled) {
                 message.append(Text.literal(". Market Price: " + this.getMarketPrice(this.getOrderType()) + " Order Price: " + this.getPricePerItem()));
             }
 
