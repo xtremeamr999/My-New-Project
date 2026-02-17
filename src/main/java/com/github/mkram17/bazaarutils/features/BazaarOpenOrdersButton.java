@@ -1,12 +1,15 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
@@ -18,48 +21,74 @@ import net.minecraft.util.Identifier;
 import java.util.Collections;
 import java.util.List;
 
-//brings you to the orders page as long as you have a cookie
+@ConfigObject
 public class BazaarOpenOrdersButton {
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.buttons.button.enabled.value"
+    )
+    @Comment(
+            value = "Whether the button will be registered or not",
+            translation = "bazaarutils.config.buttons.button.enabled.description"
+    )
+    public boolean enabled;
 
-    @Getter @Setter
-    private boolean enabled;
-    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/generic_widget_base");
-    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/generic_widget_hover");
+    @ConfigEntry(
+            id = "size",
+            translation = "bazaarutils.config.buttons.button.size.value"
+    )
+    public int size = 18;
+
+    @ConfigEntry(
+            id = "spacing",
+            translation = "bazaarutils.config.buttons.button.spacing.value"
+    )
+    public int spacing = 4;
+
+    @ConfigEntry(
+            id = "offset",
+            translation = "bazaarutils.config.buttons.button.offset.value"
+    )
+    public int offset = 18;
+
+    private static final Identifier DEFAULT = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/generic_widget_base");
+    private static final Identifier HOVERED = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/generic_widget_hover");
+
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
-            BASE,
-            HOVER);
+            DEFAULT,
+            HOVERED
+    );
 
     public BazaarOpenOrdersButton(boolean enabled) {
         this.enabled = enabled;
-    }
+    };
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidget() {
-        if(!BUConfig.get().feature.bazaarOpenOrdersButton.isEnabled())
+        if (!ButtonsConfig.openOrders.enabled) {
             return Collections.emptyList();
+        }
 
         ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar())
-            return Collections.emptyList();
 
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar()) {
+            return Collections.emptyList();
+        }
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
+        ItemSlotButtonWidget button = ButtonsConfig.openOrders.getItemSlotButtonWidget(dimensions);
 
-        ItemSlotButtonWidget button = getItemSlotButtonWidget(dimensions);
         return Collections.singletonList(button);
     }
 
-    private static ItemSlotButtonWidget getItemSlotButtonWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
-        int buttonSize = 18;
-        int spacing = 4;
-        int buttonOffset = 18; // to avoid overlap with other buttons since this is the second button down
-        int buttonX = dimensions.x() - buttonSize - spacing;
-        int currentButtonY = dimensions.y() + spacing + (buttonOffset + spacing) * 1;
+    private ItemSlotButtonWidget getItemSlotButtonWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
+        int buttonX = dimensions.x() - size - spacing;
+        int currentButtonY = dimensions.y() + spacing + (offset + spacing);
 
         return new ItemSlotButtonWidget(
                 buttonX,
                 currentButtonY,
-                buttonSize, buttonSize,
+                size, size,
                 SLOT_BUTTON_TEXTURES,
                 (btn) -> {
 //                    GUIUtils.closeHandledScreen();

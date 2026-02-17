@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.features.FeatureConfig;
 import com.github.mkram17.bazaarutils.config.features.KeybindConfig;
 import com.github.mkram17.bazaarutils.config.features.chat.ChatConfig;
+import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
 import com.github.mkram17.bazaarutils.config.features.notification.NotificationsConfig;
@@ -23,6 +24,7 @@ import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfig;
                 GeneralDataConfig.class,
                 MetadataConfig.class,
                 ChatConfig.class,
+                ButtonsConfig.class,
                 InventoryConfig.class,
                 OverlaysConfig.class,
                 NotificationsConfig.class,

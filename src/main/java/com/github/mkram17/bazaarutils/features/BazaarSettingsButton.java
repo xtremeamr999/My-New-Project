@@ -1,53 +1,93 @@
 package com.github.mkram17.bazaarutils.features;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
+import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Collections;
 import java.util.List;
 
+@ConfigObject
 public class BazaarSettingsButton {
-    private static final Identifier BASE = Identifier.tryParse(BazaarUtils.MODID, "widget/settings_widget_base");
-    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MODID, "widget/settings_widget_hover");
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.buttons.button.enabled.value"
+    )
+    @Comment(
+            value = "Whether the button will be registered or not",
+            translation = "bazaarutils.config.buttons.button.enabled.description"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "size",
+            translation = "bazaarutils.config.buttons.button.size.value"
+    )
+    public int size = 18;
+
+    @ConfigEntry(
+            id = "spacing",
+            translation = "bazaarutils.config.buttons.button.spacing.value"
+    )
+    public int spacing = 4;
+
+    private static final Identifier DEFAULT = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/settings_widget_base");
+    private static final Identifier HOVER = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/settings_widget_hover");
+
     public static final ButtonTextures SLOT_BUTTON_TEXTURES = new ButtonTextures(
-            BASE,
-            HOVER);
+            DEFAULT,
+            HOVER
+    );
+
+    public BazaarSettingsButton(boolean enabled) {
+        this.enabled = enabled;
+    };
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidget() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar())
+        if (!ButtonsConfig.modSettings.enabled) {
             return Collections.emptyList();
+        }
+
+        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
+
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar()) {
+            return Collections.emptyList();
+        }
 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
+        ItemSlotButtonWidget button = ButtonsConfig.modSettings.getItemSlotButtonWidget(dimensions);
 
-        int buttonSize = 18;
-        int spacing = 4;
-        int buttonX = dimensions.x() - buttonSize - spacing;
+        return Collections.singletonList(button);
+    }
+
+    private ItemSlotButtonWidget getItemSlotButtonWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
+        int buttonX = dimensions.x() - size - spacing;
         int currentButtonY = dimensions.y() + spacing;
 
-
-        ItemSlotButtonWidget button = new ItemSlotButtonWidget(
+        return new ItemSlotButtonWidget(
                 buttonX,
                 currentButtonY,
-                buttonSize, buttonSize,
+                size, size,
                 SLOT_BUTTON_TEXTURES,
                 (btn) -> ConfigUtil.openGUI(),
                 null,
                 Text.literal("Bazaar Utils Settings")
         );
-        return Collections.singletonList(button);
     }
-
 }
