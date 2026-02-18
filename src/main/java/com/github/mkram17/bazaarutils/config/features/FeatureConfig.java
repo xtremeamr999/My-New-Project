@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.config.features;
 
 import com.github.mkram17.bazaarutils.features.*;
 import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
+import com.github.mkram17.bazaarutils.features.restrictsell.InstantSellRestrictions;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 
@@ -22,9 +22,6 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "outbidOrderHandler")
     public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true, true);
-
-    @ConfigEntry(id = "instaSellRestrictions")
-    public InstaSellRestrictions instaSellRestrictions = new InstaSellRestrictions(true, new ArrayList<>());
 
     @ConfigEntry(id = "orderLimitVisual")
     public OrderLimitVisual orderLimitVisual = new OrderLimitVisual(true);

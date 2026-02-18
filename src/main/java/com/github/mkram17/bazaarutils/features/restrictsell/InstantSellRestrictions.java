@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.features.restrictsell;
 
+import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
@@ -11,6 +12,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
@@ -23,22 +25,34 @@ import java.util.List;
 
 //TODO maybe color chest if it is locked
 @ConfigObject
-public class InstaSellRestrictions extends BUListener implements ConfigurableFeature {
-    @Getter @Setter @ConfigEntry(id = "enabled")
-    private boolean enabled;
-    private static final int SAFETY_CLICKS_REQUIRED = 3; // Number of clicks it stops blocking insta-sell
-    @Getter @Setter @ConfigEntry(id = "controls")
-    private ArrayList<SellRestrictionControl> controls;
-    @Getter
-    private int safetyClicks = 0;
-    private boolean isInstaSellRestricted;
-
+public class InstantSellRestrictions extends BUListener implements ConfigurableFeature {
     private static final int INSTA_SELL_SLOT_INDEX = 47;
 
-    public InstaSellRestrictions(boolean enabled, ArrayList<SellRestrictionControl> controls) {
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.enabled.value"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "clicksRequired",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.value"
+    )
+    @Comment(
+            value = "The amount of clicks required to be pressed on the §aInstant Sell§r item to allow the action.",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.description"
+    )
+    public int clicksRequired;
+
+    public InstantSellRestrictions(boolean enabled, int clicksRequired) {
         this.enabled = enabled;
-        this.controls = controls;
+        this.clicksRequired = clicksRequired;
     }
+
+    @Getter
+    private transient int clicks = 0;
+
+    private transient boolean isInstantSellRestricted;
 
     @Override
     protected void registerFabricEvents() {
@@ -47,43 +61,47 @@ public class InstaSellRestrictions extends BUListener implements ConfigurableFea
 
     private void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            safetyClicks = 0;
-            isInstaSellRestricted = true;
+            clicks = 0;
+            isInstantSellRestricted = true;
         });
     }
 
     @EventHandler
     private void onChestLoaded(ChestLoadedEvent e) {
-        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
+        if (!enabled || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
             return;
+        }
 
         List<OrderInfo> items = InstaSellUtil.getInstaSellOrders(e.getItemStacks());
-        isInstaSellRestricted = shouldRestrictInstaSell(items);
+        isInstantSellRestricted = shouldRestrictInstantSell(items);
     }
 
     @EventHandler
     private void onClick(SlotClickEvent clickEvent){
         if(!enabled || clickEvent.slot.getIndex() != INSTA_SELL_SLOT_INDEX)
             return;
-        if (isInstaSellRestricted && safetyClicks < SAFETY_CLICKS_REQUIRED) {
-            safetyClicks++;
+        if (isInstantSellRestricted && clicks < clicksRequired) {
+            clicks++;
             PlayerActionUtil.notifyAll(getMessage());
             clickEvent.cancel();
         }
     }
 
-    private boolean shouldRestrictInstaSell(List<OrderInfo> items){
+    private boolean shouldRestrictInstantSell(List<OrderInfo> items){
         return items.stream().anyMatch(this::isItemRestricted);
     }
 
-    public void addRule(SellRestrictionControl control){
-        controls.add(control);
+    public void addRule(SellRestrictionControl<?> control){
+//        TODO: deprecate this
+//        controls.add(control);
     }
 
     private boolean isItemRestricted(OrderInfo item) {
-        for(SellRestrictionControl control : controls) {
-            if(!control.isEnabled())
+        for (SellRestrictionControl<?> control : InventoryConfig.SellRestrictionsRules.restrictors()) {
+            if (!control.isEnabled()) {
                 continue;
+            }
+
             if (control.shouldRestrict(item)) {
                 return true;
             }
@@ -91,24 +109,34 @@ public class InstaSellRestrictions extends BUListener implements ConfigurableFea
         return false;
     }
 
-    public String getMessage(){
+    public String getMessage() {
         StringBuilder message = new StringBuilder("Sell protected by rules:");
-        for(SellRestrictionControl control : controls) {
-            if(!control.isEnabled())
+
+        for (SellRestrictionControl<?> control : InventoryConfig.SellRestrictionsRules.restrictors()) {
+            if (!control.isEnabled()) {
                 continue;
-            if(control instanceof DoubleSellRestrictionControl doubleControl) {
-                if (control.getRule() == RestrictInstaSellBy.PRICE)
-                    message.append(" PRICE: ");
-                else if (control.getRule() == RestrictInstaSellBy.VOLUME)
-                    message.append(" VOLUME: ");
+            }
+
+            if (control instanceof DoubleSellRestrictionControl doubleControl) {
+                switch (doubleControl.getRule()) {
+                    case NumericRestrictBy.PRICE -> message.append(" PRICE: ");
+                    case NumericRestrictBy.VOLUME -> message.append(" VOLUME: ");
+                }
+
                 message.append(doubleControl.getAmount());
             } else {
                 StringSellRestrictionControl stringControl = (StringSellRestrictionControl) control;
+
                 message.append(" NAME: ");
                 message.append(stringControl.getName());
             }
         }
-        message.append(" (Safety Clicks Left: ").append(3 - safetyClicks).append(")");
+
+        message.append(" (")
+                .append("Safety Clicks Left: ")
+                .append(clicksRequired - clicks)
+                .append(")");
+
         return message.toString();
     }
 }

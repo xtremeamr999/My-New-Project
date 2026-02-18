@@ -1,17 +1,37 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
-import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
+import com.github.mkram17.bazaarutils.features.restrictsell.StringRestrictBy;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 
-public class StringSellRestrictionControl extends SellRestrictionControl{
-    @Getter
-    @Setter
-    private String name;
-    public StringSellRestrictionControl(String name) {
-        super(RestrictInstaSellBy.NAME);
+@Getter
+@Setter
+@ConfigObject
+public final class StringSellRestrictionControl implements SellRestrictionControl<StringRestrictBy> {
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.enabled.value"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "name",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.name.value"
+    )
+    @Comment(
+            value = "The items' name which if held will lock",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.name.description"
+    )
+    public String name;
+
+    private StringRestrictBy rule = StringRestrictBy.NAME;
+
+    public StringSellRestrictionControl(boolean enabled, String name) {
+        this.enabled = enabled;
         this.name = name;
     }
 

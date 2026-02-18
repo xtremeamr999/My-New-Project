@@ -1,9 +1,10 @@
 package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
+import com.github.mkram17.bazaarutils.features.restrictsell.NumericRestrictBy;
+import com.github.mkram17.bazaarutils.features.restrictsell.StringRestrictBy;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
@@ -17,13 +18,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
-public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
+public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowLayout> {
     private static final float BACKGROUND_BLUR_QUALITY = 10f;
     private static final float BACKGROUND_BLUR_SIZE = 10f;
 
     //TODO make this work depending on screen size so it doesnt only work for me
     private static final int MAXIMUM_ORDERS_BEFORE_SCROLL = 8;
-    private static RestrictInstaSellBy restrictionType;
+    private T restrictionType;
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -63,13 +64,14 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
     }
 
     private ParentComponent generateRestrictionsContainer() {
-        var sellRestrictions = BUConfig.get().feature.instaSellRestrictions.getControls();
+        var sellRestrictions = InventoryConfig.SellRestrictionsRules.restrictors();
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
 
 
         for (SellRestrictionControl control : sellRestrictions) {
             verticalFlow.child(generateRestrictionButton(control));
         }
+
         return verticalFlow.padding(Insets.of(20));
     }
 
@@ -90,22 +92,22 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
         SingleOptionCheckboxDropdownComponent dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
         return dropdown.closeWhenNotHovered(false)
                 .checkbox(Text.literal("Restrict By Name"),
-                        restrictionType == RestrictInstaSellBy.NAME,
+                        restrictionType == StringRestrictBy.NAME,
                         button -> {
                     dropdown.disableCheckboxes();
-                    restrictionType = RestrictInstaSellBy.NAME;
+                    restrictionType = (T) StringRestrictBy.NAME;
                 })
                 .checkbox(Text.literal("Restrict By Volume"),
-                        restrictionType == RestrictInstaSellBy.VOLUME,
+                        restrictionType == NumericRestrictBy.VOLUME,
                         button -> {
                             dropdown.disableCheckboxes();
-                            restrictionType = RestrictInstaSellBy.VOLUME;
+                            restrictionType = (T) NumericRestrictBy.VOLUME;
                         })
                 .checkbox(Text.literal("Restrict By Price"),
-                        restrictionType == RestrictInstaSellBy.PRICE,
+                        restrictionType == NumericRestrictBy.PRICE,
                         button -> {
                             dropdown.disableCheckboxes();
-                            restrictionType = RestrictInstaSellBy.PRICE;
+                            restrictionType = (T) NumericRestrictBy.PRICE;
                         });
     }
 
@@ -115,8 +117,8 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                         button -> {
                             PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
 
-                            SellRestrictionControl newControl = new StringSellRestrictionControl("Example Restriction");
-                            BUConfig.get().feature.instaSellRestrictions.addRule(newControl);
+                            SellRestrictionControl newControl = new StringSellRestrictionControl(true, "Example Restriction");
+                            InventoryConfig.instantSellRestrictions.addRule(newControl);
                             MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
                             ConfigUtil.scheduleConfigSave();
                         })
@@ -135,7 +137,8 @@ public class SellRestrictionsMenu extends BaseOwoScreen<FlowLayout> {
                 Components.button(
                         Text.literal(garbageCanEmoji),
                         button -> {
-                            BUConfig.get().feature.instaSellRestrictions.getControls().remove(control);
+//                            dumb and not functional, we have to decide whether we still have this owo screen or not.
+                            InventoryConfig.SellRestrictionsRules.restrictors().remove(control);
                             MinecraftClient.getInstance().setScreen(new CustomOrdersMenu());
                         }).margins(Insets.of(3, 3, 1, 3))
         );

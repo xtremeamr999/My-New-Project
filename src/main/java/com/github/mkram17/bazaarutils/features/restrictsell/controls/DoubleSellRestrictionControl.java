@@ -1,17 +1,43 @@
 package com.github.mkram17.bazaarutils.features.restrictsell.controls;
 
-import com.github.mkram17.bazaarutils.features.restrictsell.InstaSellRestrictions;
-import com.github.mkram17.bazaarutils.features.restrictsell.RestrictInstaSellBy;
+import com.github.mkram17.bazaarutils.features.restrictsell.NumericRestrictBy;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 
-public class DoubleSellRestrictionControl extends SellRestrictionControl{
-    @Getter
-    @Setter
-    private double amount;
-    public DoubleSellRestrictionControl(RestrictInstaSellBy rule, double amount) {
-        super(rule);
+@Getter
+@Setter
+@ConfigObject
+public final class DoubleSellRestrictionControl implements SellRestrictionControl<NumericRestrictBy> {
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.enabled.value"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "rule",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.value"
+    )
+    @Comment(
+            value = "Whether the restriction will be on total coins worth or items held",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.description"
+    )
+    public NumericRestrictBy rule;
+
+    @ConfigEntry(id = "amount", translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.value")
+    @Comment(
+            value = "The amount of coins or items held to lock upon",
+            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.description"
+    )
+    public double amount;
+
+    public DoubleSellRestrictionControl(boolean enabled, NumericRestrictBy rule, double amount) {
+        this.enabled = enabled;
+        this.rule = rule;
         this.amount = amount;
     }
 
