@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.chat;
 
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;

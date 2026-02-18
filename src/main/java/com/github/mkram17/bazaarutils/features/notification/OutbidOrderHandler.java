@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.notification;
 
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;

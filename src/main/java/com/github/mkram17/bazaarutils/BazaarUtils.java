@@ -3,11 +3,10 @@ package com.github.mkram17.bazaarutils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.ListenerManager;
-import com.github.mkram17.bazaarutils.features.Bookmark;
+import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmark;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.mojang.serialization.Codec;
-import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
 import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfig;
 import lombok.Getter;
@@ -25,7 +24,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

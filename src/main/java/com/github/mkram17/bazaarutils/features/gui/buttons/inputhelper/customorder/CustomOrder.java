@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.customorder;
+package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;

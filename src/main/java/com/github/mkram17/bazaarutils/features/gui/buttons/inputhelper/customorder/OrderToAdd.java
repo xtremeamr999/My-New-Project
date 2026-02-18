@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features.customorder;
+package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

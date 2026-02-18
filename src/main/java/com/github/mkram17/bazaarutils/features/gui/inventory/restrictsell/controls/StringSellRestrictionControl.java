@@ -1,6 +1,6 @@
-package com.github.mkram17.bazaarutils.features.restrictsell.controls;
+package com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls;
 
-import com.github.mkram17.bazaarutils.features.restrictsell.StringRestrictBy;
+import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.StringRestrictBy;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;

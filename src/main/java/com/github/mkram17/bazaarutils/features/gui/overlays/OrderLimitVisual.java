@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.gui.overlays;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;

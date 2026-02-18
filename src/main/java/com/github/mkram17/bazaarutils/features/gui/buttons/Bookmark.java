@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.gui.buttons;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
@@ -8,12 +8,12 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
@@ -42,13 +42,17 @@ import java.util.Optional;
 //Object is created in GUIUtils when in an item's bazaar page
 @ConfigObject
 public class Bookmark extends CustomItemButton {
-    @Getter @ConfigEntry(id = "name")
+    @Getter
+    @ConfigEntry(id = "name")
     public final String name;
 
-    @Getter @Setter @ConfigEntry(id = "bookmarkedItemStack")
+    @Getter
+    @Setter
+    @ConfigEntry(id = "bookmarkedItemStack")
     public ItemStack bookmarkedItemStack;
 
-    @Getter @ConfigEntry(id = "orderInfo")
+    @Getter
+    @ConfigEntry(id = "orderInfo")
     private final OrderInfo orderInfo;
 
     private static final int SIGN_SLOT_NUMBER = 45;
@@ -163,7 +167,7 @@ public class Bookmark extends CustomItemButton {
 
     public static String findItemName(ChestLoadedEvent e) {
         String nameFromContainer = findItemNameFromContainer();
-        if (!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30 ) {
+        if (!OrderInfo.isValidName(nameFromContainer) || nameFromContainer.length() >= 30) {
             return findNameFromItemStacks(e.getItemStacks(), nameFromContainer);
         }
         return nameFromContainer;
@@ -188,7 +192,7 @@ public class Bookmark extends CustomItemButton {
         String containerName = screenInfo.getScreenName();
 
         if (screenInfo.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)) {
-            return containerName.substring(0, containerName.indexOf("➜")-1);
+            return containerName.substring(0, containerName.indexOf("➜") - 1);
         } else {
             return containerName.substring(containerName.indexOf("➜") + 2);
         }

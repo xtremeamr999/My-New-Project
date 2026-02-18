@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;

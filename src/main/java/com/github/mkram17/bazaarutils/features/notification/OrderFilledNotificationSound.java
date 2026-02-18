@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.features;
+package com.github.mkram17.bazaarutils.features.notification;
 
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import lombok.AllArgsConstructor;

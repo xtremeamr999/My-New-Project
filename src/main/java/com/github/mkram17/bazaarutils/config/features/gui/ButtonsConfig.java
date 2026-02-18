@@ -1,8 +1,8 @@
 package com.github.mkram17.bazaarutils.config.features.gui;
 
-import com.github.mkram17.bazaarutils.features.BazaarOpenOrdersButton;
-import com.github.mkram17.bazaarutils.features.BazaarSettingsButton;
-import com.github.mkram17.bazaarutils.features.CancelOrderAndSearch;
+import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarOpenOrdersButton;
+import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarSettingsButton;
+import com.github.mkram17.bazaarutils.features.gui.buttons.CancelOrderAndSearch;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
 import net.minecraft.item.Items;
 
