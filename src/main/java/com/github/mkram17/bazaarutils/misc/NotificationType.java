@@ -7,6 +7,6 @@ public enum NotificationType {
     GUI, FEATURE, BAZAARDATA, COMMAND, ORDERDATA, ERROR;
 
     public boolean isEnabled() {
-        return DeveloperConfig.DebugMessages.isDeveloperVariableEnabled(this);
+        return DeveloperConfig.isDeveloperVariableEnabled(this);
     }
 }

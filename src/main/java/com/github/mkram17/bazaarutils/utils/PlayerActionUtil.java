@@ -47,7 +47,7 @@ public class PlayerActionUtil {
                 .formatted(Formatting.GOLD)
                 .append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
-        if(notificationType.isEnabled() || DeveloperConfig.DebugMessages.all)
+        if(notificationType.isEnabled())
             notifyAll(messageText);
     }
 

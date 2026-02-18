@@ -129,13 +129,6 @@
   "bazaarutils.config.developer.enabled.description": "Global toggle for all developer related functionalities/utilities.",
   "bazaarutils.config.developer.disableErrorNotifications.value": "Disable Error Notifications",
 
-  "bazaarutils.config.developer.debugMessages.category.value": "Debug Messages",
-  "bazaarutils.config.developer.debugMessages.category.description": "Configure the messages or notifications pushed to the chat about routines & the state of the mod",
-  "bazaarutils.config.developer.debugMessages.all.value": "All Messages",
-  "bazaarutils.config.developer.debugMessages.errors.value": "Error Messages",
-  "bazaarutils.config.developer.debugMessages.features.value": "Feature Messages",
-  "bazaarutils.config.developer.debugMessages.bazaarData.value": "Bazaar Data Messages",
-  "bazaarutils.config.developer.debugMessages.itemData.value": "Item Data Messages",
-  "bazaarutils.config.developer.debugMessages.gui.value": "GUI Messages",
-  "bazaarutils.config.developer.debugMessages.commands.value": "Commands Messages"
+  "bazaarutils.config.developer.debugMessages.value": "Debug Messages",
+  "bazaarutils.config.developer.debugMessages.description": "Configure the messages or notifications pushed to the chat about routines & the state of the mod"
 }
