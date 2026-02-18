@@ -2,7 +2,9 @@ package com.github.mkram17.bazaarutils.config.features.gui;
 
 import com.github.mkram17.bazaarutils.features.BazaarOpenOrdersButton;
 import com.github.mkram17.bazaarutils.features.BazaarSettingsButton;
+import com.github.mkram17.bazaarutils.features.CancelOrderAndSearch;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
+import net.minecraft.item.Items;
 
 @Category(value = "buttons_config")
 @ConfigInfo(
@@ -12,7 +14,7 @@ import com.teamresourceful.resourcefulconfig.api.annotations.*;
         descriptionTranslation = "bazaarutils.config.buttons.category.description",
         icon = "pointer"
 )
-public class ButtonsConfig {
+public final class ButtonsConfig {
     @ConfigEntry(id = "generalSeparator")
     @ConfigOption.Hidden
     @ConfigOption.Separator(
@@ -46,4 +48,11 @@ public class ButtonsConfig {
             description = "bazaarutils.config.buttons.separator.market.description"
     )
     public static boolean MARKET_BUTTONS_SEPARATOR = true;
+
+    @ConfigEntry(id = "cancelOrderAndSearch", translation = "bazaarutils.config.buttons.cancelOrderAndSearch.value")
+    @Comment(
+            value = "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
+            translation = "bazaarutils.config.buttons.cancelOrderAndSearch.description"
+    )
+    public static final CancelOrderAndSearch cancelOrderAndSearch = new CancelOrderAndSearch(false, 25, Items.BLUE_TERRACOTTA.toString());
 }

@@ -13,7 +13,7 @@ import net.minecraft.sound.SoundEvents;
 
 public class CustomItemButton extends BUListener {
     //TODO make flip helper and custom order use this instead of their own settings variables when possible
-    @Getter @ConfigEntry(id = "slotNumber")
+    @Getter
     protected int slotNumber;
     @Getter @Setter
     protected transient ItemStack replacementItem;

@@ -29,6 +29,10 @@
   "bazaarutils.config.buttons.button.size.value": "Button Size",
   "bazaarutils.config.buttons.button.spacing.value": "Spacing",
   "bazaarutils.config.buttons.button.offset.value": "Offset",
+  "bazaarutils.config.buttons.button.slot.value": "Slot Number",
+  "bazaarutils.config.buttons.button.slot.description": "The container slot where the button will be registered at",
+  "bazaarutils.config.buttons.button.itemId.value": "Item Id",
+  "bazaarutils.config.buttons.button.itemId.description": "The item id which will be used as a reference to construct the button",
 
   "bazaarutils.config.buttons.separator.general.value": "General Buttons",
   "bazaarutils.config.buttons.separator.general.description": "asdjasdhgasfhga write this shit",
@@ -46,6 +50,9 @@
 
   "bazaarutils.config.buttons.separator.market.value": "Market Buttons",
   "bazaarutils.config.buttons.separator.market.description": "asdjasdhgasfhga write this shit",
+
+  "bazaarutils.config.buttons.cancelOrderAndSearch.value": "Cancel & Search Button",
+  "bazaarutils.config.buttons.cancelOrderAndSearch.description": "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
 
   "bazaarutils.config.inventory.category.value": "Inventory",
   "bazaarutils.config.inventory.category.description": "Configurations for the inventory features of the mod",
@@ -109,6 +116,7 @@
   "bazaarutils.config.inventory.instantSellRestrictions.rules.thirdStringRestriction.value": "#3 Name Predicate",
   "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthStringRestriction.value": "#4 Name Predicate",
   "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthStringRestriction.value": "#5 Name Predicate",
+
   "bazaarutils.config.overlays.category.value": "Overlays",
   "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
 
