@@ -39,7 +39,7 @@ public final class DeveloperConfig {
             translation = "bazaarutils.config.developer.debugMessages.description"
     )
     @ConfigOption.Draggable
-    public static NotificationType[] debugMessages = {};
+    public static NotificationType[] debugMessages = new NotificationType[]{};
 
     public static boolean isDeveloperVariableEnabled(NotificationType type) {
         return Arrays.asList(debugMessages).contains(type);

@@ -131,7 +131,7 @@ public final class InventoryConfig {
         )
         public static final StringSellRestrictionControl FIFTH_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 
-        public static final SellRestrictionControl<?>[] ALL = {
+        public static final SellRestrictionControl<?>[] ALL = new SellRestrictionControl<?>[]{
                 FIRST_NUMERIC_RESTRICTION,
                 SECOND_NUMERIC_RESTRICTION,
                 THIRD_NUMERIC_RESTRICTION,
