@@ -7,7 +7,6 @@ import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.FlipHelpe
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.MaxBuyOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarOpenOrdersButton;
-import com.github.mkram17.bazaarutils.features.gui.inventory.InstaSellHighlight;
 import com.github.mkram17.bazaarutils.features.gui.inventory.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.gui.overlays.OrderLimitVisual;
 import com.github.mkram17.bazaarutils.features.gui.overlays.PriceCharts;
@@ -56,7 +55,4 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "maxBuyOrder")
     public MaxBuyOrder maxBuyOrder = new MaxBuyOrder(true);
-
-    @ConfigEntry(id = "instaSellHighlight")
-    public InstaSellHighlight instaSellHighlight = new InstaSellHighlight(true);
 }

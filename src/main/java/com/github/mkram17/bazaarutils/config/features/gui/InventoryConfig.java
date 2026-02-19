@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config.features.gui;
 
+import com.github.mkram17.bazaarutils.features.gui.inventory.InstantSellHighlight;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.InstantSellRestrictions;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.NumericRestrictBy;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.DoubleSellRestrictionControl;
@@ -34,6 +35,16 @@ public final class InventoryConfig {
             translation = "bazaarutils.config.inventory.instantSellRestrictions.description"
     )
     public static final InstantSellRestrictions instantSellRestrictions = new InstantSellRestrictions(true, 3);
+
+    @ConfigEntry(
+            id = "instantSellHighlight",
+            translation = "bazaarutils.config.inventory.instantSellHighlight.value"
+    )
+    @Comment(
+            value = "Highlights the items on your inventory that would be sold by the Bazaars' §aInstant Sell§r button.",
+            translation = "bazaarutils.config.inventory.instantSellHighlight.description"
+    )
+    public static final InstantSellHighlight instantSellHighlight = new InstantSellHighlight(true, 0xB2FFFF00);
 
     @Category(value = "instant_sell_rules")
     @ConfigInfo(

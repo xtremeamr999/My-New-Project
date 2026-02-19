@@ -8,9 +8,10 @@ import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -20,15 +21,41 @@ import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
 
-@NoArgsConstructor
-public class InstaSellHighlight extends BUListener {
+@ConfigObject
+public class InstantSellHighlight extends BUListener {
+    @Getter
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.inventory.instantSellHighlight.enabled.value"
+    )
+    public boolean enabled;
 
-    @Getter @Setter
-    private boolean enabled;
+    @ConfigEntry(
+            id = "color",
+            translation = "bazaarutils.config.inventory.instantSellHighlight.color.value"
+    )
+    @ConfigOption.Color(
+            alpha = true,
+            presets = {
+                    0xB2FF5555,
+                    0xB2FF55FF,
+                    0xB2FFFF55,
+                    0xB2FFFFFF,
+                    0xB2FF0000,
+                    0xB2AA0000,
+                    0xB255FF55,
+                    0xB2AAAAAA,
+                    0xB2FFAA00,
+                    0xB2FFFF00
+            }
+    )
+    public int color;
+
     private transient final List<Integer> highlightedSlotIndexes = new ArrayList<>();
 
-    public InstaSellHighlight(boolean enabled) {
+    public InstantSellHighlight(boolean enabled, int color) {
         this.enabled = enabled;
+        this.color = color;
     }
 
     @EventHandler
@@ -99,11 +126,10 @@ public class InstaSellHighlight extends BUListener {
     }
 
     public OptionalInt getColorFromIndex(int slotIndex) {
-        if(highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex)))
+        if (highlightedSlotIndexes.stream().noneMatch(i -> i.equals(slotIndex))) {
             return OptionalInt.empty();
+        }
 
-        float transparency = 0.7f;
-        int argb = ColorHelper.fromFloats(transparency, 1f, 1f, 0f); // yellow
-        return OptionalInt.of(argb);
+        return OptionalInt.of(color);
     }
 }

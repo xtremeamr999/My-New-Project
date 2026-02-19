@@ -117,6 +117,18 @@
   "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthStringRestriction.value": "#4 Name Predicate",
   "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthStringRestriction.value": "#5 Name Predicate",
 
+  "bazaarutils.config.inventory.instantSellHighlight.value": "Instant Sell Highlight",
+  "bazaarutils.config.inventory.instantSellHighlight.description": [
+    "Highlights the items on your inventory that would be sold by the Bazaars'",
+    " ",
+    { "text": "Instant Sell", "color": "green" },
+    " ",
+    "button."
+  ],
+
+  "bazaarutils.config.inventory.instantSellHighlight.enabled.value": "Enabled",
+  "bazaarutils.config.inventory.instantSellHighlight.color.value": "Highlight Color",
+
   "bazaarutils.config.overlays.category.value": "Overlays",
   "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
 
