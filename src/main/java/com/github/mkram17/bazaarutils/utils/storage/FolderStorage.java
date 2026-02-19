@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.data.storage;
+package com.github.mkram17.bazaarutils.utils.storage;
 
 import com.github.mkram17.bazaarutils.utils.Util;
 import org.jetbrains.annotations.Nullable;
