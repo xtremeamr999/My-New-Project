@@ -129,6 +129,18 @@
   "bazaarutils.config.inventory.instantSellHighlight.enabled.value": "Enabled",
   "bazaarutils.config.inventory.instantSellHighlight.color.value": "Highlight Color",
 
+  "bazaarutils.config.inventory.orderStatusHighlight.value": "Order Status Highlight",
+  "bazaarutils.config.inventory.orderStatusHighlight.description": "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
+
+  "bazaarutils.config.inventory.orderStatusHighlight.enabled.value": "Enabled",
+
+  "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.value": "Competitive Color",
+  "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.description": "The color to highlight orders which are the best offer to the market",
+  "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.value": "Matched Color",
+  "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.description": "The color to highlight orders which match the market price",
+  "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.value": "Outbid Color",
+  "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.description": "The color to highlight orders which are below the market price",
+
   "bazaarutils.config.overlays.category.value": "Overlays",
   "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
 

@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.config.features.gui;
 
 import com.github.mkram17.bazaarutils.features.gui.inventory.InstantSellHighlight;
+import com.github.mkram17.bazaarutils.features.gui.inventory.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.InstantSellRestrictions;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.NumericRestrictBy;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.DoubleSellRestrictionControl;
@@ -45,6 +46,16 @@ public final class InventoryConfig {
             translation = "bazaarutils.config.inventory.instantSellHighlight.description"
     )
     public static final InstantSellHighlight instantSellHighlight = new InstantSellHighlight(true, 0xB2FFFF00);
+
+    @ConfigEntry(
+            id = "orderStatusHighlight",
+            translation = "bazaarutils.config.inventory.orderStatusHighlight.value"
+    )
+    @Comment(
+            value = "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
+            translation = "bazaarutils.config.inventory.orderStatusHighlight.description"
+    )
+    public static final OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true, 0xFF55FF55, 0xFFFFFF55, 0xFFFF5555);
 
     @Category(value = "instant_sell_rules")
     @ConfigInfo(

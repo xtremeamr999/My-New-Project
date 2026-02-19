@@ -78,7 +78,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 			return;
 
 		var config = BUConfig.get().feature;
-		if(config.orderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
+		if(InventoryConfig.orderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
 			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
 		}
 	}

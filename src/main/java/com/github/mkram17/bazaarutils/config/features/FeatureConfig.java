@@ -7,7 +7,6 @@ import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.FlipHelpe
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.MaxBuyOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarOpenOrdersButton;
-import com.github.mkram17.bazaarutils.features.gui.inventory.OrderStatusHighlight;
 import com.github.mkram17.bazaarutils.features.gui.overlays.OrderLimitVisual;
 import com.github.mkram17.bazaarutils.features.gui.overlays.PriceCharts;
 import com.github.mkram17.bazaarutils.features.notification.OrderFilledNotificationSound;
@@ -46,9 +45,6 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "stashMessages")
     public StashMessages stashMessages = new StashMessages(false);
-
-    @ConfigEntry(id = "orderStatusHighlight")
-    public OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true);
 
     @ConfigEntry(id = "bazaarOpenOrdersButton")
     public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
