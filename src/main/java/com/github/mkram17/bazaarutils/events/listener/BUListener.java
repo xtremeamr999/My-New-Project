@@ -20,9 +20,9 @@ import lombok.Getter;
 public abstract class BUListener implements AbstractListener{
 
     @Getter
-    private boolean isSubscribed = false;
-    protected boolean runOnInit = true;
-    protected boolean subscribeToMeteorEventBus = true;
+    private transient boolean isSubscribed = false;
+    protected transient boolean runOnInit = true;
+    protected transient boolean subscribeToMeteorEventBus = true;
 
     public BUListener(){
         ListenerManager.listeners.add(this);
