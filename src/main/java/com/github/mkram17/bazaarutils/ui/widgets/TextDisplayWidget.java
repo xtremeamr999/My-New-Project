@@ -21,7 +21,7 @@ public class TextDisplayWidget extends ClickableWidget {
         int textWidth = textRenderer.getWidth(text);
         int textX = this.getX() + (this.width - textWidth) / 2;
         int textY = this.getY() + (this.height - textRenderer.fontHeight) / 2;
-        context.drawText(textRenderer, text, textX, textY, 0xFFFFFF, false);
+        context.drawText(textRenderer, text, textX, textY, 0xFFFFFFFF, false);
     }
 
     @Override
