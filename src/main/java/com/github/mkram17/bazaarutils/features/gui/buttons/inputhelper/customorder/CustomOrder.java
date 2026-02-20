@@ -5,12 +5,15 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.GUIUtils;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +33,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 //TODO low priority -- add number formating with commas (NumberFormat class?) for the tooltips to make large numbers easier to read
 //TODO find new name for this
 @NoArgsConstructor @ConfigObject
-public class CustomOrder extends CustomItemButton {
+public class CustomOrder extends BUListener implements CustomItemButton {
     public static final Map<Integer, Item> COLORMAP = new HashMap<>(Map.of(0, Items.PURPLE_STAINED_GLASS_PANE, 1, Items.BLUE_STAINED_GLASS_PANE, 2, Items.ORANGE_STAINED_GLASS_PANE, 3, Items.BROWN_STAINED_GLASS, 4, Items.RED_STAINED_GLASS_PANE));
 
     @Getter @Setter @ConfigEntry(id = "enabled")
@@ -39,6 +42,21 @@ public class CustomOrder extends CustomItemButton {
     private int orderAmount;
     @Getter @ConfigEntry(id = "item")
     private Item item;
+
+    @Getter
+    @ConfigEntry(
+            id = "slot",
+            translation = "bazaarutils.config.buttons.button.slot.value"
+    )
+    @Comment(
+            value = "The container slot where the button will be registered at",
+            translation = "bazaarutils.config.buttons.button.slot.description"
+    )
+    @ConfigOption.Range(min = 0, max = 35)
+    public int slotNumber;
+
+    @Getter
+    private transient ItemStack replacementItem;
 
     public CustomOrder(boolean enabled, int orderAmount, int slotNumber) {
         this.enabled = enabled;

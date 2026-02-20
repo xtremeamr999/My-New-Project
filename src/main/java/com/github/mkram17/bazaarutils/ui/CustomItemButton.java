@@ -11,20 +11,19 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
-public class CustomItemButton extends BUListener {
-    //TODO make flip helper and custom order use this instead of their own settings variables when possible
-    @Getter
-    protected int slotNumber;
-    @Getter @Setter
-    protected transient ItemStack replacementItem;
-    protected static final RegistryEntry<SoundEvent> BUTTON_SOUND = SoundEvents.UI_BUTTON_CLICK;
-    protected static final float BUTTON_VOLUME = .2f;
+public interface CustomItemButton {
+    RegistryEntry<SoundEvent> BUTTON_SOUND = SoundEvents.UI_BUTTON_CLICK;
+    float BUTTON_VOLUME = 0.2f;
 
-    protected boolean shouldReplaceItem(ReplaceItemEvent event) {
-        return event.getSlotId() == slotNumber;
+    int getSlotNumber();
+
+    ItemStack getReplacementItem();
+
+    default boolean shouldReplaceItem(ReplaceItemEvent event) {
+        return event.getSlotId() == getSlotNumber();
     }
 
-    protected boolean wasButtonSlotClicked(SlotClickEvent event) {
-        return (event.slotId == slotNumber);
+    default boolean wasButtonSlotClicked(SlotClickEvent event) {
+        return event.getSlotId() == getSlotNumber();
     }
 }

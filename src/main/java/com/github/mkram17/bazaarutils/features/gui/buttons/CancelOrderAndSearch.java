@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ConfigObject
-public class CancelOrderAndSearch extends CustomItemButton {
+public class CancelOrderAndSearch extends BUListener implements CustomItemButton {
     @ConfigEntry(
             id = "enabled",
             translation = "bazaarutils.config.buttons.button.enabled.value"
@@ -53,6 +54,7 @@ public class CancelOrderAndSearch extends CustomItemButton {
     )
     public boolean enabled;
 
+    @Getter
     @ConfigEntry(
             id = "slot",
             translation = "bazaarutils.config.buttons.button.slot.value"
@@ -74,19 +76,14 @@ public class CancelOrderAndSearch extends CustomItemButton {
     )
     public String itemId;
 
+    @Getter
+    private transient ItemStack replacementItem;
+
     public CancelOrderAndSearch(boolean enabled, int slotNumber, String itemId) {
         this.enabled = enabled;
         this.slotNumber = slotNumber;
         this.itemId = itemId;
-
-//      TODO: Consider either deprecating or making of CustomItemButton either an interface or a record,
-//       for no matter whether we @ConfigEntry or @ConfigObject it,
-//       ResourcefulConfig will not reflect on a ConfigObjects' super class for fields to add/consider. **The subclass must own the field**.
-//       I will personally come to this once I'm refactoring the InputHelper pr, for this button is just a subset of such.
-//
-//      Faulty and not final at all, just placed this here to prevent NPE's while development
-        super.slotNumber = slotNumber;
-        super.replacementItem = Items.BLUE_TERRACOTTA.getDefaultStack();
+        this.replacementItem = Items.BLUE_TERRACOTTA.getDefaultStack();
     }
 
     private transient OrderInfo orderInfo;

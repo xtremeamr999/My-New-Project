@@ -4,6 +4,7 @@ package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.events.*;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.ui.CustomItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -16,8 +17,10 @@ import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
 import lombok.Setter;
 import meteordevelopment.orbit.EventHandler;
@@ -37,7 +40,7 @@ import java.util.regex.Pattern;
 
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
 @ConfigObject
-public class FlipHelper extends CustomItemButton implements ConfigurableFeature {
+public class FlipHelper extends BUListener implements ConfigurableFeature, CustomItemButton {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
@@ -49,6 +52,21 @@ public class FlipHelper extends CustomItemButton implements ConfigurableFeature 
     private boolean enabled;
     @Getter @Setter @ConfigEntry(id = "pricingPosition")
     private PricingPosition pricingPosition;
+
+    @Getter
+    @ConfigEntry(
+            id = "slot",
+            translation = "bazaarutils.config.buttons.button.slot.value"
+    )
+    @Comment(
+            value = "The container slot where the button will be registered at",
+            translation = "bazaarutils.config.buttons.button.slot.description"
+    )
+    @ConfigOption.Range(min = 0, max = 35)
+    public int slotNumber;
+
+    @Getter
+    private transient ItemStack replacementItem;
 
     @Getter
     private static final Item BUTTON_ITEM = Items.CHERRY_SIGN;

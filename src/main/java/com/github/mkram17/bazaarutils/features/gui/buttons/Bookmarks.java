@@ -6,6 +6,7 @@ import com.github.mkram17.bazaarutils.data.BookmarksStorage;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
+import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
@@ -15,9 +16,12 @@ import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
@@ -34,27 +38,9 @@ import net.minecraft.util.Identifier;
 
 import java.util.*;
 
+@Slf4j
 @ConfigObject
-public class Bookmarks extends CustomItemButton {
-    @Getter
-    @ConfigEntry(
-            id = "enabled",
-            translation = "bazaarutils.config.buttons.button.enabled.value"
-    )
-    public boolean enabled;
-
-    @ConfigEntry(
-            id = "size",
-            translation = "bazaarutils.config.buttons.button.size.value"
-    )
-    public int size = 18;
-
-    @ConfigEntry(
-            id = "spacing",
-            translation = "bazaarutils.config.buttons.button.spacing.value"
-    )
-    public int spacing = 4;
-
+public class Bookmarks extends BUListener implements CustomItemButton {
     public record Bookmark(
             String name,
             ItemStack itemStack,
@@ -94,9 +80,45 @@ public class Bookmarks extends CustomItemButton {
                 .findAny();
     }
 
-    public Bookmarks(boolean enabled, int slotNumber, ItemStack replacementItem) {
+    @Getter
+    private transient ItemStack replacementItem;
+
+    @Getter
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.buttons.button.enabled.value"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "size",
+            translation = "bazaarutils.config.buttons.button.size.value"
+    )
+    public int size;
+
+    @ConfigEntry(
+            id = "spacing",
+            translation = "bazaarutils.config.buttons.button.spacing.value"
+    )
+    public int spacing;
+
+    @Getter
+    @ConfigEntry(
+            id = "slot",
+            translation = "bazaarutils.config.buttons.button.slot.value"
+    )
+    @Comment(
+            value = "The container slot where the button will be registered at",
+            translation = "bazaarutils.config.buttons.button.slot.description"
+    )
+    @ConfigOption.Range(min = 0, max = 35)
+    public int slotNumber;
+
+    public Bookmarks(boolean enabled, int slotNumber, ItemStack replacementItem, int size, int spacing) {
         super();
         this.enabled = enabled;
+        this.size = size;
+        this.spacing = spacing;
         this.slotNumber = slotNumber;
         this.replacementItem = replacementItem;
     }
@@ -107,7 +129,7 @@ public class Bookmarks extends CustomItemButton {
 
     @EventHandler
     private void onReplaceItemEvent(ReplaceItemEvent event) {
-        if (!enabled || !super.shouldReplaceItem(event) || !inCorrectScreen()) {
+        if (!enabled || !shouldReplaceItem(event) || !inCorrectScreen()) {
             return;
         }
 
@@ -121,7 +143,7 @@ public class Bookmarks extends CustomItemButton {
 
     @EventHandler
     private void onClick(SlotClickEvent event) {
-        if (!enabled || !super.wasButtonSlotClicked(event) || !inCorrectScreen()) {
+        if (!enabled || !wasButtonSlotClicked(event) || !inCorrectScreen()) {
             return;
         }
 

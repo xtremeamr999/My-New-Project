@@ -63,5 +63,5 @@ public final class ButtonsConfig {
             value = "Adds a button to an item's page to toggle a quick access button to search the same item on the Bazaar.",
             translation = "bazaarutils.config.buttons.bookmark.description"
     )
-    public static final Bookmarks bookmark = new Bookmarks(true,0, ItemStack.EMPTY);
+    public static final Bookmarks bookmark = new Bookmarks(true,0, ItemStack.EMPTY, 18, 4);
 }
