@@ -3,7 +3,6 @@ package com.github.mkram17.bazaarutils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.ListenerManager;
-import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmark;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.BUCommands;
 import com.mojang.serialization.Codec;
@@ -48,7 +47,6 @@ public class BazaarUtils implements ClientModInitializer {
     public static ComponentType<String> CUSTOM_SIZE_COMPONENT;
     public static ComponentType<Boolean> CUSTOM_SHOWPRICECHART_COMPONENT;
 
-
     @Override
     public void onInitializeClient() {
         registerDataComponents();
@@ -58,7 +56,6 @@ public class BazaarUtils implements ClientModInitializer {
         getModProperties();
         registerEventBus();
         registerCommands();
-        setDefaultValues();
         subscribeEvents();
     }
 
@@ -68,6 +65,7 @@ public class BazaarUtils implements ClientModInitializer {
                 Identifier.of(BazaarUtils.MOD_ID, "custom_size"),
                 ComponentType.<String>builder().codec(Codec.STRING).build()
         );
+
         CUSTOM_SHOWPRICECHART_COMPONENT = Registry.register(
                 Registries.DATA_COMPONENT_TYPE,
                 Identifier.of(BazaarUtils.MOD_ID, "has_price_chart"),
@@ -89,14 +87,6 @@ public class BazaarUtils implements ClientModInitializer {
         ListenerManager.subscribeAll();
     }
 
-    private void setDefaultValues(){
-        //causes errors if done as default in config bc constructor uses other config info which isnt loaded yet
-        if(BUConfig.get().feature.bookmarks.isEmpty()) {
-            BUConfig.get().feature.bookmarks.add(new Bookmark("Diamond")); // Default
-        }
-
-
-    }
     private void getModProperties(){
         FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(modContainer -> {
             ModMetadata metadata = modContainer.getMetadata();

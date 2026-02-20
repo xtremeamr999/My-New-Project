@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config.data;
 
+import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmarks;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
 
@@ -26,4 +27,13 @@ public final class GeneralDataConfig {
             translation = "bazaarutils.config.general.userBazaarTax.description"
     )
     public static double userBazaarTax = 1.125;
+
+    @ConfigButton(
+            text = "bazaarutils.config.general.resetBookmarks.runnable",
+            title = "bazaarutils.config.general.resetBookmarks.value"
+    )
+    public static final Runnable resetBookmarks = () -> {
+        Bookmarks.bookmarks().clear();
+        Bookmarks.saveBookmarks();
+    };
 }

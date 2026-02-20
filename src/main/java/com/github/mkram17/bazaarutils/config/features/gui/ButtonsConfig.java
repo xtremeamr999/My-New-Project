@@ -2,8 +2,10 @@ package com.github.mkram17.bazaarutils.config.features.gui;
 
 import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarOpenOrdersButton;
 import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarSettingsButton;
+import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmarks;
 import com.github.mkram17.bazaarutils.features.gui.buttons.CancelOrderAndSearch;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @Category(value = "buttons_config")
@@ -55,4 +57,11 @@ public final class ButtonsConfig {
             translation = "bazaarutils.config.buttons.cancelOrderAndSearch.description"
     )
     public static final CancelOrderAndSearch cancelOrderAndSearch = new CancelOrderAndSearch(false, 25, Items.BLUE_TERRACOTTA.toString());
+
+    @ConfigEntry(id = "bookmark", translation = "bazaarutils.config.buttons.bookmark.value")
+    @Comment(
+            value = "Adds a button to an item's page to toggle a quick access button to search the same item on the Bazaar.",
+            translation = "bazaarutils.config.buttons.bookmark.description"
+    )
+    public static final Bookmarks bookmark = new Bookmarks(true,0, ItemStack.EMPTY);
 }

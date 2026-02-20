@@ -11,10 +11,7 @@ import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
 import com.github.mkram17.bazaarutils.config.features.notification.NotificationsConfig;
-import com.teamresourceful.resourcefulconfig.api.annotations.Config;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
+import com.teamresourceful.resourcefulconfig.api.annotations.*;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
 import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfig;
 

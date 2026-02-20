@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.utils.bazaar.market.order;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
@@ -12,8 +13,10 @@ import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.google.gson.JsonElement;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.types.entries.SerializableObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +155,7 @@ public class Order extends OrderInfo {
             return;
         }
 
-        CompletableFuture.runAsync(() ->{
+        CompletableFuture.runAsync(() -> {
             for (int i = 3; i >= 1; i--) {
                 try {
                     if (i == 3) {
@@ -176,7 +179,7 @@ public class Order extends OrderInfo {
      * @return index of this order within the persisted user order list.
      */
     public int getIndex() {
-        return BUConfig.get().general.userOrders.indexOf(this);
+        return GeneralDataConfig.userOrders.indexOf(this);
     }
 
     @Override
@@ -234,7 +237,7 @@ public class Order extends OrderInfo {
 
     /**
      * Calculates a non-competitive flip price.
-     * 
+     *
      * @return price .1 coin less competitive than market rate.
      */
     public double getOutbidPrice(OrderType orderType) {

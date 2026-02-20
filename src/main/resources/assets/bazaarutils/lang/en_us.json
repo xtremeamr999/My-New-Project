@@ -9,14 +9,18 @@
     "second line!"
   ],
 
+  "bazaarutils.config.general.category.value": "General Config",
+  "bazaarutils.config.general.category.description": "Definitions for general data of the mod",
+
+  "bazaarutils.config.general.userBazaarTax.value": "Bazaar Tax (%)",
+  "bazaarutils.config.general.userBazaarTax.description": "The bazaar tax percentage of your current profile considering all possible upgrades.",
+
+  "bazaarutils.config.general.resetBookmarks.value": "Saved Bookmarks",
+  "bazaarutils.config.general.resetBookmarks.runnable": "Reset",
+
   "bazaarutils.config.meta.modVersion.value": "Mod Version",
   "bazaarutils.config.meta.resourcesSha.value": "Resources SHA",
   "bazaarutils.config.meta.isFirstLoad.value": "First Load?",
-
-  "bazaarutils.config.general.category.value": "General Config",
-  "bazaarutils.config.general.category.description": "Definitions for general data of the mod",
-  "bazaarutils.config.general.userBazaarTax.value": "Bazaar Tax (%)",
-  "bazaarutils.config.general.userBazaarTax.description": "The bazaar tax percentage of your current profile considering all possible upgrades.",
 
   "bazaarutils.config.chat.category.value": "Chat",
   "bazaarutils.config.chat.category.description": "Configurations for the chat features of the mod",
@@ -53,6 +57,9 @@
 
   "bazaarutils.config.buttons.cancelOrderAndSearch.value": "Cancel & Search Button",
   "bazaarutils.config.buttons.cancelOrderAndSearch.description": "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
+
+  "bazaarutils.config.buttons.bookmark.value": "Bookmark Item Button",
+  "bazaarutils.config.buttons.bookmark.description": "Adds a button to an items' page to toggle a quick access button to search the same item on the Bazaar.",
 
   "bazaarutils.config.inventory.category.value": "Inventory",
   "bazaarutils.config.inventory.category.description": "Configurations for the inventory features of the mod",

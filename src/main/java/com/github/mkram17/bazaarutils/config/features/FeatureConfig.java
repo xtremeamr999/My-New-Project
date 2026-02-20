@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.config.features;
 
 import com.github.mkram17.bazaarutils.features.chat.StashMessages;
 import com.github.mkram17.bazaarutils.features.chat.UselessBazaarNotificationRemover;
-import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmark;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.FlipHelper;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.MaxBuyOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
@@ -21,9 +20,6 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "customOrders")
     public final List<CustomOrder> customOrders = new ArrayList<>();
-
-    @ConfigEntry(id = "bookmarks")
-    public final List<Bookmark> bookmarks = new ArrayList<>();
 
     @ConfigEntry(id = "flipHelper")
     public FlipHelper flipHelper = new FlipHelper(true, PricingPosition.COMPETITIVE, 17);
