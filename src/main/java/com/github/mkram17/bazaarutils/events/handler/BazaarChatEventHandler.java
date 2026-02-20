@@ -2,6 +2,7 @@ package com.github.mkram17.bazaarutils.events.handler;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.data.GeneralDataConfig;
+import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
 import com.github.mkram17.bazaarutils.events.BazaarChatEvent;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
@@ -62,7 +63,7 @@ public class BazaarChatEventHandler {
             return;
         }
 
-        BUConfig.get().feature.orderLimitVisual.addOrderToLimit(order.getVolume()* order.getPricePerItem());
+        OverlaysConfig.orderLimitVisual.addOrderToLimit(order.getVolume()* order.getPricePerItem());
 
         Util.addWatchedOrder(order);
         //for some reason 52800046 for 4 was on hypixel as 13200011.6 but calculates to 13200011.5. current theory is that buy price wasnt fully accurate, and it rounded up. also was .2 off on sell order for it. obviously problems with big prices
@@ -85,7 +86,7 @@ public class BazaarChatEventHandler {
         double totalPriceWithTax = totalPriceBeforeTax * ((100 + GeneralDataConfig.userBazaarTax)/100);
 
         //order limit does not count the tax
-        BUConfig.get().feature.orderLimitVisual.addOrderToLimit(totalPriceBeforeTax);
+        OverlaysConfig.orderLimitVisual.addOrderToLimit(totalPriceBeforeTax);
 
         PlayerActionUtil.notifyAll("Insta sell for " + order, NotificationType.FEATURE);
     }
@@ -103,7 +104,7 @@ public class BazaarChatEventHandler {
 
         double totalPrice = order.getVolume() * order.getPricePerItem();
 
-        BUConfig.get().feature.orderLimitVisual.addOrderToLimit(totalPrice);
+        OverlaysConfig.orderLimitVisual.addOrderToLimit(totalPrice);
 
         PlayerActionUtil.notifyAll("Insta buy for " + order, NotificationType.FEATURE);
     }

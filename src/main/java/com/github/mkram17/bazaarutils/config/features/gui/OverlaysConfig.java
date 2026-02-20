@@ -1,5 +1,6 @@
 package com.github.mkram17.bazaarutils.config.features.gui;
 
+import com.github.mkram17.bazaarutils.features.gui.overlays.OrderLimitVisual;
 import com.github.mkram17.bazaarutils.features.gui.overlays.PriceCharts;
 import com.teamresourceful.resourcefulconfig.api.annotations.Category;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
@@ -24,5 +25,15 @@ public class OverlaysConfig {
             translation = "bazaarutils.config.overlays.priceCharts.description"
     )
     public static final PriceCharts priceCharts = new PriceCharts(false, true);
+
+    @ConfigEntry(
+            id = "orderLimitVisual",
+            translation = "bazaarutils.config.overlays.orderLimitVisual.value"
+    )
+    @Comment(
+            value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
+            translation = "bazaarutils.config.overlays.orderLimitVisual.description"
+    )
+    public static final OrderLimitVisual orderLimitVisual = new OrderLimitVisual(true);
 }
 

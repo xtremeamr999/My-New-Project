@@ -5,9 +5,6 @@ import com.github.mkram17.bazaarutils.features.chat.UselessBazaarNotificationRem
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.FlipHelper;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.MaxBuyOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
-import com.github.mkram17.bazaarutils.features.gui.buttons.BazaarOpenOrdersButton;
-import com.github.mkram17.bazaarutils.features.gui.overlays.OrderLimitVisual;
-import com.github.mkram17.bazaarutils.features.gui.overlays.PriceCharts;
 import com.github.mkram17.bazaarutils.features.notification.OrderFilledNotificationSound;
 import com.github.mkram17.bazaarutils.features.notification.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
@@ -27,9 +24,6 @@ public class FeatureConfig {
     @ConfigEntry(id = "outbidOrderHandler")
     public OutbidOrderHandler outbidOrderHandler = new OutbidOrderHandler(false, true, true);
 
-    @ConfigEntry(id = "orderLimitVisual")
-    public OrderLimitVisual orderLimitVisual = new OrderLimitVisual(true);
-
     @ConfigEntry(id = "orderFilledNotificationSound")
     public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(false);
 
@@ -38,9 +32,6 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "stashMessages")
     public StashMessages stashMessages = new StashMessages(false);
-
-    @ConfigEntry(id = "bazaarOpenOrdersButton")
-    public BazaarOpenOrdersButton bazaarOpenOrdersButton = new BazaarOpenOrdersButton(true);
 
     @ConfigEntry(id = "maxBuyOrder")
     public MaxBuyOrder maxBuyOrder = new MaxBuyOrder(true);
