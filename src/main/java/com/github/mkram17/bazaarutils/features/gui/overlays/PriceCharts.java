@@ -7,8 +7,10 @@ import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
@@ -28,11 +30,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ConfigObject
 public class PriceCharts extends BUListener implements ItemTooltipCallback, BUToggleableFeature {
+    @Getter
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.buttons.button.enabled.value"
+    )
+    public boolean enabled;
 
-    @ConfigEntry(id = "showOutsideBazaar")
-    private boolean showOutsideBazaar;
+    @ConfigEntry(
+            id = "showOutsideBazaar",
+            translation = "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value"
+    )
+    @Comment(
+            value = "Whether to render the charts on items when outside of a Bazaar screen",
+            translation = "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description"
+    )
+    public boolean showOutsideBazaar;
 
-    public PriceCharts(boolean showOutsideBazaar) {
+    public PriceCharts(boolean enabled, boolean showOutsideBazaar) {
+        this.enabled = enabled;
         this.showOutsideBazaar = showOutsideBazaar;
     }
 
@@ -41,7 +57,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
 
     @Override
     public void getTooltip(ItemStack stack, Item.TooltipContext ctx, TooltipType type, List<Text> lines) {
-        if (stack == null || stack.isEmpty() || !shouldShow()) return;
+        if (!enabled || stack == null || stack.isEmpty() || !shouldShow()) return;
         if (stack.getItem().getName().getString().contains("GLASS_PANE")) return;
 
         String key = sanitizeName(stack.getName().getString());
@@ -63,7 +79,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
 
     @EventHandler
     private void onClick(SlotClickEvent e){
-        if (!shouldShow() || e.isCancelled()) {
+        if (!enabled || !shouldShow() || e.isCancelled()) {
             return;
         }
 

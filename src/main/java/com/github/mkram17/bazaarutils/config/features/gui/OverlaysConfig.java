@@ -1,6 +1,9 @@
 package com.github.mkram17.bazaarutils.config.features.gui;
 
+import com.github.mkram17.bazaarutils.features.gui.overlays.PriceCharts;
 import com.teamresourceful.resourcefulconfig.api.annotations.Category;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 
 @Category(value = "overlays_config")
@@ -12,4 +15,14 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
         icon = "sidebar"
 )
 public class OverlaysConfig {
+    @ConfigEntry(
+            id = "priceCharts",
+            translation = "bazaarutils.config.overlays.priceCharts.value"
+    )
+    @Comment(
+            value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
+            translation = "bazaarutils.config.overlays.priceCharts.description"
+    )
+    public static final PriceCharts priceCharts = new PriceCharts(false, true);
 }
+

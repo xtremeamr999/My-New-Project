@@ -30,9 +30,6 @@ public class FeatureConfig {
     @ConfigEntry(id = "orderLimitVisual")
     public OrderLimitVisual orderLimitVisual = new OrderLimitVisual(true);
 
-    @ConfigEntry(id = "showPriceChartsOutsideBazaar")
-    public PriceCharts showPriceChartsOutsideBazaar = new PriceCharts(false);
-
     @ConfigEntry(id = "orderFilledNotificationSound")
     public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(false);
 

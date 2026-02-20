@@ -151,6 +151,12 @@
   "bazaarutils.config.overlays.category.value": "Overlays",
   "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
 
+  "bazaarutils.config.overlays.priceCharts.value": "Price Charts",
+  "bazaarutils.config.overlays.priceCharts.description": "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
+
+  "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value": "Show Outside of Bazaar",
+  "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description": "Whether to render the charts on tooltips when outside of a Bazaar screen",
+
   "bazaarutils.config.notifications.category.value": "Notifications",
   "bazaarutils.config.notifications.category.description": "Configurations for the notifications to be pushed by the mod",
 
