@@ -4,9 +4,11 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.util.EventPriorities;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.utils.codecs.ItemStackCodecGsonAdapter;
 import com.google.gson.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.ItemStack;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -19,11 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class DataStorage<T> {
+    public static final Path DEFAULT_PATH = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MOD_ID).resolve("data");
 
-    private static final Set<DataStorage<?>> REQUIRES_SAVE = ConcurrentHashMap.newKeySet();
-    static final Path DEFAULT_PATH = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MOD_ID).resolve("data");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())
+            .create();
+
     private static int tickCounter = 0;
+    private static final Set<DataStorage<?>> REQUIRES_SAVE = ConcurrentHashMap.newKeySet();
 
     @RunOnInit(priority = EventPriorities.HIGH)
     public static void registerTickListener() {
