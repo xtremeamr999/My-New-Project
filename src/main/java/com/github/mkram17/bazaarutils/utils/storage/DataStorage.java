@@ -4,8 +4,8 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.util.EventPriorities;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.github.mkram17.bazaarutils.utils.codecs.ItemStackCodecGsonAdapter;
-import com.github.mkram17.bazaarutils.utils.codecs.ZonedDateTimeAdapter;
+import com.github.mkram17.bazaarutils.utils.codecs.CodecGsonAdapter;
+import com.github.mkram17.bazaarutils.utils.codecs.ZonedDateTimeCodec;
 import com.google.gson.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DataStorage<T> {
@@ -27,8 +28,8 @@ public class DataStorage<T> {
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(ItemStack.class, new ItemStackCodecGsonAdapter())
-            .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
+            .registerTypeAdapter(ItemStack.class, new CodecGsonAdapter<>(ItemStack.CODEC))
+            .registerTypeAdapter(ZonedDateTime.class, new CodecGsonAdapter<>(ZonedDateTimeCodec.CODEC))
             .create();
 
     private static int tickCounter = 0;
@@ -55,20 +56,27 @@ public class DataStorage<T> {
         for (DataStorage<?> s : toSave) s.saveToSystem();
     }
 
+    private final Function<Integer, Type> codec;
+    private final Type currentCodec;
     private final int version;
-    private final Type dataType;
     private final Path path;
     private T data;
 
-    public DataStorage(int version, Supplier<T> defaultData, String fileName, Type dataType) {
+
+    public DataStorage(int version, Supplier<T> defaultData, String fileName, Function<Integer, Type> codec) {
         this.version = version;
-        this.dataType = dataType;
+        this.codec = codec;
         this.path = DEFAULT_PATH.resolve(fileName + ".json");
         this.data = load(defaultData);
+        this.currentCodec = codec.apply(version);
+    }
+
+    public DataStorage(int version, Supplier<T> defaultData, String fileName, Type dataType) {
+        this(version, defaultData, fileName, v -> dataType);
     }
 
     public DataStorage(Supplier<T> defaultData, String fileName, Type dataType) {
-        this(0, defaultData, fileName, dataType);
+        this(0, defaultData, fileName, v -> dataType);
     }
 
     public T get() { return data; }
@@ -87,29 +95,44 @@ public class DataStorage<T> {
             return defaultData.get();
         }
         try {
-            JsonObject root = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = JsonParser.parseString(
+                    Files.readString(path, StandardCharsets.UTF_8)
+            ).getAsJsonObject();
+
             int fileVersion = root.get("@bazaarutils:version").getAsInt();
-            if (fileVersion != this.version) {
-                Util.logMessage("Version mismatch for " + path.getFileName() + ", using defaults.");
-                return defaultData.get();
+            JsonElement data = root.get("@bazaarutils:data");
+
+            for (int v = fileVersion; v < this.version; v++) {
+                Object intermediate = GSON.fromJson(data, codec.apply(v));
+                data = GSON.toJsonTree(intermediate, codec.apply(v));
             }
-            T loaded = GSON.fromJson(root.get("@bazaarutils:data"), dataType);
+
+            T loaded = GSON.fromJson(data, codec.apply(this.version));
+
             return loaded != null ? loaded : defaultData.get();
         } catch (Exception e) {
-            Util.logError("Failed to load " + path + ", using defaults.", e);
+            Util.logError("Failed to load " + DEFAULT_PATH.relativize(path) + ", using defaults.", e);
+
             return defaultData.get();
         }
     }
 
     private void saveToSystem() {
+        Util.logMessage("Saving " + path);
         try {
             Files.createDirectories(path.getParent());
             JsonObject root = new JsonObject();
             root.addProperty("@bazaarutils:version", version);
-            root.add("@bazaarutils:data", GSON.toJsonTree(data, dataType));
+            JsonElement encoded = GSON.toJsonTree(data, currentCodec);
+            if (encoded == null) {
+                Util.logMessage("Failed to encode " + data + " to json");
+                return;
+            }
+            root.add("@bazaarutils:data", encoded);
             Files.writeString(path, GSON.toJson(root), StandardCharsets.UTF_8);
+            Util.logMessage("Saved " + path);
         } catch (Exception e) {
-            Util.logError("Failed to save " + path, e);
+            Util.logError("Failed to save " + data + " to file", e);
         }
     }
 }
