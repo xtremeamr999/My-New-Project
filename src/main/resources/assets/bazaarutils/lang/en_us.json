@@ -25,6 +25,19 @@
   "bazaarutils.config.chat.category.value": "Chat",
   "bazaarutils.config.chat.category.description": "Configurations for the chat features of the mod",
 
+  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.value": "Useless Bazaar Notifications",
+  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.description": "Enables to remove some of the transient messages sent to the chat by the Bazaar when interacting with it.",
+
+  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.enabled.value": "Enabled",
+
+  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.value": "Excluded Notifications",
+  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.description": "The list of transient messages/notifications to be excluded/unallowed from the chat",
+
+  "bazaarutils.config.chat.stashMessages.value": "Stash Messages",
+  "bazaarutils.config.chat.stashMessages.description": "Enables to remove the messages sent to the chat remembering to pick up your stash.",
+
+  "bazaarutils.config.chat.stashMessages.enabled.value": "Enabled",
+
   "bazaarutils.config.buttons.category.value": "Buttons",
   "bazaarutils.config.buttons.category.description": "Configurations for the buttons to be injected/handled by the mod",
 

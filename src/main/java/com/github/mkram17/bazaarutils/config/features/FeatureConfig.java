@@ -1,7 +1,5 @@
 package com.github.mkram17.bazaarutils.config.features;
 
-import com.github.mkram17.bazaarutils.features.chat.StashMessages;
-import com.github.mkram17.bazaarutils.features.chat.UselessBazaarNotificationRemover;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.FlipHelper;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.MaxBuyOrder;
 import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
@@ -26,12 +24,6 @@ public class FeatureConfig {
 
     @ConfigEntry(id = "orderFilledNotificationSound")
     public OrderFilledNotificationSound orderFilledNotificationSound = new OrderFilledNotificationSound(false);
-
-    @ConfigEntry(id = "uselessBazaarNotificationRemover")
-    public UselessBazaarNotificationRemover uselessBazaarNotificationRemover = new UselessBazaarNotificationRemover(true);
-
-    @ConfigEntry(id = "stashMessages")
-    public StashMessages stashMessages = new StashMessages(false);
 
     @ConfigEntry(id = "maxBuyOrder")
     public MaxBuyOrder maxBuyOrder = new MaxBuyOrder(true);
