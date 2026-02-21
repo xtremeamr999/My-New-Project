@@ -36,39 +36,39 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.enabled.value"
+            translation = "bazaarutils.config.inventory.order_status_highlight.enabled.value"
     )
     public boolean enabled;
 
     @ConfigEntry(
-            id = "competitiveColor",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.value"
+            id = "competitive_color",
+            translation = "bazaarutils.config.inventory.order_status_highlight.competitive_color.value"
     )
     @Comment(
             value = "The color to highlight orders which are the best offer to the market",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.description"
+            translation = "bazaarutils.config.inventory.order_status_highlight.competitive_color.description"
     )
     @ConfigOption.Color(alpha = true)
     public int competitiveColor;
 
     @ConfigEntry(
-            id = "matchedColor",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.value"
+            id = "matched_color",
+            translation = "bazaarutils.config.inventory.order_status_highlight.matched_color.value"
     )
     @Comment(
             value = "The color to highlight orders which match the market price",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.description"
+            translation = "bazaarutils.config.inventory.order_status_highlight.matched_color.description"
     )
     @ConfigOption.Color(alpha = true)
     public int matchedColor;
 
     @ConfigEntry(
-            id = "outbidColor",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.value"
+            id = "outbid_color",
+            translation = "bazaarutils.config.inventory.order_status_highlight.outbid_color.value"
     )
     @Comment(
             value = "The color to highlight orders which are below the market price",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.description"
+            translation = "bazaarutils.config.inventory.order_status_highlight.outbid_color.description"
     )
     @ConfigOption.Color(alpha = true)
     public int outbidColor;

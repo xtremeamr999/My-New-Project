@@ -14,24 +14,27 @@ import lombok.Setter;
 public final class DoubleSellRestrictionControl implements SellRestrictionControl<NumericRestrictBy> {
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.enabled.value"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.enabled.value"
     )
     public boolean enabled;
 
     @ConfigEntry(
             id = "rule",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.value"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.numeric.value"
     )
     @Comment(
             value = "Whether the restriction will be on total coins worth or items held",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.description"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.numeric.description"
     )
     public NumericRestrictBy rule;
 
-    @ConfigEntry(id = "amount", translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.value")
+    @ConfigEntry(
+            id = "amount",
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.amount.value"
+    )
     @Comment(
             value = "The amount of coins or items held to lock upon",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.description"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.amount.description"
     )
     public double amount;
 

@@ -18,22 +18,22 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 )
 public final class ChatConfig {
     @ConfigEntry(
-            id = "uselessBazaarNotificationsRemover",
-            translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.value"
+            id = "useless_bazaar_notifications_remover",
+            translation = "bazaarutils.config.chat.useless_bazaar_notifications_remover.value"
     )
     @Comment(
             value = "Enables to remove the transient messages sent to the chat by the Bazaar when interacting with it.",
-            translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.description"
+            translation = "bazaarutils.config.chat.useless_bazaar_notifications_remover.description"
     )
     public static final UselessBazaarNotificationsRemover USELESS_BAZAAR_NOTIFICATIONS_REMOVER = new UselessBazaarNotificationsRemover(false);
 
     @ConfigEntry(
-            id = "STASH_MESSAGES_REMOVER",
-            translation = "bazaarutils.config.chat.STASH_MESSAGES_REMOVER.value"
+            id = "stash_messages_remover",
+            translation = "bazaarutils.config.chat.stash_messages_remover.value"
     )
     @Comment(
             value = "Enables to remove the messages sent to the chat remembering to pick up your stash.",
-            translation = "bazaarutils.config.chat.STASH_MESSAGES_REMOVER.description"
+            translation = "bazaarutils.config.chat.stash_messages_remover.description"
     )
     public static final StashMessagesRemover STASH_MESSAGES_REMOVER = new StashMessagesRemover(false);
 }

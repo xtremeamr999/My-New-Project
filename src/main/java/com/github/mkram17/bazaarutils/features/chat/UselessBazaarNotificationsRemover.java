@@ -44,21 +44,21 @@ public class UselessBazaarNotificationsRemover extends BUListener implements BUT
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.enabled.value"
+            translation = "bazaarutils.config.chat.useless_bazaar_notifications_remover.enabled.value"
     )
     public boolean enabled;
 
-    @ConfigEntry(id = "firstTimeRemoved")
+    @ConfigEntry(id = "first_time_removed")
     @ConfigOption.Hidden
     public boolean firstTimeRemoved = true;
 
     @ConfigEntry(
-            id = "excludedNotifications",
-            translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.value"
+            id = "excluded_notifications",
+            translation = "bazaarutils.config.chat.useless_bazaar_notifications_remover.excluded_notifications.value"
     )
     @Comment(
             value = "The list of transient messages/notifications to be excluded/unallowed from the chat",
-            translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.description"
+            translation = "bazaarutils.config.chat.useless_bazaar_notifications_remover.excluded_notifications.description"
     )
     @ConfigOption.Draggable()
     public static TransientBazaarMessages[] excludedNotifications = new TransientBazaarMessages[]{

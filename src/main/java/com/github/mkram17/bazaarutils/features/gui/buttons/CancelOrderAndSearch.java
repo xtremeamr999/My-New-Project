@@ -56,23 +56,23 @@ public class CancelOrderAndSearch extends BUListener implements CustomItemButton
 
     @Getter
     @ConfigEntry(
-            id = "slot",
-            translation = "bazaarutils.config.buttons.button.slot.value"
+            id = "slot_number",
+            translation = "bazaarutils.config.buttons.button.slot_number.value"
     )
     @Comment(
             value = "The container slot where the button will be registered at",
-            translation = "bazaarutils.config.buttons.button.slot.description"
+            translation = "bazaarutils.config.buttons.button.slot_number.description"
     )
     @ConfigOption.Range(min = 0, max = 35)
     public int slotNumber;
 
     @ConfigEntry(
-            id = "itemId",
-            translation = "bazaarutils.config.buttons.button.itemId.value"
+            id = "item_id",
+            translation = "bazaarutils.config.buttons.button.item_id.value"
     )
     @Comment(
             value = "The item id which will be used as a reference to construct the button (make sure it is valid)",
-            translation = "bazaarutils.config.buttons.button.itemId.description"
+            translation = "bazaarutils.config.buttons.button.item_id.description"
     )
     public String itemId;
 

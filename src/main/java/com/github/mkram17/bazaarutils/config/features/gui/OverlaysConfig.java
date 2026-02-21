@@ -17,23 +17,23 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 )
 public class OverlaysConfig {
     @ConfigEntry(
-            id = "priceCharts",
-            translation = "bazaarutils.config.overlays.priceCharts.value"
+            id = "price_charts",
+            translation = "bazaarutils.config.overlays.price_charts.value"
     )
     @Comment(
 
             value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
-            translation = "bazaarutils.config.overlays.priceCharts.description"
+            translation = "bazaarutils.config.overlays.price_charts.description"
     )
     public static final PriceCharts PRICE_CHARTS = new PriceCharts(false, true);
 
     @ConfigEntry(
-            id = "bazaarLimitsVisualizer",
-            translation = "bazaarutils.config.overlays.bazaarLimitsVisualizer.value"
+            id = "bazaar_limits_visualizer",
+            translation = "bazaarutils.config.overlays.bazaar_limits_visualizer.value"
     )
     @Comment(
             value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
-            translation = "bazaarutils.config.overlays.bazaarLimitsVisualizer.description"
+            translation = "bazaarutils.config.overlays.bazaar_limits_visualizer.description"
     )
     public static final BazaarLimitsVisualizer BAZAAR_LIMITS_VISUALIZER = new BazaarLimitsVisualizer(true);
 }

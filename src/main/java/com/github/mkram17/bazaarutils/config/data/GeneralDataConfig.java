@@ -20,18 +20,18 @@ public final class GeneralDataConfig {
     public static List<Order> userOrders = new ArrayList<>();
 
     @ConfigEntry(
-            id = "userBazaarTax",
-            translation = "bazaarutils.config.general.userBazaarTax.value"
+            id = "user_bazaar_tax",
+            translation = "bazaarutils.config.general.user_bazaar_tax.value"
     )
     @Comment(
             value = "The bazaar tax percentage of your current profile considering all possible upgrades.",
-            translation = "bazaarutils.config.general.userBazaarTax.description"
+            translation = "bazaarutils.config.general.user_bazaar_tax.description"
     )
     public static double userBazaarTax = 1.125;
 
     @ConfigButton(
-            text = "bazaarutils.config.general.resetBookmarks.runnable",
-            title = "bazaarutils.config.general.resetBookmarks.value"
+            text = "bazaarutils.config.general.reset_bookmarks.runnable",
+            title = "bazaarutils.config.general.reset_bookmarks.value"
     )
     public static final Runnable resetBookmarks = () -> {
         Bookmarks.bookmarks().clear();
@@ -39,8 +39,8 @@ public final class GeneralDataConfig {
     };
 
     @ConfigButton(
-            text = "bazaarutils.config.general.resetLimits.runnable",
-            title = "bazaarutils.config.general.resetLimits.value"
+            text = "bazaarutils.config.general.reset_limits.runnable",
+            title = "bazaarutils.config.general.reset_limits.value"
     )
     public static final Runnable resetLimits = () -> {
         BazaarLimitsVisualizer.limits().clear();

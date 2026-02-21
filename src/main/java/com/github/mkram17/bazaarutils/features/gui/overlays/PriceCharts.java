@@ -33,17 +33,17 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.overlays.priceCharts.enabled.value"
+            translation = "bazaarutils.config.overlays.price_charts.enabled.value"
     )
     public boolean enabled;
 
     @ConfigEntry(
             id = "showOutsideBazaar",
-            translation = "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value"
+            translation = "bazaarutils.config.overlays.price_charts.show_outside_bazaar.value"
     )
     @Comment(
             value = "Whether to render the charts on items when outside of a Bazaar screen",
-            translation = "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description"
+            translation = "bazaarutils.config.overlays.price_charts.show_outside_bazaar.description"
     )
     public boolean showOutsideBazaar;
 

@@ -48,7 +48,7 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.overlays.bazaarLimitsVisualizer.enabled.value"
+            translation = "bazaarutils.config.overlays.bazaar_limits_visualizer.enabled.value"
     )
     public boolean enabled;
 

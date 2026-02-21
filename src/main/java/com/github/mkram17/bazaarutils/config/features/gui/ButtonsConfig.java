@@ -17,7 +17,7 @@ import net.minecraft.item.Items;
         icon = "pointer"
 )
 public final class ButtonsConfig {
-    @ConfigEntry(id = "generalSeparator")
+    @ConfigEntry(id = "general_separator")
     @ConfigOption.Hidden
     @ConfigOption.Separator(
             value = "bazaarutils.config.buttons.separator.general.value",
@@ -25,25 +25,31 @@ public final class ButtonsConfig {
     )
     public static boolean GENERAL_BUTTONS_SEPARATOR = true;
 
-    @ConfigEntry(id = "modSettings", translation = "bazaarutils.config.buttons.modSettings.value")
+    @ConfigEntry(
+            id = "mod_settings",
+            translation = "bazaarutils.config.buttons.mod_settings.value"
+    )
     @Comment(
             value = "Adds a button to selected menus/screen to quick access the mods' settings.",
-            translation = "bazaarutils.config.buttons.modSettings.description"
+            translation = "bazaarutils.config.buttons.mod_settings.description"
     )
     public static final BazaarSettingsButton MOD_SETTINGS = new BazaarSettingsButton(true);
 
-    @ConfigEntry(id = "openOrders", translation = "bazaarutils.config.buttons.openOrders.value")
+    @ConfigEntry(
+            id = "open_orders",
+            translation = "bazaarutils.config.buttons.open_orders.value"
+    )
     @Comment(
             value = """
             Adds a button to selected menus/screen to quick access your orders page.
             
             Requires a §dBooster Cookie§r effect active in order to function.
             """,
-            translation = "bazaarutils.config.buttons.openOrders.description"
+            translation = "bazaarutils.config.buttons.open_orders.description"
     )
     public static final BazaarOpenOrdersButton OPEN_ORDERS = new BazaarOpenOrdersButton(true);
 
-    @ConfigEntry(id = "marketSeparator")
+    @ConfigEntry(id = "market_separator")
     @ConfigOption.Hidden
     @ConfigOption.Separator(
             value = "bazaarutils.config.buttons.separator.market.value",
@@ -51,17 +57,23 @@ public final class ButtonsConfig {
     )
     public static boolean MARKET_BUTTONS_SEPARATOR = true;
 
-    @ConfigEntry(id = "cancelOrderAndSearch", translation = "bazaarutils.config.buttons.cancelOrderAndSearch.value")
+    @ConfigEntry(
+            id = "cancel_order_and_search",
+            translation = "bazaarutils.config.buttons.cancel_order_and_search.value"
+    )
     @Comment(
             value = "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
-            translation = "bazaarutils.config.buttons.cancelOrderAndSearch.description"
+            translation = "bazaarutils.config.buttons.cancel_order_and_search.description"
     )
     public static final CancelOrderAndSearch CANCEL_ORDER_AND_SEARCH = new CancelOrderAndSearch(false, 25, Items.BLUE_TERRACOTTA.toString());
 
-    @ConfigEntry(id = "bookmark", translation = "bazaarutils.config.buttons.bookmark.value")
+    @ConfigEntry(
+            id = "bookmarks",
+            translation = "bazaarutils.config.buttons.bookmarks.value"
+    )
     @Comment(
             value = "Adds a button to an item's page to toggle a quick access button to search the same item on the Bazaar.",
-            translation = "bazaarutils.config.buttons.bookmark.description"
+            translation = "bazaarutils.config.buttons.bookmarks.description"
     )
     public static final Bookmarks BOOKMARKS = new Bookmarks(true,0, ItemStack.EMPTY, 18, 4);
 }

@@ -28,117 +28,117 @@ import java.util.stream.Collectors;
 )
 public final class InventoryConfig {
     @ConfigEntry(
-            id = "instantSellRestrictions",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.value"
+            id = "instant_sell_restrictions",
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.value"
     )
     @Comment(
             value = "Manages a locking functionality over the Bazaars' §aInstant Sell§r button, with inventory state as well as action restriction.",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.description"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.description"
     )
     public static final InstantSellRestrictions INSTANT_SELL_RESTRICTIONS = new InstantSellRestrictions(true, 3);
 
     @ConfigEntry(
-            id = "instantSellHighlight",
-            translation = "bazaarutils.config.inventory.instantSellHighlight.value"
+            id = "instant_sell_highlight",
+            translation = "bazaarutils.config.inventory.instant_sell_highlight.value"
     )
     @Comment(
             value = "Highlights the items on your inventory that would be sold by the Bazaars' §aInstant Sell§r button.",
-            translation = "bazaarutils.config.inventory.instantSellHighlight.description"
+            translation = "bazaarutils.config.inventory.instant_sell_highlight.description"
     )
     public static final InstantSellHighlight INSTANT_SELL_HIGHLIGHT = new InstantSellHighlight(true, 0xB2FFFF00);
 
     @ConfigEntry(
-            id = "orderStatusHighlight",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.value"
+            id = "order_status_highlight",
+            translation = "bazaarutils.config.inventory.order_status_highlight.value"
     )
     @Comment(
             value = "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
-            translation = "bazaarutils.config.inventory.orderStatusHighlight.description"
+            translation = "bazaarutils.config.inventory.order_status_highlight.description"
     )
     public static final OrderStatusHighlight ORDER_STATUS_HIGHLIGHT = new OrderStatusHighlight(true, 0xFF55FF55, 0xFFFFFF55, 0xFFFF5555);
 
     @Category(value = "instant_sell_rules")
     @ConfigInfo(
             title = "Instant Sell Rules",
-            titleTranslation = "bazaarutils.config.inventory.instantSellRestrictions.rules.category.value",
+            titleTranslation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.value",
             description = "Manage the rules to be checked by the Instant Sell Restrictions feature",
-            descriptionTranslation = "bazaarutils.config.inventory.instantSellRestrictions.rules.category.description",
+            descriptionTranslation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.description",
             icon = "ruler"
     )
     public static final class SellRestrictionsRules {
-        @ConfigEntry(id = "numericRestrictionsSeparator")
+        @ConfigEntry(id = "numeric_restrictions_separator")
         @ConfigOption.Hidden
         @ConfigOption.Separator(
-                value = "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.numericRestrictions.value",
-                description = "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.numericRestrictions.description"
+                value = "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.value",
+                description = "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.description"
         )
         public static boolean NUMERIC_RESTRICTIONS_SEPARATOR = true;
 
         @ConfigEntry(
-                id = "firstNumericRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.firstNumericRestriction.value"
+                id = "first_numeric_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_numeric_restriction.value"
         )
         public static final DoubleSellRestrictionControl FIRST_NUMERIC_RESTRICTION = new DoubleSellRestrictionControl(false, NumericRestrictBy.PRICE, 0);
 
         @ConfigEntry(
-                id = "secondNumericRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.secondNumericRestriction.value"
+                id = "second_numeric_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_numeric_restriction.value"
         )
         public static final DoubleSellRestrictionControl SECOND_NUMERIC_RESTRICTION = new DoubleSellRestrictionControl(false, NumericRestrictBy.PRICE, 0);
 
         @ConfigEntry(
-                id = "thirdNumericRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.thirdNumericRestriction.value"
+                id = "third_numeric_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.third_numeric_restriction.value"
         )
         public static final DoubleSellRestrictionControl THIRD_NUMERIC_RESTRICTION = new DoubleSellRestrictionControl(false, NumericRestrictBy.PRICE, 0);
 
         @ConfigEntry(
-                id = "fourthNumericRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthNumericRestriction.value"
+                id = "fourth_numeric_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.fourth_numeric_restriction.value"
         )
         public static final DoubleSellRestrictionControl FOURTH_NUMERIC_RESTRICTION = new DoubleSellRestrictionControl(false, NumericRestrictBy.PRICE, 0);
 
         @ConfigEntry(
-                id = "fifthNumericRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthNumericRestriction.value"
+                id = "fifth_numeric_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.fifth_numeric_restriction.value"
         )
         public static final DoubleSellRestrictionControl FIFTH_NUMERIC_RESTRICTION = new DoubleSellRestrictionControl(false, NumericRestrictBy.PRICE, 0);
 
-        @ConfigEntry(id = "stringRestrictionsSeparator")
+        @ConfigEntry(id = "string_restrictions_separator")
         @ConfigOption.Hidden
         @ConfigOption.Separator(
-                value = "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.stringRestrictions.value",
-                description = "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.stringRestrictions.description"
+                value = "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.value",
+                description = "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.description"
         )
         public static boolean STRING_RESTRICTIONS_SEPARATOR = true;
 
         @ConfigEntry(
-                id = "firstStringRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.firstStringRestriction.value"
+                id = "first_string_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_string_restriction.value"
         )
         public static final StringSellRestrictionControl FIRST_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 
         @ConfigEntry(
-                id = "secondStringRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.secondStringRestriction.value"
+                id = "second_string_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_string_restriction.value"
         )
         public static final StringSellRestrictionControl SECOND_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 
         @ConfigEntry(
-                id = "thirdStringRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.thirdStringRestriction.value"
+                id = "third_string_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.third_string_restriction.value"
         )
         public static final StringSellRestrictionControl THIRD_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 
         @ConfigEntry(
-                id = "fourthStringRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthStringRestriction.value"
+                id = "fourth_string_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.fourth_string_restriction.value"
         )
         public static final StringSellRestrictionControl FOURTH_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 
         @ConfigEntry(
-                id = "fifthStringRestriction",
-                translation = "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthStringRestriction.value"
+                id = "fifth_string_restriction",
+                translation = "bazaarutils.config.inventory.instant_sell_restrictions.rules.fifth_string_restriction.value"
         )
         public static final StringSellRestrictionControl FIFTH_STRING_RESTRICTION = new StringSellRestrictionControl(false, "");
 

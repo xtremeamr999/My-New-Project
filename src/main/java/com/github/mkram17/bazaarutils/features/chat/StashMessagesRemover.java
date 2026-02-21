@@ -19,12 +19,12 @@ public class StashMessagesRemover extends BUListener implements BUToggleableFeat
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.chat.STASH_MESSAGES_REMOVER.enabled.value"
+            translation = "bazaarutils.config.chat.stash_messages_remover.enabled.value"
     )
     public boolean enabled;
 
     @Getter
-    @ConfigEntry(id = "stashsPreviouslyClaimed")
+    @ConfigEntry(id = "stash_previously_claimed")
     @ConfigOption.Hidden
     public boolean stashPreviouslyClaimed = false;
 

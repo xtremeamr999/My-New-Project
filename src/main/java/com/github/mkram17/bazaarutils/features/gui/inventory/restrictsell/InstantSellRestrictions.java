@@ -28,17 +28,17 @@ public class InstantSellRestrictions extends BUListener implements ConfigurableF
 
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.enabled.value"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.enabled.value"
     )
     public boolean enabled;
 
     @ConfigEntry(
             id = "clicksRequired",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.value"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.clicks_required.value"
     )
     @Comment(
             value = "The amount of clicks required to be pressed on the §aInstant Sell§r item to allow the action.",
-            translation = "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.description"
+            translation = "bazaarutils.config.inventory.instant_sell_restrictions.clicks_required.description"
     )
     public int clicksRequired;
 

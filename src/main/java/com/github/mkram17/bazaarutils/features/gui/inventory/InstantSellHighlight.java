@@ -26,13 +26,13 @@ public class InstantSellHighlight extends BUListener {
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.inventory.instantSellHighlight.enabled.value"
+            translation = "bazaarutils.config.inventory.instant_sell_highlight.enabled.value"
     )
     public boolean enabled;
 
     @ConfigEntry(
             id = "color",
-            translation = "bazaarutils.config.inventory.instantSellHighlight.color.value"
+            translation = "bazaarutils.config.inventory.instant_sell_highlight.color.value"
     )
     @ConfigOption.Color(
             alpha = true,

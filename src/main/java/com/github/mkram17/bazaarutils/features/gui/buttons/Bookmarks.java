@@ -104,12 +104,12 @@ public class Bookmarks extends BUListener implements CustomItemButton {
 
     @Getter
     @ConfigEntry(
-            id = "slot",
-            translation = "bazaarutils.config.buttons.button.slot.value"
+            id = "slot_number",
+            translation = "bazaarutils.config.buttons.button.slot_number.value"
     )
     @Comment(
             value = "The container slot where the button will be registered at",
-            translation = "bazaarutils.config.buttons.button.slot.description"
+            translation = "bazaarutils.config.buttons.button.slot_number.description"
     )
     @ConfigOption.Range(min = 0, max = 35)
     public int slotNumber;

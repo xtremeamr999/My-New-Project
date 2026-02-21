@@ -12,34 +12,34 @@
   "bazaarutils.config.general.category.value": "General Config",
   "bazaarutils.config.general.category.description": "Definitions for general data of the mod",
 
-  "bazaarutils.config.general.userBazaarTax.value": "Bazaar Tax (%)",
-  "bazaarutils.config.general.userBazaarTax.description": "The bazaar tax percentage of your current profile considering all possible upgrades.",
+  "bazaarutils.config.general.user_bazaar_tax.value": "Bazaar Tax (%)",
+  "bazaarutils.config.general.user_bazaar_tax.description": "The bazaar tax percentage of your current profile considering all possible upgrades.",
 
-  "bazaarutils.config.general.resetBookmarks.value": "Saved Bookmarks",
-  "bazaarutils.config.general.resetBookmarks.runnable": "Reset",
+  "bazaarutils.config.general.reset_bookmarks.value": "Saved Bookmarks",
+  "bazaarutils.config.general.reset_bookmarks.runnable": "Reset",
 
-  "bazaarutils.config.general.resetLimits.value": "Daily Order Limits",
-  "bazaarutils.config.general.resetLimits.runnable": "Reset",
+  "bazaarutils.config.general.reset_limits.value": "Daily Order Limits",
+  "bazaarutils.config.general.reset_limits.runnable": "Reset",
 
-  "bazaarutils.config.meta.modVersion.value": "Mod Version",
-  "bazaarutils.config.meta.resourcesSha.value": "Resources SHA",
-  "bazaarutils.config.meta.isFirstLoad.value": "First Load?",
+  "bazaarutils.config.meta.mod_version.value": "Mod Version",
+  "bazaarutils.config.meta.resources_sha.value": "Resources SHA",
+  "bazaarutils.config.meta.is_first_load.value": "First Load?",
 
   "bazaarutils.config.chat.category.value": "Chat",
   "bazaarutils.config.chat.category.description": "Configurations for the chat features of the mod",
 
-  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.value": "Useless Bazaar Notifications",
-  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.description": "Enables to remove some of the transient messages sent to the chat by the Bazaar when interacting with it.",
+  "bazaarutils.config.chat.useless_bazaar_notifications_remover.value": "Useless Bazaar Notifications",
+  "bazaarutils.config.chat.useless_bazaar_notifications_remover.description": "Enables to remove some of the transient messages sent to the chat by the Bazaar when interacting with it.",
 
-  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.enabled.value": "Enabled",
+  "bazaarutils.config.chat.useless_bazaar_notifications_remover.enabled.value": "Enabled",
 
-  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.value": "Excluded Notifications",
-  "bazaarutils.config.chat.uselessBazaarNotificationsRemover.excludedNotifications.description": "The list of transient messages/notifications to be excluded/unallowed from the chat",
+  "bazaarutils.config.chat.useless_bazaar_notifications_remover.excluded_notifications.value": "Excluded Notifications",
+  "bazaarutils.config.chat.useless_bazaar_notifications_remover.excluded_notifications.description": "The list of transient messages/notifications to be excluded/unallowed from the chat",
 
-  "bazaarutils.config.chat.stashMessages.value": "Stash Messages",
-  "bazaarutils.config.chat.stashMessages.description": "Enables to remove the messages sent to the chat remembering to pick up your stash.",
+  "bazaarutils.config.chat.stash_messages_remover.value": "Stash Messages",
+  "bazaarutils.config.chat.stash_messages_remover.description": "Enables to remove the messages sent to the chat remembering to pick up your stash.",
 
-  "bazaarutils.config.chat.stashMessages.enabled.value": "Enabled",
+  "bazaarutils.config.chat.stash_messages_remover.enabled.value": "Enabled",
 
   "bazaarutils.config.buttons.category.value": "Buttons",
   "bazaarutils.config.buttons.category.description": "Configurations for the buttons to be injected/handled by the mod",
@@ -49,39 +49,40 @@
   "bazaarutils.config.buttons.button.size.value": "Button Size",
   "bazaarutils.config.buttons.button.spacing.value": "Spacing",
   "bazaarutils.config.buttons.button.offset.value": "Offset",
-  "bazaarutils.config.buttons.button.slot.value": "Slot Number",
-  "bazaarutils.config.buttons.button.slot.description": "The container slot where the button will be registered at",
-  "bazaarutils.config.buttons.button.itemId.value": "Item Id",
-  "bazaarutils.config.buttons.button.itemId.description": "The item id which will be used as a reference to construct the button",
+  "bazaarutils.config.buttons.button.slot_number.value": "Slot Number",
+  "bazaarutils.config.buttons.button.slot_number.description": "The container slot where the button will be registered at",
+  "bazaarutils.config.buttons.button.item_id.value": "Item Id",
+  "bazaarutils.config.buttons.button.item_id.description": "The item id which will be used as a reference to construct the button",
 
   "bazaarutils.config.buttons.separator.general.value": "General Buttons",
   "bazaarutils.config.buttons.separator.general.description": "asdjasdhgasfhga write this shit",
 
-  "bazaarutils.config.buttons.openOrders.value": "Orders Page Button",
-  "bazaarutils.config.buttons.openOrders.description": [
+  "bazaarutils.config.buttons.open_orders.value": "Orders Page Button",
+  "bazaarutils.config.buttons.open_orders.description": [
     "Adds a button to selected menus/screen to quick access your orders page.",
     "\n \n",
     "Requires a ",
     { "text": "Booster Cookie", "color": "light_purple" },
     " effect active in order to function."
   ],
-  "bazaarutils.config.buttons.modSettings.value": "Mod Settings Button",
-  "bazaarutils.config.buttons.modSettings.description": "Adds a button to selected menus/screen to quick access the mods' settings.",
+
+  "bazaarutils.config.buttons.mod_settings.value": "Mod Settings Button",
+  "bazaarutils.config.buttons.mod_settings.description": "Adds a button to selected menus/screen to quick access the mods' settings.",
 
   "bazaarutils.config.buttons.separator.market.value": "Market Buttons",
   "bazaarutils.config.buttons.separator.market.description": "asdjasdhgasfhga write this shit",
 
-  "bazaarutils.config.buttons.cancelOrderAndSearch.value": "Cancel & Search Button",
-  "bazaarutils.config.buttons.cancelOrderAndSearch.description": "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
+  "bazaarutils.config.buttons.cancel_order_and_search.value": "Cancel & Search Button",
+  "bazaarutils.config.buttons.cancel_order_and_search.description": "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
 
-  "bazaarutils.config.buttons.bookmark.value": "Bookmark Item Button",
-  "bazaarutils.config.buttons.bookmark.description": "Adds a button to an items' page to toggle a quick access button to search the same item on the Bazaar.",
+  "bazaarutils.config.buttons.bookmarks.value": "Bookmark Item Button",
+  "bazaarutils.config.buttons.bookmarks.description": "Adds a button to an items' page to toggle a quick access button to search the same item on the Bazaar.",
 
   "bazaarutils.config.inventory.category.value": "Inventory",
   "bazaarutils.config.inventory.category.description": "Configurations for the inventory features of the mod",
 
-  "bazaarutils.config.inventory.instantSellRestrictions.value": "Instant Sell Restrictions",
-  "bazaarutils.config.inventory.instantSellRestrictions.description": [
+  "bazaarutils.config.inventory.instant_sell_restrictions.value": "Instant Sell Restrictions",
+  "bazaarutils.config.inventory.instant_sell_restrictions.description": [
     "Manages a locking functionality over the Bazaars'",
     " ",
     { "text": "Instant Sell", "color": "green" },
@@ -89,9 +90,9 @@
     "button, with inventory as well as action restriction."
   ],
 
-  "bazaarutils.config.inventory.instantSellRestrictions.enabled.value": "Enabled",
-  "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.value": "Clicks Required",
-  "bazaarutils.config.inventory.instantSellRestrictions.clicksRequired.description": [
+  "bazaarutils.config.inventory.instant_sell_restrictions.enabled.value": "Enabled",
+  "bazaarutils.config.inventory.instant_sell_restrictions.clicks_required.value": "Clicks Required",
+  "bazaarutils.config.inventory.instant_sell_restrictions.clicks_required.description": [
     "The amount of clicks required to be pressed on the",
     " ",
     { "text": "Instant Sell", "color": "green" },
@@ -99,19 +100,19 @@
     "item to allow the action."
   ],
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.category.value": "Instant Sell Rules",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.category.description": "Manage the rules to be checked by the Instant Sell Restrictions feature",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.value": "Instant Sell Rules",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.description": "Manage the rules to be checked by the Instant Sell Restrictions feature",
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.enabled.value": "Enabled",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.name.value": "Item Name",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.name.description": "The items' name which if held will lock",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.value": "Predicate Type",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.numericRule.description": "Whether the restriction will be on total coins worth or items held",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.value": "Quantity/Amount",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.restriction.amount.description": "The amount of coins or items held to lock upon",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.enabled.value": "Enabled",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.name.value": "Item Name",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.name.description": "The items' name which if held will lock",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.amount.value": "Quantity/Amount",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.amount.description": "The amount of coins or items held to lock upon",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.numeric.value": "Predicate Type",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.numeric.description": "Whether the restriction will be on total coins worth or items held",
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.numericRestrictions.value": "Number predicates/restrictions",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.numericRestrictions.description": [
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.value": "Number predicates/restrictions",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.description": [
     "These rules check for specific numeric conditions, such as the total number of items or coins, to restrict the",
     " ",
     { "text": "Instant Sell", "color": "green" },
@@ -119,14 +120,14 @@
     "action."
   ],
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.firstNumericRestriction.value": "#1 Number Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.secondNumericRestriction.value": "#2 Number Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.thirdNumericRestriction.value": "#3 Number Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthNumericRestriction.value": "#4 Number Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthNumericRestriction.value": "#5 Number Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_numeric_restriction.value": "#1 Number Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_numeric_restriction.value": "#2 Number Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.third_numeric_restriction.value": "#3 Number Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.fourth_numeric_restriction.value": "#4 Number Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.fifth_numeric_restriction.value": "#5 Number Predicate",
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.stringRestrictions.value": "String predicates/restrictions",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.separator.stringRestrictions.description": [
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.value": "String predicates/restrictions",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.description": [
     "These rules check for specific item names or types to determine if",
     " ",
     { "text": "Instant Sell", "color": "green" },
@@ -134,14 +135,14 @@
     "the action should be restricted."
   ],
 
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.firstStringRestriction.value": "#1 Name Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.secondStringRestriction.value": "#2 Name Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.thirdStringRestriction.value": "#3 Name Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.fourthStringRestriction.value": "#4 Name Predicate",
-  "bazaarutils.config.inventory.instantSellRestrictions.rules.fifthStringRestriction.value": "#5 Name Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_string_restriction.value": "#1 Name Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_string_restriction.value": "#2 Name Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.third_string_restriction.value": "#3 Name Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.fourth_string_restriction.value": "#4 Name Predicate",
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.fifth_string_restriction.value": "#5 Name Predicate",
 
-  "bazaarutils.config.inventory.instantSellHighlight.value": "Instant Sell Highlight",
-  "bazaarutils.config.inventory.instantSellHighlight.description": [
+  "bazaarutils.config.inventory.instant_sell_highlight.value": "Instant Sell Highlight",
+  "bazaarutils.config.inventory.instant_sell_highlight.description": [
     "Highlights the items on your inventory that would be sold by the Bazaars'",
     " ",
     { "text": "Instant Sell", "color": "green" },
@@ -149,50 +150,52 @@
     "button."
   ],
 
-  "bazaarutils.config.inventory.instantSellHighlight.enabled.value": "Enabled",
-  "bazaarutils.config.inventory.instantSellHighlight.color.value": "Highlight Color",
+  "bazaarutils.config.inventory.instant_sell_highlight.enabled.value": "Enabled",
+  "bazaarutils.config.inventory.instant_sell_highlight.color.value": "Highlight Color",
 
-  "bazaarutils.config.inventory.orderStatusHighlight.value": "Order Status Highlight",
-  "bazaarutils.config.inventory.orderStatusHighlight.description": "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
+  "bazaarutils.config.inventory.order_status_highlight.value": "Order Status Highlight",
+  "bazaarutils.config.inventory.order_status_highlight.description": "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
 
-  "bazaarutils.config.inventory.orderStatusHighlight.enabled.value": "Enabled",
+  "bazaarutils.config.inventory.order_status_highlight.enabled.value": "Enabled",
 
-  "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.value": "Competitive Color",
-  "bazaarutils.config.inventory.orderStatusHighlight.competitiveColor.description": "The color to highlight orders which are the best offer to the market",
-  "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.value": "Matched Color",
-  "bazaarutils.config.inventory.orderStatusHighlight.matchedColor.description": "The color to highlight orders which match the market price",
-  "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.value": "Outbid Color",
-  "bazaarutils.config.inventory.orderStatusHighlight.outbidColor.description": "The color to highlight orders which are below the market price",
+  "bazaarutils.config.inventory.order_status_highlight.competitive_color.value": "Competitive Color",
+  "bazaarutils.config.inventory.order_status_highlight.competitive_color.description": "The color to highlight orders which are the best offer to the market",
+  "bazaarutils.config.inventory.order_status_highlight.matched_color.value": "Matched Color",
+  "bazaarutils.config.inventory.order_status_highlight.matched_color.description": "The color to highlight orders which match the market price",
+  "bazaarutils.config.inventory.order_status_highlight.outbid_color.value": "Outbid Color",
+  "bazaarutils.config.inventory.order_status_highlight.outbid_color.description": "The color to highlight orders which are below the market price",
 
   "bazaarutils.config.overlays.category.value": "Overlays",
   "bazaarutils.config.overlays.category.description": "Configurations for the overlays to be created by the mod",
 
-  "bazaarutils.config.overlays.priceCharts.value": "Price Charts",
-  "bazaarutils.config.overlays.priceCharts.description": "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
+  "bazaarutils.config.overlays.price_charts.value": "Price Charts",
+  "bazaarutils.config.overlays.price_charts.description": "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
 
-  "bazaarutils.config.overlays.priceCharts.enabled.value": "Enabled",
+  "bazaarutils.config.overlays.price_charts.enabled.value": "Enabled",
 
-  "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value": "Show Outside of Bazaar",
-  "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description": "Whether to render the charts on tooltips when outside of a Bazaar screen",
+  "bazaarutils.config.overlays.price_charts.show_outside_bazaar.value": "Show Outside of Bazaar",
+  "bazaarutils.config.overlays.price_charts.show_outside_bazaar.description": "Whether to render the charts on tooltips when outside of a Bazaar screen",
 
-  "bazaarutils.config.overlays.bazaarLimitsVisualizer.value": "Bazaar Limits",
-  "bazaarutils.config.overlays.bazaarLimitsVisualizer.description": [
+  "bazaarutils.config.overlays.bazaar_limits_visualizer.value": "Bazaar Limits",
+  "bazaarutils.config.overlays.bazaar_limits_visualizer.description": [
     "Adds informational text to Bazaar Screens about the status of your daily Bazaar Limits.",
     "\n \n",
     "The Bazaar limits each profile to order/offer tradeables for up to 15,000,000,000.00 coins each day."
   ],
 
-  "bazaarutils.config.overlays.bazaarLimitsVisualizer.enabled.value": "Enabled",
+  "bazaarutils.config.overlays.bazaar_limits_visualizer.enabled.value": "Enabled",
 
   "bazaarutils.config.notifications.category.value": "Notifications",
   "bazaarutils.config.notifications.category.description": "Configurations for the notifications to be pushed by the mod",
 
   "bazaarutils.config.developer.category.value": "Developer Config",
   "bazaarutils.config.developer.category.description": "Developer configurations & toggleable tools of the mod",
+
   "bazaarutils.config.developer.enabled.value": "Enabled",
   "bazaarutils.config.developer.enabled.description": "Global toggle for all developer related functionalities/utilities.",
-  "bazaarutils.config.developer.disableErrorNotifications.value": "Disable Error Notifications",
 
-  "bazaarutils.config.developer.debugMessages.value": "Debug Messages",
-  "bazaarutils.config.developer.debugMessages.description": "Configure the messages or notifications pushed to the chat about routines & the state of the mod"
+  "bazaarutils.config.developer.disable_error_notifications.value": "Disable Error Notifications",
+
+  "bazaarutils.config.developer.debug_messages.value": "Debug Messages",
+  "bazaarutils.config.developer.debug_messages.description": "Configure the messages or notifications pushed to the chat about routines & the state of the mod"
 }
