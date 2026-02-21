@@ -2,18 +2,12 @@ package com.github.mkram17.bazaarutils.features.gui.overlays;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
-import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
-import com.github.mkram17.bazaarutils.data.BookmarksStorage;
-import com.github.mkram17.bazaarutils.data.OrderLimitStorage;
+import com.github.mkram17.bazaarutils.data.BazaarLimitsStorage;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmarks;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
@@ -27,16 +21,13 @@ import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
-import lombok.Setter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 @ConfigObject
-public class OrderLimitVisual extends BUListener implements BUToggleableFeature {
+public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFeature {
     private static final double COIN_LIMIT = 15_000_000_000d;
 
     public record OrderLimitEntry(double price, ZonedDateTime time) {
@@ -47,11 +38,11 @@ public class OrderLimitVisual extends BUListener implements BUToggleableFeature 
     }
 
     public static void saveLimits() {
-        OrderLimitStorage.INSTANCE.save();
+        BazaarLimitsStorage.INSTANCE.save();
     }
 
     public static List<OrderLimitEntry> limits() {
-        return OrderLimitStorage.INSTANCE.get();
+        return BazaarLimitsStorage.INSTANCE.get();
     }
 
     @Getter
@@ -61,7 +52,7 @@ public class OrderLimitVisual extends BUListener implements BUToggleableFeature 
     )
     public boolean enabled;
 
-    public OrderLimitVisual(boolean enabled) {
+    public BazaarLimitsVisualizer(boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -74,7 +65,7 @@ public class OrderLimitVisual extends BUListener implements BUToggleableFeature 
                 return;
             }
 
-            OverlaysConfig.orderLimitVisual.removeOldEntries();
+            OverlaysConfig.bazaarLimitsVisualizer.removeOldEntries();
         });
     }
 
@@ -120,9 +111,14 @@ public class OrderLimitVisual extends BUListener implements BUToggleableFeature 
                 .sum();
     }
 
+    private static final int TEXT_HEIGHT = 8;
+    private static final int LINE_GAP = 4;
+    private static final int OVERLAY_WIDTH = 116;
+    private static final int OVERLAY_HEIGHT = TEXT_HEIGHT * 2 + LINE_GAP;
+
     @RegisterWidget
-    public static List<ClickableWidget> getWidget() {
-        if (!OverlaysConfig.orderLimitVisual.enabled) {
+    public static List<TextDisplayWidget> getWidget() {
+        if (!OverlaysConfig.bazaarLimitsVisualizer.enabled) {
             return Collections.emptyList();
         }
 
@@ -135,57 +131,47 @@ public class OrderLimitVisual extends BUListener implements BUToggleableFeature 
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
 
-        String orderedCoinsFormatted = formatNumberWithPrefix(OverlaysConfig.orderLimitVisual.getTotalOrderedCoins());
-
-        return List.of(createLimitWidget(dimensions, orderedCoinsFormatted), createTimeUntilResetWidget(dimensions));
+        return List.of(createLimitWidget(dimensions), createTimeUntilResetWidget(dimensions));
     }
 
-    private static TextDisplayWidget createTimeUntilResetWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions){
-        int spacing = BUCompatibilityHelper.isSkyblockerLoaded()
-                ? 28
-                : 7;
+    private static TextDisplayWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
+        BazaarLimitsVisualizer instance = OverlaysConfig.bazaarLimitsVisualizer;
 
-        int limitWidgetHeight = 16;
+        double ordered = instance.getTotalOrderedCoins();
+        String current = formatNumberWithPrefix(ordered);
+        String max = formatNumberWithPrefix(BazaarLimitsVisualizer.COIN_LIMIT);
 
-        int textSizeX = 43;
-        int widgetX = dimensions.x() + textSizeX;
-        int widgetY = dimensions.y() - spacing - limitWidgetHeight;
+        Formatting color = (ordered >= BazaarLimitsVisualizer.COIN_LIMIT) ? Formatting.RED : Formatting.GREEN;
+        Text message = Text.literal("Bazaar Order Limit: ").formatted(Formatting.GOLD)
+                .append(Text.literal(current).formatted(color))
+                .append(Text.literal(" / " + max).formatted(Formatting.GRAY));
 
+        int spacing = BUCompatibilityHelper.isSkyblockerLoaded() ? 26 : 5;
+
+        int x = dimensions.x();
+        int y = dimensions.y() - spacing - OVERLAY_HEIGHT;
+
+        return new TextDisplayWidget(x, y, OVERLAY_WIDTH, TEXT_HEIGHT, message, TextDisplayWidget.Alignment.LEFT);
+    }
+
+    private static TextDisplayWidget createTimeUntilResetWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
         ZonedDateTime nextReset = TimeUtil.getNextBazaarLimitReset();
-
         Duration duration = Duration.between(ZonedDateTime.now(), nextReset);
+
         long hours = duration.toHours();
         long minutes = duration.toMinutesPart();
 
-        MutableText timeUntilResetFormatted = Text.literal(String.format("%02d:%02d", hours, minutes)).formatted(Formatting.DARK_GREEN);
-        MutableText timeUntilText = Text.literal("Time Until Reset: ").formatted(Formatting.GOLD);
-        Text timeUntilResetText = timeUntilText.append(timeUntilResetFormatted);
+        Formatting urgencyColor = (hours < 1) ? Formatting.RED : (hours < 10 ? Formatting.YELLOW : Formatting.GRAY);
 
-        return new TextDisplayWidget(widgetX, widgetY, 30, 8, timeUntilResetText);
-    }
+        String timeLabel = String.format("%dh %dm", hours, minutes);
+        Text timeText = Text.literal("Until Reset: ").formatted(Formatting.GOLD)
+                .append(Text.literal(timeLabel).formatted(urgencyColor));
 
-    private static ClickableWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions, String orderedCoinsFormatted){
-        OrderLimitVisual instance = OverlaysConfig.orderLimitVisual;
+        int spacing = BUCompatibilityHelper.isSkyblockerLoaded() ? 26 : 5; 
 
-        Text orderedCoinsText = instance.getTotalOrderedCoins() >= OrderLimitVisual.COIN_LIMIT
-                ? Text.literal(orderedCoinsFormatted).formatted(Formatting.RED)
-                : Text.literal(orderedCoinsFormatted).formatted(Formatting.GREEN);
+        int x = dimensions.x();
+        int y = dimensions.y() - spacing - OVERLAY_HEIGHT + TEXT_HEIGHT + LINE_GAP;
 
-        Text limitText = Text.literal("/" + formatNumberWithPrefix(OrderLimitVisual.COIN_LIMIT)).formatted(Formatting.GOLD);
-        Text message = Text.literal("Bazaar Order Limit: ")
-                .formatted(Formatting.GOLD)
-                .append(orderedCoinsText)
-                .append(limitText);
-
-        int spacing = BUCompatibilityHelper.isSkyblockerLoaded()
-                ? 26
-                : 5;
-
-        int textSizeX = 58;
-        int textSizeY = 8;
-        int textX = dimensions.x() + textSizeX;
-        int textY = dimensions.y() - spacing - textSizeY;
-
-        return new TextDisplayWidget(textX, textY, textSizeX, textSizeY, message);
+        return new TextDisplayWidget(x, y, OVERLAY_WIDTH, TEXT_HEIGHT, timeText, TextDisplayWidget.Alignment.LEFT);
     }
 }

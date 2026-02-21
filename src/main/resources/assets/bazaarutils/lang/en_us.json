@@ -157,8 +157,8 @@
   "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value": "Show Outside of Bazaar",
   "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description": "Whether to render the charts on tooltips when outside of a Bazaar screen",
 
-  "bazaarutils.config.overlays.orderLimitVisual.value": "Bazaar Limits",
-  "bazaarutils.config.overlays.orderLimitVisual.description": [
+  "bazaarutils.config.overlays.bazaarLimitsVisualizer.value": "Bazaar Limits",
+  "bazaarutils.config.overlays.bazaarLimitsVisualizer.description": [
     "Adds informational text to Bazaar Screens about the status of your daily Bazaar Limits.",
     "\n \n",
     "The Bazaar limits each profile to order/offer tradeables for up to 15,000,000,000.00 coins each day."
