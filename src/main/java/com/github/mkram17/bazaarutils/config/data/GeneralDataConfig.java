@@ -1,6 +1,7 @@
 package com.github.mkram17.bazaarutils.config.data;
 
 import com.github.mkram17.bazaarutils.features.gui.buttons.Bookmarks;
+import com.github.mkram17.bazaarutils.features.gui.overlays.BazaarLimitsVisualizer;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
 
@@ -35,5 +36,14 @@ public final class GeneralDataConfig {
     public static final Runnable resetBookmarks = () -> {
         Bookmarks.bookmarks().clear();
         Bookmarks.saveBookmarks();
+    };
+
+    @ConfigButton(
+            text = "bazaarutils.config.general.resetLimits.runnable",
+            title = "bazaarutils.config.general.resetLimits.value"
+    )
+    public static final Runnable resetLimits = () -> {
+        BazaarLimitsVisualizer.limits().clear();
+        BazaarLimitsVisualizer.saveLimits();
     };
 }

@@ -18,6 +18,9 @@
   "bazaarutils.config.general.resetBookmarks.value": "Saved Bookmarks",
   "bazaarutils.config.general.resetBookmarks.runnable": "Reset",
 
+  "bazaarutils.config.general.resetLimits.value": "Daily Order Limits",
+  "bazaarutils.config.general.resetLimits.runnable": "Reset",
+
   "bazaarutils.config.meta.modVersion.value": "Mod Version",
   "bazaarutils.config.meta.resourcesSha.value": "Resources SHA",
   "bazaarutils.config.meta.isFirstLoad.value": "First Load?",
