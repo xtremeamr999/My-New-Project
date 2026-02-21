@@ -118,7 +118,7 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                             PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
 
                             SellRestrictionControl newControl = new StringSellRestrictionControl(true, "Example Restriction");
-                            InventoryConfig.instantSellRestrictions.addRule(newControl);
+                            InventoryConfig.INSTANT_SELL_RESTRICTIONS.addRule(newControl);
                             MinecraftClient.getInstance().setScreen(new SellRestrictionsMenu());
                             ConfigUtil.scheduleConfigSave();
                         })

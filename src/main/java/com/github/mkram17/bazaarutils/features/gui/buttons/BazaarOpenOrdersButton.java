@@ -63,7 +63,7 @@ public class BazaarOpenOrdersButton {
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidget() {
-        if (!ButtonsConfig.openOrders.enabled) {
+        if (!ButtonsConfig.OPEN_ORDERS.enabled) {
             return Collections.emptyList();
         }
 
@@ -74,7 +74,7 @@ public class BazaarOpenOrdersButton {
         }
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
-        ItemSlotButtonWidget button = ButtonsConfig.openOrders.getItemSlotButtonWidget(dimensions);
+        ItemSlotButtonWidget button = ButtonsConfig.OPEN_ORDERS.getItemSlotButtonWidget(dimensions);
 
         return Collections.singletonList(button);
     }

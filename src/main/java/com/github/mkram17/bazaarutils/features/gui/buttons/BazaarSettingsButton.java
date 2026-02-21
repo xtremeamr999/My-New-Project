@@ -56,7 +56,7 @@ public class BazaarSettingsButton {
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidget() {
-        if (!ButtonsConfig.modSettings.enabled) {
+        if (!ButtonsConfig.MOD_SETTINGS.enabled) {
             return Collections.emptyList();
         }
 
@@ -69,7 +69,7 @@ public class BazaarSettingsButton {
         String screenTitle = MinecraftClient.getInstance().currentScreen.getTitle().getString();
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenTitle);
-        ItemSlotButtonWidget button = ButtonsConfig.modSettings.getItemSlotButtonWidget(dimensions);
+        ItemSlotButtonWidget button = ButtonsConfig.MOD_SETTINGS.getItemSlotButtonWidget(dimensions);
 
         return Collections.singletonList(button);
     }

@@ -65,7 +65,7 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
                 return;
             }
 
-            OverlaysConfig.bazaarLimitsVisualizer.removeOldEntries();
+            OverlaysConfig.BAZAAR_LIMITS_VISUALIZER.removeOldEntries();
         });
     }
 
@@ -118,7 +118,7 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
 
     @RegisterWidget
     public static List<TextDisplayWidget> getWidget() {
-        if (!OverlaysConfig.bazaarLimitsVisualizer.enabled) {
+        if (!OverlaysConfig.BAZAAR_LIMITS_VISUALIZER.enabled) {
             return Collections.emptyList();
         }
 
@@ -135,7 +135,7 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
     }
 
     private static TextDisplayWidget createLimitWidget(ItemSlotButtonWidget.ScreenWidgetDimensions dimensions) {
-        BazaarLimitsVisualizer instance = OverlaysConfig.bazaarLimitsVisualizer;
+        BazaarLimitsVisualizer instance = OverlaysConfig.BAZAAR_LIMITS_VISUALIZER;
 
         double ordered = instance.getTotalOrderedCoins();
         String current = formatNumberWithPrefix(ordered);

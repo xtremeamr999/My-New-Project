@@ -35,7 +35,7 @@ public final class InventoryConfig {
             value = "Manages a locking functionality over the Bazaars' §aInstant Sell§r button, with inventory state as well as action restriction.",
             translation = "bazaarutils.config.inventory.instantSellRestrictions.description"
     )
-    public static final InstantSellRestrictions instantSellRestrictions = new InstantSellRestrictions(true, 3);
+    public static final InstantSellRestrictions INSTANT_SELL_RESTRICTIONS = new InstantSellRestrictions(true, 3);
 
     @ConfigEntry(
             id = "instantSellHighlight",
@@ -45,7 +45,7 @@ public final class InventoryConfig {
             value = "Highlights the items on your inventory that would be sold by the Bazaars' §aInstant Sell§r button.",
             translation = "bazaarutils.config.inventory.instantSellHighlight.description"
     )
-    public static final InstantSellHighlight instantSellHighlight = new InstantSellHighlight(true, 0xB2FFFF00);
+    public static final InstantSellHighlight INSTANT_SELL_HIGHLIGHT = new InstantSellHighlight(true, 0xB2FFFF00);
 
     @ConfigEntry(
             id = "orderStatusHighlight",
@@ -55,7 +55,7 @@ public final class InventoryConfig {
             value = "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
             translation = "bazaarutils.config.inventory.orderStatusHighlight.description"
     )
-    public static final OrderStatusHighlight orderStatusHighlight = new OrderStatusHighlight(true, 0xFF55FF55, 0xFFFFFF55, 0xFFFF5555);
+    public static final OrderStatusHighlight ORDER_STATUS_HIGHLIGHT = new OrderStatusHighlight(true, 0xFF55FF55, 0xFFFFFF55, 0xFFFF5555);
 
     @Category(value = "instant_sell_rules")
     @ConfigInfo(

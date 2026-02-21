@@ -25,7 +25,7 @@ public final class ChatConfig {
             value = "Enables to remove the transient messages sent to the chat by the Bazaar when interacting with it.",
             translation = "bazaarutils.config.chat.uselessBazaarNotificationsRemover.description"
     )
-    public static final UselessBazaarNotificationsRemover uselessBazaarNotificationsRemover = new UselessBazaarNotificationsRemover(false);
+    public static final UselessBazaarNotificationsRemover USELESS_BAZAAR_NOTIFICATIONS_REMOVER = new UselessBazaarNotificationsRemover(false);
 
     @ConfigEntry(
             id = "STASH_MESSAGES_REMOVER",
@@ -35,5 +35,5 @@ public final class ChatConfig {
             value = "Enables to remove the messages sent to the chat remembering to pick up your stash.",
             translation = "bazaarutils.config.chat.STASH_MESSAGES_REMOVER.description"
     )
-    public static final StashMessagesRemover stashMessagesRemover = new StashMessagesRemover(false);
+    public static final StashMessagesRemover STASH_MESSAGES_REMOVER = new StashMessagesRemover(false);
 }

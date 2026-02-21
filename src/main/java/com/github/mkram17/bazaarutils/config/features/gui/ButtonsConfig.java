@@ -30,7 +30,7 @@ public final class ButtonsConfig {
             value = "Adds a button to selected menus/screen to quick access the mods' settings.",
             translation = "bazaarutils.config.buttons.modSettings.description"
     )
-    public static final BazaarSettingsButton modSettings = new BazaarSettingsButton(true);
+    public static final BazaarSettingsButton MOD_SETTINGS = new BazaarSettingsButton(true);
 
     @ConfigEntry(id = "openOrders", translation = "bazaarutils.config.buttons.openOrders.value")
     @Comment(
@@ -41,7 +41,7 @@ public final class ButtonsConfig {
             """,
             translation = "bazaarutils.config.buttons.openOrders.description"
     )
-    public static final BazaarOpenOrdersButton openOrders = new BazaarOpenOrdersButton(true);
+    public static final BazaarOpenOrdersButton OPEN_ORDERS = new BazaarOpenOrdersButton(true);
 
     @ConfigEntry(id = "marketSeparator")
     @ConfigOption.Hidden
@@ -56,12 +56,12 @@ public final class ButtonsConfig {
             value = "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item.",
             translation = "bazaarutils.config.buttons.cancelOrderAndSearch.description"
     )
-    public static final CancelOrderAndSearch cancelOrderAndSearch = new CancelOrderAndSearch(false, 25, Items.BLUE_TERRACOTTA.toString());
+    public static final CancelOrderAndSearch CANCEL_ORDER_AND_SEARCH = new CancelOrderAndSearch(false, 25, Items.BLUE_TERRACOTTA.toString());
 
     @ConfigEntry(id = "bookmark", translation = "bazaarutils.config.buttons.bookmark.value")
     @Comment(
             value = "Adds a button to an item's page to toggle a quick access button to search the same item on the Bazaar.",
             translation = "bazaarutils.config.buttons.bookmark.description"
     )
-    public static final Bookmarks bookmark = new Bookmarks(true,0, ItemStack.EMPTY, 18, 4);
+    public static final Bookmarks BOOKMARKS = new Bookmarks(true,0, ItemStack.EMPTY, 18, 4);
 }

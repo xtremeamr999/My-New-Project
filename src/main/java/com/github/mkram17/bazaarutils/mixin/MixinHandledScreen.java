@@ -78,7 +78,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 			return;
 
 		var config = BUConfig.get().feature;
-		if(InventoryConfig.orderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
+		if(InventoryConfig.ORDER_STATUS_HIGHLIGHT.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
 			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
 		}
 	}
@@ -92,7 +92,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 			return;
 
 		var config = BUConfig.get().feature;
-		if (InventoryConfig.instantSellHighlight.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
+		if (InventoryConfig.INSTANT_SELL_HIGHLIGHT.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
 			draw(context, slot.x, slot.y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
 		}
 	}

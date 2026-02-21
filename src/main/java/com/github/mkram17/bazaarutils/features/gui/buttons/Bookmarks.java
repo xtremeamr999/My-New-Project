@@ -217,7 +217,7 @@ public class Bookmarks extends BUListener implements CustomItemButton {
 
     @RegisterWidget
     public static List<ItemSlotButtonWidget> getWidgets() {
-        if (!ButtonsConfig.bookmark.enabled) {
+        if (!ButtonsConfig.BOOKMARKS.enabled) {
             return Collections.emptyList();
         }
 
@@ -232,8 +232,8 @@ public class Bookmarks extends BUListener implements CustomItemButton {
 
         ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
 
-        int buttonSize = ButtonsConfig.bookmark.size;
-        int spacing = ButtonsConfig.bookmark.spacing;
+        int buttonSize = ButtonsConfig.BOOKMARKS.size;
+        int spacing = ButtonsConfig.BOOKMARKS.spacing;
         int buttonX = dimensions.x() + dimensions.backgroundWidth() + spacing;
         int currentButtonY = dimensions.y() + spacing;
 

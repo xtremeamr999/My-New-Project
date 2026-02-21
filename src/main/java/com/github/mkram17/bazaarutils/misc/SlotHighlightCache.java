@@ -1,14 +1,12 @@
 package com.github.mkram17.bazaarutils.misc;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.inventory.Inventory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,8 +30,8 @@ public class SlotHighlightCache {
         var screenInfo = ScreenInfo.getCurrentScreenInfo();
         if(!screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN, ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) return;
 
-        InventoryConfig.orderStatusHighlight.updateHighlightCache(event.getItemStacks());
-        InventoryConfig.instantSellHighlight.updateHighlightCache();
+        InventoryConfig.ORDER_STATUS_HIGHLIGHT.updateHighlightCache(event.getItemStacks());
+        InventoryConfig.INSTANT_SELL_HIGHLIGHT.updateHighlightCache();
     }
 
     @RunOnInit

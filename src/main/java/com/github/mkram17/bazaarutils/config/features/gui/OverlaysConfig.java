@@ -25,7 +25,7 @@ public class OverlaysConfig {
             value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
             translation = "bazaarutils.config.overlays.priceCharts.description"
     )
-    public static final PriceCharts priceCharts = new PriceCharts(false, true);
+    public static final PriceCharts PRICE_CHARTS = new PriceCharts(false, true);
 
     @ConfigEntry(
             id = "bazaarLimitsVisualizer",
@@ -35,6 +35,6 @@ public class OverlaysConfig {
             value = "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
             translation = "bazaarutils.config.overlays.bazaarLimitsVisualizer.description"
     )
-    public static final BazaarLimitsVisualizer bazaarLimitsVisualizer = new BazaarLimitsVisualizer(true);
+    public static final BazaarLimitsVisualizer BAZAAR_LIMITS_VISUALIZER = new BazaarLimitsVisualizer(true);
 }
 
