@@ -167,6 +167,8 @@
   "bazaarutils.config.overlays.priceCharts.value": "Price Charts",
   "bazaarutils.config.overlays.priceCharts.description": "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
 
+  "bazaarutils.config.overlays.priceCharts.enabled.value": "Enabled",
+
   "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.value": "Show Outside of Bazaar",
   "bazaarutils.config.overlays.priceCharts.showOutsideBazaar.description": "Whether to render the charts on tooltips when outside of a Bazaar screen",
 
@@ -176,6 +178,8 @@
     "\n \n",
     "The Bazaar limits each profile to order/offer tradeables for up to 15,000,000,000.00 coins each day."
   ],
+
+  "bazaarutils.config.overlays.bazaarLimitsVisualizer.enabled.value": "Enabled",
 
   "bazaarutils.config.notifications.category.value": "Notifications",
   "bazaarutils.config.notifications.category.description": "Configurations for the notifications to be pushed by the mod",

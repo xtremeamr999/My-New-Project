@@ -33,7 +33,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     @Getter
     @ConfigEntry(
             id = "enabled",
-            translation = "bazaarutils.config.buttons.button.enabled.value"
+            translation = "bazaarutils.config.overlays.priceCharts.enabled.value"
     )
     public boolean enabled;
 
