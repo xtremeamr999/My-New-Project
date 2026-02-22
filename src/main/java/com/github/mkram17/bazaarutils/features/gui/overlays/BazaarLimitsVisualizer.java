@@ -10,8 +10,8 @@ import com.github.mkram17.bazaarutils.data.BazaarLimitsStorage;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RegisterWidget;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;

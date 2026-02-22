@@ -2,7 +2,7 @@ package com.github.mkram17.bazaarutils.utils.storage;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.util.EventPriorities;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.codecs.CodecGsonAdapter;
 import com.github.mkram17.bazaarutils.utils.codecs.ZonedDateTimeCodec;

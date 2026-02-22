@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.misc.autoregistration;
+package com.github.mkram17.bazaarutils.utils.annotations.autoregistration;
 
 import com.github.mkram17.bazaarutils.events.util.EventPriorities;
 
