@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils.config;
 
-import com.github.mkram17.bazaarutils.config.hidden.GeneralDataConfig;
 import com.github.mkram17.bazaarutils.config.hidden.MetadataConfig;
 import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.features.FeatureConfig;
@@ -25,7 +24,6 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.MOD_ID;
 @Config(
         value =  MOD_ID + "/config",
         categories = {
-                GeneralDataConfig.class,
                 MetadataConfig.class,
                 ChatConfig.class,
                 ButtonsConfig.class,
@@ -77,7 +75,6 @@ public final class BUConfig {
     )
     public static PlayerAccountUpgrades.BazaarFlipper USER_BAZAAR_FLIPPER_ACCOUNT_UPGRADE = PlayerAccountUpgrades.BazaarFlipper.NOT_UPGRADED;
 
-    public GeneralDataConfig general = new GeneralDataConfig();
     public FeatureConfig feature = new FeatureConfig();
 
     public static final Map<Integer, UnaryOperator<JsonObject>> PATCHES = ConfigPatches.loadPatches();
