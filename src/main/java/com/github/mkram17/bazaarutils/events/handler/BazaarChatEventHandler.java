@@ -133,6 +133,7 @@ public class BazaarChatEventHandler {
         if (orderMatch.isPresent()) {
             orderMatch.get().setFilled();
             PlayerActionUtil.notifyAll(order.getName() + "[" + orderMatch.get().getIndex() + "] was filled", NotificationType.ORDERDATA);
+            UserOrdersStorage.INSTANCE.save();
         } else {
             Util.notifyError("Could not find item to fill with info vol: " + order.getVolume() + " name: " + order.getName(), new Exception("Order Filled Event error"));
         }
