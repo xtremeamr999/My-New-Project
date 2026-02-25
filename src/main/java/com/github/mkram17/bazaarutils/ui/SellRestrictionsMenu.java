@@ -10,8 +10,13 @@ import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.contro
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.StringSellRestrictionControl;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
+/*? if 1.21.11 {*/
+/*import io.wispforest.owo.ui.component.UIComponents;
+import io.wispforest.owo.ui.container.UIContainers;
+*//*?} else {*/
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
+/*?}*/
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +34,11 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
+        /*? if 1.21.11 {*/
+        /*return OwoUIAdapter.create(this, UIContainers::verticalFlow);
+         *//*?} else {*/
         return OwoUIAdapter.create(this, Containers::verticalFlow);
+        /*?}*/
     }
 
     @Override
@@ -37,12 +46,20 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
         rootComponent.surface(Surface.blur(BACKGROUND_BLUR_QUALITY, BACKGROUND_BLUR_SIZE))
                 .verticalAlignment(VerticalAlignment.CENTER)
                 .horizontalAlignment(HorizontalAlignment.CENTER);
+        /*? if 1.21.11 {*/
+        /*FlowLayout horizontalFlow = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
+         *//*?} else {*/
         FlowLayout horizontalFlow = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
+        /*?}*/
         horizontalFlow.child(generateNewRestrictionsParent());
 
 
         // Center: Orders (wrap in full-size container that centers its child)
+        /*? if 1.21.11 {*/
+        /*FlowLayout centered = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
+         *//*?} else {*/
         FlowLayout centered = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        /*?}*/
         centered.child(generateUserRestrictionsParent());
 
         horizontalFlow.child(centered);
@@ -50,11 +67,23 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
         rootComponent.child(horizontalFlow);
     }
 
+    /*? if 1.21.11 {*/
+    /*private UIComponent generateUserRestrictionsParent() {
+     *//*?} else {*/
     private Component generateUserRestrictionsParent() {
+        /*?}*/
         var customOrders = BUConfig.get().feature.customOrders;
+        /*? if 1.21.11 {*/
+        /*ParentUIComponent parent;
+         *//*?} else {*/
         ParentComponent parent;
+        /*?}*/
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
+            /*? if 1.21.11 {*/
+            /*parent = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
+             *//*?} else {*/
             parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
+            /*?}*/
         } else {
             parent = generateRestrictionsContainer();
         }
@@ -64,9 +93,17 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                 .margins(Insets.top(20));
     }
 
+    /*? if 1.21.11 {*/
+    /*private ParentUIComponent generateRestrictionsContainer() {
+     *//*?} else {*/
     private ParentComponent generateRestrictionsContainer() {
+        /*?}*/
         var sellRestrictions = InventoryConfig.SellRestrictionsRules.restrictors();
+        /*? if 1.21.11 {*/
+        /*var verticalFlow = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
+         *//*?} else {*/
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        /*?}*/
 
 
         for (SellRestrictionControl control : sellRestrictions) {
@@ -76,9 +113,18 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
         return verticalFlow.padding(Insets.of(20));
     }
 
+    /*? if 1.21.11 {*/
+    /*private ParentUIComponent generateNewRestrictionsParent() {
+     *//*?} else {*/
     private ParentComponent generateNewRestrictionsParent() {
+        /*?}*/
+        /*? if 1.21.11 {*/
+        /*var horizontalFlow = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+        horizontalFlow.child(UIComponents.label(Text.literal("New Sell Restriction").formatted(Formatting.BOLD)).margins(Insets.of(10)));
+        *//*?} else {*/
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         horizontalFlow.child(Components.label(Text.literal("New Sell Restriction").formatted(Formatting.BOLD)).margins(Insets.of(10)));
+        /*?}*/
         horizontalFlow.child(addRestrictionTypeDropdown());
         horizontalFlow.child(addRestrictionButton());
 
@@ -89,15 +135,19 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                 .verticalAlignment(VerticalAlignment.CENTER);
     }
 
+    /*? if 1.21.11 {*/
+    /*private UIComponent addRestrictionTypeDropdown() {
+     *//*?} else {*/
     private Component addRestrictionTypeDropdown() {
+        /*?}*/
         SingleOptionCheckboxDropdownComponent dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
         return dropdown.closeWhenNotHovered(false)
                 .checkbox(Text.literal("Restrict By Name"),
                         restrictionType == StringRestrictBy.NAME,
                         button -> {
-                    dropdown.disableCheckboxes();
-                    restrictionType = (T) StringRestrictBy.NAME;
-                })
+                            dropdown.disableCheckboxes();
+                            restrictionType = (T) StringRestrictBy.NAME;
+                        })
                 .checkbox(Text.literal("Restrict By Volume"),
                         restrictionType == NumericRestrictBy.VOLUME,
                         button -> {
@@ -112,8 +162,13 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                         });
     }
 
+    /*? if 1.21.11 {*/
+    /*private UIComponent addRestrictionButton() {
+        return UIComponents.button(
+                        *//*?} else {*/
     private Component addRestrictionButton() {
         return Components.button(
+                        /*?}*/
                         Text.literal("Add"),
                         button -> {
                             PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
@@ -127,15 +182,28 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
     }
 
     private FlowLayout generateRestrictionButton(SellRestrictionControl control) {
+        /*? if 1.21.11 {*/
+        /*var horizontalFlow = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+         *//*?} else {*/
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+        /*?}*/
         String garbageCanEmoji = "\uD83D\uDDD1";
 
+        /*? if 1.21.11 {*/
+        /*horizontalFlow.child(
+                UIComponents.label(
+                        Text.literal("Restrict Insta Selling: " + control.getRule())
+                ).margins(Insets.of(3, 3, 3, 1))
+        ).child(
+                UIComponents.button(
+                        *//*?} else {*/
         horizontalFlow.child(
                 Components.label(
                         Text.literal("Restrict Insta Selling: " + control.getRule())
                 ).margins(Insets.of(3, 3, 3, 1))
         ).child(
                 Components.button(
+                        /*?}*/
                         Text.literal(garbageCanEmoji),
                         button -> {
 //                            dumb and not functional, we have to decide whether we still have this owo screen or not.

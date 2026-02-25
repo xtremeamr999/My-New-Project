@@ -71,30 +71,51 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	}
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
+			/*? if 1.21.11 {*/
+	/*private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {
+	 *//*?} else {*/
 	private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
+		/*?}*/
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-		if (slot == null || !slot.hasStack() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN))
-			return;
-		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory())
-			return;
 
-		var config = BUConfig.get().feature;
-		if(OrderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())){
+		if (slot == null || !slot.hasStack() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.ORDER_SCREEN)) {
+			return;
+		}
+
+		if (MinecraftClient.getInstance().player != null && slot.inventory == MinecraftClient.getInstance().player.getInventory()) {
+			return;
+		}
+
+		if (OrderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())) {
+			/*? if 1.21.11 {*/
+			/*draw(context, x, y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
+			 *//*?} else {*/
 			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
+			/*?}*/
 		}
 	}
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
+			/*? if 1.21.11 {*/
+	/*private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {
+	 *//*?} else {*/
 	private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
+		/*?}*/
 		ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-		if (slot == null || !slot.hasStack() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE))
+		if (slot == null || !slot.hasStack() || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
 			return;
-		if (MinecraftClient.getInstance().player != null && !(slot.inventory == MinecraftClient.getInstance().player.getInventory()))
-			return;
+		}
 
-		var config = BUConfig.get().feature;
+		if (MinecraftClient.getInstance().player != null && !(slot.inventory == MinecraftClient.getInstance().player.getInventory())) {
+			return;
+		}
+
 		if (InstantSellHighlight.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
+			/*? if 1.21.11 {*/
+			/*draw(context, x, y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
+			 *//*?} else {*/
 			draw(context, slot.x, slot.y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
+			/*?}*/
 		}
 	}
 
@@ -109,3 +130,4 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 	}
 
 }
+

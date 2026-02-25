@@ -1,9 +1,17 @@
 package com.github.mkram17.bazaarutils.ui;
 
+/*? if 1.21.11 {*/
+/*import io.wispforest.owo.ui.base.BaseUIComponent;
+import io.wispforest.owo.ui.component.UIComponents;
+import io.wispforest.owo.ui.container.UIContainers;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+*//*?} else {*/
 import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.core.OwoUIDrawContext;
+/*?}*/
+import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import io.wispforest.owo.ui.parsing.UIModel;
@@ -36,7 +44,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
     protected SingleOptionCheckboxDropdownComponent(Sizing horizontalSizing) {
         super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
 
+        /*? if 1.21.11 {*/
+        /*this.entries = UIContainers.verticalFlow(horizontalSizing, Sizing.content());
+         *//*?} else {*/
         this.entries = Containers.verticalFlow(horizontalSizing, Sizing.content());
+        /*?}*/
         this.entries.padding(Insets.of(1));
         this.entries.allowOverflow(true);
         this.entries.surface(Surface.flat(0xC7000000).and(Surface.blur(3, 5)).and(Surface.outline(0xFF121212)));
@@ -55,7 +67,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
      * @param mouseY        The y-coordinate at which to open the dropdown
      * @param builder       A function to add entries to the dropdown
      */
+    /*? if 1.21.11 {*/
+    /*public static <R extends ParentUIComponent> SingleOptionCheckboxDropdownComponent openContextMenu(Screen screen, R rootComponent, BiConsumer<R, SingleOptionCheckboxDropdownComponent> mountFunction, double mouseX, double mouseY, Consumer<SingleOptionCheckboxDropdownComponent> builder) {
+     *//*?} else {*/
     public static <R extends ParentComponent> SingleOptionCheckboxDropdownComponent openContextMenu(Screen screen, R rootComponent, BiConsumer<R, SingleOptionCheckboxDropdownComponent> mountFunction, double mouseX, double mouseY, Consumer<SingleOptionCheckboxDropdownComponent> builder) {
+        /*?}*/
         var dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
         builder.accept(dropdown);
 
@@ -85,12 +101,20 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
     }
 
     @Override
+            /*? if 1.21.11 {*/
+    /*public ParentUIComponent surface(Surface surface) {
+     *//*?} else {*/
     public ParentComponent surface(Surface surface) {
+        /*?}*/
         return this.entries.surface(surface);
     }
 
     @Override
+            /*? if 1.21.11 {*/
+    /*public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+     *//*?} else {*/
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+        /*?}*/
         super.draw(context, mouseX, mouseY, partialTicks, delta);
         if (this.closeWhenNotHovered && !this.isInBoundingBox(mouseX, mouseY)) {
             this.queue(() -> {
@@ -105,7 +129,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         super.layout(space);
 
         var entries = this.entries.children();
+        /*? if 1.21.11 {*/
+        /*for (UIComponent entry : entries) {
+         *//*?} else {*/
         for (Component entry : entries) {
+            /*?}*/
             if (!(entry instanceof ResizeableComponent sizeable)) continue;
 
             sizeable.setWidth(this.entries.width() - this.entries.padding().get().horizontal() - entry.margins().get().horizontal());
@@ -118,7 +146,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
     }
 
     public SingleOptionCheckboxDropdownComponent text(Text text) {
+        /*? if 1.21.11 {*/
+        /*this.entries.child(UIComponents.label(text).color(Color.ofFormatting(Formatting.GRAY)).margins(Insets.of(2)));
+         *//*?} else {*/
         this.entries.child(Components.label(text).color(Color.ofFormatting(Formatting.GRAY)).margins(Insets.of(2)));
+        /*?}*/
         return this;
     }
 
@@ -140,7 +172,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
     }
 
     @Override
+            /*? if 1.21.11 {*/
+    /*public FlowLayout removeChild(UIComponent child) {
+     *//*?} else {*/
     public FlowLayout removeChild(Component child) {
+        /*?}*/
         if (child == this.entries) {
             this.queue(() -> {
                 this.closeWhenNotHovered(false);
@@ -201,7 +237,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         }
     }
 
+    /*? if 1.21.11 {*/
+    /*protected static void drawIconFromTexture(OwoUIGraphics context, ParentUIComponent dropdown, int y, int u, int v) {
+     *//*?} else {*/
     protected static void drawIconFromTexture(OwoUIDrawContext context, ParentComponent dropdown, int y, int u, int v) {
+        /*?}*/
         context.drawTexture(RenderPipelines.GUI_TEXTURED, ICONS_TEXTURE,
                 dropdown.x() + dropdown.width() - dropdown.padding().get().right() - 10, y,
                 u, v,
@@ -214,14 +254,22 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         void setWidth(int width);
     }
 
+    /*? if 1.21.11 {*/
+    /*protected static class Divider extends BaseUIComponent implements ResizeableComponent {
+     *//*?} else {*/
     protected static class Divider extends BaseComponent implements ResizeableComponent {
+        /*?}*/
 
         public Divider() {
             this.sizing(Sizing.fixed(1));
         }
 
         @Override
+                /*? if 1.21.11 {*/
+        /*public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+         *//*?} else {*/
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            /*?}*/
             var margins = this.margins.get();
             context.fill(
                     this.x - margins.left(),
@@ -257,7 +305,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         }
 
         @Override
+                /*? if 1.21.11 {*/
+        /*public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+         *//*?} else {*/
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            /*?}*/
             super.draw(context, mouseX, mouseY, partialTicks, delta);
             drawIconFromTexture(context, this.parent, this.y, 0, 16);
 
@@ -299,7 +351,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         }
 
         @Override
+                /*? if 1.21.11 {*/
+        /*public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+         *//*?} else {*/
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            /*?}*/
             if (this.isInBoundingBox(mouseX, mouseY)) {
                 var margins = this.margins.get();
                 context.fill(
@@ -345,7 +401,11 @@ public class SingleOptionCheckboxDropdownComponent extends FlowLayout {
         }
 
         @Override
+                /*? if 1.21.11 {*/
+        /*public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+         *//*?} else {*/
         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+            /*?}*/
             super.draw(context, mouseX, mouseY, partialTicks, delta);
             drawIconFromTexture(context, this.parent, this.y, this.state ? 16 : 0, 0);
         }

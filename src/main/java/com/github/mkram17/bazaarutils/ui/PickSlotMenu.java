@@ -83,11 +83,19 @@ public class PickSlotMenu extends Screen {
         recalcPanel();
     }
 
+    /*? if 1.21.11 {*/
+    /*@Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        recalcPanel();
+    }
+    *//*?} else {*/
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         super.resize(client, width, height);
         recalcPanel();
     }
+    /*?}*/
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {

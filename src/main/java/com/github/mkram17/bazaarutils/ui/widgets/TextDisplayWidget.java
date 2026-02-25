@@ -7,7 +7,6 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 
-
 public class TextDisplayWidget extends ClickableWidget {
     public enum Alignment {
         LEFT,

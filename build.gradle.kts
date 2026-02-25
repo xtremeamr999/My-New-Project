@@ -1,6 +1,5 @@
-
 plugins {
-    id("fabric-loom") version "1.11-SNAPSHOT"
+    id("fabric-loom") version "1.15-SNAPSHOT"
     id("maven-publish")
     `maven-publish`
     java
@@ -32,6 +31,9 @@ repositories {
     }
     maven("https://maven.wispforest.io") {
         name = "Owo Lib"
+    }
+    maven("https://jitpack.io") {
+        name = "Jit Pack"
     }
 
     exclusiveContent {
@@ -80,6 +82,12 @@ dependencies {
     include("net.hypixel:hypixel-api-transport-apache:4.4")
     include("net.hypixel:hypixel-api-core:4.4")
 
+    // Apache HTTP Client + all transitive deps — no longer bundled as of 1.21.11
+    include("org.apache.httpcomponents:httpclient:4.5.14")
+    include("org.apache.httpcomponents:httpcore:4.4.16")
+    include("commons-logging:commons-logging:1.2")
+    include("commons-codec:commons-codec:1.16.0")
+
     // Config lib and settings screen
     modImplementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-${deps["resourcefulconfig_version"]}")
 
@@ -104,7 +112,6 @@ dependencies {
     modImplementation("io.wispforest:owo-lib:${deps["owo_version"]}")
     //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
     include("io.wispforest:owo-sentinel:${deps["owo_version"]}")
-
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
