@@ -6,8 +6,8 @@ import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
-import com.github.mkram17.bazaarutils.features.gui.inventory.InstantSellHighlight;
 import com.github.mkram17.bazaarutils.features.gui.inventory.OrderStatusHighlight;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
@@ -74,8 +74,8 @@ public abstract class MixinHandledScreen extends Screen {
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 			/*? if 1.21.11 {*/
-	/*private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {*/
-			/*?} else {*/
+	/*private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {
+			*//*?} else {*/
 	private void drawOnItem_OrderStatusHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
 		/*?}*/
 		if (slot == null || !slot.hasStack() || !ScreenManager.getInstance().isCurrent(BazaarScreens.ORDERS_PAGE)) {
@@ -86,10 +86,10 @@ public abstract class MixinHandledScreen extends Screen {
 			return;
 		}
 
-		if (OrderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())) {
+		if (BazaarUtilsModules.OrderStatusHighlight.isEnabled() && SlotHighlightCache.orderStatusHighlightCache.containsKey(slot.getIndex())) {
 			/*? if 1.21.11 {*/
-			/*draw(context, x, y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));*/
-			/*?} else {*/
+			/*draw(context, x, y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
+			*//*?} else {*/
 			draw(context, slot.x, slot.y, SlotHighlightCache.orderStatusHighlightCache.get(slot.getIndex()));
 			/*?}*/
 		}
@@ -97,8 +97,8 @@ public abstract class MixinHandledScreen extends Screen {
 
 	@Inject(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawItem(Lnet/minecraft/item/ItemStack;III)V"))
 			/*? if 1.21.11 {*/
-	/*private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {*/
-			/*?} else {*/
+	/*private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, int x, int y, CallbackInfo ci) {
+			*//*?} else {*/
 	private void drawOnItem_InstaSellHighlight(DrawContext context, Slot slot, CallbackInfo ci) {
 		/*?}*/
 		if (slot == null || !slot.hasStack() || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
@@ -109,10 +109,10 @@ public abstract class MixinHandledScreen extends Screen {
 			return;
 		}
 
-		if (InstantSellHighlight.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
+		if (BazaarUtilsModules.InstantSellHighlight.isEnabled() && SlotHighlightCache.instaSellHighlightCache.containsKey(slot.getIndex())) {
 			/*? if 1.21.11 {*/
-			/*draw(context, x, y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));*/
-			/*?} else {*/
+			/*draw(context, x, y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
+			*//*?} else {*/
 			draw(context, slot.x, slot.y, SlotHighlightCache.instaSellHighlightCache.get(slot.getIndex()));
 			/*?}*/
 		}

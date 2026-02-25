@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.features.DisableErrorNotifications;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -93,7 +94,7 @@ public class Util {
                     }
                 });
 
-        if (!DisableErrorNotifications.isEnabled()) {
+        if (!BazaarUtilsModules.DisableErrorNotifications.isEnabled()) {
             PlayerActionUtil.sendPlayerMessage(messageText);
         }
 

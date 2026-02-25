@@ -2,7 +2,6 @@ package com.github.mkram17.bazaarutils.utils.minecraft.gui;
 
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.ScreenChangeEvent;
-import com.github.mkram17.bazaarutils.events.SignOpenEvent;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
@@ -18,19 +17,19 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
-//TODO make inBazaar() work all the time
 public class ScreenManager {
     @Getter
     private static final ScreenManager instance = new ScreenManager();
@@ -41,32 +40,7 @@ public class ScreenManager {
 
         EVENT_BUS.subscribe(ScreenManager.class);
 
-        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            instance.setCurrentScreen(screen);
-        });
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private static void onScreenChange(ScreenChangeEvent event) {
-        instance.setCurrentScreen(event.getNewScreen());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private static void onChestLoaded(ChestLoadedEvent event) {
-        ContainerManager.onChestLoaded(event);
-
-        // Ensures that the instances' state matches that of the loaded screen:container per this event
-        if (instance.current != null && (instance.current.type() == null || instance.current.screen() == event.getGenericContainerScreen())) {
-            instance.current = new ScreenSnapshot(
-                    event.getGenericContainerScreen(),
-                    matchType(event.getGenericContainerScreen()).orElse(null)
-            );
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private static void onSignOpened(SignOpenEvent event){
-        instance.setCurrentScreen(event.getSignEditScreen());
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> instance.setCurrentScreen(screen));
     }
 
     private static final Set<ScreenType> types = ConcurrentHashMap.newKeySet();
@@ -78,59 +52,205 @@ public class ScreenManager {
     }
 
     public static Optional<ScreenType> matchType(Screen screen) {
-        if (screen instanceof GenericContainerScreen gcs) {
-            if (gcs.getScreenHandler() == null || gcs.getScreenHandler().getInventory() == null) {
-                return Optional.empty();
-            }
-        }
-
         for (ScreenType type : types) {
             try {
-                if (type.test(screen)) {
-                    return Optional.of(type);
-                }
-            } catch (Exception e) {
-                return Optional.empty();
+                if (type.test(screen)) return Optional.of(type);
+            } catch (Exception ignored) {
             }
         }
         return Optional.empty();
     }
 
-    public record ScreenSnapshot(
-            Screen screen,
-            ScreenType type
-    ) {}
+    public record ScreenSnapshot(Screen screen, ScreenType type) {
+        @Override
+        public @NotNull String toString() {
+            return typeLabel(type) + " " + (screen != null ? screen.getClass().getSimpleName() : "null");
+        }
+    }
 
-    public void setCurrentScreen(Screen screen) {
-        if (current != null && current.screen() == screen) {
+    private static final int MAX_HISTORY = 8;
+
+    private final ArrayDeque<ScreenSnapshot> history = new ArrayDeque<>(MAX_HISTORY);
+
+    /**
+     * True immediately after a screen closes that is known to cause the server to
+     * open a follow-up screen, leaving Minecraft momentarily with no current screen
+     * between the two (so the follow-up arrives with prev=null).
+     * <p>
+     * This distinguishes two structurally identical events:
+     *   (a) prev=null, next=Screen after a follow-up close → history is valid, keep it
+     *   (b) prev=null, next=Screen from the game world     → history is stale, clear it
+     * Reset as soon as the follow-up screen is pushed.
+     */
+    private boolean expectingServerFollowUp = false;
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private static void onScreenChange(ScreenChangeEvent event) {
+        Screen next = event.getNewScreen();
+        Screen prev = event.getOldScreen();
+
+        if (next == null) {
+            if (prev == null) return;
+
+            // A screen closed. We check whether it is a known overlay which double nulls currentScreen
+            instance.expectingServerFollowUp = isFollowUpScreen(prev);
+//            instance.logHistory("CLOSE  " + typeLabel(instance.history.isEmpty() ? null : instance.history.peekFirst().type()));
+            instance.logHistoryCompact("CLOSE");
             return;
         }
 
-        previous = current;
-        current = new ScreenSnapshot(screen, matchType(screen).orElse(null));
+        // A real screen is arriving. prev=null means nothing was open before it — either
+        // we're starting fresh from the game world, or a server follow-up just arrived.
+        if (prev == null && !instance.expectingServerFollowUp && !instance.history.isEmpty()) {
+            instance.history.clear();
+//            instance.logHistory("CLEAR  (new session)");
+            instance.logHistoryCompact("CLEAR");
+        }
+        instance.expectingServerFollowUp = false;
+
+        instance.setCurrentScreen(next);
     }
-
-    private ScreenSnapshot current;
-
-    public Optional<ScreenContext> current() {
-        return Optional.ofNullable(current).map(ScreenContext::new);
-    }
-
-    private ScreenSnapshot previous;
 
     /**
-     * Gets a temporary ScreenContext object representing the previous screen.
-     * Returns null if there was no previous screen.
+     * Returns true for screens that are known to cause the server to immediately open
+     * a follow-up screen after they close, resulting in a prev=null arrival.
      */
-    public Optional<ScreenContext> previous() {
-        return Optional.ofNullable(previous).map(ScreenContext::new);
+    private static boolean isFollowUpScreen(Screen screen) {
+        return screen instanceof SignEditScreen;
     }
 
-    /*
-     * returns true if the instance is in any of the specified types of bazaar menus
-     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private static void onChestLoaded(ChestLoadedEvent event) {
+        ContainerManager.onChestLoaded(event);
+
+        GenericContainerScreen screen = event.getGenericContainerScreen();
+        ScreenType resolved = matchType(screen).orElse(null);
+
+        List<ScreenSnapshot> list = new ArrayList<>(instance.history);
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).screen() == screen) {
+                list.set(i, new ScreenSnapshot(screen, resolved));
+                instance.history.clear();
+                instance.history.addAll(list);
+//                instance.logHistory("LOADED " + typeLabel(resolved));
+                instance.logHistoryCompact("LOADED");
+                return;
+            }
+        }
+    }
+
+    public void setCurrentScreen(Screen screen) {
+        if (screen == null) return;
+
+        ScreenSnapshot snapshot = new ScreenSnapshot(screen, matchType(screen).orElse(null));
+
+        ScreenSnapshot head = history.peekFirst();
+        if (head != null && head.screen() == screen) {
+            if (head.type() == null && snapshot.type() != null) {
+                history.removeFirst();
+                history.addFirst(snapshot);
+//                logHistory("RETYPE " + typeLabel(snapshot.type()));
+                logHistoryCompact("RETYPE");
+            }
+
+            return;
+        }
+
+        if (history.size() >= MAX_HISTORY) history.removeLast();
+        history.addFirst(snapshot);
+//        logHistory("PUSH   " + typeLabel(snapshot.type()));
+        logHistoryCompact("PUSH");
+    }
+
+//    Useful for debugging, too large as to stream it to the chat.
+//    public void logHistory(String trigger) {
+//        StringBuilder builder = new StringBuilder();
+//        String header = "── " + trigger + " ";
+//        builder.append(header).append("─".repeat(Math.max(0, 72 - header.length()))).append("\n");
+//
+//        if (history.isEmpty()) {
+//            builder.append("  (empty)\n");
+//        } else {
+//            int depth = 0;
+//            for (ScreenSnapshot snapshot : history) {
+//                String pointer = depth == 0 ? "▶" : " ";
+//                String typeStr = typeLabel(snapshot.type());
+//                String screenStr = snapshot.screen() != null
+//                        ? snapshot.screen().getClass().getSimpleName() + "@"
+//                        + Integer.toHexString(System.identityHashCode(snapshot.screen()))
+//                        : "null";
+//
+//                builder.append(String.format("  [%d] %s %-55s %s%n", depth, pointer, typeStr, screenStr));
+//                depth++;
+//            }
+//        }
+//
+//        builder.append("─".repeat(72));
+//        Util.logMessage(builder.toString());
+//    }
+
+    private void logHistoryCompact(String trigger) {
+        if (!NotificationType.GUI.isEnabled()) return;
+
+        StringJoiner breadcrumb = new StringJoiner(" › ");
+
+        for (ScreenSnapshot snap : history) {
+            breadcrumb.add(snap.type() != null ? snap.type().shortName() : "???");
+        }
+
+        PlayerActionUtil.notifyAll("[" + trigger.strip() + "] " + breadcrumb, NotificationType.GUI);
+    }
+
+    private static String typeLabel(ScreenType type) {
+        return type == null ? "???" : type.asString();
+    }
+
+    public Optional<ScreenContext> current() {
+        return Optional.ofNullable(history.peekFirst()).map(ScreenContext::new);
+    }
+
+    public Optional<ScreenContext> getAtDepth(int depth) {
+        if (depth < 0 || depth >= history.size()) return Optional.empty();
+
+        Iterator<ScreenSnapshot> it = history.iterator();
+        ScreenSnapshot target = null;
+
+        for (int i = 0; i <= depth; i++) {
+            if (!it.hasNext()) return Optional.empty();
+            target = it.next();
+        }
+
+        return Optional.ofNullable(target).map(ScreenContext::new);
+    }
+
+    public Optional<ScreenContext> previous() {
+        return getAtDepth(1);
+    }
+    
+    public Optional<ScreenContext> findBack(ScreenType... wanted) {
+        Iterator<ScreenSnapshot> it = history.iterator();
+
+        if (it.hasNext()) it.next();
+
+        while (it.hasNext()) {
+            ScreenSnapshot snap = it.next();
+            if (snap.type() != null) {
+                for (ScreenType w : wanted) {
+                    if (snap.type() == w) return Optional.of(new ScreenContext(snap));
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public List<ScreenSnapshot> getHistorySnapshot() {
+        return new ArrayList<>(history);
+    }
+
     public boolean isCurrent(ScreenType... wanted) {
-        return current().map(context -> context.isAnyOf(wanted)).orElse(false);
+        return current().map(ctx -> ctx.isAnyOf(wanted)).orElse(false);
     }
 
     public boolean inRegisteredScreenType() {
@@ -138,7 +258,7 @@ public class ScreenManager {
     }
 
     public Optional<GenericContainerScreen> inGenericContainerScreen() {
-        return current().flatMap(context -> context.as(GenericContainerScreen.class));
+        return current().flatMap(ctx -> ctx.as(GenericContainerScreen.class));
     }
 
     public static <T extends ScreenHandler> Optional<T> getCurrentScreenHandler(Class<T> type) {
@@ -148,7 +268,9 @@ public class ScreenManager {
             return Optional.empty();
         }
 
-        return type.isInstance(client.player.currentScreenHandler) ? Optional.of(type.cast(client.player.currentScreenHandler)) : Optional.empty();
+        return type.isInstance(client.player.currentScreenHandler)
+                ? Optional.of(type.cast(client.player.currentScreenHandler))
+                : Optional.empty();
     }
 
     public static <T extends HandledScreen<?>> Optional<T> getCurrentlyHandledScreen(Class<T> type) {
@@ -158,11 +280,14 @@ public class ScreenManager {
             return Optional.empty();
         }
 
-        return type.isInstance(client.currentScreen) ? Optional.of(type.cast(client.currentScreen)) : Optional.empty();
+        return type.isInstance(client.currentScreen)
+                ? Optional.of(type.cast(client.currentScreen))
+                : Optional.empty();
     }
 
     public static Optional<Inventory> getScreenContainer() {
-        return getCurrentScreenHandler(GenericContainerScreenHandler.class).map(GenericContainerScreenHandler::getInventory);
+        return getCurrentScreenHandler(GenericContainerScreenHandler.class)
+                .map(GenericContainerScreenHandler::getInventory);
     }
 
     public static Optional<Integer> getScreenContainerSize() {
@@ -171,20 +296,19 @@ public class ScreenManager {
 
     public static ItemStack getScreenItem(int chestSlot) {
         return getScreenContainer()
-                .map((inventory) -> SlotLookup.getInventoryItem(inventory, chestSlot))
+                .map(inv -> SlotLookup.getInventoryItem(inv, chestSlot))
                 .orElse(ItemStack.EMPTY);
     }
 
     public static Optional<Integer> getInventorySlotFromItemStack(ItemStack wanted) {
-        return getScreenContainer().flatMap(inventory -> SlotLookup.getInventorySlotFromItemStack(inventory, wanted));
+        return getScreenContainer()
+                .flatMap(inv -> SlotLookup.getInventorySlotFromItemStack(inv, wanted));
     }
 
     public static void closeHandledScreen() {
         PlayerActionUtil.notifyAll("Closing GUI", NotificationType.GUI);
 
-        var currentScreenOpt = getCurrentlyHandledScreen(HandledScreen.class);
-
-        if (currentScreenOpt.isEmpty()) {
+        if (getCurrentlyHandledScreen(HandledScreen.class).isEmpty()) {
             Util.notifyError("Current screen does not implement HandledScreen", new Throwable());
 
             return;
@@ -211,7 +335,6 @@ public class ScreenManager {
 
             if (client.player == null) {
                 Util.notifyError("Player is null, cannot close screen", new Throwable());
-
                 return;
             }
 
@@ -220,7 +343,6 @@ public class ScreenManager {
             client.player.currentScreenHandler = client.player.playerScreenHandler;
         } catch (Exception exception) {
             Util.notifyError("Error encountered while closing screen with custom method", exception);
-
             throw new RuntimeException(exception);
         }
     }

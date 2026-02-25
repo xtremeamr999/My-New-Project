@@ -13,6 +13,7 @@ import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
@@ -44,7 +45,7 @@ import java.util.*;
 
 @Slf4j
 @Module
-public class Bookmarks extends BUListener implements ItemButton {
+public class Bookmarks extends BUListener implements ItemButton, BUToggleableFeature {
     public record Bookmark(
             String name,
             ItemStack itemStack,
@@ -93,6 +94,11 @@ public class Bookmarks extends BUListener implements ItemButton {
     }
 
     @Override
+    public boolean isEnabled() {
+        return isRegistryEnabled() || isButtonEnabled();
+    }
+
+    @Override
     public int getSlotNumber() {
         return ButtonsConfig.BookmarksConfig.TOGGLE_BOOKMARK_BUTTON.slotNumber;
     }
@@ -105,7 +111,7 @@ public class Bookmarks extends BUListener implements ItemButton {
     }
 
     private boolean inCorrectScreen() {
-        return ScreenManager.isCurrent(BazaarScreens.ITEM_PAGE);
+        return ScreenManager.getInstance().isCurrent(BazaarScreens.ITEM_PAGE);
     }
 
     @EventHandler
@@ -189,7 +195,7 @@ public class Bookmarks extends BUListener implements ItemButton {
         }
 
         ContainerManager.clickSlot(SIGN_SLOT_NUMBER, 0);
-        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(name, true));
+        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(bookmark.name(), true));
 
         if (userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));

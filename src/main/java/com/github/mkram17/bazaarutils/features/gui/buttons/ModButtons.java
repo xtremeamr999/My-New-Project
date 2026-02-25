@@ -3,12 +3,16 @@ package com.github.mkram17.bazaarutils.features.gui.buttons;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.item.Items;
@@ -19,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Module
-public class ModButtons {
+public class ModButtons implements BUToggleableFeature {
     private static final Identifier DEFAULT_ORDERS = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/generic_widget_base");
     private static final Identifier HOVERED_ORDERS = Identifier.tryParse(BazaarUtils.MOD_ID, "widget/generic_widget_hover");
 
@@ -36,7 +40,8 @@ public class ModButtons {
             HOVERED_SETTINGS
     );
 
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return ButtonsConfig.OPEN_ORDERS_BUTTON.enabled || ButtonsConfig.OPEN_SETTINGS_BUTTON.enabled;
     }
 
@@ -46,13 +51,11 @@ public class ModButtons {
     public static List<ItemSlotButtonWidget> getWidget() {
         List<ItemSlotButtonWidget> result = new ArrayList<>();
 
-        if (!isEnabled()) {
+        if (!BazaarUtilsModules.ModButtons.isEnabled()) {
             return result;
         }
 
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inBazaar()) {
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new))) {
             return result;
         }
 

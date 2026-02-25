@@ -6,7 +6,8 @@ import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 
 @Module
 public class DisableErrorNotifications implements BUToggleableFeature {
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return DeveloperConfig.DEVELOPER_MODE_TOGGLE && DeveloperConfig.DEVELOPER_MODE_DISABLE_ERROR_NOTIFICATIONS;
     }
 

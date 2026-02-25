@@ -5,7 +5,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.utils.config.ConfigurableFeature;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
-public class FlipHelper extends BUListener implements ConfigurableFeature, ItemButton {
+public class FlipHelper extends BUListener implements BUToggleableFeature, ItemButton {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");

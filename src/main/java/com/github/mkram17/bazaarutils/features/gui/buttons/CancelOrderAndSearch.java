@@ -3,14 +3,14 @@ package com.github.mkram17.bazaarutils.features.gui.buttons;
 import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 @ConfigObject
-public class CancelOrderAndSearch extends BUListener implements CustomItemButton {
+public class CancelOrderAndSearch extends BUListener implements ItemButton {
     @Override
     public int getSlotNumber() {
         return ButtonsConfig.CANCEL_ORDER_AND_SEARCH.slotNumber;

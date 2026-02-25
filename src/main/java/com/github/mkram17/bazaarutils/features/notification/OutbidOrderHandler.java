@@ -15,7 +15,8 @@ import java.util.List;
 
 @Module
 public class OutbidOrderHandler implements BUToggleableFeature {
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return NotificationsConfig.ORDER_NOTIFICATIONS_OUTBID.isEnabled();
     }
 

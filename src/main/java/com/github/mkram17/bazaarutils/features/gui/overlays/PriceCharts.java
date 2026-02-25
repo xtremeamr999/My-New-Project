@@ -33,6 +33,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     // Cache: sanitized item name -> should show tooltip
     private static final Map<String, Boolean> SHOW_CACHE = new ConcurrentHashMap<>();
 
+    @Override
     public boolean isEnabled() {
         return OverlaysConfig.PRICE_CHARTS_TOGGLE;
     }
