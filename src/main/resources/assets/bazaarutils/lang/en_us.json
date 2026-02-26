@@ -7,26 +7,10 @@
   "bazaarutils.hypixel.account_upgrades.bazaar_flipper.second_tier.value": "Bazaar Flipper II",
 
   "bazaarutils.config.separator.introductory.value": "Welcome to Bazaar Utils!",
-  "bazaarutils.config.separator.introductory.description": [
-    "first line!",
-    "\n \n",
-    "second line!"
-  ],
+  "bazaarutils.config.separator.introductory.description": "first line!\n\nsecond line!",
 
   "bazaarutils.config.bazaar_flipper_account_upgrade.value": "Bazaar Flipper Account Upgrade",
-  "bazaarutils.config.bazaar_flipper_account_upgrade.description": [
-    "The tier of your ",
-    { "text": "Bazaar Flipper", "color": "gold" },
-    " Account Upgrade, which is factored in on tax calculation and current order limits.",
-    "\n \n",
-    "Your Bazaar Flipper level can be upgraded by talking to ",
-    { "text": "Elizabeth", "color": "light_purple" },
-    ", at the ",
-    { "text": "Community Center", "color": "aqua" },
-    ", in the ",
-    { "text": "SkyBlock Hub", "color": "aqua" },
-    "."
-  ],
+  "bazaarutils.config.bazaar_flipper_account_upgrade.description": "The tier of your Bazaar Flipper Account Upgrade, which is factored in on tax calculation and current order limits.\n\nYour Bazaar Flipper level can be upgraded by talking to Elizabeth, at the Community Center, in the SkyBlock Hub.",
 
   "bazaarutils.config.chat.category.value": "Chat",
   "bazaarutils.config.chat.category.description": "Configurations for the chat features of the mod",
@@ -57,13 +41,7 @@
   "bazaarutils.config.buttons.open_settings.description": "Adds a button to selected menus/screen to quick access the mods' settings.",
 
   "bazaarutils.config.buttons.open_orders.value": "Orders Page Button",
-  "bazaarutils.config.buttons.open_orders.description": [
-    "Adds a button to selected menus/screen to quick access your orders page.",
-    "\n \n",
-    "Requires a ",
-    { "text": "Booster Cookie", "color": "light_purple" },
-    " effect active in order to function."
-  ],
+  "bazaarutils.config.buttons.open_orders.description": "Adds a button to selected menus/screen to quick access your orders page.\n\nRequires a Booster Cookie effect active in order to function.",
 
   "bazaarutils.config.buttons.button:widget.enabled.value": "Enabled",
   "bazaarutils.config.buttons.button:widget.enabled.description": "Whether the button will be registered or not",
@@ -101,22 +79,10 @@
   "bazaarutils.config.inventory.separator.instant_sell_restrictions.value": "Instant Sell Restrictions",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.value": "Instant Sell Restrictions",
-  "bazaarutils.config.inventory.instant_sell_restrictions.description": [
-    "Enables a locking functionality over the Bazaars'",
-    " ",
-    { "text": "Instant Sell", "color": "green" },
-    " ",
-    "button, with inventory as well as action restriction."
-  ],
+  "bazaarutils.config.inventory.instant_sell_restrictions.description": "Enables a locking functionality over the Bazaars' Instant Sell button, with inventory as well as action restriction.",
 
   "bazaarutils.config.inventory.instant_sell_restrictions:clicks_required.value": "Clicks Required",
-  "bazaarutils.config.inventory.instant_sell_restrictions:clicks_required.description": [
-    "The amount of clicks required to be pressed on the",
-    " ",
-    { "text": "Instant Sell", "color": "green" },
-    " ",
-    "item to allow the action."
-  ],
+  "bazaarutils.config.inventory.instant_sell_restrictions:clicks_required.description": "The amount of clicks required to be pressed on the Instant Sell item to allow the action.",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.value": "Instant Sell Rules",
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.category.description": "Manage the rules to be checked by the Instant Sell Restrictions feature",
@@ -130,13 +96,7 @@
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.restriction.numeric.description": "Whether the restriction will be on total coins worth or items held",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.value": "Number predicates/restrictions",
-  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.description": [
-    "These rules check for specific numeric conditions, such as the total number of items or coins, to restrict the",
-    " ",
-    { "text": "Instant Sell", "color": "green" },
-    " ",
-    "action."
-  ],
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.numeric_restrictions.description": "These rules check for specific numeric conditions, such as the total number of items or coins, to restrict the Instant Sell action.",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_numeric_restriction.value": "#1 Number Predicate",
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_numeric_restriction.value": "#2 Number Predicate",
@@ -145,13 +105,7 @@
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.fifth_numeric_restriction.value": "#5 Number Predicate",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.value": "String predicates/restrictions",
-  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.description": [
-    "These rules check for specific item names or types to determine if",
-    " ",
-    { "text": "Instant Sell", "color": "green" },
-    " ",
-    "the action should be restricted."
-  ],
+  "bazaarutils.config.inventory.instant_sell_restrictions.rules.separator.string_restrictions.description": "These rules check for specific item names or types to determine if Instant Sell the action should be restricted.",
 
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.first_string_restriction.value": "#1 Name Predicate",
   "bazaarutils.config.inventory.instant_sell_restrictions.rules.second_string_restriction.value": "#2 Name Predicate",
@@ -162,13 +116,7 @@
   "bazaarutils.config.inventory.separator.instant_sell_highlight.value": "Instant Sell Highlight",
 
   "bazaarutils.config.inventory.instant_sell_highlight.value": "Instant Sell Highlight",
-  "bazaarutils.config.inventory.instant_sell_highlight.description": [
-    "Highlights the items on your inventory that would be sold by the Bazaars'",
-    " ",
-    { "text": "Instant Sell", "color": "green" },
-    " ",
-    "button."
-  ],
+  "bazaarutils.config.inventory.instant_sell_highlight.description": "Highlights the items on your inventory that would be sold by the Bazaars' Instant Sell button.",
 
   "bazaarutils.config.inventory.instant_sell_highlight:color.value": "Highlight Color",
 
@@ -198,12 +146,8 @@
   "bazaarutils.config.overlays.separator.bazaar_limits_visualizer.value": "Bazaar Limits",
 
   "bazaarutils.config.overlays.bazaar_limits_visualizer.value": "Bazaar Limits",
-  "bazaarutils.config.overlays.bazaar_limits_visualizer.description": [
-    "Adds informational text to Bazaar Screens about the status of your daily Bazaar Limits.",
-    "\n \n",
-    "The Bazaar limits each profile to order/offer tradeables for up to 15,000,000,000.00 coins each day."
-  ],
-  
+  "bazaarutils.config.overlays.bazaar_limits_visualizer.description": "Adds informational text to Bazaar Screens about the status of your daily Bazaar Limits.\n\nThe Bazaar limits each profile to order/offer tradeables for up to 15,000,000,000.00 coins each day.",
+
   "bazaarutils.config.overlays.bazaar_limits_visualizer:reset_limits.value": "Daily Order Limits",
   "bazaarutils.config.overlays.bazaar_limits_visualizer:reset_limits.runnable": "Reset",
 
