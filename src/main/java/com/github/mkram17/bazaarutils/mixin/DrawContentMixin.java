@@ -14,8 +14,8 @@ public abstract class DrawContentMixin {
     @ModifyVariable(
             method = "drawStackCount",
             at = @At("HEAD"),
-            ordinal = 0
-    )
+            ordinal = 0,
+            argsOnly = true)
     private String modifyStackCountString(String text, TextRenderer textRenderer, ItemStack stack, int x, int y) {
         String customData = stack.get(BazaarUtils.CUSTOM_SIZE_COMPONENT);
         double dataSize;
