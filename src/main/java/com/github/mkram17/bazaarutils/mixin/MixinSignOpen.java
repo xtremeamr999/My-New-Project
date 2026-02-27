@@ -11,16 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //TODO maybe try to do this with AbstractSignEditScreen init() and see if it works to be more efficient
 //used for SignOpenEvent
-@Mixin(Screen.class)
+@Mixin(SignEditScreen.class)
 public class MixinSignOpen {
     @Inject(method = "init()V", at = @At("TAIL"))
     private void onScreenInit(CallbackInfo ci) {
-        Screen screen = (Screen) (Object) this;
+        SignEditScreen screen = (SignEditScreen) (Object) this;
 
-        if (screen instanceof SignEditScreen) {
-            // Post the SignOpenEvent
-            SignOpenEvent event = new SignOpenEvent((SignEditScreen) screen);
-            BazaarUtils.EVENT_BUS.post(event);
-        }
+        BazaarUtils.EVENT_BUS.post(new SignOpenEvent(screen));
     }
 }
