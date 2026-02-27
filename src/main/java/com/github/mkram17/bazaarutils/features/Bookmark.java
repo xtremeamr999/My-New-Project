@@ -99,7 +99,7 @@ public class Bookmark extends CustomItemButton implements BUListener {
 
     public void onWidgetLeftClick(){
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
-        boolean userHasSkyblockerBazaarOverlay = BUCompatibilityHelper.isSkyblockerBazaarOverlayEnabled();
+        boolean userHasSkyblockerBazaarOverlay = BUCompatibilityHelper.isSkyblockerLoaded() && BUCompatibilityHelper.isSkyblockerBazaarOverlayEnabled();
 
         if(userHasSkyblockerBazaarOverlay) {
             BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(false);
