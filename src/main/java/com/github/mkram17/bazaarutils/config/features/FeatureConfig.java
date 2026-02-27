@@ -12,10 +12,4 @@ import java.util.List;
 public class FeatureConfig {
     @ConfigEntry(id = "customOrders")
     public final List<CustomOrder> customOrders = new ArrayList<>();
-
-    @ConfigEntry(id = "flipHelper")
-    public FlipHelper flipHelper = new FlipHelper(true, PricingPosition.COMPETITIVE, 17);
-
-    @ConfigEntry(id = "maxBuyOrder")
-    public MaxBuyOrder maxBuyOrder = new MaxBuyOrder(true);
 }

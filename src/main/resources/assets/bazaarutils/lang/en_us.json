@@ -73,6 +73,41 @@
   "bazaarutils.config.buttons.button:container.slot_number.value": "Slot Number",
   "bazaarutils.config.buttons.button:container.slot_number.description": "The container slot where the button will be registered at",
 
+  "bazaarutils.config.buttons.helpers.category.value": "Input Helper",
+
+  "bazaarutils.config.buttons.helpers.separator.buy_order_amount.value": "Buy Order Amount",
+
+  "bazaarutils.config.buttons.helpers.buy_order_amount.value": "Buy Order Amount",
+  "bazaarutils.config.buttons.helpers.buy_order_amount.description": "Places a item at the desired slot, which when clicked will input as the amount for this order the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.buy_order_amount:first_buy_order_amount.value": "First Button",
+  "bazaarutils.config.buttons.helpers.buy_order_amount:second_buy_order_amount.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.buy_order_amount:third_buy_order_amount.value": "Third Button",
+
+  "bazaarutils.config.buttons.helpers.separator.instant_buy_amount.value": "Instant Buy Amount",
+
+  "bazaarutils.config.buttons.helpers.instant_buy_amount.value": "Instant Buy Amount",
+  "bazaarutils.config.buttons.helpers.instant_buy_amount.description": "Places a item at the desired slot, which when clicked will input as the amount for this purchase the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.instant_buy_amount:first_instant_buy_amount.value": "First Button",
+  "bazaarutils.config.buttons.helpers.instant_buy_amount:second_instant_buy_amount.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.instant_buy_amount:third_instant_buy_amount.value": "Third Button",
+
+  "bazaarutils.config.buttons.helpers.separator.sell_offer_amount.value": "Sell Offer Amount",
+
+  "bazaarutils.config.buttons.helpers.sell_offer_amount.value": "Sell Offer Amount",
+  "bazaarutils.config.buttons.helpers.sell_offer_amount.description": "Places a item at the desired slot, which when clicked will input as the amount for this offer the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.sell_offer_amount:first_sell_offer_amount.value": "First Button",
+  "bazaarutils.config.buttons.helpers.sell_offer_amount:second_sell_offer_amount.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.sell_offer_amount:third_sell_offer_amount.value": "Third Button",
+
+  "bazaarutils.config.buttons.button:container.amount_strategy.value": "Amount Strategy",
+  "bazaarutils.config.buttons.button:container.amount_strategy.description": "The strategy with which to calculate the amount value.\n\nWill order the maximum amount you may order considering the action (instant, order)\nFIXED: Will order whatever amount you've configured below.",
+
+  "bazaarutils.config.buttons.button:container.fixed_amount.value": "Fixed Amount",
+  "bazaarutils.config.buttons.button:container.fixed_amount.description": "The amount which will be used if FIXED is set as the amount strategy",
+
   "bazaarutils.config.inventory.category.value": "Inventory",
   "bazaarutils.config.inventory.category.description": "Configurations for the inventory features of the mod",
 
