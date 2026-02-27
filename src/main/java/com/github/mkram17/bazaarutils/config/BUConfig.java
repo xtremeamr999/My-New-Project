@@ -8,16 +8,9 @@ import com.github.mkram17.bazaarutils.config.features.gui.ButtonsConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
 import com.github.mkram17.bazaarutils.config.features.notification.NotificationsConfig;
-import com.github.mkram17.bazaarutils.config.patcher.ConfigPatches;
-import com.github.mkram17.bazaarutils.utils.Util;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.utils.bazaar.PlayerAccountUpgrades;
-import com.google.gson.JsonObject;
 import com.teamresourceful.resourcefulconfig.api.annotations.*;
-import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
-import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfig;
-
-import java.util.Map;
-import java.util.function.UnaryOperator;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.MOD_ID;
 
@@ -32,7 +25,7 @@ import static com.github.mkram17.bazaarutils.BazaarUtils.MOD_ID;
                 NotificationsConfig.class,
                 DeveloperConfig.class
         },
-        version = BUConfig.VERSION
+        version = ConfigUtil.VERSION
 )
 @ConfigInfo(
         title = "Bazaar Utils",
@@ -77,28 +70,4 @@ public final class BUConfig {
 
     public FeatureConfig feature = new FeatureConfig();
 
-    public static final Map<Integer, UnaryOperator<JsonObject>> PATCHES = ConfigPatches.loadPatches();
-    public static final int VERSION = 1;
-
-    public static ResourcefulConfig register(Configurator configurator) {
-        if (PATCHES.size() + 1 != VERSION) {
-            throw new IllegalStateException(
-                    "BUConfig VERSION (" + VERSION + ") is out of sync with patch count " +
-                            "— expected VERSION = " + (PATCHES.size() + 1)
-            );
-        }
-
-        configurator.register(BUConfig.class, event ->
-                PATCHES.forEach((version, patch) ->
-                        event.register(version, json -> {
-                            Util.logMessage("Applying patch " + version);
-                            JsonObject result = patch.apply(json);
-                            Util.logMessage("[BUConfig] Patch " + version + " applied successfully");
-                            return result;
-                        })
-                )
-        );
-
-        return configurator.getConfig(BUConfig.class);
-    }
 }
