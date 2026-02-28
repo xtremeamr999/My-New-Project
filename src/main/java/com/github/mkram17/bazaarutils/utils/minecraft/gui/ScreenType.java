@@ -17,55 +17,57 @@ import java.util.function.Predicate;
 
 public interface ScreenType extends Predicate<Screen> {
     String asString();
+    String shortName();
 
     final class Builder {
         private final List<ScreenPredicate> chain;
+        private final String name;
 
         private static List<ScreenPredicate> concat(List<ScreenPredicate> list, ScreenPredicate next) {
             List<ScreenPredicate> copy = new ArrayList<>(list.size() + 1);
-
             copy.addAll(list);
             copy.add(next);
-
             return List.copyOf(copy);
         }
 
-        private Builder(List<ScreenPredicate> chain) {
+        private Builder(List<ScreenPredicate> chain, String name) {
             this.chain = List.copyOf(chain);
+            this.name  = name;
         }
 
         public Builder() {
-            this(List.of());
+            this(List.of(), null);
+        }
+
+        public Builder name(String label) {
+            return new Builder(chain, label);
         }
 
         public Builder genericContainer() {
-            return new Builder(concat(chain, new ScreenPredicate("GenericContainer", screen -> screen instanceof GenericContainerScreen)));
+            return new Builder(concat(chain, new ScreenPredicate("GenericContainer",
+                    screen -> screen instanceof GenericContainerScreen)), name);
         }
 
         public Builder containerTitle(String fragment) {
-            return new Builder(concat(chain, new ScreenPredicate("TitleContains[" + fragment + "]", screen -> {
+            return new Builder(concat(chain, new ScreenPredicate("Title[" + fragment + "]", screen -> {
                 Text text = screen.getTitle();
-
-                return text != null && (Util.removeFormatting(text.getString())).contains(fragment);
-            })));
+                return text != null && Util.removeFormatting(text.getString()).contains(fragment);
+            })), name);
         }
 
         public Builder containerItem(NumberRange.IntRange slotRange, Item... wanted) {
-            String desc = "ItemInSlots[" + slotRange.getMin().orElse(0) + '-' +
-                    slotRange.getMax().orElse(54) + "] " +
-                    java.util.Arrays.toString(wanted);
+            String desc = "Item[slots=" + slotRange.getMin().orElse(0) + ".." +
+                    slotRange.getMax().orElse(54) + ", types=" +
+                    java.util.Arrays.toString(wanted) + "]";
 
             return new Builder(concat(chain, new ScreenPredicate(desc, screen -> ContainerQuery
                     .range(
                             slotRange.getMin().orElse(0),
-                            slotRange
-                                    .getMax()
-                                    .orElse(ContainerManager.getLowerChestInventory().size() - 1)
+                            slotRange.getMax().orElse(ContainerManager.getLowerChestInventory().size() - 1)
                     )
                     .itemType(wanted)
                     .first()
-                    .isPresent())
-            ));
+                    .isPresent())), name);
         }
 
         public Builder containerItem(int slot, Item... wanted) {
@@ -73,15 +75,23 @@ public interface ScreenType extends Predicate<Screen> {
         }
 
         public Builder containerQuery(ContainerQuery query) {
-            return new Builder(concat(chain, new ScreenPredicate("ContainerQuery", screen -> query.first().isPresent())));
+            return new Builder(concat(chain, new ScreenPredicate(
+                    "Query[" + query.describe() + "]",
+                    screen -> query.first().isPresent())), name);
         }
 
         public Builder containerQuery(Function<Inventory, ContainerQuery> builder) {
-            return new Builder(concat(chain, new ScreenPredicate("ContainerQueryFn", screen -> builder.apply(ContainerManager.getLowerChestInventory()).first().isPresent())));
+            return containerQuery("fn", builder);
         }
 
-        public Builder custom(String name, Predicate<Screen> test) {
-            return new Builder(concat(chain, new ScreenPredicate(name, test)));
+        public Builder containerQuery(String label, Function<Inventory, ContainerQuery> builder) {
+            return new Builder(concat(chain, new ScreenPredicate(
+                    "Query[" + label + "]",
+                    screen -> builder.apply(ContainerManager.getLowerChestInventory()).first().isPresent())), name);
+        }
+
+        public Builder custom(String label, Predicate<Screen> test) {
+            return new Builder(concat(chain, new ScreenPredicate(label, test)), name);
         }
 
         public Builder custom(Predicate<Screen> test) {
@@ -89,22 +99,35 @@ public interface ScreenType extends Predicate<Screen> {
         }
 
         public ScreenType build() {
+            String chainDesc = chain.isEmpty()
+                    ? "always false"
+                    : chain.stream()
+                    .map(ScreenPredicate::name)
+                    .reduce((a, b) -> a + " && " + b)
+                    .orElse("");
+
+            String label = name != null
+                    ? name + " (" + chainDesc + ")"
+                    : chainDesc;
+
             return new ScreenType() {
                 @Override
                 public String asString() {
-                    return chain.isEmpty()
-                            ? "ScreenType{always false}"
-                            : "ScreenType{" +
-                            chain.stream()
-                                    .map(ScreenPredicate::name)
-                                    .reduce((a, b) -> a + " && " + b)
-                                    .orElse("") +
-                            '}';
+                    return label;
+                }
+
+                public String shortName() {
+                    return name != null ? name : label;
                 }
 
                 @Override
                 public boolean test(Screen screen) {
                     return chain.stream().allMatch(predicate -> predicate.test(screen));
+                }
+
+                @Override
+                public String toString() {
+                    return asString();
                 }
             };
         }
