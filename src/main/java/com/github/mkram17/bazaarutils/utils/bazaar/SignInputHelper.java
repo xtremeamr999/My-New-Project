@@ -101,6 +101,7 @@ public abstract class SignInputHelper<T extends SignInputState> extends InputHel
 
                 @NotNull
                 String productId,
+
                 @NotNull
                 ItemStack productItem,
 
@@ -369,4 +370,75 @@ public abstract class SignInputHelper<T extends SignInputState> extends InputHel
         }
     }
 
+    public abstract static class TransactionFlip extends SignInputHelper.TransactionCost {
+        public static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
+        public static final int INPUT_LORE_LINE_VOLUME = 1;
+
+        public static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
+        public static final int INPUT_LORE_LINE_PRICE = 3;
+
+        public TransactionFlip(@NotNull String name,  @NotNull BazaarSlots.BazaarSlot inputSignRef) {
+            super(name, inputSignRef);
+        }
+
+        @Override
+        protected Optional<String> getItemProductId(GenericContainerScreen context, ItemInfo inputSign) {
+            LoreComponent lore = inputSign.itemStack().getComponents().get(DataComponentTypes.LORE);
+
+            if (lore == null) return Optional.empty();
+
+            return matchToUserOrder(lore).map(Order::getProductID);
+        }
+
+        private Optional<Order> matchToUserOrder(LoreComponent lore) {
+            Optional<PriceInfo> priceInfo = getOrderPriceInfo(lore);
+            Optional<Integer> volume = getVolumeUnclaimed(lore);
+
+            if (priceInfo.isEmpty() || volume.isEmpty()) return Optional.empty();
+
+            OrderInfo tempOrder = new OrderInfo(
+                    null,
+                    priceInfo.get().getOrderType(),
+                    null,
+                    volume.get(),
+                    priceInfo.get().getPricePerItem(),
+                    null
+            );
+
+            return tempOrder.findOrderInList(UserOrdersStorage.INSTANCE.get());
+        }
+
+        private Optional<PriceInfo> getOrderPriceInfo(LoreComponent lore) {
+            if (lore.lines().size() <= INPUT_LORE_LINE_PRICE) return Optional.empty();
+
+            Matcher matcher = PRICE_PATTERN.matcher(lore.lines().get(INPUT_LORE_LINE_PRICE).getString());
+
+            if (matcher.find()) {
+                try {
+                    // Flip orders are always on the buy side; the sell price is computed after matching
+                    return Optional.of(new PriceInfo(Double.parseDouble(matcher.group(1).replace(",", "")), OrderType.BUY));
+                } catch (NumberFormatException e) {
+                    Util.notifyError("Error parsing order price in TransactionFlip", e);
+                }
+            }
+
+            return Optional.empty();
+        }
+
+        private Optional<Integer> getVolumeUnclaimed(LoreComponent lore) {
+            if (lore.lines().size() <= INPUT_LORE_LINE_VOLUME) return Optional.empty();
+
+            Matcher matcher = VOLUME_PATTERN.matcher(lore.lines().get(INPUT_LORE_LINE_VOLUME).getString());
+
+            if (matcher.find()) {
+                try {
+                    return Optional.of(Integer.parseInt(matcher.group(1).replace(",", "")));
+                } catch (NumberFormatException e) {
+                    Util.notifyError("Error parsing order volume in TransactionFlip", e);
+                }
+            }
+
+            return Optional.empty();
+        }
+    }
 }
