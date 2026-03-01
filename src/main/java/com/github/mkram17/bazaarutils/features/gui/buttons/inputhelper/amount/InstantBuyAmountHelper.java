@@ -71,7 +71,7 @@ public class InstantBuyAmountHelper extends SignInputHelper.TransactionAmount {
 
     @Override
     public Item getButtonItem() {
-        return Items.GOLDEN_APPLE;
+        return Items.GREEN_STAINED_GLASS_PANE;
     }
 
     @Override
@@ -84,8 +84,10 @@ public class InstantBuyAmountHelper extends SignInputHelper.TransactionAmount {
         return ScreenManager.getInstance().isCurrent(BazaarScreens.INSTANT_BUY);
     }
 
-    public InstantBuyAmountHelper() {
+    public InstantBuyAmountHelper(boolean enabled, int slotNumber) {
         super("Instant Buy Amount Helper", BazaarSlots.INSTANT_BUY.INPUT_CUSTOM_AMOUNT.slot);
+        this.enabled = enabled;
+        this.slotNumber = slotNumber;
     }
 
     @Override

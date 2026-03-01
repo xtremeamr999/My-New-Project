@@ -27,7 +27,7 @@ public class BuyOrderAmountHelper extends SignInputHelper.TransactionAmount {
             value = "Whether the button will be registered or not",
             translation = "bazaarutils.config.buttons.button:container.enabled.description"
     )
-    public boolean enabled = false;
+    public boolean enabled;
 
     @ConfigEntry(
             id = "slot_number",
@@ -38,7 +38,7 @@ public class BuyOrderAmountHelper extends SignInputHelper.TransactionAmount {
             translation = "bazaarutils.config.buttons.button:container.slot_number.description"
     )
     @ConfigOption.Range(min = 0, max = 35)
-    public int slotNumber = 17;
+    public int slotNumber;
 
     @ConfigEntry(
             id = "amount_strategy",
@@ -71,7 +71,7 @@ public class BuyOrderAmountHelper extends SignInputHelper.TransactionAmount {
 
     @Override
     public Item getButtonItem() {
-        return Items.GOLDEN_APPLE;
+        return Items.GREEN_STAINED_GLASS_PANE;
     }
 
     @Override
@@ -84,8 +84,10 @@ public class BuyOrderAmountHelper extends SignInputHelper.TransactionAmount {
         return ScreenManager.getInstance().isCurrent(BazaarScreens.BUY_ORDER_AMOUNT);
     }
 
-    public BuyOrderAmountHelper() {
+    public BuyOrderAmountHelper(boolean enabled, int slotNumber) {
         super("Buy Order Amount Helper", BazaarSlots.BUY_ORDER.INPUT_CUSTOM_AMOUNT.slot);
+        this.enabled = enabled;
+        this.slotNumber = slotNumber;
     }
 
     @Override

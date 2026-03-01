@@ -27,7 +27,7 @@ public class FlipOrderPriceHelper extends SignInputHelper.TransactionFlip {
             value = "Whether the button will be registered or not",
             translation = "bazaarutils.config.buttons.button:container.enabled.description"
     )
-    public boolean enabled = false;
+    public boolean enabled;
 
     @ConfigEntry(
             id = "slot_number",
@@ -38,7 +38,7 @@ public class FlipOrderPriceHelper extends SignInputHelper.TransactionFlip {
             translation = "bazaarutils.config.buttons.button:container.slot_number.description"
     )
     @ConfigOption.Range(min = 0, max = 35)
-    public int slotNumber = 17;
+    public int slotNumber;
 
     @ConfigEntry(
             id = "pricing_position",
@@ -54,7 +54,7 @@ public class FlipOrderPriceHelper extends SignInputHelper.TransactionFlip {
                     """,
             translation = "bazaarutils.config.buttons.button:container.pricing_position.description"
     )
-    public PricingPosition pricingPosition = PricingPosition.COMPETITIVE;
+    public PricingPosition pricingPosition;
 
     public OrderType orderType = OrderType.SELL;
 
@@ -62,7 +62,11 @@ public class FlipOrderPriceHelper extends SignInputHelper.TransactionFlip {
 
     @Override
     public Item getButtonItem() {
-        return Items.GOLDEN_APPLE;
+        return switch (getPricingPosition()) {
+            case COMPETITIVE -> Items.GREEN_STAINED_GLASS_PANE;
+            case MATCHED -> Items.YELLOW_STAINED_GLASS_PANE;
+            case OUTBID -> Items.ORANGE_STAINED_GLASS_PANE;
+        };
     }
 
     @Override
@@ -75,8 +79,11 @@ public class FlipOrderPriceHelper extends SignInputHelper.TransactionFlip {
         return ScreenManager.getInstance().isCurrent(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS);
     }
 
-    public FlipOrderPriceHelper() {
+    public FlipOrderPriceHelper(boolean enabled, int slotNumber, PricingPosition pricingPosition) {
         super("Flip Order Price Helper", BazaarSlots.ORDER_OPTIONS.FLIP_FILLED_BUY_ORDER.slot);
+        this.enabled = enabled;
+        this.slotNumber = slotNumber;
+        this.pricingPosition = pricingPosition;
     }
 
     @Override
