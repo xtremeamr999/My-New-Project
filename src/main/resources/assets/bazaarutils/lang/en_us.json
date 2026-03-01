@@ -102,6 +102,36 @@
   "bazaarutils.config.buttons.helpers.sell_offer_amount:second_sell_offer_amount.value": "Second Button",
   "bazaarutils.config.buttons.helpers.sell_offer_amount:third_sell_offer_amount.value": "Third Button",
 
+  "bazaarutils.config.buttons.helpers.separator.buy_order_price.value": "Buy Order Price",
+
+  "bazaarutils.config.buttons.helpers.buy_order_price.value": "Buy Order Price",
+  "bazaarutils.config.buttons.helpers.buy_order_price.description": "Places a item at the desired slot, which when clicked will input as the price for this offer the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.buy_order_price:first_buy_order_price.value": "First Button",
+  "bazaarutils.config.buttons.helpers.buy_order_price:second_buy_order_price.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.buy_order_price:third_buy_order_price.value": "Third Button",
+
+  "bazaarutils.config.buttons.helpers.separator.sell_offer_price.value": "Sell Offer Price",
+
+  "bazaarutils.config.buttons.helpers.sell_offer_price.value": "Sell Offer Price",
+  "bazaarutils.config.buttons.helpers.sell_offer_price.description": "Places a item at the desired slot, which when clicked will input as the price for this offer the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.sell_offer_price:first_sell_offer_price.value": "First Button",
+  "bazaarutils.config.buttons.helpers.sell_offer_price:second_sell_offer_price.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.sell_offer_price:third_sell_offer_price.value": "Third Button",
+
+  "bazaarutils.config.buttons.helpers.separator.flip_order_price.value": "Flip Order Price",
+
+  "bazaarutils.config.buttons.helpers.flip_order_price.value": "Flip Order Price",
+  "bazaarutils.config.buttons.helpers.flip_order_price.description": "Places a item at the desired slot, which when clicked will input as the price for this flip the computed, configurable, value.",
+
+  "bazaarutils.config.buttons.helpers.flip_order_price:first_flip_order_price.value": "First Button",
+  "bazaarutils.config.buttons.helpers.flip_order_price:second_flip_order_price.value": "Second Button",
+  "bazaarutils.config.buttons.helpers.flip_order_price:third_flip_order_price.value": "Third Button",
+
+  "bazaarutils.config.buttons.button:container.pricing_position.value": "Pricing Position",
+  "bazaarutils.config.buttons.button:container.pricing_position.description": "The strategy with which to calculate the price to bid per item\n\nCOMPETITIVE: The bid will be +0.1 the current best offer on the market\nMATCHED: The bid will be equal to that of the current best offer on the market\nOUTBID: The bid will be -0.1 the current best offer on the market",
+
   "bazaarutils.config.buttons.button:container.amount_strategy.value": "Amount Strategy",
   "bazaarutils.config.buttons.button:container.amount_strategy.description": "The strategy with which to calculate the amount value.\n\nWill order the maximum amount you may order considering the action (instant, order)\nFIXED: Will order whatever amount you've configured below.",
 
