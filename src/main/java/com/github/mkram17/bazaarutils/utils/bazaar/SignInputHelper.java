@@ -1,10 +1,13 @@
 package com.github.mkram17.bazaarutils.utils.bazaar;
 
+import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarSlots;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
@@ -18,6 +21,8 @@ import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -280,4 +285,88 @@ public abstract class SignInputHelper<T extends SignInputState> extends InputHel
             };
         }
     }
+
+    public abstract static class TransactionCost extends SignInputHelper<TransactionCost.TransactionState> {
+        public record TransactionState(
+                @NotNull
+                String productId,
+
+                @NotNull
+                ItemInfo inputSign,
+
+                @NotNull
+                GenericContainerScreen containerScreen
+        ) implements SignInputState {
+        }
+
+        /**
+         * The prospect with which to resolve the output value.
+         */
+        protected abstract PricingPosition getPricingPosition();
+
+        /**
+         * The way this helper resolves—in that of to make state— the inventory item
+         */
+        protected Optional<String> getItemProductId(GenericContainerScreen context, ItemInfo inputSign) {
+            return ScreenManager.getInstance()
+                    .findBack(BazaarScreens.ITEM_PAGE)
+                    .flatMap(screen -> screen.as(GenericContainerScreen.class))
+                    .map(inv -> SlotLookup.getInventoryItem(inv.getScreenHandler().getInventory(), BazaarSlots.ITEM_PAGE.ITEM_DISPLAY.slot))
+                    .map(ItemStack::getCustomName)
+                    .map(Text::getString)
+                    .flatMap(BazaarDataManager::findProductIdOptional);
+        };
+
+        @Override
+        protected Optional<TransactionState> makeState(ChestLoadedEvent event) {
+            Optional<GenericContainerScreen> container = ScreenManager.getInstance()
+                    .current()
+                    .flatMap(context -> context.as(GenericContainerScreen.class));
+
+            Optional<Inventory> inventory = container
+                    .map(GenericContainerScreen::getScreenHandler)
+                    .map(GenericContainerScreenHandler::getInventory);
+
+            if (container.isEmpty() || inventory.isEmpty()) return Optional.empty();
+
+            Optional<ItemInfo> inputSign = inventory.flatMap(this::getInputSign);
+
+            if (inputSign.isEmpty()) return Optional.empty();
+
+            Optional<String> productId = getItemProductId(container.get(), inputSign.get());
+
+            if (productId.isEmpty()) return Optional.empty();
+
+            return Optional.of(new TransactionState(productId.get(), inputSign.get(), container.get()));
+        }
+
+        public TransactionCost(@NotNull String name,  @NotNull BazaarSlots.BazaarSlot inputSignRef) {
+            super(name, inputSignRef);
+        }
+
+        @Override
+        protected String getButtonItemStackSize(TransactionState state) {
+            ResolvedInput input = resolveInput(state);
+
+            return input.format();
+        }
+
+        @Override
+        protected ResolvedInput resolveInput(TransactionState state) {
+            OrderType resolvedType = getMarketType().withIntention(getOrderType());
+            OptionalDouble price = BazaarDataManager.findItemPriceOptional(state.productId(), resolvedType);
+
+            if (price.isEmpty()) {
+                Util.logMessage("Could not retrieve relevant item pricing for " + name + "'s resolved value.");
+
+                return new ResolvedInput.Value(0);
+            }
+
+            PriceInfo priceInfo = new PriceInfo(price.getAsDouble(), resolvedType);
+            priceInfo.updateMarketPrice(state.productId());
+
+            return new ResolvedInput.Value(priceInfo.getPriceForPosition(getPricingPosition(), getOrderType()));
+        }
+    }
+
 }
