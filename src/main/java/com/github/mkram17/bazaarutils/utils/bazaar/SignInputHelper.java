@@ -35,6 +35,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.regex.Matcher;
@@ -279,7 +280,11 @@ public abstract class SignInputHelper<T extends SignInputState> extends InputHel
                     }
                     case SELL -> state.playerInventory().getMainStacks().stream()
                             .filter(stack -> !stack.isEmpty())
-                            .filter(stack -> stack.isOf(state.productItem().getItem()))
+                            .filter(stack -> Optional.ofNullable(stack.getCustomName())
+                                    .map(Text::getString)
+                                    .flatMap(BazaarDataManager::findProductIdOptional)
+                                    .map(productId -> productId.equals(state.productId()))
+                                    .orElse(false))
                             .mapToInt(ItemStack::getCount)
                             .sum();
                 };
