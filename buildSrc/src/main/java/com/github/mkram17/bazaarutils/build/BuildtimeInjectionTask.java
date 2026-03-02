@@ -102,8 +102,8 @@ public abstract class BuildtimeInjectionTask extends DefaultTask {
     }
 
     private void injectWidgetCalls(File classesDir, List<MethodReference> methodSignatures) {
-        String configClassName = "com/github/mkram17/bazaarutils/config/BUConfig.class";
-        Path configClassFile = Objects.requireNonNull(findClass(classesDir, configClassName), "BUConfig class wasn't found").toPath();
+        String configClassName = "com/github/mkram17/bazaarutils/config/util/ConfigUtil.class";
+        Path configClassFile = Objects.requireNonNull(findClass(classesDir, configClassName), "ConfigUtil class wasn't found").toPath();
 
         try (InputStream inputStream = Files.newInputStream(configClassFile)) {
             ClassReader classReader = new ClassReader(inputStream);

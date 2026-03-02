@@ -1,7 +1,8 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -39,14 +40,14 @@ public class PlayerActionUtil {
     }
 
     //only used for developer messages and debugging. notifyAll(String/Text messsage) is used to send messages to the player
-    public static void notifyAll(String message, Util.notificationTypes notificationType) {
+    public static void notifyAll(String message, NotificationType notificationType) {
         String callingName = Util.getCallingClassName();
         String simpleCallingName = callingName.substring(callingName.lastIndexOf(".") + 1);
         MutableText messageText = Text.literal("(" + simpleCallingName + ") ")
                 .formatted(Formatting.GOLD)
                 .append(Text.literal(message).formatted(Formatting.DARK_GREEN));
 
-        if(notificationType.isEnabled() || BUConfig.get().developer.allMessages)
+        if(notificationType.isEnabled())
             notifyAll(messageText);
     }
 

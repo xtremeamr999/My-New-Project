@@ -5,6 +5,8 @@ import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,14 +14,15 @@ import lombok.Setter;
  * Container for market price metadata of a single product. For actual user orders, prefer
  * {@link OrderInfo} or {@link Order}.
  */
+@ConfigObject
 public class PriceInfo {
-    @Setter @Getter
+    @Setter @Getter @ConfigEntry(id = "orderType")
     protected OrderType orderType;
 
-    @Setter @Getter
+    @Setter @Getter @ConfigEntry(id = "pricingPosition")
     protected PricingPosition pricingPosition;
 
-    @Setter @Getter
+    @Setter @Getter @ConfigEntry(id = "pricePerItem")
     protected Double pricePerItem;
 
     @Setter

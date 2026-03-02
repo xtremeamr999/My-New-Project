@@ -1,8 +1,13 @@
 package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
+import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
+import com.github.mkram17.bazaarutils.utils.bazaar.PlayerAccountUpgrades;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
-import com.github.mkram17.bazaarutils.features.OutbidOrderHandler;
+import com.github.mkram17.bazaarutils.features.notification.OutbidOrderHandler;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.ui.CustomOrdersMenu;
@@ -22,8 +27,6 @@ import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
-import static com.github.mkram17.bazaarutils.config.BUConfig.openGUI;
 
 public class BUCommands {
 
@@ -68,7 +71,7 @@ public class BUCommands {
                     )
     );
     private static final LiteralArgumentBuilder<FabricClientCommandSource> bazaarutils = ClientCommandManager.literal("bazaarutils").executes(context -> {
-        openGUI();
+        ConfigUtil.openGUI();
         return 1;
     });
 
@@ -83,16 +86,6 @@ public class BUCommands {
                             return 1;
                         }
                 ));
-
-        bazaarutils.then(ClientCommandManager.literal("tax")
-                .then((ClientCommandManager.argument("amount", DoubleArgumentType.doubleArg(1, 1.25))
-                                .executes((context) -> {
-                                    BUConfig.get().bzTax = DoubleArgumentType.getDouble(context, "amount") / 100;
-                                    return 1;
-                                })
-                        )
-                )
-        );
         bazaarutils.then(ClientCommandManager.literal("discord")
                 .executes((context) -> {
                     MinecraftClient client = MinecraftClient.getInstance();
@@ -111,12 +104,12 @@ public class BUCommands {
         );
         bazaarutils.then(ClientCommandManager.literal("developer")
                 .executes((context) -> {
-                    BUConfig.get().developerMode = !BUConfig.get().developerMode;
-                    BUConfig.scheduleConfigSave();
+                    DeveloperConfig.DEVELOPER_MODE_TOGGLE = !DeveloperConfig.DEVELOPER_MODE_TOGGLE;
+                    ConfigUtil.scheduleConfigSave();
                     //TODO register new commands so they can be used without restarting
-                    PlayerActionUtil.notifyAll(BUConfig.get().developerMode ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
+                    PlayerActionUtil.notifyAll(DeveloperConfig.DEVELOPER_MODE_TOGGLE ? "Developer mode enabled." : "Developer mode disabled. Restart for all changes to take effect");
 
-                    if(BUConfig.get().developerMode) {
+                    if(DeveloperConfig.DEVELOPER_MODE_TOGGLE) {
                         registerDeveloperCommands(dispatcher);
                     }
                     return 1;
@@ -145,10 +138,10 @@ public class BUCommands {
         );
 
 
-        if (BUConfig.get().developerMode) {
+        if (DeveloperConfig.DEVELOPER_MODE_TOGGLE) {
             registerDeveloperCommands(dispatcher);
         }
-//
+
         CommandNode<FabricClientCommandSource> bazaarutilsNode = dispatcher.register(bazaarutils);
         dispatcher.register(
                 ClientCommandManager.literal("bu")
@@ -169,15 +162,15 @@ public class BUCommands {
 
     private static int executeRemove(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        Order order = BUConfig.get().userOrders.get(index);
+        Order order = UserOrdersStorage.INSTANCE.get().get(index);
         order.removeFromWatchedItems();
-        PlayerActionUtil.notifyAll("Removed " + order, Util.notificationTypes.COMMAND);
+        PlayerActionUtil.notifyAll("Removed " + order, NotificationType.COMMAND);
         return 1;
     }
 
     private static int executeInfo(CommandContext<FabricClientCommandSource> context) {
         int index = IntegerArgumentType.getInteger(context, "index");
-        PlayerActionUtil.notifyAll(BUConfig.get().userOrders.get(index).toString());
+        PlayerActionUtil.notifyAll(UserOrdersStorage.INSTANCE.get().get(index).toString());
         return 1;
     }
 }

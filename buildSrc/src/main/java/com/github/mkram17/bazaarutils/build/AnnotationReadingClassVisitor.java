@@ -24,10 +24,10 @@ public class AnnotationReadingClassVisitor extends ClassVisitor {
         return new MethodVisitor(Opcodes.ASM9, super.visitMethod(access, methodName, descriptor, signature, exceptions)) {
             @Override
             public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-                if (desc.equals("Lcom/github/mkram17/bazaarutils/misc/autoregistration/RunOnInit;")) {
+                if (desc.equals("Lcom/github/mkram17/bazaarutils/utils/annotations/autoregistration/RunOnInit;")) {
                     return new InitAnnotationVisitor(initMethods, createMethodReference(methodName, descriptor, access));
                 }
-                if (desc.equals("Lcom/github/mkram17/bazaarutils/misc/autoregistration/RegisterWidget;")) {
+                if (desc.equals("Lcom/github/mkram17/bazaarutils/utils/annotations/autoregistration/RegisterWidget;")) {
                     validateAndAddWidgetMethod(methodName, descriptor, access);
                     // This annotation has no values, so we don't need to visit it.
                     // We still pass the annotation to the next visitor in the chain.

@@ -1,14 +1,13 @@
 package com.github.mkram17.bazaarutils.events;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
-import meteordevelopment.orbit.ICancellable;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
@@ -140,7 +139,7 @@ public class ChestLoadedEvent {
             if (customName != null) {
                 String displayName = Util.removeFormatting(customName.getString());
                 if (displayName.contains("Loading")) {
-                    PlayerActionUtil.notifyAll("Loading item...", Util.notificationTypes.GUI);
+                    PlayerActionUtil.notifyAll("Loading item...", NotificationType.GUI);
                     return true;
                 }
             }

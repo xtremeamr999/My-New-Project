@@ -2,8 +2,10 @@ package com.github.mkram17.bazaarutils.utils;
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.config.BUConfig;
+import com.github.mkram17.bazaarutils.config.hidden.MetadataConfig;
+import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -27,9 +29,9 @@ import java.util.concurrent.CompletableFuture;
 //TODO move config to config/bazaarutils directory and rename to "config". See how REI does this.
 public class ResourceManager {
 
-    private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MODID);
+    private static final Path MOD_CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(BazaarUtils.MOD_ID);
     private static final Path LOCAL_RESOURCES_PATH = MOD_CONFIG_DIR.resolve("bazaar-resources.json");
-    private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MODID, "bazaar-resources.json");
+    private static final Identifier BUNDLED_RESOURCES_ID = Identifier.of(BazaarUtils.MOD_ID, "bazaar-resources.json");
     private static final String GITHUB_API_URL = "https://api.github.com/repos/mkram17/Skyblock-Bazaar-Conversions/contents/conversionupdating/bazaar-conversions.json?ref=main";
 
 
@@ -58,8 +60,8 @@ public class ResourceManager {
             try (InputStream inputStream = resourceOptional.get().getInputStream()) {
                 Files.copy(inputStream, LOCAL_RESOURCES_PATH);
                 // don't know the SHA of the bundled file, so stays null to force an update check.
-                BUConfig.get().resourcesSha = "";
-                BUConfig.scheduleConfigSave();
+                MetadataConfig.RESOURCES_SHA = "";
+                ConfigUtil.scheduleConfigSave();
             }
         } else {
             Util.notifyError("Could not find bundled bazaar-resources.json", null);
@@ -87,18 +89,22 @@ public class ResourceManager {
                     String latestSha = jsonObject.get("sha").getAsString();
                     String downloadUrl = jsonObject.get("download_url").getAsString();
 
-                    if (!latestSha.equals(BUConfig.get().resourcesSha)) {
-                        if (manual)
+                    if (!latestSha.equals(MetadataConfig.RESOURCES_SHA)) {
+                        if (manual) {
                             PlayerActionUtil.notifyAll("New resources found, downloading...");
+                        }
                         downloadLatestResources(downloadUrl, latestSha);
                     } else {
-                        if (manual)
+                        if (manual) {
                             PlayerActionUtil.notifyAll("Resources are already up-to-date.");
+                        }
                     }
                 }
             } catch (Exception e) {
-                if (manual)
+                if (manual) {
                     Util.notifyError("An error occurred while checking for updates.", new Exception());
+                }
+
                 Util.notifyError("Failed to check for resource updates", e);
             }
         });
@@ -110,8 +116,8 @@ public class ResourceManager {
             Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
             Files.move(tempPath, LOCAL_RESOURCES_PATH, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
-            BUConfig.get().resourcesSha = latestSha;
-            BUConfig.scheduleConfigSave();
+            MetadataConfig.RESOURCES_SHA = latestSha;
+            ConfigUtil.scheduleConfigSave();
             BazaarDataManager.setConversionsLoaded(false);
             PlayerActionUtil.notifyAll("Successfully updated Bazaar resources!");
         } catch (Exception e) {

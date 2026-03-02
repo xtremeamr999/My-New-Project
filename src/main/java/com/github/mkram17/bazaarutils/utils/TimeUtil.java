@@ -4,7 +4,7 @@ import java.time.*;
 
 import javax.swing.Timer;
 
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import lombok.Getter;
 
 public class TimeUtil {

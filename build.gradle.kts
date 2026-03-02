@@ -20,9 +20,6 @@ repositories {
     maven("https://repo.hypixel.net/repository/Hypixel/") {
         name = "Hypixel"
     }
-    maven("https://maven.isxander.dev/releases") {
-        name = "YACL"
-    }
     maven("https://maven.teamresourceful.com/repository/maven-public/"){
         name = "Resourceful Config"
     }
@@ -31,6 +28,9 @@ repositories {
     }
     maven("https://maven.wispforest.io") {
         name = "Owo Lib"
+    }
+    maven("https://jitpack.io") {
+        name = "Jit Pack"
     }
 
     exclusiveContent {
@@ -113,7 +113,6 @@ dependencies {
     modImplementation("io.wispforest:owo-lib:${deps["owo_version"]}")
     //  If a player installs without installing owo, sentinel will prevent their game from launching and instead open a window warning them that owo is required.
     include("io.wispforest:owo-sentinel:${deps["owo_version"]}")
-
 }
 
 val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build.BuildtimeInjectionTask>("processInitAnnotations") {
@@ -123,6 +122,18 @@ val buildtimeInjectionTask = tasks.register<com.github.mkram17.bazaarutils.build
     dependsOn(tasks.compileJava)
     // The input is the output directory of the compileJava task
     classesDir.set(tasks.compileJava.get().destinationDirectory)
+}
+
+val generateModuleRegistry = tasks.register<com.github.mkram17.bazaarutils.build.ModuleRegistryGeneratingTask>("generateModuleRegistry") {
+    group = "build"
+    sourcesDir.set(rootProject.file("src/main/java"))
+    outputDir.set(layout.buildDirectory.dir("generated/modules"))
+}
+
+sourceSets {
+    main {
+        java.srcDir(generateModuleRegistry.flatMap { it.outputDir })
+    }
 }
 
 tasks {

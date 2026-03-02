@@ -1,7 +1,7 @@
 package com.github.mkram17.bazaarutils.ui;
 
 import com.github.mkram17.bazaarutils.config.BUConfig;
-import com.github.mkram17.bazaarutils.features.customorder.CustomOrder;
+import com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.customorder.CustomOrder;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import net.minecraft.client.MinecraftClient;
@@ -9,14 +9,12 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.IntConsumer;
 
 public class PickSlotMenu extends Screen {
@@ -57,7 +55,7 @@ public class PickSlotMenu extends Screen {
         setSlotItem(16, Items.OAK_SIGN.getDefaultStack());
         setSlotItem(31, Items.ARROW.getDefaultStack());
 
-        for(CustomOrder order : BUConfig.get().customOrders){
+        for(CustomOrder order : BUConfig.get().feature.customOrders){
             setSlotItem(order.getSlotNumber(), order.getItem().getDefaultStack());
         }
     }
@@ -85,11 +83,19 @@ public class PickSlotMenu extends Screen {
         recalcPanel();
     }
 
+    /*? if 1.21.11 {*/
+    /*@Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        recalcPanel();
+    }
+    *//*?} else {*/
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         super.resize(client, width, height);
         recalcPanel();
     }
+    /*?}*/
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {

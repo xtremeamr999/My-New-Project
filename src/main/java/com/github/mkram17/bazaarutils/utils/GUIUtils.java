@@ -3,8 +3,8 @@ package com.github.mkram17.bazaarutils.utils;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.SignOpenEvent;
-import com.github.mkram17.bazaarutils.features.Bookmark;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.mixin.AccessorSignEditScreen;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,17 +61,6 @@ public class GUIUtils {
         guiType = guiType.SIGN;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    private static void setUpBookmark(ChestLoadedEvent e){
-        if(!ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM))
-            return;
-        String name = Bookmark.findItemName(e);
-        if (Bookmark.isItemBookmarked(name)) {
-            Bookmark.findMatchingBookmark(name).get().subscribe();
-        } else {
-            new Bookmark(name);
-        }
-    }
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onLoad(ChestLoadedEvent e){
         guiType = guiType.CHEST;
@@ -80,7 +69,7 @@ public class GUIUtils {
 
     public static void closeHandledScreen() {
         try {
-            PlayerActionUtil.notifyAll("Closing gui", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing gui", NotificationType.GUI);
             MinecraftClient client = MinecraftClient.getInstance();
             if (client == null) {
                 Util.notifyError("Client is null", new Throwable());
@@ -145,7 +134,7 @@ public class GUIUtils {
 
     public static void closeSign(){
         try {
-            PlayerActionUtil.notifyAll("Closing sign", Util.notificationTypes.GUI);
+            PlayerActionUtil.notifyAll("Closing sign", NotificationType.GUI);
             MinecraftClient mcclient = MinecraftClient.getInstance();
             if (mcclient != null && mcclient.currentScreen instanceof AbstractSignEditScreen signEditScreen) {
                 mcclient.execute(signEditScreen::close);

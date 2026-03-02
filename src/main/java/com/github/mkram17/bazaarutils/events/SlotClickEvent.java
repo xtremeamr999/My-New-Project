@@ -50,6 +50,7 @@ public class SlotClickEvent implements ICancellable {
     /**
      * The index of the slot that was clicked.
      */
+    @Getter
     public final int slotId;
     
     /**

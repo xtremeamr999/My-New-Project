@@ -3,17 +3,16 @@ package com.github.mkram17.bazaarutils.utils.bazaar.data;
 import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.data.APIUtils;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
-import com.github.mkram17.bazaarutils.misc.autoregistration.RunOnInit;
+import com.github.mkram17.bazaarutils.misc.NotificationType;
+import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.mixin.AccessorSkyBlockBazaarReply;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.ResourceManager;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.mojang.datafixers.util.Either;
 import lombok.Getter;
 import lombok.Setter;
 import net.hypixel.api.reply.skyblock.SkyBlockBazaarReply;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.*;
@@ -70,7 +69,7 @@ public final class BazaarDataManager {
     @RunOnInit
     public static void init() {
         scheduleFetch(0);
-        PlayerActionUtil.notifyAll("BazaarDataManager initialized (simple fixed-interval poller). Base=" + BASE_INTERVAL_MS + "ms", Util.notificationTypes.BAZAARDATA);
+        PlayerActionUtil.notifyAll("BazaarDataManager initialized (simple fixed-interval poller). Base=" + BASE_INTERVAL_MS + "ms", NotificationType.BAZAARDATA);
     }
 
 
@@ -97,13 +96,13 @@ public final class BazaarDataManager {
         APIUtils.API.getSkyBlockBazaar().whenComplete((reply, throwable) -> {
             if (throwable != null) {
                 consecutiveFailures.incrementAndGet();
-                PlayerActionUtil.notifyAll("Fetch failure (" + throwable.getClass().getSimpleName() + "). Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", Util.notificationTypes.BAZAARDATA);
+                PlayerActionUtil.notifyAll("Fetch failure (" + throwable.getClass().getSimpleName() + "). Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", NotificationType.BAZAARDATA);
                 scheduleFetch(FAILURE_RETRY_MS);
                 return;
             }
             if (reply == null || !reply.isSuccess()) {
                 consecutiveFailures.incrementAndGet();
-                PlayerActionUtil.notifyAll("Null/unsuccessful reply. Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", Util.notificationTypes.BAZAARDATA);
+                PlayerActionUtil.notifyAll("Null/unsuccessful reply. Retry in " + FAILURE_RETRY_MS + "ms (failures=" + consecutiveFailures.get() + ")", NotificationType.BAZAARDATA);
                 scheduleFetch(FAILURE_RETRY_MS);
                 return;
             }
@@ -111,7 +110,7 @@ public final class BazaarDataManager {
 
             long snapshotTs = extractLastUpdated(reply);
             if (snapshotTs <= 0) {
-                PlayerActionUtil.notifyAll("Invalid lastUpdated <= 0. Retry in " + FAILURE_RETRY_MS + "ms", Util.notificationTypes.BAZAARDATA);
+                PlayerActionUtil.notifyAll("Invalid lastUpdated <= 0. Retry in " + FAILURE_RETRY_MS + "ms", NotificationType.BAZAARDATA);
                 scheduleFetch(FAILURE_RETRY_MS);
                 return;
             }
@@ -125,17 +124,17 @@ public final class BazaarDataManager {
                 EVENT_BUS.post(new BazaarDataUpdateEvent(reply));
 
                 if (previous != -1) {
-                    PlayerActionUtil.notifyAll("New snapshot " + snapshotTs + " (Δ " + (snapshotTs - previous) + " ms). Scheduling next predicted fetch.", Util.notificationTypes.BAZAARDATA);
+                    PlayerActionUtil.notifyAll("New snapshot " + snapshotTs + " (Δ " + (snapshotTs - previous) + " ms). Scheduling next predicted fetch.", NotificationType.BAZAARDATA);
                 } else {
-                    PlayerActionUtil.notifyAll("First snapshot " + snapshotTs + " received.", Util.notificationTypes.BAZAARDATA);
+                    PlayerActionUtil.notifyAll("First snapshot " + snapshotTs + " received.", NotificationType.BAZAARDATA);
                 }
 
                 scheduleNextFromSnapshot(snapshotTs);
             } else {
                 int identical = consecutiveIdenticalSnapshots.incrementAndGet();
-                PlayerActionUtil.notifyAll("Snapshot unchanged (" + snapshotTs + ") x" + identical, Util.notificationTypes.BAZAARDATA);
+                PlayerActionUtil.notifyAll("Snapshot unchanged (" + snapshotTs + ") x" + identical, NotificationType.BAZAARDATA);
                 if (identical == STALE_WARNING_THRESHOLD) {
-                    PlayerActionUtil.notifyAll("WARNING: " + identical + " identical snapshots in a row. Server might be lagging or BASE_INTERVAL_MS too short.", Util.notificationTypes.BAZAARDATA);
+                    PlayerActionUtil.notifyAll("WARNING: " + identical + " identical snapshots in a row. Server might be lagging or BASE_INTERVAL_MS too short.", NotificationType.BAZAARDATA);
                 }
                 scheduleNextFromSnapshot(snapshotTs);
             }
@@ -298,7 +297,7 @@ public final class BazaarDataManager {
                 nameToProductIdCache = Collections.unmodifiableMap(mutable);
                 conversionsLoaded = true;
 
-                PlayerActionUtil.notifyAll("Loaded bazaarConversions cache: " + nameToProductIdCache.size() + " entries.", Util.notificationTypes.BAZAARDATA);
+                PlayerActionUtil.notifyAll("Loaded bazaarConversions cache: " + nameToProductIdCache.size() + " entries.", NotificationType.BAZAARDATA);
             } catch (Exception e) {
                 Util.notifyError("Failed loading bazaarConversions cache", e);
 
