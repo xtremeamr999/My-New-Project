@@ -1,0 +1,94 @@
+package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper.price;
+
+import com.github.mkram17.bazaarutils.utils.bazaar.SignInputHelper;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarSlots;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
+import lombok.Getter;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
+
+@Getter
+@ConfigObject
+public class SellOfferPriceHelper extends SignInputHelper.TransactionCost {
+    @ConfigEntry(
+            id = "enabled",
+            translation = "bazaarutils.config.buttons.button:container.enabled.value"
+    )
+    @Comment(
+            value = "Whether the button will be registered or not",
+            translation = "bazaarutils.config.buttons.button:container.enabled.description"
+    )
+    public boolean enabled;
+
+    @ConfigEntry(
+            id = "slot_number",
+            translation = "bazaarutils.config.buttons.button:container.slot_number.value"
+    )
+    @Comment(
+            value = "The container slot where the button will be registered at",
+            translation = "bazaarutils.config.buttons.button:container.slot_number.description"
+    )
+    @ConfigOption.Range(min = 0, max = 35)
+    public int slotNumber;
+
+    @ConfigEntry(
+            id = "pricing_position",
+            translation = "bazaarutils.config.buttons.button:container.pricing_position.value"
+    )
+    @Comment(
+            value = """
+                    The strategy with which to calculate the price to bid per item
+                    
+                    COMPETITIVE: The bid will be +0.1 the current best offer on the market
+                    MATCHED: The bid will be equal to that of the current best offer on the market
+                    OUTBID: The bid will be -0.1 the current best offer on the market
+                    """,
+            translation = "bazaarutils.config.buttons.button:container.pricing_position.description"
+    )
+    public PricingPosition pricingPosition;
+
+    public OrderType orderType = OrderType.SELL;
+
+    public MarketType marketType = MarketType.ORDER;
+
+    @Override
+    public Item getButtonItem() {
+        return switch (getPricingPosition()) {
+            case COMPETITIVE -> Items.GREEN_STAINED_GLASS_PANE;
+            case MATCHED -> Items.YELLOW_STAINED_GLASS_PANE;
+            case OUTBID -> Items.ORANGE_STAINED_GLASS_PANE;
+        };
+    }
+
+    @Override
+    public ItemStack getReplacementItem() {
+        return new ItemStack(this::getButtonItem, 1);
+    }
+
+    @Override
+    protected boolean inCorrectScreen() {
+        return ScreenManager.getInstance().isCurrent(BazaarScreens.SELL_ORDER_PRICE);
+    }
+
+    public SellOfferPriceHelper(boolean enabled, int slotNumber, PricingPosition pricingPosition) {
+        super("Sell Offer Price Helper", BazaarSlots.SELL_OFFER.INPUT_CUSTOM_PRICE.slot);
+        this.enabled = enabled;
+        this.slotNumber = slotNumber;
+        this.pricingPosition = pricingPosition;
+    }
+
+    @Override
+    protected Text getButtonItemText(TransactionState state) {
+        return Text.of("Ask " + getButtonItemStackSize(state) + " per item.");
+    }
+}

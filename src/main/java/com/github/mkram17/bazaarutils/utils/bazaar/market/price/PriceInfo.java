@@ -50,7 +50,7 @@ public class PriceInfo {
         this.pricePerItem = newPrice;
     }
 
-    protected void updateMarketPrice(String productId) {
+    public void updateMarketPrice(String productId) {
         var buyPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.BUY);
         var sellPriceOpt = BazaarDataManager.findItemPriceOptional(productId, OrderType.SELL);
 
