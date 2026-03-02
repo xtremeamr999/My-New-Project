@@ -25,7 +25,9 @@ public abstract class BUListener implements AbstractListener{
     protected transient boolean subscribeToMeteorEventBus = true;
 
     public BUListener(){
-        ListenerManager.listeners.add(this);
+        if(!ListenerManager.listeners.contains(this)){
+            ListenerManager.listeners.add(this);
+        }
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.github.mkram17.bazaarutils;
 
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.config.hidden.MetadataConfig;
 import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.ListenerManager;
@@ -39,7 +38,7 @@ public class BazaarUtils implements ClientModInitializer {
 
     public static Configurator CONFIGURATOR = new Configurator(MOD_ID);
 
-    public static ResourcefulConfig config = BUConfig.register(CONFIGURATOR);
+    public static ResourcefulConfig config = ConfigUtil.register(CONFIGURATOR);
 
     public static boolean updatedMajorVersion = false;
 
