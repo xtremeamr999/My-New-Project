@@ -1,2 +1,2 @@
- - Fixed a bug with internal annotation which caused issues with keybind registration.
- - Fix null client error when using Flip Helper
+ - Fix maximum Custom Order amount being 71679 instead of 71680
+ - Internal code changes

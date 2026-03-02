@@ -13,7 +13,7 @@
     "AccessorSignEditScreen",
     "DrawContentMixin",
     "MixinHandledScreen",
-    "MixinSignOpen",
+    "MixinSignEditScreen",
     "MixinSimpleInventory",
     "AccessorSkyBlockBazaarReply"
   ]

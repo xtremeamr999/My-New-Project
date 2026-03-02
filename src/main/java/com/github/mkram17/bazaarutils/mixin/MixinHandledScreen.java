@@ -29,8 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //used for SlotClickEvent, register keybinds in chests, block slot clicks, highlighting slots
 @Mixin(value = HandledScreen.class, priority = 999)
-public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen {
-
+public abstract class MixinHandledScreen extends Screen {
 
 	protected MixinHandledScreen(Text title) {
 		super(title);
@@ -38,21 +37,24 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen
 
 	@Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
 	private void onHandleMouseClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-		if (slot == null) return;
+		if (slot == null){
+            return;
+        }
 
 		HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
 		SlotClickEvent event = new SlotClickEvent(screen, slot, slotId, button, actionType);
 		BazaarUtils.EVENT_BUS.post(event);
 		// Use the accessor to safely get the client instance
 		MinecraftClient client = ((AccessorScreen) screen).getClient();
+
 		if (event.isCancelled()) {
 			ci.cancel();
 			return;
 		}
 
 		if (event.usePickblockInstead) {
-			assert client != null && client.player != null;
-			client.interactionManager.clickSlot(
+			assert client != null && client.player != null && client.interactionManager != null;
+            client.interactionManager.clickSlot(
 					screen.getScreenHandler().syncId,
 					slotId,
 					2,
