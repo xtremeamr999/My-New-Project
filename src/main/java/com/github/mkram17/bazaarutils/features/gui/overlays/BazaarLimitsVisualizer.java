@@ -8,7 +8,7 @@ import java.util.List;
 import com.github.mkram17.bazaarutils.config.features.gui.OverlaysConfig;
 import com.github.mkram17.bazaarutils.data.BazaarLimitsStorage;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
@@ -16,12 +16,12 @@ import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
 
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.ui.widgets.TextDisplayWidget;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
 import com.github.mkram17.bazaarutils.utils.TimeUtil;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import lombok.Getter;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenType;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -41,7 +41,8 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
         return BazaarLimitsStorage.INSTANCE.get();
     }
 
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return OverlaysConfig.BAZAAR_LIMITS_VISUALIZER_TOGGLE;
     }
 
@@ -51,9 +52,7 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
     @RunOnInit
     public static void registerBazaarOpen() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-            if (!screenInfo.inBazaar()) {
+            if (!ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new))) {
                 return;
             }
 
@@ -110,13 +109,11 @@ public class BazaarLimitsVisualizer extends BUListener implements BUToggleableFe
 
     @RegisterWidget
     public static List<TextDisplayWidget> getWidget() {
-        if (!isEnabled()) {
+        if (!BazaarUtilsModules.BazaarLimitsVisualizer.isEnabled()) {
             return Collections.emptyList();
         }
 
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
+        if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
             return Collections.emptyList();
         }
 

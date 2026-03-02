@@ -3,7 +3,8 @@ package com.github.mkram17.bazaarutils.features.gui.inventory;
 import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.*;
@@ -28,7 +29,8 @@ import java.util.Optional;
 public class OrderStatusHighlight extends BUListener implements BUToggleableFeature {
     public static final Identifier IDENTIFIER = Identifier.tryParse("bazaarutils", "orderstatushighlight/background");
 
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return InventoryConfig.ORDER_STATUS_HIGHLIGHT_TOGGLE;
     }
 
@@ -49,7 +51,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
     }
 
     public static void updateHighlightCache(List<ItemStack> itemStacks) {
-        if (!isEnabled()) {
+        if (!BazaarUtilsModules.OrderStatusHighlight.isEnabled()) {
             return;
         }
 
@@ -91,7 +93,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
             return null;
         }
 
-        return getArgbFromOutbidStatus(pricingPosition);
+        return getArgbFromPricingPosition(pricingPosition);
     }
 
     //maybe could be split into separate methods, but this is fine for now
@@ -170,7 +172,7 @@ public class OrderStatusHighlight extends BUListener implements BUToggleableFeat
         });
     }
 
-    private static int getArgbFromOutbidStatus(PricingPosition pricingPosition) {
+    private static int getArgbFromPricingPosition(PricingPosition pricingPosition) {
         return switch (pricingPosition) {
             case COMPETITIVE -> InventoryConfig.ORDER_STATUS_HIGHLIGHT_COMPETITIVE_COLOR;
             case MATCHED -> InventoryConfig.ORDER_STATUS_HIGHLIGHT_MATCHED_COLOR;

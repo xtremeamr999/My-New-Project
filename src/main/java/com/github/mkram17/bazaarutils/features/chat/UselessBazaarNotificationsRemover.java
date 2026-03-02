@@ -1,12 +1,11 @@
 package com.github.mkram17.bazaarutils.features.chat;
 
 import com.github.mkram17.bazaarutils.config.features.chat.ChatConfig;
-import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
 import com.teamresourceful.resourcefulconfig.api.types.info.TooltipProvider;
 import lombok.Getter;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -39,6 +38,7 @@ public class UselessBazaarNotificationsRemover extends BUListener implements BUT
         }
     }
 
+    @Override
     public boolean isEnabled() {
         return ChatConfig.USELESS_BAZAAR_NOTIFICATIONS_REMOVER_TOGGLE;
     }

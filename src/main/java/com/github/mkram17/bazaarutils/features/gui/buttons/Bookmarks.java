@@ -8,15 +8,22 @@ import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.misc.BUCompatibilityHelper;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
+import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RegisterWidget;
 import com.github.mkram17.bazaarutils.mixin.AccessorHandledScreen;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.ui.widgets.ItemSlotButtonWidget;
 import com.github.mkram17.bazaarutils.utils.*;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.sign.SignManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import meteordevelopment.orbit.EventHandler;
@@ -25,6 +32,7 @@ import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.MutableText;
@@ -37,7 +45,7 @@ import java.util.*;
 
 @Slf4j
 @Module
-public class Bookmarks extends BUListener implements CustomItemButton {
+public class Bookmarks extends BUListener implements ItemButton, BUToggleableFeature {
     public record Bookmark(
             String name,
             ItemStack itemStack,
@@ -86,6 +94,11 @@ public class Bookmarks extends BUListener implements CustomItemButton {
     }
 
     @Override
+    public boolean isEnabled() {
+        return isRegistryEnabled() || isButtonEnabled();
+    }
+
+    @Override
     public int getSlotNumber() {
         return ButtonsConfig.BookmarksConfig.TOGGLE_BOOKMARK_BUTTON.slotNumber;
     }
@@ -93,13 +106,12 @@ public class Bookmarks extends BUListener implements CustomItemButton {
     @Getter
     private transient ItemStack replacementItem;
 
-
     public Bookmarks() {
         super();
     }
 
     private boolean inCorrectScreen() {
-        return ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.INDIVIDUAL_ITEM);
+        return ScreenManager.getInstance().isCurrent(BazaarScreens.ITEM_PAGE);
     }
 
     @EventHandler
@@ -182,8 +194,8 @@ public class Bookmarks extends BUListener implements CustomItemButton {
             BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(false);
         }
 
-        GUIUtils.clickSlot(SIGN_SLOT_NUMBER, 0);
-        GUIUtils.runOnNextSignOpen(event -> GUIUtils.setSignText(bookmark.name, true));
+        ContainerManager.clickSlot(SIGN_SLOT_NUMBER, 0);
+        SignManager.runOnNextSignOpen(event -> SignManager.setSignText(bookmark.name(), true));
 
         if (userHasSkyblockerBazaarOverlay) {
             Util.tickExecuteLater(10, () -> BUCompatibilityHelper.setSkyblockerBazaarOverlayValue(true));
@@ -198,14 +210,13 @@ public class Bookmarks extends BUListener implements CustomItemButton {
 
         List<ItemSlotButtonWidget> widgets = new ArrayList<>();
 
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-        boolean isTargetScreen = screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
+        boolean isTargetScreen = ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE);
 
         if (!(MinecraftClient.getInstance().currentScreen instanceof AccessorHandledScreen screen) || !isTargetScreen) {
             return Collections.emptyList();
         }
 
-        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, screenInfo.getScreenName());
+        ItemSlotButtonWidget.ScreenWidgetDimensions dimensions = ItemSlotButtonWidget.getSafeScreenDimensions(screen, ContainerManager.getContainerName());
 
         int buttonSize = ButtonsConfig.BookmarksConfig.OPEN_BOOKMARK_BUTTON.size;
         int spacing = ButtonsConfig.BookmarksConfig.OPEN_BOOKMARK_BUTTON.spacing;
@@ -253,13 +264,13 @@ public class Bookmarks extends BUListener implements CustomItemButton {
     }
 
     private static ItemStack findItemStack(String name) {
-        ScreenHandler handler = GUIUtils.getHandledScreen();
+        Optional<ScreenHandler> handler = ScreenManager.getCurrentScreenHandler(ScreenHandler.class);
 
-        if (handler == null) {
+        if (handler.isEmpty()) {
             return null;
         }
 
-        for (Slot slot : handler.slots) {
+        for (Slot slot : handler.get().slots) {
             ItemStack itemStack = slot.getStack();
 
             if (itemStack == null) {
@@ -271,7 +282,7 @@ public class Bookmarks extends BUListener implements CustomItemButton {
             }
         }
 
-        for (Slot slot : handler.slots) {
+        for (Slot slot : handler.get().slots) {
             ItemStack itemStack = slot.getStack();
 
             if (!itemStack.isEmpty() && itemStack.getName().getString().contains(name)) {
@@ -307,11 +318,12 @@ public class Bookmarks extends BUListener implements CustomItemButton {
     }
 
     private static String findItemNameFromContainer() {
-        ScreenInfo info = ScreenInfo.getCurrentScreenInfo();
-        String name = info.getScreenName();
+        String containerName = ContainerManager.getContainerName();
 
-        return info.inMenu(ScreenInfo.BazaarMenuType.INSTA_BUY)
-                ? name.substring(0, name.indexOf("➜") - 1)
-                : name.substring(name.indexOf("➜") + 2);
+        if (ScreenManager.getInstance().isCurrent(BazaarScreens.INSTANT_BUY)) {
+            return containerName.substring(0, containerName.indexOf("➜")-1);
+        } else {
+            return containerName.substring(containerName.indexOf("➜") + 2);
+        }
     }
 }

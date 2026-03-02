@@ -7,15 +7,13 @@ import com.github.mkram17.bazaarutils.events.listener.BUListener;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.DoubleSellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.SellRestrictionControl;
 import com.github.mkram17.bazaarutils.features.gui.inventory.restrictsell.controls.StringSellRestrictionControl;
-import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -24,10 +22,10 @@ import java.util.List;
 
 //TODO maybe color chest if it is locked
 @Module
-public class InstantSellRestrictions extends BUListener implements ConfigurableFeature {
+public class InstantSellRestrictions extends BUListener implements BUToggleableFeature {
     private static final int INSTA_SELL_SLOT_INDEX = 47;
 
-    public static boolean isEnabled() {
+    public boolean isEnabled() {
         return InventoryConfig.INSTANT_SELL_RESTRICTIONS_TOGGLE;
     }
 
@@ -52,7 +50,7 @@ public class InstantSellRestrictions extends BUListener implements ConfigurableF
 
     @EventHandler
     private void onChestLoaded(ChestLoadedEvent e) {
-        if (!isEnabled() || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
+        if (!isEnabled() || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
             return;
         }
 

@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 
-//used for GUIUtils setSignText()
+//used for ScreenManager setSignText()
 @Mixin(AbstractSignEditScreen.class)
 public interface AccessorSignEditScreen {
 

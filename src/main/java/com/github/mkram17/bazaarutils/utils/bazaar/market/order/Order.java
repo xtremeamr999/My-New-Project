@@ -5,10 +5,12 @@ import com.github.mkram17.bazaarutils.config.features.DeveloperConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.BazaarDataUpdateEvent;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemInfo;
 import com.github.mkram17.bazaarutils.features.notification.OutbidOrderHandler;
-import com.github.mkram17.bazaarutils.utils.bazaar.ItemInfo;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenType;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
@@ -68,14 +70,14 @@ public class Order extends OrderInfo {
     }
 
     @EventHandler
-    private void onDataUpdate(BazaarDataUpdateEvent e) {
+    private void onDataUpdate(BazaarDataUpdateEvent event) {
         updateMarketPrice();
         handleOutbidStatusChange();
     }
 
     @EventHandler
-    private void onUserOrderChange(UserOrdersChangeEvent e) {
-        if (e.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || e.getOrder() != this) {
+    private void onUserOrderChange(UserOrdersChangeEvent event) {
+        if (event.getChangeType() == UserOrdersChangeEvent.ChangeTypes.REMOVE || event.getOrder() != this) {
             return;
         }
 
@@ -84,13 +86,13 @@ public class Order extends OrderInfo {
     }
 
     private void handleOutbidStatusChange() {
-        Optional<PricingPosition> outbidOptional = findPricingPosition();
+        Optional<PricingPosition> pricingPositionOptional = findPricingPosition();
 
-        if (outbidOptional.isEmpty()) {
+        if (pricingPositionOptional.isEmpty()) {
             return;
         }
 
-        PricingPosition newPosition = outbidOptional.get();
+        PricingPosition newPosition = pricingPositionOptional.get();
 
         if (this.pricingPosition != newPosition) {
             this.pricingPosition = newPosition;
@@ -148,9 +150,7 @@ public class Order extends OrderInfo {
      * Opens the Bazaar order management screen after a short countdown if the player is not already there.
      */
     public void openBazaar() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        if (screenInfo.inBazaar()) {
+        if (ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new))) {
             return;
         }
 
@@ -183,23 +183,23 @@ public class Order extends OrderInfo {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(super.toString());
+        StringBuilder builder = new StringBuilder(super.toString());
 
-        sb.append(name).append("[").append(getIndex()).append("]");
+        builder.append(name).append("[").append(getIndex()).append("]");
 
         if (amountClaimed != 0) {
-            sb.append(", amount claimed: ").append(amountClaimed);
+            builder.append(", amount claimed: ").append(amountClaimed);
         }
 
-        sb.append(", type: ").append(getOrderType().getString());
+        builder.append(", type: ").append(getOrderType().getString());
 
         if (status == OrderStatus.FILLED) {
-            sb.append(", status: ").append(status);
+            builder.append(", status: ").append(status);
         }
 
-        sb.append(")");
+        builder.append(")");
 
-        return sb.toString();
+        return builder.toString();
     }
 
     /**
@@ -236,7 +236,7 @@ public class Order extends OrderInfo {
 
     /**
      * Calculates a non-competitive flip price.
-     *
+     * 
      * @return price .1 coin less competitive than market rate.
      */
     public double getOutbidPrice(OrderType orderType) {

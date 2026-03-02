@@ -4,7 +4,7 @@ import com.github.mkram17.bazaarutils.BazaarUtils;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.PlayerActionUtil;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import lombok.Getter;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -57,6 +57,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ChestLoadedEvent {
     /**
+     * The container that is being displayed.
+     */
+    @Getter
+    private GenericContainerScreen genericContainerScreen;
+
+    /**
      * The inventory of the lower chest/container (this is actually the inventory on top, NOT the player's inventory (ask Mojang, not me)).
      */
     @Getter
@@ -81,7 +87,7 @@ public class ChestLoadedEvent {
     @RunOnInit
     public static void registerScreenEvent() {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
-            if (screen instanceof GenericContainerScreen genericContainerScreen) {
+            if (screen instanceof GenericContainerScreen gcs) {
                 // Use an AtomicInteger for mutable integer in lambda
                 final AtomicInteger attempts = new AtomicInteger(0);
                 final int MAX_ATTEMPTS = 50; // ~2.5 seconds timeout (50 * 1 tick)
@@ -91,11 +97,11 @@ public class ChestLoadedEvent {
                     @Override
                     public void run() {
                         // Ensure we are still on the same screen
-                        if (client.currentScreen != genericContainerScreen) {
+                        if (client.currentScreen != gcs) {
                             return;
                         }
 
-                        ScreenHandler handler = genericContainerScreen.getScreenHandler();
+                        ScreenHandler handler = gcs.getScreenHandler();
                         if (handler instanceof GenericContainerScreenHandler containerHandler) {
                             Inventory inv = containerHandler.getInventory();
                             // Check if inventory is populated and not in a loading state
@@ -103,7 +109,8 @@ public class ChestLoadedEvent {
                                 // GUI is loaded, post the event
                                 ChestLoadedEvent event = new ChestLoadedEvent();
                                 event.lowerChestInventory = inv;
-                                event.containerName = ScreenInfo.getCurrentScreenInfo().getScreenName();
+                                event.genericContainerScreen = gcs;
+                                event.containerName = ContainerManager.getContainerName();
                                 event.itemStacks = getChestItemSlots(inv);
                                 BazaarUtils.EVENT_BUS.post(event);
                             } else if (attempts.getAndIncrement() < MAX_ATTEMPTS) {

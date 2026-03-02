@@ -1,4 +1,4 @@
-package com.github.mkram17.bazaarutils.ui;
+package com.github.mkram17.bazaarutils.utils.minecraft;
 
 import com.github.mkram17.bazaarutils.events.ReplaceItemEvent;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
@@ -11,7 +11,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
-public interface CustomItemButton {
+public interface ItemButton {
     RegistryEntry<SoundEvent> BUTTON_SOUND = SoundEvents.UI_BUTTON_CLICK;
     float BUTTON_VOLUME = 0.2f;
 

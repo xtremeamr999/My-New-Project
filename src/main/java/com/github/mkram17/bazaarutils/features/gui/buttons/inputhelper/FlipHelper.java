@@ -2,25 +2,26 @@ package com.github.mkram17.bazaarutils.features.gui.buttons.inputhelper;
 
 
 import com.github.mkram17.bazaarutils.BazaarUtils;
-import com.github.mkram17.bazaarutils.config.BUConfig;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.*;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.util.ConfigurableFeature;
-import com.github.mkram17.bazaarutils.ui.CustomItemButton;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
+import com.github.mkram17.bazaarutils.utils.minecraft.ItemButton;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderType;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PriceInfo;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenContext;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import com.github.mkram17.bazaarutils.utils.SoundUtil;
 import com.github.mkram17.bazaarutils.utils.Util;
 
 import com.github.mkram17.bazaarutils.utils.bazaar.market.price.PricingPosition;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.container.ContainerManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.sign.SignManager;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,9 +40,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
+
 //TODO switch to finding market price without finding the OrderData first. Then, OrderUpdater should handle fixing it. Or just do it that way for redundancy.
-@ConfigObject
-public class FlipHelper extends BUListener implements ConfigurableFeature, CustomItemButton {
+public class FlipHelper extends BUListener implements BUToggleableFeature, ItemButton {
     private static final int FLIP_ORDER_SLOT = 15;
     private static final Pattern PRICE_PATTERN = Pattern.compile("([\\d,.]+) coins");
     private static final Pattern VOLUME_PATTERN = Pattern.compile("([\\d,]+)");
@@ -79,9 +81,9 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
         this.slotNumber = slotNumber;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onChestLoaded(ChestLoadedEvent e) {
-        if (!enabled) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onChestLoaded(ChestLoadedEvent event) {
+        if (!isEnabled()) {
             return;
         }
 
@@ -92,13 +94,13 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
         }
 
         try {
-            ItemStack flipOrderSign = getFlipSign(e.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
+
+            ItemStack flipOrderSign = getFlipSign(event.getItemStacks()).orElse(new ItemStack(Items.BARRIER, 1));
 
             Optional<Order> orderOptional = matchToUserOrder(flipOrderSign.getComponents().get(DataComponentTypes.LORE));
 
             if (orderOptional.isEmpty()) {
                 return;
-
             }
             order = orderOptional.get();
         } catch (Exception ex) {
@@ -108,20 +110,20 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
 
     @EventHandler
     public void onSlotClicked(SlotClickEvent event) {
-        if (!enabled || event.slot.getIndex() != slotNumber || !inCorrectScreen() || order == null) {
+        if (!isEnabled() || !(wasButtonSlotClicked(event)) || !inCorrectScreen() || order == null) {
             return;
         }
 
         SoundUtil.playSound(BUTTON_SOUND, BUTTON_VOLUME);
 
-        GUIUtils.clickSlot(FLIP_ORDER_SLOT,0);
+        ContainerManager.clickSlot(FLIP_ORDER_SLOT,0);
 
-        GUIUtils.runOnNextSignOpen(signOpenEvent -> handleFlip());
+        SignManager.runOnNextSignOpen(signOpenEvent -> handleFlip());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void replaceItemEvent(ReplaceItemEvent event) {
-        if (!enabled || !(event.getSlotId() == slotNumber) || !inCorrectScreen() || order == null) {
+        if (!isEnabled() || !(shouldReplaceItem(event)) || !inCorrectScreen() || order == null) {
             return;
         }
 
@@ -164,10 +166,10 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
     private void handleFlip() {
         double flipPrice = computeFlipPrice();
 
-        ScreenInfo previousScreen = ScreenInfo.getCurrentScreenInfo().getPreviousScreenInfo();
+        Optional<ScreenContext> previousScreen = ScreenManager.getInstance().previous();
 
-        if (order != null && flipPrice != 0 && previousScreen.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI)) {
-            GUIUtils.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
+        if (order != null && previousScreen.isPresent() && flipPrice != 0 && previousScreen.get().matches(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS)) {
+            SignManager.setSignText(Double.toString(Util.truncateNum(flipPrice)), true);
 
             order.flipItem(flipPrice);
         }
@@ -246,12 +248,11 @@ public class FlipHelper extends BUListener implements ConfigurableFeature, Custo
 
             return tempOrder.findOrderInList(UserOrdersStorage.INSTANCE.get());
         }
+
         return Optional.empty();
     }
 
     private static boolean inCorrectScreen() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        return screenInfo.inMenu(ScreenInfo.BazaarMenuType.FLIP_GUI) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.CANCEL_ORDER);
+        return ScreenManager.getInstance().isCurrent(BazaarScreens.COMPLETED_BUY_ORDER_OPTIONS);
     }
 }

@@ -3,31 +3,29 @@ package com.github.mkram17.bazaarutils.features.gui.inventory;
 import com.github.mkram17.bazaarutils.config.features.gui.InventoryConfig;
 import com.github.mkram17.bazaarutils.events.ChestLoadedEvent;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.misc.SlotHighlightCache;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.GUIUtils;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
 import com.github.mkram17.bazaarutils.utils.Util;
 import com.github.mkram17.bazaarutils.utils.InstaSellUtil;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
-import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.ColorHelper;
 
 import java.util.*;
 
 @Module
-public class InstantSellHighlight extends BUListener {
-    private static transient final List<Integer> highlightedSlotIndexes = new ArrayList<>();
+public class InstantSellHighlight extends BUListener implements BUToggleableFeature {
+    private static final List<Integer> highlightedSlotIndexes = new ArrayList<>();
 
-    public static boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return InventoryConfig.INSTANT_SELL_HIGHLIGHT_TOGGLE;
     }
 
@@ -37,7 +35,7 @@ public class InstantSellHighlight extends BUListener {
     private void onScreenLoad(ChestLoadedEvent e) {
         highlightedSlotIndexes.clear();
 
-        if (!isEnabled() || !ScreenInfo.getCurrentScreenInfo().inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE)) {
+        if (!isEnabled() || !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE)) {
             return;
         }
 
@@ -59,7 +57,8 @@ public class InstantSellHighlight extends BUListener {
         highlightedSlotIndexes.addAll(
                 inventoryStacks.stream()
                         .filter(itemStack -> !itemStack.isEmpty())
-                        .map(itemStack -> GUIUtils.getSlotFromItemStack(inventory, itemStack))
+                        .map(ScreenManager::getInventorySlotFromItemStack)
+                        .flatMap(Optional::stream)
                         .toList()
         );
     }
@@ -95,7 +94,7 @@ public class InstantSellHighlight extends BUListener {
     }
 
     public static void updateHighlightCache() {
-        if (!isEnabled()) {
+        if (!BazaarUtilsModules.InstantSellHighlight.isEnabled()) {
             return;
         }
 

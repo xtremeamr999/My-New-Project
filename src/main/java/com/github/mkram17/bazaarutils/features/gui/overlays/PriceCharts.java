@@ -5,14 +5,12 @@ import com.github.mkram17.bazaarutils.utils.annotations.modules.Module;
 import com.github.mkram17.bazaarutils.utils.bazaar.data.BazaarDataManager;
 import com.github.mkram17.bazaarutils.events.SlotClickEvent;
 import com.github.mkram17.bazaarutils.events.listener.BUListener;
-import com.github.mkram17.bazaarutils.features.util.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.config.BUToggleableFeature;
+import com.github.mkram17.bazaarutils.utils.bazaar.gui.BazaarScreens;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.OrderInfo;
-import com.github.mkram17.bazaarutils.utils.ScreenInfo;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenManager;
+import com.github.mkram17.bazaarutils.utils.minecraft.gui.ScreenType;
 import com.github.mkram17.bazaarutils.utils.Util;
-import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigObject;
-import lombok.Getter;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
@@ -35,6 +33,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     // Cache: sanitized item name -> should show tooltip
     private static final Map<String, Boolean> SHOW_CACHE = new ConcurrentHashMap<>();
 
+    @Override
     public boolean isEnabled() {
         return OverlaysConfig.PRICE_CHARTS_TOGGLE;
     }
@@ -104,9 +103,7 @@ public class PriceCharts extends BUListener implements ItemTooltipCallback, BUTo
     }
 
     private boolean shouldShow() {
-        ScreenInfo screenInfo = ScreenInfo.getCurrentScreenInfo();
-
-        return (screenInfo.inBazaar() || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !screenInfo.inMenu(ScreenInfo.BazaarMenuType.BAZAAR_MAIN_PAGE);
+        return (ScreenManager.getInstance().isCurrent(BazaarScreens.ALL.toArray(ScreenType[]::new)) || OverlaysConfig.PRICE_CHARTS_SHOW_OUTSIDE_BAZAAR) && !ScreenManager.getInstance().isCurrent(BazaarScreens.MAIN_PAGE);
     }
 
     private static String sanitizeName(String raw){

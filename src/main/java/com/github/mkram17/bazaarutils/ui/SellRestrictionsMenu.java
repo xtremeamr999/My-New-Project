@@ -36,9 +36,9 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
         /*? if 1.21.11 {*/
         /*return OwoUIAdapter.create(this, UIContainers::verticalFlow);
-         *//*?} else {*/
+        *//*?} else {*/
         return OwoUIAdapter.create(this, Containers::verticalFlow);
-        /*?}*/
+         /*?}*/
     }
 
     @Override
@@ -48,18 +48,18 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                 .horizontalAlignment(HorizontalAlignment.CENTER);
         /*? if 1.21.11 {*/
         /*FlowLayout horizontalFlow = UIContainers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-         *//*?} else {*/
+        *//*?} else {*/
         FlowLayout horizontalFlow = Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100));
-        /*?}*/
+         /*?}*/
         horizontalFlow.child(generateNewRestrictionsParent());
 
 
         // Center: Orders (wrap in full-size container that centers its child)
         /*? if 1.21.11 {*/
         /*FlowLayout centered = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
-         *//*?} else {*/
+        *//*?} else {*/
         FlowLayout centered = Containers.verticalFlow(Sizing.content(), Sizing.content());
-        /*?}*/
+         /*?}*/
         centered.child(generateUserRestrictionsParent());
 
         horizontalFlow.child(centered);
@@ -69,21 +69,21 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
 
     /*? if 1.21.11 {*/
     /*private UIComponent generateUserRestrictionsParent() {
-     *//*?} else {*/
-    private Component generateUserRestrictionsParent() {
-        /*?}*/
+        *//*?} else {*/
+        private Component generateUserRestrictionsParent() {
+         /*?}*/
         var customOrders = BUConfig.get().feature.customOrders;
         /*? if 1.21.11 {*/
         /*ParentUIComponent parent;
-         *//*?} else {*/
+        *//*?} else {*/
         ParentComponent parent;
-        /*?}*/
+         /*?}*/
         if (customOrders.size() > MAXIMUM_ORDERS_BEFORE_SCROLL) {
             /*? if 1.21.11 {*/
             /*parent = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
-             *//*?} else {*/
+            *//*?} else {*/
             parent = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), generateRestrictionsContainer());
-            /*?}*/
+             /*?}*/
         } else {
             parent = generateRestrictionsContainer();
         }
@@ -95,15 +95,15 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
 
     /*? if 1.21.11 {*/
     /*private ParentUIComponent generateRestrictionsContainer() {
-     *//*?} else {*/
-    private ParentComponent generateRestrictionsContainer() {
-        /*?}*/
+        *//*?} else {*/
+        private ParentComponent generateRestrictionsContainer() {
+         /*?}*/
         var sellRestrictions = InventoryConfig.SellRestrictionsRules.restrictors();
         /*? if 1.21.11 {*/
         /*var verticalFlow = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
-         *//*?} else {*/
+        *//*?} else {*/
         var verticalFlow = Containers.verticalFlow(Sizing.content(), Sizing.content());
-        /*?}*/
+         /*?}*/
 
 
         for (SellRestrictionControl control : sellRestrictions) {
@@ -115,9 +115,9 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
 
     /*? if 1.21.11 {*/
     /*private ParentUIComponent generateNewRestrictionsParent() {
-     *//*?} else {*/
-    private ParentComponent generateNewRestrictionsParent() {
-        /*?}*/
+        *//*?} else {*/
+        private ParentComponent generateNewRestrictionsParent() {
+         /*?}*/
         /*? if 1.21.11 {*/
         /*var horizontalFlow = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         horizontalFlow.child(UIComponents.label(Text.literal("New Sell Restriction").formatted(Formatting.BOLD)).margins(Insets.of(10)));
@@ -137,9 +137,9 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
 
     /*? if 1.21.11 {*/
     /*private UIComponent addRestrictionTypeDropdown() {
-     *//*?} else {*/
-    private Component addRestrictionTypeDropdown() {
-        /*?}*/
+        *//*?} else {*/
+        private Component addRestrictionTypeDropdown() {
+         /*?}*/
         SingleOptionCheckboxDropdownComponent dropdown = new SingleOptionCheckboxDropdownComponent(Sizing.content());
         return dropdown.closeWhenNotHovered(false)
                 .checkbox(Text.literal("Restrict By Name"),
@@ -168,7 +168,7 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                         *//*?} else {*/
     private Component addRestrictionButton() {
         return Components.button(
-                        /*?}*/
+    /*?}*/
                         Text.literal("Add"),
                         button -> {
                             PlayerActionUtil.notifyAll("Please enter a restriction type and amount/name.");
@@ -184,9 +184,9 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
     private FlowLayout generateRestrictionButton(SellRestrictionControl control) {
         /*? if 1.21.11 {*/
         /*var horizontalFlow = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-         *//*?} else {*/
+        *//*?} else {*/
         var horizontalFlow = Containers.horizontalFlow(Sizing.content(), Sizing.content());
-        /*?}*/
+         /*?}*/
         String garbageCanEmoji = "\uD83D\uDDD1";
 
         /*? if 1.21.11 {*/
@@ -203,7 +203,7 @@ public class SellRestrictionsMenu<T extends Enum<T>> extends BaseOwoScreen<FlowL
                 ).margins(Insets.of(3, 3, 3, 1))
         ).child(
                 Components.button(
-                        /*?}*/
+        /*?}*/
                         Text.literal(garbageCanEmoji),
                         button -> {
 //                            dumb and not functional, we have to decide whether we still have this owo screen or not.

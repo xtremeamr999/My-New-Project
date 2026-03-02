@@ -7,6 +7,7 @@ import com.github.mkram17.bazaarutils.config.util.ConfigUtil;
 import com.github.mkram17.bazaarutils.data.UserOrdersStorage;
 import com.github.mkram17.bazaarutils.events.UserOrdersChangeEvent;
 import com.github.mkram17.bazaarutils.features.DisableErrorNotifications;
+import com.github.mkram17.bazaarutils.generated.BazaarUtilsModules;
 import com.github.mkram17.bazaarutils.misc.NotificationType;
 import com.github.mkram17.bazaarutils.utils.annotations.autoregistration.RunOnInit;
 import com.github.mkram17.bazaarutils.utils.bazaar.market.order.Order;
@@ -19,11 +20,14 @@ import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.mkram17.bazaarutils.BazaarUtils.EVENT_BUS;
 
@@ -90,7 +94,7 @@ public class Util {
                     }
                 });
 
-        if (!DisableErrorNotifications.isEnabled()) {
+        if (!BazaarUtilsModules.DisableErrorNotifications.isEnabled()) {
             PlayerActionUtil.sendPlayerMessage(messageText);
         }
 
@@ -180,6 +184,7 @@ public class Util {
         }
         return -1;
     }
+
     @Nullable
     public static Text findComponentWith(List<Text> components, String lookingFor){
         for(Text component : components){
@@ -187,6 +192,37 @@ public class Util {
                 return component;
         }
             return null;
+    }
+
+    public static List<Text> findComponentsSpanningMatch(List<Text> components, String lookingFor) {
+        String combined = components.stream()
+                .map(Text::getString)
+                .collect(Collectors.joining(" "));
+
+        int matchStart = combined.indexOf(lookingFor);
+
+        if (matchStart == -1) return List.of();
+
+        int matchEnd = matchStart + lookingFor.length();
+
+        List<Text> result = new LinkedList<>();
+
+        int currentOffset = 0;
+
+        for (Text component : components) {
+            String content = component.getString();
+
+            int componentStart = currentOffset;
+            int componentEnd = currentOffset + content.length();
+
+            if (componentStart < matchEnd && componentEnd > matchStart) {
+                result.add(component);
+            }
+
+            currentOffset = componentEnd;
+        }
+
+        return result.isEmpty() ? List.of() : result;
     }
 
     public static String removeFormatting(String str) {
@@ -242,7 +278,9 @@ public class Util {
     }
 
     public static double truncateNum(double num) {
-        return Math.round(num * 10.0) / 10.0;
+        return BigDecimal.valueOf(num)
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
 }
