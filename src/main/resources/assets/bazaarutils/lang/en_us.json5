@@ -77,7 +77,7 @@
   "bazaarutils.config.{}": {
 
     "separator.introductory.label": "Welcome to Bazaar Utils!",
-    "separator.introductory.hint": "first line!\nsecond line!",
+    "separator.introductory.hint": "Thank you for installing Bazaar Utils! This mod provides quality of life features for the Hypixel Bazaar.",
 
     "bazaar_flipper_account_upgrade.{}": {
       "label": "Bazaar Flipper Account Upgrade",
@@ -85,8 +85,8 @@
         "The tier of your ", { "translate": "bazaarutils.ref.bazaar_flipper" },
         " Account Upgrade, which is factored in on tax calculation and current order limits.",
         "\nYour Bazaar Flipper level can be upgraded by talking to ",
-        { "translate": "bazaarutils.ref.elizabeth" }, ", at the ",
-        { "translate": "bazaarutils.ref.community_center" }, ", in the ",
+        { "translate": "bazaarutils.ref.elizabeth" }, " at the ",
+        { "translate": "bazaarutils.ref.community_center" }, " in the ",
         { "translate": "bazaarutils.ref.skyblock_hub" }, "."
       ]
     },
@@ -98,17 +98,17 @@
       "separator.useless_bazaar_notifications_remover.label": "Useless Bazaar Notifications",
       "useless_bazaar_notifications_remover.{}": {
         "label": "Useless Bazaar Notifications",
-        "hint": "Enables to remove the transient messages sent to the chat by the Bazaar when interacting with it.",
+        "hint": "Removes specific transient messages sent to chat when interacting with the Bazaar to reduce clutter.",
         "excluded_notifications.{}": {
           "label": "Excluded Notifications",
-          "hint": "The list of transient messages/notifications to be excluded/unallowed from the chat"
+          "hint": "A list of messages and notifications to block from chat."
         }
       },
 
       "separator.stash_messages_remover.label": "Stash Messages",
       "stash_messages_remover.{}": {
         "label": "Stash Messages",
-        "hint": "Enables to remove the messages sent to the chat remembering to pick up your stash."
+        "hint": "Removes chat messages reminding you to pick up items from your stash."
       }
     },
 
@@ -118,38 +118,37 @@
 
       "separator.mod_buttons.{}": {
         "label": "Mod Buttons",
-        "hint": "Register buttons to inventory screens to quick access/manage features."
+        "hint": "Adds buttons to inventory screens for quick access to mod features."
       },
 
       "open_settings.{}": {
         "label": "Mod Settings Button",
-        "hint": "Adds a button to selected menus/screen to quick access the mods' settings."
+        "hint": "Adds a button to selected menus for quick access to the mod's settings."
       },
 
       "open_orders.{}": {
         "label": "Orders Page Button",
         "hint": [
-          "Adds a button to selected menus/screen to quick access your orders page.",
-          "\nRequires a ", { "translate": "bazaarutils.ref.booster_cookie" },
-          " effect active in order to function."
+          "Adds a button to selected menus for quick access to your orders page.",
+          "\n\nRequires an active ", { "translate": "bazaarutils.ref.booster_cookie" }, "."
         ]
       },
 
       "separator.container_buttons.{}": {
         "label": "Container Buttons",
-        "hint": "Register buttons in selected containers to act as helpers relevant to the screen."
+        "hint": "Adds helper buttons to specific container interfaces."
       },
 
       "cancel_order_and_search.{}": {
         "label": "Cancel & Search Button",
-        "hint": "Adds a button to an unfilled orders' (or offer) settings page to cancel it and search once again the item."
+        "hint": "Adds a button to unfilled order/offer pages to cancel the order and immediately search for the item again."
       },
 
       "button.{}": {
         "widget.{}": {
           "enabled.{}": {
             "label": "Enabled",
-            "hint": "Whether the button will be registered or not"
+            "hint": "Whether the button will be enabled."
           },
           "size.label": "Button Size",
           "spacing.label": "Spacing"
@@ -157,11 +156,11 @@
         "container.{}": {
           "enabled.{}": {
             "label": "Enabled",
-            "hint": "Whether the button will be registered or not"
+            "hint": "Whether the button will be enabled."
           },
           "slot_number.{}": {
             "label": "Slot Number",
-            "hint": "The container slot where the button will be registered at"
+            "hint": "The container slot where the button will be placed."
           }
         }
       },
@@ -171,17 +170,17 @@
 
         "separator.introductory.{}": {
           "label": "Item Bookmarks",
-          "hint": "Item Bookmarks are a feature which allows to quick search selected items onto the Bazaar."
+          "hint": "Item Bookmarks allow you to quickly search for specific items on the Bazaar."
         },
 
         "open_bookmark.{}": {
           "label": "Open Bookmark",
-          "hint": "Configures the button that appears on selected menus/screen to quick search the relevant bookmark."
+          "hint": "Configures the button on selected menus that quickly searches for the bookmarked item."
         },
 
         "toggle_bookmark.{}": {
           "label": "Bookmark Item",
-          "hint": "Adds a button to every item's page to toggle a quick access button to search the same item on the Bazaar."
+          "hint": "Adds a button to item pages to toggle whether the item is bookmarked for quick access."
         },
 
         "reset_bookmarks.label": "Saved Bookmarks",
@@ -197,16 +196,13 @@
       "instant_sell_restrictions.{}": {
         "label": "Instant Sell Restrictions",
         "hint": [
-          "Enables a locking functionality over the Bazaars' ",
-          { "translate": "bazaarutils.ref.instant_sell" },
-          " button, with inventory as well as action restriction."
+          "Locks the Bazaar's Instant Sell button based on inventory or action criteria to prevent accidental sales."
         ],
 
         "clicks_required.{}": {
           "label": "Clicks Required",
           "hint": [
-            "The amount of clicks required to be pressed on the ",
-            { "translate": "bazaarutils.ref.instant_sell" }, " item to allow the action."
+            "The number of clicks required on the Instant Sell button to confirm the action."
           ]
         },
 
@@ -217,8 +213,7 @@
           "separator.numeric_restrictions.{}": {
             "label": "Number predicates/restrictions",
             "hint": [
-              "These rules check for specific numeric conditions, such as the total number of items or coins, to restrict the ",
-              { "translate": "bazaarutils.ref.instant_sell" }, " action."
+              "Rules checking numeric conditions (e.g., total items or coins) to restrict Instant Sell."
             ]
           },
 
@@ -233,8 +228,7 @@
           "separator.string_restrictions.{}": {
             "label": "String predicates/restrictions",
             "hint": [
-              "These rules check for specific item names or types to determine if ",
-              { "translate": "bazaarutils.ref.instant_sell" }, " the action should be restricted."
+              "Rules checking specific item names or types to restrict Instant Sell."
             ]
           },
 
@@ -250,15 +244,15 @@
             "enabled.label": "Enabled",
             "numeric.{}": {
               "label": "Restriction Type",
-              "hint": "Whether the restriction will be on total coins worth or items held"
+              "hint": "Determines if the restriction applies to total coin value or item quantity."
             },
             "amount.{}": {
               "label": "Amount",
-              "hint": "The amount of coins or items held to lock upon"
+              "hint": "The quantity of coins or items required to trigger the lock."
             },
             "name.{}": {
               "label": "Item Name",
-              "hint": "The items' name which if held will lock"
+              "hint": "The name of the item that, if present, will lock Instant Sell."
             }
           }
         }
@@ -268,8 +262,7 @@
       "instant_sell_highlight.{}": {
         "label": "Instant Sell Highlight",
         "hint": [
-          "Highlights the items on your inventory that would be sold by the Bazaars' ",
-          { "translate": "bazaarutils.ref.instant_sell" }, " button."
+          "Highlights items in your inventory that would be sold by the Instant Sell button."
         ],
         "color.label": "Highlight Color"
       },
@@ -277,33 +270,33 @@
       "separator.order_status_highlight.label": "Order Status Highlight",
       "order_status_highlight.{}": {
         "label": "Order Status Highlight",
-        "hint": "Highlights the status of your Bazaar Orders by colouring their item of a representative color.",
+        "hint": "Highlights the status of your Bazaar Orders by coloring the items with representative colors.",
         "competitive_color.{}": {
           "label": "Competitive Color",
-          "hint": "The color to highlight orders which are the best offer to the market."
+          "hint": "The highlight color for orders that are currently the best market offer."
         },
         "matched_color.{}": {
           "label": "Matched Color",
-          "hint": "The color to highlight orders which match the market price."
+          "hint": "The highlight color for orders that match the current market price."
         },
         "outbid_color.{}": {
           "label": "Outbid Color",
-          "hint": "The color to highlight orders which are below the market price."
+          "hint": "The highlight color for orders that have been outbid."
         }
       }
     },
 
     "overlays.{}": {
       "category.label": "Overlays",
-      "category.hint": "Configurations for the overlays to be created by the mod",
+      "category.hint": "Configurations for the overlays created by the mod",
 
       "separator.price_charts.label": "Price Charts",
       "price_charts.{}": {
         "label": "Price Charts",
-        "hint": "Injects a link to every Bazaar Items' tooltip to quick access relevant market charts.",
+        "hint": "Adds a link to Bazaar item tooltips for quick access to market price charts.",
         "show_outside_bazaar.{}": {
           "label": "Show Outside of Bazaar",
-          "hint": "Whether to render the charts on items when outside of a Bazaar screen."
+          "hint": "Whether to show price charts in tooltips when outside of a Bazaar menu."
         }
       },
 
@@ -311,8 +304,7 @@
       "bazaar_limits_visualizer.{}": {
         "label": "Bazaar Limits",
         "hint": [
-          "Adds informational text to Bazaar Screens about the status of your daily Bazaar Limits.",
-          "\nThe Bazaar limits each profile to order/offer tradeables for up to ",
+          "Displays your daily Bazaar Limit status on Bazaar screens.\n\nProfiles are limited to ",
           {
             "text": "15,000,000,000.00 coins",
             "color": "gold",
@@ -325,7 +317,7 @@
               ]
             }
           },
-          " each day."
+          " in tradeable orders/offers per day."
         ],
         "reset_limits.label": "Daily Order Limits",
         "reset_limits.runnable": "Reset"
@@ -334,26 +326,26 @@
 
     "notifications.{}": {
       "category.label": "Notifications",
-      "category.hint": "Configurations for the notifications to be pushed by the mod",
+      "category.hint": "Configurations for the notifications pushed by the mod",
 
       "separator.order_notifications.label": "Order Notifications",
       "order_notifications.{}": {
         "label": "Order Notifications",
-        "hint": "Enables functions to produce different types of notifications, related to the status of your orders.",
+        "hint": "Enables notifications related to the status of your Bazaar orders.",
         "outbid.{}": {
           "label": "Order Outbidded",
-          "hint": "Configure the notification to be produced when an order/offer of yours is outbidded."
+          "hint": "Configures the notification shown when your order is outbid."
         },
         "filled.{}": {
           "label": "Order Filled",
-          "hint": "Configure the notification to be produced when an order/offer of yours is filled."
+          "hint": "Configures the notification shown when your order is filled."
         }
       },
 
       "notification.{}": {
         "enabled.{}": {
           "label": "Enabled",
-          "hint": "Whether the notification will be produced or not"
+          "hint": "Whether the notification will be produced."
         },
         "auto_open_bazaar.label": "Auto Open Bazaar",
         "emit_chat_message.label": "Emit Chat Message",
@@ -366,12 +358,12 @@
       "category.hint": "Developer configurations & toggleable tools of the mod",
       "enabled.{}": {
         "label": "Enabled",
-        "hint": "Global toggle for all developer related functionalities/utilities."
+        "hint": "Global toggle for all developer features and utilities."
       },
       "disable_error_notifications.label": "Disable Error Notifications",
       "debug_messages.{}": {
         "label": "Debug Messages",
-        "hint": "Configure the messages or notifications pushed to the chat about routines & the state of the mod"
+        "hint": "Configures debug messages sent to chat regarding mod routines and state"
       }
     }
   }
