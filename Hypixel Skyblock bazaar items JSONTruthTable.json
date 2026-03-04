@@ -1,0 +1,2381 @@
+{
+  "Farming": [
+    {
+      "Wheat & Seeds": [
+        "Wheat",
+        "Enchanted Bread",
+        "Enchanted Wheat",
+        "Enchanted Hay Bale",
+        "Seeds",
+        "Enchanted Seeds",
+        "Box of Seeds"
+      ]
+    },
+    {
+      "Carrot": [
+        "Carrot",
+        "Enchanted Carrot",
+        "Enchanted Carrot on a Stick",
+        "Enchanted Golden Carrot"
+      ]
+    },
+    {
+      "Potato": [
+        "Potato",
+        "Poisonous Potato",
+        "Enchanted Potato",
+        "Enchanted Poisonous Potato",
+        "Enchanted Baked Potato"
+      ]
+    },
+    {
+      "Pumpkin": [
+        "Pumpkin",
+        "Enchanted Pumpkin",
+        "Polished Pumpkin"
+      ]
+    },
+    {
+      "Melon": [
+        "Melon",
+        "Enchanted Melon",
+        "Enchanted Glistering Melon",
+        "Melon Block",
+        "Enchanted Melon Block"
+      ]
+    },
+    {
+      "Mushrooms": [
+        "Red Mushroom",
+        "Enchanted Red Mushroom",
+        "Red Mushroom Block",
+        "Enchanted Red Mushroom Block",
+        "Brown Mushroom",
+        "Enchanted Brown Mushroom",
+        "Brown Mushroom Block",
+        "Enchanted Brown Mushroom Block"
+      ]
+    },
+    {
+      "Cocoa Beans": [
+        "Cocoa Beans",
+        "Enchanted Cocoa Bean",
+        "Enchanted Cookie",
+        "Cactus",
+        "Enchanted Cactus Green",
+        "Enchanted Cactus",
+        {
+          "Cactus": []
+        }
+      ]
+    },
+    {
+      "Sugar Cane": [
+        "Sugar Cane",
+        "Enchanted Sugar",
+        "Enchanted Paper",
+        "Enchanted Sugar Cane"
+      ]
+    },
+    {
+      "Leather & Beef": [
+        "Leather",
+        "Enchanted Leather",
+        "Raw Beef",
+        "Enchanted Raw Beef"
+      ]
+    },
+    {
+      "Pork": [
+        "Raw Porkchop",
+        "Enchanted Pork",
+        "Enchanted Grilled Pork"
+      ]
+    },
+    {
+      "Chicken & Feather": [
+        "Raw Chicken",
+        "Enchanted Raw Chicken",
+        "Enchanted Cake",
+        "Feather",
+        "Enchanted Feather",
+        "Egg",
+        "Enchanted Egg",
+        "Super Enchanted Egg",
+        "Omega Enchanted Egg",
+        "Mutton",
+        "Enchanted Mutton",
+        "Enchanted Cooked Mutton",
+        "White Wool",
+        "Enchanted Wool",
+        {
+          "Mutton": []
+        }
+      ]
+    },
+    {
+      "Rabbit": [
+        "Raw Rabbit",
+        "Enchanted Raw Rabbit",
+        "Enchanted Cooked Rabbit",
+        "Rabbit's Foot",
+        "Rabbit Hide",
+        "Enchanted Rabbit Foot",
+        "Enchanted Rabbit Hide"
+      ]
+    },
+    {
+      "Nether Warts": [
+        "Nether Wart",
+        "Enchanted Nether Wart",
+        "Mutant Nether Wart"
+      ]
+    },
+    {
+      "Garden": [
+        "Compost",
+        "Compost Bundle",
+        "Cropie",
+        "Squash",
+        "Fermento",
+        "Condensed Fermento",
+        "Dung",
+        "Tasty Cheese",
+        "Plant Matter",
+        "Honey Jar",
+        "Wriggling Larva",
+        "Fine Flour"
+      ]
+    }
+  ],
+  "Mining": [
+    {
+      "Cobblestone": [
+        "Cobblestone",
+        "Enchanted Cobblestone"
+      ]
+    },
+    {
+      "Coal": [
+        "Coal",
+        "Enchanted Coal",
+        "Enchanted Charcoal",
+        "Enchanted Block of Coal"
+      ]
+    },
+    {
+      "Iron": [
+        "Iron Ingot",
+        "Enchanted Iron",
+        "Enchanted Iron Block"
+      ]
+    },
+    {
+      "Gold": [
+        "Gold Ingot",
+        "Enchanted Gold",
+        "Enchanted Gold Block"
+      ]
+    },
+    {
+      "Diamond": [
+        "Diamond",
+        "Enchanted Diamond",
+        "Enchanted Diamond Block",
+        "Refined Diamond"
+      ]
+    },
+    {
+      "Lapis": [
+        "Lapis Lazuli",
+        "Enchanted Lapis Lazuli",
+        "Enchanted Lapis Block"
+      ]
+    },
+    {
+      "Emerald": [
+        "Emerald",
+        "Enchanted Emerald",
+        "Enchanted Emerald Block"
+      ]
+    },
+    {
+      "Redstone": [
+        "Redstone",
+        "Enchanted Redstone",
+        "Enchanted Redstone Block"
+      ]
+    },
+    {
+      "Obsidian": [
+        "Obsidian",
+        "Enchanted Obsidian"
+      ]
+    },
+    {
+      "End Stone": [
+        "End Stone",
+        "Enchanted End Stone"
+      ]
+    },
+    {
+      "Flint & Gravel": [
+        "Flint",
+        "Enchanted Flint",
+        "Gravel"
+      ]
+    },
+    {
+      "Sand": [
+        "Sand",
+        "Enchanted Sand"
+      ]
+    },
+    {
+      "Ice": [
+        "Ice",
+        "Packed Ice",
+        "Enchanted Ice",
+        "Enchanted Packed Ice",
+        "Glacial Fragment"
+      ]
+    },
+    {
+      "Snow": [
+        "Snowball",
+        "Snow Block",
+        "Enchanted Snow Block"
+      ]
+    },
+    {
+      "Hard Stone": [
+        "Hard Stone",
+        "Enchanted Hard Stone",
+        "Concentrated Stone"
+      ]
+    },
+    {
+      "Gemstones": [
+        {
+          "Jade Gemstone": [
+            "Rough Jade Gemstone",
+            "Flawed Jade Gemstone",
+            "Fine Jade Gemstone",
+            "Flawless Jade Gemstone",
+            "Perfect Jade Gemstone"
+          ]
+        },
+        {
+          "Amber Gemstone": [
+            "Rough Amber Gemstone",
+            "Flawed Amber Gemstone",
+            "Fine Amber Gemstone",
+            "Flawless Amber Gemstone",
+            "Perfect Amber Gemstone"
+          ]
+        },
+        {
+          "Topaz Gemstone": [
+            "Rough Topaz Gemstone",
+            "Flawed Topaz Gemstone",
+            "Fine Topaz Gemstone",
+            "Flawless Topaz Gemstone",
+            "Perfect Topaz Gemstone"
+          ]
+        },
+        {
+          "Sapphire Gemstone": [
+            "Rough Sapphire Gemstone",
+            "Flawed Sapphire Gemstone",
+            "Fine Sapphire Gemstone",
+            "Flawless Sapphire Gemstone",
+            "Perfect Sapphire Gemstone"
+          ]
+        },
+        {
+          "Amethyst Gemstone": [
+            "Rough Amethyst Gemstone",
+            "Flawed Amethyst Gemstone",
+            "Fine Amethyst Gemstone",
+            "Flawless Amethyst Gemstone",
+            "Perfect Amethyst Gemstone"
+          ]
+        },
+        {
+          "Jasper Gemstone": [
+            "Rough Jasper Gemstone",
+            "Flawed Jasper Gemstone",
+            "Fine Jasper Gemstone",
+            "Flawless Jasper Gemstone",
+            "Perfect Jasper Gemstone"
+          ]
+        },
+        {
+          "Ruby Gemstone": [
+            "Rough Ruby Gemstone",
+            "Flawed Ruby Gemstone",
+            "Fine Ruby Gemstone",
+            "Flawless Ruby Gemstone",
+            "Perfect Ruby Gemstone"
+          ]
+        },
+        {
+          "Opal Gemstone": [
+            "Rough Opal Gemstone",
+            "Flawed Opal Gemstone",
+            "Fine Opal Gemstone",
+            "Flawless Opal Gemstone",
+            "Perfect Opal Gemstone"
+          ]
+        },
+        {
+          "Onyx Gemstone": [
+            "Rough Onyx Gemstone",
+            "Flawed Onyx Gemstone",
+            "Fine Onyx Gemstone",
+            "Flawless Onyx Gemstone",
+            "Perfect Onyx Gemstone"
+          ]
+        },
+        {
+          "Aquamarine Gemstone": [
+            "Rough Aquamarine Gemstone",
+            "Flawed Aquamarine Gemstone",
+            "Fine Aquamarine Gemstone",
+            "Flawless Aquamarine Gemstone",
+            "Perfect Aquamarine Gemstone"
+          ]
+        },
+        {
+          "Citrine Gemstone": [
+            "Rough Citrine Gemstone",
+            "Flawed Citrine Gemstone",
+            "Fine Citrine Gemstone",
+            "Flawless Citrine Gemstone",
+            "Perfect Citrine Gemstone"
+          ]
+        },
+        {
+          "Peridot Gemstone": [
+            "Rough Peridot Gemstone",
+            "Flawed Peridot Gemstone",
+            "Fine Peridot Gemstone",
+            "Flawless Peridot Gemstone",
+            "Perfect Peridot Gemstone"
+          ]
+        }
+      ]
+    },
+    {
+      "Goblin Eggs": [
+        "Goblin Egg",
+        "Red Goblin Egg",
+        "Blue Goblin Egg",
+        "Yellow Goblin Egg",
+        "Green Goblin Egg"
+      ]
+    },
+    {
+      "Dwarven Mines": [
+        "Mithril",
+        "Enchanted Mithril",
+        "Refined Mithril",
+        "Starfall",
+        "Titanium",
+        "Enchanted Titanium",
+        "Refined Titanium",
+        "Treasurite",
+        "Sorrow"
+      ]
+    },
+    {
+      "Forge": [
+        "Plasma",
+        "Glacite Jewel",
+        "Fuel Canister",
+        "Bejeweled Handle",
+        "Gemstone Mixture",
+        "Mithril Plate",
+        "Drill Motor",
+        "Golden Plate"
+      ]
+    },
+    {
+      "Crystal Hollows": [
+        "Precursor Apparatus",
+        "Electron Transmitter",
+        "FTX 3070",
+        "Robotron Reflector",
+        "Superlite Motor",
+        "Control Switch",
+        "Synthetic Heart",
+        "Jungle Key",
+        "Jungle Heart",
+        "Divan Fragment",
+        "Corleonite",
+        "Sludge Juice",
+        "Yoggie",
+        "Ascension Rope",
+        "Wishing Compass",
+        "Bob-omb"
+      ]
+    },
+    {
+      "Crimson Isle": [
+        {
+          "Glowstone": [
+            "Glowstone Dust",
+            "Enchanted Glowstone Dust",
+            "Enchanted Glowstone",
+            "Enchanted Redstone Lamp"
+          ]
+        },
+        {
+          "Netherrack": [
+            "Netherrack",
+            "Enchanted Netherrack"
+          ]
+        },
+        {
+          "Quartz": [
+            "Nether Quartz",
+            "Enchanted Quartz",
+            "Enchanted Quartz Block"
+          ]
+        },
+        {
+          "Red Sand": [
+            "Red Sand",
+            "Enchanted Red Sand",
+            "Enchanted Red Sand Cube"
+          ]
+        },
+        {
+          "Sulphur": [
+            "Sulphur",
+            "Enchanted Sulphur",
+            "Enchanted Sulphur Cube"
+          ]
+        },
+        {
+          "Mycelium": [
+            "Mycelium",
+            "Enchanted Mycelium",
+            "Enchanted Mycelium Cube"
+          ]
+        },
+        {
+          "Glacite Tunnels": [
+            "Umber",
+            "Enchanted Umber",
+            "Refined Umber",
+            "Umber Plate",
+            "Umber Key",
+            "Tungsten",
+            "Enchanted Tungsten",
+            "Refined Tungsten",
+            "Tungsten Plate",
+            "Tungsten Key",
+            "Glacite",
+            "Enchanted Glacite",
+            "Glacite Amalgamation",
+            "Perfect Plate",
+            "Skeleton Key",
+            "Suspicious Scrap"
+          ]
+        }
+      ]
+    }
+  ],
+  "Combat": [
+    {
+      "Rotten Flesh": [
+        "Rotten Flesh",
+        "Enchanted Rotten Flesh"
+      ]
+    },
+    {
+      "Bone": [
+        "Bone",
+        "Enchanted Bone",
+        "Enchanted Bone Block",
+        "Enchanted Bone Meal"
+      ]
+    },
+    {
+      "Arachnids": [
+        "String",
+        "Enchanted String",
+        "Spider Eye",
+        "Enchanted Spider Eye",
+        "Enchanted Fermented Spider Eye",
+        "Soul String",
+        "Arachne's Calling",
+        "Arachne Fragment",
+        "Arachne's Fang"
+      ]
+    },
+    {
+      "Gunpowder": [
+        "Gunpowder",
+        "Enchanted Gunpowder",
+        "Enchanted Firework Rocket"
+      ]
+    },
+    {
+      "Ender Pearl": [
+        "Ender Pearl",
+        "Enchanted Ender Pearl",
+        "Enchanted Eye of Ender",
+        "Absolute Ender Pearl",
+        "Tessellated Ender Pearl"
+      ]
+    },
+    {
+      "Ghast Tear": [
+        "Ghast Tear",
+        "Enchanted Ghast Tear",
+        "Silver Fang"
+      ]
+    },
+    {
+      "Slimes": [
+        "Slimeball",
+        "Enchanted Slimeball",
+        "Enchanted Slime Block",
+        "Poison Sample"
+      ]
+    },
+    {
+      "Magma Cream": [
+        "Magma Cream",
+        "Enchanted Magma Cream",
+        "Whipped Magma Cream"
+      ]
+    },
+    {
+      "Blaze Rod": [
+        "Blaze Rod",
+        "Enchanted Blaze Powder",
+        "Enchanted Blaze Rod"
+      ]
+    },
+    {
+      "The End": [
+        "Summoning Eye",
+        "Crystal Fragment",
+        "Protector Dragon Fragment",
+        "Old Dragon Fragment",
+        "Unstable Dragon Fragment",
+        "Strong Dragon Fragment",
+        "Young Dragon Fragment",
+        "Wise Dragon Fragment",
+        "Superior Dragon Fragment",
+        "Holy Dragon Fragment",
+        "Ritual Residue",
+        "Mite Gel",
+        {
+          "Dragon Fragments": []
+        },
+        {
+          "Draconic Sarcrifice": []
+        }
+      ]
+    },
+    {
+      "Crimson Isle": [
+        {
+          "Mob Drops": [
+            "Blaze Ashes",
+            "Mutated Blaze Ashes",
+            "Millennia-Old Blaze Ashes",
+            "Spectre Dust",
+            "Wither Soul",
+            "Bezos",
+            "Magmag",
+            "Digested Mushrooms",
+            "Burning Eye",
+            "Magma Chunk",
+            "Gazing Pearl",
+            "Flames",
+            "Kada Lead",
+            "Match-Sticks",
+            "Tentacle Meat",
+            "Corrupted Fragment"
+          ]
+        },
+        {
+          "Mini Bosses": [
+            "Hallowed Skull",
+            "Spell Powder",
+            "Leather Cloth",
+            "Lumino Fiber",
+            "Compact Ooze",
+            "Rekindled Ember Fragment"
+          ]
+        },
+        {
+          "Special": [
+            "Nether Star",
+            "Heavy Pearl",
+            "Kuudra Teeth",
+            "X",
+            "Y",
+            "Z"
+          ]
+        }
+      ]
+    },
+    {
+      "Slayers": [
+        {
+          "Revenant Horror": [
+            "Revenant Flesh",
+            "Revenant Viscera",
+            "Golden Powder",
+            "Undead Catalyst",
+            "Revenant Catalyst"
+          ]
+        },
+        {
+          "Tarantula Broodfather": [
+            "Tarantula Web",
+            "Tarantula Silk",
+            "Spider Catalyst",
+            "Tarantula Catalyst",
+            "Fly Swatter",
+            "Toxic Arrow Poison"
+          ]
+        },
+        {
+          "Sven Packmaster": [
+            "Wolf Tooth",
+            "Golden Tooth",
+            "Weak Wolf Catalyst"
+          ]
+        },
+        {
+          "Voidgloom Seraph": [
+            "Null Sphere",
+            "Null Ovoid",
+            "Null Atom",
+            "Raw Soulflow",
+            "Soulflow_(Item)",
+            "Braided Griffin Feather",
+            "Twilight Arrow Poison",
+            "Null Blade",
+            "Null Edge"
+          ]
+        },
+        {
+          "Inferno Demonlord": [
+            "Derelict Ashe",
+            "Amalgamated Crimsonite",
+            "Molten Powder",
+            "Blaze Rod Distillate",
+            "Gabagool Distillate",
+            "Glowstone Distillate",
+            "Magma Cream Distillate",
+            "Nether Wart Distillate",
+            "Bundle of Magma Arrows",
+            "Kelvin Inverter",
+            "Subzero Inverter"
+          ]
+        },
+        {
+          "Catacombs": [
+            {
+              "Special Fragments": [
+                "Jolly Pink Rock",
+                "L.A.S.R.'s Eye",
+                "Bigfoot's Lasso",
+                "Diamante's Handle"
+              ]
+            },
+            {
+              "Mob Drops": [
+                "Mimic Fragment",
+                "Fel Pearl",
+                "Ancient Rose",
+                "Healing Tissue"
+              ]
+            },
+            {
+              "Secret Drops": [
+                "Dungeon Chest Key",
+                "Superboom TNT",
+                "Trap",
+                "Spirit Leap",
+                "Inflatable Jerry",
+                "Decoy",
+                "Architect's First Draft"
+              ]
+            },
+            {
+              "Catacombs Misc.": [
+                "Kismet Feather",
+                "Wither Catalyst",
+                "Spirit Wing",
+                "Spirit Bone"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Woods & Fishes": [
+    {
+      "Wood": [
+        {
+          "Oak": [
+            "Oak Log",
+            "Enchanted Oak Log"
+          ]
+        },
+        {
+          "Spruce": [
+            "Spruce Log",
+            "Enchanted Spruce Log"
+          ]
+        },
+        {
+          "Birch": [
+            "Birch Log",
+            "Enchanted Birch Log"
+          ]
+        },
+        {
+          "Dark Oak": [
+            "Dark Oak Log",
+            "Enchanted Dark Oak Log"
+          ]
+        },
+        {
+          "Acacia": [
+            "Acacia Log",
+            "Enchanted Acacia Log"
+          ]
+        },
+        {
+          "Jungle": [
+            "Jungle Log",
+            "Enchanted Jungle Log"
+          ]
+        },
+        {
+          "Fig": [
+            "Fig Log",
+            "Enchanted Fig Log",
+            "Figstone"
+          ]
+        },
+        {
+          "Mangrove": [
+            "Mangrove Log",
+            "Enchanted Mangrove Log",
+            "Mangcore"
+          ]
+        }
+      ]
+    },
+    {
+      "Fish": [
+        {
+          "Raw Fish": [
+            "Raw Fish",
+            "Enchanted Raw Fish",
+            "Enchanted Cooked Fish"
+          ]
+        },
+        {
+          "Salmon": [
+            "Raw Salmon",
+            "Enchanted Raw Salmon",
+            "Enchanted Cooked Salmon"
+          ]
+        },
+        {
+          "Clownfish": [
+            "Clownfish",
+            "Enchanted Clownfish"
+          ]
+        },
+        {
+          "Pufferfish": [
+            "Pufferfish",
+            "Enchanted Pufferfish"
+          ]
+        }
+      ]
+    },
+    {
+      "Flowers": [
+        "Poppy",
+        "Enchanted Poppy",
+        "Dandelion",
+        "Enchanted Dandelion"
+      ]
+    },
+    {
+      "Prismarine": [
+        "Prismarine Shard",
+        "Enchanted Prismarine Shard",
+        "Prismarine Crystals",
+        "Enchanted Prismarine Crystals"
+      ]
+    },
+    {
+      "Clay": [
+        "Clay",
+        "Enchanted Clay",
+        "Enchanted Clay Block"
+      ]
+    },
+    {
+      "Sponge": [
+        "Sponge",
+        "Enchanted Sponge",
+        "Enchanted Wet Sponge"
+      ]
+    },
+    {
+      "Lily Pad": [
+        "Lily Pad",
+        "Enchanted Lily Pad"
+      ]
+    },
+    {
+      "Ink Sac": [
+        "Ink Sac",
+        "Enchanted Ink Sac"
+      ]
+    },
+    {
+      "Baits": [
+        "Carrot Bait",
+        "Minnow Bait",
+        "Fish Bait",
+        "Light Bait",
+        "Dark Bait",
+        "Spooky Bait",
+        "Spiked Bait",
+        "Blessed Bait",
+        "Ice Bait",
+        "Frozen Bait",
+        "Whale Bait",
+        "Shark Bait",
+        "Corrupted Bait",
+        "Hot Bait",
+        "Glowy Chum Bait",
+        "Worm Bait",
+        "Golden Bait",
+        "Treasure Bait",
+        "Hotspot Bait",
+        "Wooden Bait"
+      ]
+    },
+    {
+      "Mob Drops": [
+        "Worm Membrane",
+        "Hunk of Ice",
+        "Hunk of Blue Ice",
+        "Emperor's Skull",
+        "Bobbin' Scriptures",
+        "Magma Core",
+        "Half-Eaten Mushroom",
+        "Singed Powder",
+        "Fried Feather",
+        "Scorched Crab Stick",
+        "Brimstone Handle",
+        "Broken Radar",
+        "Blue Ring"
+      ]
+    },
+    {
+      "Magmafish": [
+        "Magmafish",
+        "Silver Magmafish",
+        "Gold Magmafish",
+        "Diamond Magmafish"
+      ]
+    },
+    {
+      "Lava Fishing": [
+        "Lava Shell",
+        "Lump of Magma",
+        "Moogma Pelt",
+        "Cup of Blood",
+        "Pyroclastic Scale",
+        "Flaming Heart",
+        "Orb of Energy",
+        "Horn of Taurus",
+        "Thunder Fragment",
+        "Magma Lord Fragment"
+      ]
+    },
+    {
+      "Water Orbs": [
+        "Water Orb",
+        "Lava Water Orb",
+        "Spooky Water Orb",
+        "Shark Water Orb",
+        "Winter Water Orb",
+        "Bayou Water Orb",
+        "Hotspot Water Orb"
+      ]
+    },
+    {
+      "Chum Fishing": [
+        "Chum",
+        "Glowing Mushroom",
+        "Empty Chum Bucket",
+        "Full Chum Bucket",
+        "Rusty Coin",
+        "Busted Belt Buckle",
+        "Old Leather Boot",
+        "Torn Cloth",
+        "Bronze Bowl",
+        "Alligator Skin",
+        "Titanoboa Shed",
+        "Can of Worms",
+        {
+          "Backwater Bayou": []
+        }
+      ]
+    },
+    {
+      "Moonglade Marsh": [
+        "Vinesap",
+        "Enchanted Vinesap",
+        "Tender Wood",
+        "Enchanted Tender Wood",
+        "Sea Lumies",
+        "Enchanted Sea Lumies",
+        "Flexbone",
+        "Lushlilac",
+        "Lushlilac Bonbon",
+        "Exalted Lushlilac Bonbon",
+        "Prime Lushlilac Bonbon",
+        "Candycomb",
+        "Oceandy",
+        "Wet Water",
+        "Gill Membrane",
+        "Sturdy Bone",
+        "Starlyn Prize",
+        "Deep Root"
+      ]
+    }
+  ],
+  "Oddities": [
+    "Booster Cookie",
+    "Stock of Stonks",
+    {
+      "Modifiers": [
+        {
+          "Item Upgrades": [
+            "Recombobulator 3000",
+            "Wood Singularity",
+            "Silex",
+            "Transmission Tuner",
+            "Divan's Powder Coating",
+            "Golden Bounty",
+            "Mana Disintegrator",
+            "A Beginner's Guide to Pesthunting",
+            "Gold Bottle Cap",
+            "Troubled Bubble",
+            "Severed Pincer",
+            "Octopus Tendril",
+            "Chain of the End Times",
+            "Ensnared Snail"
+          ]
+        },
+        {
+          "Wither Scrolls": [
+            "Implosion",
+            "Wither Shield",
+            "Shadow Warp"
+          ]
+        },
+        {
+          "Master Stars": [
+            "First Master Star",
+            "Second Master Star",
+            "Third Master Star",
+            "Fourth Master Star",
+            "Fifth Master Star"
+          ]
+        },
+        {
+          "Book Modifiers": [
+            "Hot Potato Book",
+            "Fuming Potato Book",
+            "Book of Stats",
+            "The Art of War",
+            "Farming for Dummies",
+            "The Art of Peace",
+            "Jalapeno Book",
+            "Bookworm's Favorite Book",
+            "Polarvoid Book",
+            "Wet Book"
+          ]
+        },
+        {
+          "Foraging Booster": [
+            "Fighting Booster",
+            "Foraging Fortune Booster",
+            "Foraging Wisdom Booster",
+            "Sweep Booster"
+          ]
+        }
+      ]
+    },
+    {
+      "Enchantments": [
+        {
+          "Normal Enchantments": [
+            "Enchanted Book (Absorb I)",
+            "Enchanted Book (Angler VI)",
+            "Enchanted Book (Bane of Arthropods VI)",
+            "Enchanted Book (Blessing VI)",
+            "Enchanted Book (Caster VI)",
+            "Enchanted Book (Champion I)",
+            "Enchanted Book (Cleave VI)",
+            "Enchanted Book (Compact I)",
+            "Enchanted Book (Cubism VI)",
+            "Enchanted Book (Cultivating I)",
+            "Enchanted Book (Delicate V)",
+            "Enchanted Book (Execute VI)",
+            "Enchanted Book (Expertise I)",
+            "Enchanted Book (Fire Aspect III)",
+            "Enchanted Book (First Strike V)",
+            "Enchanted Book (Fortune IV)",
+            "Enchanted Book (Frail VI)",
+            "Enchanted Book (Harvesting VI)",
+            "Enchanted Book (Lethality VI)",
+            "Enchanted Book (Luck of the Sea VI)",
+            "Enchanted Book (Lure VI)",
+            "Enchanted Book (Magnet VI)",
+            "Enchanted Book (Piscary VI)",
+            "Enchanted Book (Prosecute VI)",
+            "Enchanted Book (Replenish I)",
+            "Enchanted Book (Respiration IV)",
+            "Enchanted Book (Snipe IV)",
+            "Enchanted Book (Spiked Hook VI)",
+            "Enchanted Book (Stealth I)",
+            "Enchanted Book (Toxophilite I)",
+            "Enchanted Book (Triple-Strike V)",
+            "Enchanted Book (True Protection I)",
+            "Enchanted Book (Vampirism VI)",
+            "Enchanted Book (Venomous VI)",
+            {
+              "Big Brain": [
+                "Enchanted Book (Big Brain III)",
+                "Enchanted Book (Big Brain IV)",
+                "Enchanted Book (Big Brain V)"
+              ]
+            },
+            {
+              "Blast Protection": [
+                "Enchanted Book (Blast Protection VI)",
+                "Enchanted Book (Blast Protection VII)"
+              ]
+            },
+            {
+              "Cayenne": [
+                "Enchanted Book (Cayenne IV)",
+                "Enchanted Book (Cayenne V)"
+              ]
+            },
+            {
+              "Chance": [
+                "Enchanted Book (Chance IV)",
+                "Enchanted Book (Chance V)"
+              ]
+            },
+            {
+              "Charm": [
+                "Enchanted Book (Charm I)",
+                "Enchanted Book (Charm II)",
+                "Enchanted Book (Charm III)",
+                "Enchanted Book (Charm IV)",
+                "Enchanted Book (Charm V)"
+              ]
+            },
+            {
+              "Corruption": [
+                "Enchanted Book (Corruption I)",
+                "Enchanted Book (Corruption II)",
+                "Enchanted Book (Corruption III)",
+                "Enchanted Book (Corruption IV)",
+                "Enchanted Book (Corruption V)"
+              ]
+            },
+            {
+              "Counter-Strike": [
+                "Enchanted Book (Counter-Strike III)",
+                "Enchanted Book (Counter-Strike IV)",
+                "Enchanted Book (Counter-Strike V)"
+              ]
+            },
+            {
+              "Critical": [
+                "Enchanted Book (Critical VI)",
+                "Enchanted Book (Critical VII)"
+              ]
+            },
+            {
+              "Dedication": [
+                "Enchanted Book (Dedication I)",
+                "Enchanted Book (Dedication II)",
+                "Enchanted Book (Dedication III)",
+                "Enchanted Book (Dedication IV)"
+              ]
+            },
+            {
+              "Divine Gift": [
+                "Enchanted Book (Divine Gift I)",
+                "Enchanted Book (Divine Gift II)",
+                "Enchanted Book (Divine Gift III)"
+              ]
+            },
+            {
+              "Dragon Hunter": [
+                "Enchanted Book (Dragon Hunter I)",
+                "Enchanted Book (Dragon Hunter II)",
+                "Enchanted Book (Dragon Hunter III)",
+                "Enchanted Book (Dragon Hunter IV)",
+                "Enchanted Book (Dragon Hunter V)"
+              ]
+            },
+            {
+              "Drain": [
+                "Enchanted Book (Drain IV)",
+                "Enchanted Book (Drain V)"
+              ]
+            },
+            {
+              "Ender Slayer": [
+                "Enchanted Book (Ender Slayer VI)",
+                "Enchanted Book (Ender Slayer VII)"
+              ]
+            },
+            {
+              "Experience": [
+                "Enchanted Book (Experience IV)",
+                "Enchanted Book (Experience V)"
+              ]
+            },
+            {
+              "Feather Falling": [
+                "Enchanted Book (Feather Falling VI)",
+                "Enchanted Book (Feather Falling VII)",
+                "Enchanted Book (Feather Falling VIII)",
+                "Enchanted Book (Feather Falling IX)",
+                "Enchanted Book (Feather Falling X)"
+              ]
+            },
+            {
+              "Ferocious Mana": [
+                "Enchanted Book (Ferocious Mana I)",
+                "Enchanted Book (Ferocious Mana II)",
+                "Enchanted Book (Ferocious Mana III)",
+                "Enchanted Book (Ferocious Mana IV)",
+                "Enchanted Book (Ferocious Mana V)",
+                "Enchanted Book (Ferocious Mana VI)",
+                "Enchanted Book (Ferocious Mana VII)",
+                "Enchanted Book (Ferocious Mana VIII)",
+                "Enchanted Book (Ferocious Mana IX)",
+                "Enchanted Book (Ferocious Mana X)"
+              ]
+            },
+            {
+              "Fire Protection": [
+                "Enchanted Book (Fire Protection VI)",
+                "Enchanted Book (Fire Protection VII)"
+              ]
+            },
+            {
+              "Forest Pledge": [
+                "Enchanted Book (Forest Pledge III)",
+                "Enchanted Book (Forest Pledge IV)",
+                "Enchanted Book (Forest Pledge V)"
+              ]
+            },
+            {
+              "Giant Killer": [
+                "Enchanted Book (Giant Killer VI)",
+                "Enchanted Book (Giant Killer VII)"
+              ]
+            },
+            {
+              "Green Thumb": [
+                "Enchanted Book (Green Thumb I)",
+                "Enchanted Book (Green Thumb II)",
+                "Enchanted Book (Green Thumb III)",
+                "Enchanted Book (Green Thumb IV)",
+                "Enchanted Book (Green Thumb V)"
+              ]
+            },
+            {
+              "Growth": [
+                "Enchanted Book (Growth VI)",
+                "Enchanted Book (Growth VII)"
+              ]
+            },
+            {
+              "Hardened Mana": [
+                "Enchanted Book (Hardened Mana I)",
+                "Enchanted Book (Hardened Mana II)",
+                "Enchanted Book (Hardened Mana III)",
+                "Enchanted Book (Hardened Mana IV)",
+                "Enchanted Book (Hardened Mana V)",
+                "Enchanted Book (Hardened Mana VI)",
+                "Enchanted Book (Hardened Mana VII)",
+                "Enchanted Book (Hardened Mana VIII)",
+                "Enchanted Book (Hardened Mana IX)",
+                "Enchanted Book (Hardened Mana X)"
+              ]
+            },
+            {
+              "Hecatomb": [
+                "Enchanted Book (Hecatomb I)",
+                "Enchanted Book (Hecatomb II)",
+                "Enchanted Book (Hecatomb III)",
+                "Enchanted Book (Hecatomb IV)",
+                "Enchanted Book (Hecatomb V)",
+                "Enchanted Book (Hecatomb VI)",
+                "Enchanted Book (Hecatomb VII)",
+                "Enchanted Book (Hecatomb VIII)",
+                "Enchanted Book (Hecatomb IX)",
+                "Enchanted Book (Hecatomb X)"
+              ]
+            },
+            {
+              "Ice Cold": [
+                "Enchanted Book (Ice Cold I)",
+                "Enchanted Book (Ice Cold II)",
+                "Enchanted Book (Ice Cold III)",
+                "Enchanted Book (Ice Cold IV)",
+                "Enchanted Book (Ice Cold V)"
+              ]
+            },
+            {
+              "Infinite Quiver": [
+                "Enchanted Book (Infinite Quiver VI)",
+                "Enchanted Book (Infinite Quiver VII)",
+                "Enchanted Book (Infinite Quiver VIII)",
+                "Enchanted Book (Infinite Quiver IX)",
+                "Enchanted Book (Infinite Quiver X)"
+              ]
+            },
+            {
+              "Lapidary": [
+                "Enchanted Book (Lapidary I)",
+                "Enchanted Book (Lapidary II)",
+                "Enchanted Book (Lapidary III)",
+                "Enchanted Book (Lapidary IV)",
+                "Enchanted Book (Lapidary V)"
+              ]
+            },
+            {
+              "Life Steal": [
+                "Enchanted Book (Life Steal IV)",
+                "Enchanted Book (Life Steal V)"
+              ]
+            },
+            {
+              "Looting": [
+                "Enchanted Book (Looting IV)",
+                "Enchanted Book (Looting V)"
+              ]
+            },
+            {
+              "Luck": [
+                "Enchanted Book (Luck VI)",
+                "Enchanted Book (Luck VII)"
+              ]
+            },
+            {
+              "Mana Steal": [
+                "Enchanted Book (Mana Steal I)",
+                "Enchanted Book (Mana Steal II)",
+                "Enchanted Book (Mana Steal III)"
+              ]
+            },
+            {
+              "Mana Vampire": [
+                "Enchanted Book (Mana Vampire I)",
+                "Enchanted Book (Mana Vampire II)",
+                "Enchanted Book (Mana Vampire III)",
+                "Enchanted Book (Mana Vampire IV)",
+                "Enchanted Book (Mana Vampire V)",
+                "Enchanted Book (Mana Vampire VI)",
+                "Enchanted Book (Mana Vampire VII)",
+                "Enchanted Book (Mana Vampire VIII)",
+                "Enchanted Book (Mana Vampire IX)",
+                "Enchanted Book (Mana Vampire X)"
+              ]
+            },
+            {
+              "Overload": [
+                "Enchanted Book (Overload I)",
+                "Enchanted Book (Overload II)",
+                "Enchanted Book (Overload III)",
+                "Enchanted Book (Overload IV)",
+                "Enchanted Book (Overload V)"
+              ]
+            },
+            {
+              "Paleontologist": [
+                "Enchanted Book (Paleontologist I)",
+                "Enchanted Book (Paleontologist II)",
+                "Enchanted Book (Paleontologist III)",
+                "Enchanted Book (Paleontologist IV)",
+                "Enchanted Book (Paleontologist V)"
+              ]
+            },
+            {
+              "Pesterminator": [
+                "Enchanted Book (Pesterminator I)",
+                "Enchanted Book (Pesterminator II)",
+                "Enchanted Book (Pesterminator III)",
+                "Enchanted Book (Pesterminator IV)",
+                "Enchanted Book (Pesterminator V)"
+              ]
+            },
+            {
+              "Power": [
+                "Enchanted Book (Power VI)",
+                "Enchanted Book (Power VII)"
+              ]
+            },
+            {
+              "Prismatic": [
+                "Enchanted Book (Prismatic I)",
+                "Enchanted Book (Prismatic II)",
+                "Enchanted Book (Prismatic III)",
+                "Enchanted Book (Prismatic IV)",
+                "Enchanted Book (Prismatic V)"
+              ]
+            },
+            {
+              "Projectile Protection": [
+                "Enchanted Book (Projectile Protection VI)",
+                "Enchanted Book (Projectile Protection VII)"
+              ]
+            },
+            {
+              "Prosperity": [
+                "Enchanted Book (Prosperity I)",
+                "Enchanted Book (Prosperity II)",
+                "Enchanted Book (Prosperity III)",
+                "Enchanted Book (Prosperity IV)",
+                "Enchanted Book (Prosperity V)"
+              ]
+            },
+            {
+              "Protection": [
+                "Enchanted Book (Protection VI)",
+                "Enchanted Book (Protection VII)"
+              ]
+            },
+            {
+              "Quantum": [
+                "Enchanted Book (Quantum III)",
+                "Enchanted Book (Quantum IV)",
+                "Enchanted Book (Quantum V)"
+              ]
+            },
+            {
+              "Quick Bite": [
+                "Enchanted Book (Quick Bite I)",
+                "Enchanted Book (Quick Bite II)",
+                "Enchanted Book (Quick Bite III)",
+                "Enchanted Book (Quick Bite IV)",
+                "Enchanted Book (Quick Bite V)"
+              ]
+            },
+            {
+              "Reflection": [
+                "Enchanted Book (Reflection I)",
+                "Enchanted Book (Reflection II)",
+                "Enchanted Book (Reflection III)",
+                "Enchanted Book (Reflection IV)",
+                "Enchanted Book (Reflection V)"
+              ]
+            },
+            {
+              "Rejuvenate": [
+                "Enchanted Book (Rejuvenate I)",
+                "Enchanted Book (Rejuvenate II)",
+                "Enchanted Book (Rejuvenate III)",
+                "Enchanted Book (Rejuvenate IV)",
+                "Enchanted Book (Rejuvenate V)"
+              ]
+            },
+            {
+              "Respite": [
+                "Enchanted Book (Respite I)",
+                "Enchanted Book (Respite II)",
+                "Enchanted Book (Respite III)",
+                "Enchanted Book (Respite IV)",
+                "Enchanted Book (Respite V)"
+              ]
+            },
+            {
+              "Scavenger": [
+                "Enchanted Book (Scavenger IV)",
+                "Enchanted Book (Scavenger V)"
+              ]
+            },
+            {
+              "Scuba": [
+                "Enchanted Book (Scuba III)",
+                "Enchanted Book (Scuba IV)",
+                "Enchanted Book (Scuba V)"
+              ]
+            },
+            {
+              "Sharpness": [
+                "Enchanted Book (Sharpness VI)",
+                "Enchanted Book (Sharpness VII)"
+              ]
+            },
+            {
+              "Small Brain": [
+                "Enchanted Book (Small Brain III)",
+                "Enchanted Book (Small Brain IV)",
+                "Enchanted Book (Small Brain V)"
+              ]
+            },
+            {
+              "Smarty Pants": [
+                "Enchanted Book (Smarty Pants I)",
+                "Enchanted Book (Smarty Pants II)",
+                "Enchanted Book (Smarty Pants III)",
+                "Enchanted Book (Smarty Pants IV)",
+                "Enchanted Book (Smarty Pants V)"
+              ]
+            },
+            {
+              "Smite": [
+                "Enchanted Book (Smite VI)",
+                "Enchanted Book (Smite VII)"
+              ]
+            },
+            {
+              "Smoldering": [
+                "Enchanted Book (Smoldering I)",
+                "Enchanted Book (Smoldering II)",
+                "Enchanted Book (Smoldering III)",
+                "Enchanted Book (Smoldering IV)",
+                "Enchanted Book (Smoldering V)"
+              ]
+            },
+            {
+              "Strong Mana": [
+                "Enchanted Book (Strong Mana I)",
+                "Enchanted Book (Strong Mana II)",
+                "Enchanted Book (Strong Mana III)",
+                "Enchanted Book (Strong Mana IV)",
+                "Enchanted Book (Strong Mana V)",
+                "Enchanted Book (Strong Mana VI)",
+                "Enchanted Book (Strong Mana VII)",
+                "Enchanted Book (Strong Mana VIII)",
+                "Enchanted Book (Strong Mana IX)",
+                "Enchanted Book (Strong Mana X)"
+              ]
+            },
+            {
+              "Sugar Rush": [
+                "Enchanted Book (Sugar Rush I)",
+                "Enchanted Book (Sugar Rush II)",
+                "Enchanted Book (Sugar Rush III)"
+              ]
+            },
+            {
+              "Sunder": [
+                "Enchanted Book (Sunder I)",
+                "Enchanted Book (Sunder II)",
+                "Enchanted Book (Sunder III)",
+                "Enchanted Book (Sunder IV)",
+                "Enchanted Book (Sunder V)",
+                "Enchanted Book (Sunder VI)"
+              ]
+            },
+            {
+              "Tabasco": [
+                "Enchanted Book (Tabasco II)",
+                "Enchanted Book (Tabasco III)"
+              ]
+            },
+            {
+              "Thunderbolt": [
+                "Enchanted Book (Thunderbolt VI)",
+                "Enchanted Book (Thunderbolt VII)"
+              ]
+            },
+            {
+              "Thunderlord": [
+                "Enchanted Book (Thunderlord VI)",
+                "Enchanted Book (Thunderlord VII)"
+              ]
+            },
+            {
+              "Tidal": [
+                "Enchanted Book (Tidal I)",
+                "Enchanted Book (Tidal II)",
+                "Enchanted Book (Tidal III)"
+              ]
+            },
+            {
+              "Titan Killer": [
+                "Enchanted Book (Titan Killer VI)",
+                "Enchanted Book (Titan Killer VII)"
+              ]
+            },
+            {
+              "Transylvanian": [
+                "Enchanted Book (Transylvanian IV)",
+                "Enchanted Book (Transylvanian V)"
+              ]
+            },
+            {
+              "Turbo-Cacti": [
+                "Enchanted Book (Turbo-Cacti I)",
+                "Enchanted Book (Turbo-Cacti II)",
+                "Enchanted Book (Turbo-Cacti III)",
+                "Enchanted Book (Turbo-Cacti IV)",
+                "Enchanted Book (Turbo-Cacti V)"
+              ]
+            },
+            {
+              "Turbo-Cane": [
+                "Enchanted Book (Turbo-Cane I)",
+                "Enchanted Book (Turbo-Cane II)",
+                "Enchanted Book (Turbo-Cane III)",
+                "Enchanted Book (Turbo-Cane IV)",
+                "Enchanted Book (Turbo-Cane V)"
+              ]
+            },
+            {
+              "Turbo-Carrot": [
+                "Enchanted Book (Turbo-Carrot I)",
+                "Enchanted Book (Turbo-Carrot II)",
+                "Enchanted Book (Turbo-Carrot III)",
+                "Enchanted Book (Turbo-Carrot IV)",
+                "Enchanted Book (Turbo-Carrot V)"
+              ]
+            },
+            {
+              "Turbo-Cocoa": [
+                "Enchanted Book (Turbo-Cocoa I)",
+                "Enchanted Book (Turbo-Cocoa II)",
+                "Enchanted Book (Turbo-Cocoa III)",
+                "Enchanted Book (Turbo-Cocoa IV)",
+                "Enchanted Book (Turbo-Cocoa V)"
+              ]
+            },
+            {
+              "Turbo-Melon": [
+                "Enchanted Book (Turbo-Melon I)",
+                "Enchanted Book (Turbo-Melon II)",
+                "Enchanted Book (Turbo-Melon III)",
+                "Enchanted Book (Turbo-Melon IV)",
+                "Enchanted Book (Turbo-Melon V)"
+              ]
+            },
+            {
+              "Turbo-Mushrooms": [
+                "Enchanted Book (Turbo-Mushrooms I)",
+                "Enchanted Book (Turbo-Mushrooms II)",
+                "Enchanted Book (Turbo-Mushrooms III)",
+                "Enchanted Book (Turbo-Mushrooms IV)",
+                "Enchanted Book (Turbo-Mushrooms V)"
+              ]
+            },
+            {
+              "Turbo-Potato": [
+                "Enchanted Book (Turbo-Potato I)",
+                "Enchanted Book (Turbo-Potato II)",
+                "Enchanted Book (Turbo-Potato III)",
+                "Enchanted Book (Turbo-Potato IV)",
+                "Enchanted Book (Turbo-Potato V)"
+              ]
+            },
+            {
+              "Turbo-Pumpkin": [
+                "Enchanted Book (Turbo-Pumpkin I)",
+                "Enchanted Book (Turbo-Pumpkin II)",
+                "Enchanted Book (Turbo-Pumpkin III)",
+                "Enchanted Book (Turbo-Pumpkin IV)",
+                "Enchanted Book (Turbo-Pumpkin V)"
+              ]
+            },
+            {
+              "Turbo-Warts": [
+                "Enchanted Book (Turbo-Warts I)",
+                "Enchanted Book (Turbo-Warts II)",
+                "Enchanted Book (Turbo-Warts III)",
+                "Enchanted Book (Turbo-Warts IV)",
+                "Enchanted Book (Turbo-Warts V)"
+              ]
+            },
+            {
+              "Turbo-Wheat": [
+                "Enchanted Book (Turbo-Wheat I)",
+                "Enchanted Book (Turbo-Wheat II)",
+                "Enchanted Book (Turbo-Wheat III)",
+                "Enchanted Book (Turbo-Wheat IV)",
+                "Enchanted Book (Turbo-Wheat V)"
+              ]
+            },
+            {
+              "Vicious": [
+                "Enchanted Book (Vicious III)",
+                "Enchanted Book (Vicious IV)",
+                "Enchanted Book (Vicious V)"
+              ]
+            },
+            {
+              "Woodsplitter": [
+                "Enchanted Book (Woodsplitter I)",
+                "Enchanted Book (Woodsplitter II)",
+                "Enchanted Book (Woodsplitter III)",
+                "Enchanted Book (Woodsplitter IV)",
+                "Enchanted Book (Woodsplitter V)"
+              ]
+            }
+          ]
+        },
+        {
+          "Ultimate Enchantments": [
+            "Enchanted Book (One For All I)",
+            {
+              "Bank": [
+                "Enchanted Book (Bank I)",
+                "Enchanted Book (Bank II)",
+                "Enchanted Book (Bank III)",
+                "Enchanted Book (Bank IV)",
+                "Enchanted Book (Bank V)"
+              ]
+            },
+            {
+              "Bobbin' Time": [
+                "Enchanted Book (Bobbin' Time III)",
+                "Enchanted Book (Bobbin' Time IV)",
+                "Enchanted Book (Bobbin' Time V)"
+              ]
+            },
+            {
+              "Chimera": [
+                "Enchanted Book (Chimera I)",
+                "Enchanted Book (Chimera II)",
+                "Enchanted Book (Chimera III)",
+                "Enchanted Book (Chimera IV)",
+                "Enchanted Book (Chimera V)"
+              ]
+            },
+            {
+              "Combo": [
+                "Enchanted Book (Combo I)",
+                "Enchanted Book (Combo II)",
+                "Enchanted Book (Combo III)",
+                "Enchanted Book (Combo IV)",
+                "Enchanted Book (Combo V)"
+              ]
+            },
+            {
+              "Duplex": [
+                "Enchanted Book (Duplex I)",
+                "Enchanted Book (Duplex II)",
+                "Enchanted Book (Duplex III)",
+                "Enchanted Book (Duplex IV)",
+                "Enchanted Book (Duplex V)"
+              ]
+            },
+            {
+              "Fatal Tempo": [
+                "Enchanted Book (Fatal Tempo I)",
+                "Enchanted Book (Fatal Tempo II)",
+                "Enchanted Book (Fatal Tempo III)",
+                "Enchanted Book (Fatal Tempo IV)",
+                "Enchanted Book (Fatal Tempo V)"
+              ]
+            },
+            {
+              "First Impression": [
+                "Enchanted Book (First Impression I)",
+                "Enchanted Book (First Impression II)",
+                "Enchanted Book (First Impression III)",
+                "Enchanted Book (First Impression IV)",
+                "Enchanted Book (First Impression V)"
+              ]
+            },
+            {
+              "Flash": [
+                "Enchanted Book (Flash I)",
+                "Enchanted Book (Flash II)",
+                "Enchanted Book (Flash III)",
+                "Enchanted Book (Flash IV)",
+                "Enchanted Book (Flash V)"
+              ]
+            },
+            {
+              "Flowstate": [
+                "Enchanted Book (Flowstate I)",
+                "Enchanted Book (Flowstate II)",
+                "Enchanted Book (Flowstate III)"
+              ]
+            },
+            {
+              "Habanero Tactics": [
+                "Enchanted Book (Habanero Tactics IV)",
+                "Enchanted Book (Habanero Tactics V)"
+              ]
+            },
+            {
+              "Inferno": [
+                "Enchanted Book (Inferno I)",
+                "Enchanted Book (Inferno II)",
+                "Enchanted Book (Inferno III)",
+                "Enchanted Book (Inferno IV)",
+                "Enchanted Book (Inferno V)"
+              ]
+            },
+            {
+              "Last Stand": [
+                "Enchanted Book (Last Stand I)",
+                "Enchanted Book (Last Stand II)",
+                "Enchanted Book (Last Stand III)",
+                "Enchanted Book (Last Stand IV)",
+                "Enchanted Book (Last Stand V)"
+              ]
+            },
+            {
+              "Legion": [
+                "Enchanted Book (Legion I)",
+                "Enchanted Book (Legion II)",
+                "Enchanted Book (Legion III)",
+                "Enchanted Book (Legion IV)",
+                "Enchanted Book (Legion V)"
+              ]
+            },
+            {
+              "Missile": [
+                "Enchanted Book (Missile I)",
+                "Enchanted Book (Missile II)",
+                "Enchanted Book (Missile III)",
+                "Enchanted Book (Missile IV)",
+                "Enchanted Book (Missile V)"
+              ]
+            },
+            {
+              "No Pain No Gain": [
+                "Enchanted Book (No Pain No Gain I)",
+                "Enchanted Book (No Pain No Gain II)",
+                "Enchanted Book (No Pain No Gain III)",
+                "Enchanted Book (No Pain No Gain IV)",
+                "Enchanted Book (No Pain No Gain V)"
+              ]
+            },
+            {
+              "Refrigerate": [
+                "Enchanted Book (Refrigerate I)",
+                "Enchanted Book (Refrigerate II)",
+                "Enchanted Book (Refrigerate III)",
+                "Enchanted Book (Refrigerate IV)",
+                "Enchanted Book (Refrigerate V)"
+              ]
+            },
+            {
+              "Rend": [
+                "Enchanted Book (Rend I)",
+                "Enchanted Book (Rend II)",
+                "Enchanted Book (Rend III)",
+                "Enchanted Book (Rend IV)",
+                "Enchanted Book (Rend V)"
+              ]
+            },
+            {
+              "Soul Eater": [
+                "Enchanted Book (Soul Eater I)",
+                "Enchanted Book (Soul Eater II)",
+                "Enchanted Book (Soul Eater III)",
+                "Enchanted Book (Soul Eater IV)",
+                "Enchanted Book (Soul Eater V)"
+              ]
+            },
+            {
+              "Swarm": [
+                "Enchanted Book (Swarm I)",
+                "Enchanted Book (Swarm II)",
+                "Enchanted Book (Swarm III)",
+                "Enchanted Book (Swarm IV)",
+                "Enchanted Book (Swarm V)"
+              ]
+            },
+            {
+              "The One": [
+                "Enchanted Book (The One IV)",
+                "Enchanted Book (The One V)"
+              ]
+            },
+            {
+              "Ultimate Jerry": [
+                "Enchanted Book (Ultimate Jerry I)",
+                "Enchanted Book (Ultimate Jerry II)",
+                "Enchanted Book (Ultimate Jerry III)",
+                "Enchanted Book (Ultimate Jerry IV)",
+                "Enchanted Book (Ultimate Jerry V)"
+              ]
+            },
+            {
+              "Ultimate Wise": [
+                "Enchanted Book (Ultimate Wise I)",
+                "Enchanted Book (Ultimate Wise II)",
+                "Enchanted Book (Ultimate Wise III)",
+                "Enchanted Book (Ultimate Wise IV)",
+                "Enchanted Book (Ultimate Wise V)"
+              ]
+            },
+            {
+              "Wisdom": [
+                "Enchanted Book (Wisdom I)",
+                "Enchanted Book (Wisdom II)",
+                "Enchanted Book (Wisdom III)",
+                "Enchanted Book (Wisdom IV)",
+                "Enchanted Book (Wisdom V)"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "EXP Bottles": [
+        "Experience Bottle",
+        "Grand Experience Bottle",
+        "Titanic Experience Bottle",
+        "Colossal Experience Bottle"
+      ]
+    },
+    {
+      "Shards": [
+        "Blank Icon Abyssal Lantern Shard",
+        "Aero Shard",
+        "Alligator Shard",
+        "Ananke Shard",
+        "Apex Dragon Shard",
+        "Arachne Shard",
+        "Azure Shard",
+        "Bal Shard",
+        "Bambloom Shard",
+        "Bambuleaf Shard",
+        "Barbarian Duke X Shard",
+        "Basilisk Shard",
+        "Beaconmite Shard",
+        "Bezal Shard",
+        "Birries Shard",
+        "Bitbug Shard",
+        "Blizzard Shard",
+        "Bogged Shard",
+        "Bolt Shard",
+        "Boreal Owl Shard",
+        "Bramble Shard",
+        "Bruiser Shard",
+        "Bullfrog Shard",
+        "Burningsoul Shard",
+        "Caiman Shard",
+        "Carrot King Shard",
+        "Cascade Shard",
+        "Cavernshade Shard",
+        "Chameleon Shard",
+        "Chill Shard",
+        "Blank Icon Cinder Bat Shard",
+        "Cod Shard",
+        "Condor Shard",
+        "Coralot Shard",
+        "Crocodile Shard",
+        "Cropeetle Shard",
+        "Crow Shard",
+        "Cryo Shard",
+        "Cuboa Shard",
+        "Daemon Shard",
+        "Dodo Shard",
+        "Draconic Shard",
+        "Dragonfly Shard",
+        "Dreadwing Shard",
+        "Drowned Shard",
+        "Eel Shard",
+        "Endstone Protector Shard",
+        "Ent Shard",
+        "Etherdrake Shard",
+        "Falcon Shard",
+        "Fenlord Shard",
+        "Firefly Shard",
+        "Fire Eel Shard",
+        "Flaming Spider Shard",
+        "Flare Shard",
+        "Flash Shard",
+        "Fungloom Shard",
+        "Galaxy Fish Shard",
+        "Gecko Shard",
+        "Ghost Shard",
+        "Glacite Walker Shard",
+        "Golden Ghoul Shard",
+        "Goldfin Shard",
+        "Grove Shard",
+        "Harpy Shard",
+        "Hellwisp Shard",
+        "Heron Shard",
+        "Hideonbox Shard",
+        "Hideoncave Shard",
+        "Hideondra Shard",
+        "Hideongeon Shard",
+        "Hideongift Shard",
+        "Hideonleaf Shard",
+        "Hideonring Shard",
+        "Hideonsack Shard",
+        "Iguana Shard",
+        "Inferno Koi Shard",
+        "Invisibug Shard",
+        "Jormung Shard",
+        "Joydive Shard",
+        "Kada Knight Shard",
+        "King Cobra Shard",
+        "Kiwi Shard",
+        "Komodo Dragon Shard",
+        "Kraken Shard",
+        "Ladybug Shard",
+        "Lapis Creeper Shard",
+        "Lapis Skeleton Shard",
+        "Lapis Zombie Shard",
+        "Lava Flame Shard",
+        "Leatherback Shard",
+        "Leviathan Shard",
+        "Lizard King Shard",
+        "Lord Jawbus Shard",
+        "Lumisquid Shard",
+        "Lunar Moth Shard",
+        "Magma Slug Shard",
+        "Matcho Shard",
+        "Megalith Shard",
+        "Mimic Shard",
+        "Miner Zombie Shard",
+        "Mist Shard",
+        "Mochibear Shard",
+        "Moltenfish Shard",
+        "Molthorn Shard",
+        "Moray Eel Shard",
+        "Mossybit Shard",
+        "Mudworm Shard",
+        "Naga Shard",
+        "Newt Shard",
+        "Night Squid Shard",
+        "Obsidian Defender Shard",
+        "Pandarai Shard",
+        "Pest Shard",
+        "Phanflare Shard",
+        "Phanpyre Shard",
+        "Piranha Shard",
+        "Power Dragon Shard",
+        "Praying Mantis Shard",
+        "Prince Shard",
+        "Python Shard",
+        "Quake Shard",
+        "Quartzfang Shard",
+        "Rain Slime Shard",
+        "Rana Shard",
+        "Revenant Shard",
+        "Salamander Shard",
+        "Salmon Shard",
+        "Scarf Shard",
+        "Seagull Shard",
+        "Sea Emperor Shard",
+        "Sea Serpent Shard",
+        "Seer Shard",
+        "Shellwise Shard",
+        "Shinyfish Shard",
+        "Silentdepth Shard",
+        "Skeletor Shard",
+        "Snowfin Shard",
+        "Blank Icon Soul Of The Alpha Shard",
+        "Sparrow Shard",
+        "Spike Shard",
+        "Stalagmight Shard",
+        "Starborn Shard",
+        "Star Sentry Shard",
+        "Stridersurfer Shard",
+        "Sun Fish Shard",
+        "Sycophant Shard",
+        "Sylvan Shard",
+        "Tadgang Shard",
+        "Tank Zombie Shard",
+        "Taurus Shard",
+        "Tempest Shard",
+        "Tenebris Shard",
+        "Termite Shard",
+        "Terra Shard",
+        "Thorn Shard",
+        "Thyst Shard",
+        "Tiamat Shard",
+        "Tide Shard",
+        "Toad Shard",
+        "Tortoise Shard",
+        "Toucan Shard",
+        "Troglobyte Shard",
+        "Verdant Shard",
+        "Viper Shard",
+        "Voracious Spider Shard",
+        "Wartybug Shard",
+        "Water Hydra Shard",
+        "Wither Shard",
+        "Wither Specter Shard",
+        "Wyvern Shard",
+        "XYZ Shard",
+        "Yog Shard",
+        "Zealot Shard",
+        "Zombie Soldier Shard"
+      ]
+    },
+    {
+      "Reforge Stones": [
+        "Hardened Wood",
+        "Overflowing Trash Can",
+        "Salt Cube",
+        "Warped Stone",
+        "Blazen Sphere",
+        "Blaze Wax",
+        "Burrowing Spores",
+        "Calcified Heart",
+        "Candy Corn",
+        "Diamond Atom",
+        "Diamonite",
+        "Dragon Claw",
+        "Dragon Scale",
+        "Dwarven Treasure",
+        "End Stone Geode",
+        "Entropy Suppressor",
+        "Flowering Bouquet",
+        "Full-Jaw Fanging Kit",
+        "Jaderald",
+        "Jerry Stone",
+        "Lapis Crystal",
+        "Large Walnut",
+        "Mangrove Gem",
+        "Meteor Shard",
+        "Midas Jewel",
+        "Molten Cube",
+        "Moonglade Jewel",
+        "Necromancer's Brooch",
+        "Black Diamond",
+        "Optical Lens",
+        "Overgrown Grass",
+        "Pitchin' Koi",
+        "Premium Flesh",
+        "Presumed Gallon of Red Paint",
+        "Pure Mithril",
+        "Rare Diamond",
+        "Red Nose",
+        "Red Scarf",
+        "Dwarven Geode",
+        "Rusty Anchor",
+        "Kaleidoscopic Mineral",
+        "Searing Stone",
+        "Shiny Prism",
+        "SkyMart Brochure",
+        "Spirit Stone",
+        "Squeaky Toy",
+        "Suspicious Vial",
+        "Terry's Snowglobe",
+        "Titanium Tesseract",
+        "Amber Material",
+        "Beady Eyes",
+        "Blessed Fruit",
+        "Bulky Stone",
+        "Clipped Wings",
+        "Deep Sea Orb",
+        "Dragon Horn",
+        "Frozen Bauble",
+        "Giant Tooth",
+        "Gleaming Crystal",
+        "Golden Ball",
+        "Kuudra Mandible",
+        "Lucky Dice",
+        "Petrified Starfall",
+        "Pocket Iceberg",
+        "Precursor Gear",
+        "Andesite Whetstone",
+        "Sadan's Brooch",
+        "Wither Blood",
+        "Frigid Husk",
+        "Scorched Topaz"
+      ]
+    },
+    {
+      "Power Stones": [
+        "Displaced Leech",
+        "Luxurious Spool",
+        "Rock Candy",
+        "Acacia Birdhouse",
+        "Beating Heart",
+        "Dark Orb",
+        "Ender Monocle",
+        "End Stone Shulker",
+        "Furball",
+        "Mandraa",
+        "Obsidian Tablet",
+        "Horns of Torment",
+        "Magma Urchin",
+        "Precious Pearl",
+        "Bubba Blister",
+        "Fang-tastic Chocolate Chip",
+        "Eccentric Painting",
+        "Glacite Shard",
+        "Hazmat Enderman",
+        "Vitamin Death",
+        "Scorched Books"
+      ]
+    },
+    {
+      "Pet Upgrades": [
+        "Lucky Clover Core",
+        "Exp Share Core",
+        "Tier Boost Core",
+        "Radioactive Vial",
+        "Enderman Cortex Rewriter",
+        "Jerry 3D Glasses",
+        "Vampire Fang",
+        "Mixed Mite Gel",
+        "Pure Mithril Gem",
+        "Black Woolen Yarn",
+        "Magic Top Hat",
+        "Guardian Lucky Block",
+        "Chocolate Syringe",
+        "Scuttler Shell",
+        {
+          "Pet Candies": [
+            "Simple Carrot Candy",
+            "Great Carrot Candy",
+            "Superb Carrot Candy",
+            "Ultimate Carrot Candy",
+            "Chyme",
+            "Pet Cake"
+          ]
+        }
+      ]
+    },
+    {
+      "Inferno Minion": [
+        "Crude Gabagool",
+        "Very Crude Gabagool",
+        "Fuel Gabagool",
+        "Heavy Gabagool",
+        "Hypergolic Gabagool",
+        "Inferno Vertex",
+        "Inferno Apex",
+        "Reaper Pepper",
+        "Chili Pepper",
+        "Stuffed Chili Pepper",
+        "Inferno Fuel Block",
+        "Hypergolic Ionized Ceramics",
+        "Sulphuric Coal",
+        "Re-heated Gummy Polar Bear",
+        "Capsaicin Eyedrops"
+      ]
+    },
+    {
+      "Minion Upgrades": [
+        "Diamond Spreading",
+        "Minion Expander",
+        "Potato Spreading",
+        "Auto Smelter",
+        "Soulflow Engine",
+        "Lesser Soulflow Engine",
+        "Budget Hopper",
+        "Enchanted Hopper",
+        "Corrupt Soil",
+        "Mithril Infusion",
+        "Berberis Fuel Injector",
+        "Flycatcher",
+        "Sleepy Hollow",
+        "Free Will",
+        "Fishing Minion XII Upgrade Stone",
+        "Clay Minion XII Upgrade Stone",
+        "Revenant Minion XII Upgrade Stone",
+        "Tarantula Minion XII Upgrade Stone",
+        {
+          "Minion Storage": [
+            "Small Storage",
+            "Medium Storage",
+            "Large Storage",
+            "X-Large Storage",
+            "XX-Large Storage"
+          ]
+        },
+        {
+          "Compactors": [
+            "Compactor",
+            "Dwarven Super Compactor",
+            "Super Compactor 3000"
+          ]
+        }
+      ]
+    },
+    {
+      "Fuels": [
+        "Enchanted Lava Bucket",
+        "Magma Bucket",
+        "Plasma Bucket",
+        "Hamster Wheel",
+        "Foul Flesh",
+        "Power Crystal",
+        "Catalyst",
+        "Hyper Catalyst",
+        "Solar Panel",
+        "Oil Barrel",
+        "Scorched Power Crystal",
+        "Volta"
+      ]
+    },
+    {
+      "Essence": [
+        "Wither Essence",
+        "Spider Essence",
+        "Undead Essence",
+        "Dragon Essence",
+        "Gold Essence",
+        "Diamond Essence",
+        "Ice Essence",
+        "Crimson Essence",
+        "Forest Essence"
+      ]
+    },
+    {
+      "Events": [
+        "Jacob's Ticket",
+        "Agatha's Coupon",
+        {
+          "Spooky": [
+            "Green Candy",
+            "Purple Candy",
+            "Dark Candy",
+            "Ectoplasm",
+            "Pumpkin Guts",
+            "Spooky Shard",
+            "Werewolf Skin",
+            "Soul Fragment",
+            "Bat Firework",
+            "Blast o' Lantern",
+            "Horseman's Candle",
+            "Expired Pumpkin"
+          ]
+        },
+        {
+          "Winter": [
+            "White Gift",
+            "Green Gift",
+            "Red Gift",
+            "Party Gift",
+            "Refined Bottle of Jyrre",
+            "Volcanic Rock"
+          ]
+        },
+        {
+          "Minerals": [
+            "Refined Mineral",
+            "Glossy Gemstone"
+          ]
+        },
+        {
+          "Mythological": [
+            "Griffin Feather",
+            "Daedalus Stick",
+            "Ancient Claw",
+            "Enchanted Ancient Claw"
+          ]
+        },
+        {
+          "Fishing Festival": [
+            "Nurse Shark Tooth",
+            "Blue Shark Tooth",
+            "Tiger Shark Tooth",
+            "Great White Shark Tooth",
+            "Shark Fin",
+            "Enchanted Shark Fin",
+            "Great White Tooth Meal"
+          ]
+        },
+        {
+          "Jerry Boxes": [
+            "Green Jerry Box",
+            "Blue Jerry Box",
+            "Purple Jerry Box",
+            "Golden Jerry Box"
+          ]
+        },
+        {
+          "Diaz": [
+            "Avaricious Chalice",
+            "Freshly-Minted Coins",
+            "Blood-Stained Coins",
+            "Blood-Soaked Coins"
+          ]
+        },
+        {
+          "Hoppity's Hunt": [
+            "Supreme Chocolate Bar",
+            "Refined Dark Cacao Truffle"
+          ]
+        },
+        {
+          "Year of the Seal": [
+            "Bouncy Beach Ball",
+            "Giant Bouncy Beach Ball"
+          ]
+        }
+      ]
+    },
+    {
+      "Consumables": [
+        "Magical Mushroom Soup",
+        "Mystical Mushroom Soup",
+        "Metaphysical Serum",
+        "Dwarven O's Ore Oats",
+        "Dwarven O's Block Bran",
+        "Dwarven O's Gemstone Grahams",
+        "Dwarven O's Metallic Minis",
+        "Spotlite",
+        "Moby-Duck: Collector's Edition",
+        "Vial of Venom",
+        "Festering Maggot"
+      ]
+    },
+    {
+      "Cross-Dimensional": [
+        "Lush Berberis",
+        "Enchanted Lush Berberis",
+        "Agarimoo Tongue",
+        "Exportable Carrots",
+        "Hemovibe",
+        "Hemoglass",
+        "Hemobomb",
+        "Highlite",
+        "Extremely Real Shuriken"
+      ]
+    },
+    {
+      "Upgrade Fragments": [
+        "Bonzo Fragment",
+        "Dark Queen's Soul",
+        "Golden Fragment",
+        "Livid Fragment",
+        "Scarf Fragment",
+        "Thorn Fragment",
+        "Winter Fragment"
+      ]
+    }
+  ]
+}
